@@ -10,7 +10,7 @@ tools-used:
 	astrolabe
 
 optional-dependencies:
-	- TomTom
+	- tomtom
 	
 enable-nolib-creation: yes
 
