@@ -84,6 +84,7 @@ local defaults = {
 			showSkillBar = true,
 			sinkOptions = { },
 			easyCast = false,
+			autoLoot = true,
 		},
 		artifact = {
 			show = true,
@@ -260,6 +261,18 @@ local generalOptions = {
 			get = function() return db.general.easyCast end,
 			set = function(_, value) 
 				db.general.easyCast = value
+				Archy:ConfigUpdated()
+			end,
+			width = "full",
+		},	
+		autoLoot = {
+			order = 7,
+			name = L["AutoLoot Fragments and Key Stones"],
+			desc = L["Enable the addon to auto-loot fragments and key stones for you."],
+			type = "toggle",
+			get = function() return db.general.autoLoot end,
+			set = function(_, value) 
+				db.general.autoLoot = value
 				Archy:ConfigUpdated()
 			end,
 			width = "full",
@@ -1400,7 +1413,7 @@ local function IsTaintable()
 end
 
 local function ShouldBeHidden()
-	if not db.general.show or IsInInstance() or not HasArchaeology() or not playerContinent then
+	if (not db.general.show) or IsInInstance() or (not HasArchaeology()) or (not playerContinent) then
 		return true
 	end
 end
@@ -1883,6 +1896,7 @@ local function AddSurveyNode(siteId, map, level, x, y)
 	local newNode = { m = map, f = level, x = x, y = y }
 	local exists = false
 	
+	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
 	if not Archy.db.global.surveyNodes[siteId] then Archy.db.global.surveyNodes[siteId] = {} end
 	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do	
 		local distance = astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
@@ -2785,7 +2799,7 @@ function Archy:CurrencyUpdated()
 			
 			AddSurveyNode(lastSite.id, playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y)
 			surveyPosition.map, surveyPosition.level, surveyPosition.x, surveyPosition.y = 0, 0, 0, 0		-- clear the last survey position
-			UpdateMinimapPOIs()
+			UpdateMinimapPOIs(true)
 			self:RefreshRacesDisplay()
 			self:RefreshDigSiteDisplay()
 		end
@@ -3035,7 +3049,10 @@ function Archy:RefreshRacesDisplay()
 		child.crest.tooltip = race['name']
 		child.crest.text:SetText(race['name'])
 		child.icon.texture:SetTexture(artifact['icon'])
-		child.icon.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
+		child.icon.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip'] 
+			.. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+			
+
 		--child.fragmentBar:SetStatusBarTexture(artifact['rare'] and [[Interface\Addons\Archy\Media\Arch-Progress-Rare-Fill]] or [[Interface\Archeology\Arch-Progress-Fill]])
 		if artifact['rare'] then
 			child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.1953125, 0.3671875)			-- rare
@@ -3518,6 +3535,23 @@ function Archy:OnPlayerLogin()
 	CreateSAButton("Archy_SurveyButton", Archy.CheckOverride)
 end
 
-function Archy:OnPlayerLooting(event)
+function Archy:OnPlayerLooting(event, ...)
 	isLooting = (event == "LOOT_OPENED")
+	local autoLootEnabled = ...
+	if autoLootEnabled == 1 then return end
+	if isLooting and db.general.autoLoot then
+		for slotNum = 1, GetNumLootItems() do
+			if LootSlotIsCurrency(slotNum) then
+				LootSlot(slotNum)
+			elseif LootSlotIsItem(slotNum) then
+				local link = GetLootSlotLink(slotNum)
+				if link then
+					local itemID = GetIDFromLink(link)
+					if itemID and keystoneIDToRaceID[itemID] then
+						LootSlot(slotNum)
+					end
+				end
+			end
+		end
+	end
 end
