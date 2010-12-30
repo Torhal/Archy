@@ -1,3 +1,13 @@
+v1.7b6 - 31-Dec-2010
+* Fixed a bug with the survey nodes table not being initialized
+* Fixed a bug with the Archy being locked and using a portal
+* Changed the default progress bar color to a grayish white.  
+* If you haven't solve the common artifact before, the progress bar will be the orange-brownish color
+* If you can solve the artifact with keystones but haven't attached them yet, the progress bar will be a light green
+* Rare projects now have a unique progress bar background
+* Added the number of times solved for the current artifact to the icon tooltip
+* Added the number of keystones you have in your inventory to the racial crest icon on the artifacts list
+
 v1.7b5 - 30-Dec-2010
 * Fixed a spam bug for users that don't use TomTom
 * Fixed a bug with the Distance Indicator showing when it shouldn't

@@ -1624,6 +1624,7 @@ function UpdateRaceArtifact(rid)
 		artifact['name'] = name
 		artifact['canSolveStone'] = false
 		artifact['fragAdjust'] = 0
+		artifact['completionCount'] = 0
 		
 		local prevAdded = min(artifact['stonesAdded'], raceData[rid]['keystone']['inventory'], numSockets)
 		if db.artifact.autofill[rid] then
@@ -1644,6 +1645,7 @@ function UpdateRaceArtifact(rid)
 		end
 		artifact['stonesAdded'] = prevAdded		
 		
+		RequestArtifactCompletionHistory()
 		if not db.artifact.blacklist[rid] then
 			if not artifact['ping'] and (artifact['canSolve'] or artifact['canSolveStone']) then
 				if db.artifact.ping or db.artifact.announce then
@@ -1883,7 +1885,7 @@ function Archy:UpdateSiteDistances()
 end
 
 function AnnounceNearestSite()
-	if not nearestSite then return end
+	if not nearestSite or not nearestSite.distance then return end
 	Archy:Pour(string.format(L["Nearest Dig Site is: %s in %s (%.1f yards away)"], GREEN_FONT_COLOR_CODE .. nearestSite.name .. "|r", GREEN_FONT_COLOR_CODE .. nearestSite.zoneName .. "|r", nearestSite.distance), 1, 1, 1)
 end
 
@@ -2223,7 +2225,7 @@ function UpdateSiteBlobs()
 			blob:SetFrameLevel(Minimap:GetFrameLevel() + 2)
 		end
 		
-		if (db.minimap.useBlobDistance and nearestSite and nearestSite.distance > db.minimap.blobDistance) then
+		if (db.minimap.useBlobDistance and nearestSite and nearestSite.distance and (nearestSite.distance > db.minimap.blobDistance)) then
 			if blob:IsShown() then blob:Hide() end
 			return
 		end
@@ -2577,8 +2579,10 @@ function Archy:OnInitialize()
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Minimap", L["Minimap"], "Archy")
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Profiles", L["Profiles"], "Archy")
 	
+	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
 	Archy.db.char.digsites = Archy.db.char.digsites or { stats = {}, blacklist = {} }
 	if not Archy.db.char.digsites.stats then Archy.db.char.digsites.stats = {} end
+	
 	siteStats = Archy.db.char.digsites.stats
 	setmetatable(siteStats, { __index = function(t, k) if k then t[k] = { ['surveys'] = 0, ['fragments'] = 0, ['looted'] = 0, ['keystones'] = 0, ['counter'] = 0 }; return t[k]; end end })
 	
@@ -2683,7 +2687,13 @@ end
 
 --[[ Event Handlers ]]--
 function Archy:ArtifactHistoryReady()
-	-- We don't really need this event presently and is not subscribed to
+	for rid, artifact in pairs(artifacts) do
+		local _, _, completionCount = GetArtifactStats(rid, artifact['name'])
+		if completionCount then
+			artifact['completionCount'] = completionCount
+		end
+	end
+	self:RefreshRacesDisplay()
 end
 
 function Archy:ArtifactUpdated()
@@ -3046,19 +3056,24 @@ function Archy:RefreshRacesDisplay()
 		
 		child:SetID(rid)
 		child.crest.texture:SetTexture(race['texture'])
-		child.crest.tooltip = race['name']
+		child.crest.tooltip = race['name'] .. "\n" .. NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race['keystone']['inventory']
 		child.crest.text:SetText(race['name'])
 		child.icon.texture:SetTexture(artifact['icon'])
+		local _, _, completionCount = GetArtifactStats(rid, artifact['name'])
 		child.icon.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip'] 
+			.. "\n\n" .. HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: "] .. NORMAL_FONT_COLOR_CODE .. (completionCount or "0")
 			.. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 			
 
-		--child.fragmentBar:SetStatusBarTexture(artifact['rare'] and [[Interface\Addons\Archy\Media\Arch-Progress-Rare-Fill]] or [[Interface\Archeology\Arch-Progress-Fill]])
 		if artifact['rare'] then
 			child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.1953125, 0.3671875)			-- rare
 			child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625)		-- rare
 		else
-			child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0, 0.1875)						-- fragments
+			if completionCount == 0 then
+				child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0, 0.1875)						-- fragments
+			else
+				child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)			-- can solve with keystones if they were attached
+			end
 			child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875)					-- bg
 		end
 		child.fragmentBar:SetMinMaxValues(0, artifact['fragTotal'])
@@ -3111,7 +3126,6 @@ function Archy:RefreshRacesDisplay()
 			child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.6015625, 0.7578125)			-- can solve
 		else
 			if (artifact['canSolveStone']) then
-				--child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)			-- can solve with keystones if they were attached
 				child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.796875, 0.953125)		-- can solve with keystones if they were attached
 			end
 			child.solveButton:Disable()
@@ -3227,8 +3241,19 @@ function Archy:RefreshDigSiteDisplay()
 	if ShouldBeHidden() then return end
 
 	local cid = continentMapToID[playerContinent]
+	if not cid then return end
 	if not digsites[cid] or #digsites[cid] == 0 then return end
 	for _,siteFrame in pairs(digsiteFrame.children) do siteFrame:Hide() end
+	
+	local hasNilDistance = false
+	for _, site in pairs(digsites[cid]) do
+		if site.distance == nil then 
+			hasNilDistance = true
+			break
+		end
+	end
+	if hasNilDistance then return end
+	
 	for siteIndex, site in pairs(digsites[cid]) do
 		local siteFrame = digsiteFrame.children[siteIndex]
 		
@@ -3280,7 +3305,7 @@ function Archy:SetFramePosition(frame)
 		frame:ClearAllPoints()
 		frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
 		frame:SetFrameLevel(2)
-		if  frame:GetParent() == UIParent and not IsTaintable() then
+		if  frame:GetParent() == UIParent and not IsTaintable() and not db.general.locked then
 			frame:SetUserPlaced(false)
 		end
 	end
@@ -3489,7 +3514,7 @@ local function WF_OnMouseDown(...)
    if ( button == "RightButton" and HijackCheck() ) then
       if ( CheckForDoubleClick() ) then
           -- We're stealing the mouse-up event, make sure we exit MouseLook
-         if ( IsMouselooking() ) then
+         if ( IsMouselooking() and not InCombatLockdown()) then
             MouselookStop();
          end
          CentralCasting();
