@@ -303,6 +303,7 @@
 							<Anchors>
 								<Anchor point="CENTER" x="0" y="0" />
 							</Anchors>
+							<TexCoords left="0.0" right="0.24609375" top="0.0" bottom="1" />
 						</Texture>
 						<FontString name="$parentDistance" parentKey="distance" inherits="DistanceIndicatorFont" justifyH="CENTER">
 							<Size x="50" y="50" />
