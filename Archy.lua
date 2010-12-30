@@ -365,18 +365,6 @@ local artifactOptions = {
 					end,
 					width = "full",
 				},
-				scale = {
-					order = 7,
-					type = "range",
-					name = L["Size"],
-					desc = L["Set how large the Artifacts list is"],
-					min = 0.25, max = 4, step = 0.01, bigStep = 0.05,
-					get = function() return db.artifact.scale end,
-					set = function(_, value)
-						db.artifact.scale = value
-						Archy:ConfigUpdated('artifact')
-					end,
-				},
 			},
 		},
 		blacklist = {
@@ -452,6 +440,18 @@ local artifactOptions = {
 					order = 0,
 					type = "description",
 					name = L["Control various aspects of how the Artifacts list is displayed"],
+				},
+				scale = {
+					order = 7,
+					type = "range",
+					name = L["Size"],
+					desc = L["Set how large the Artifacts list is"],
+					min = 0.25, max = 4, step = 0.01, bigStep = 0.05,
+					get = function() return db.artifact.scale end,
+					set = function(_, value)
+						db.artifact.scale = value
+						Archy:ConfigUpdated('artifact')
+					end,
 				},
 				alpha = {
 					order = 8,
@@ -1899,7 +1899,7 @@ end
 
 function ShowDistanceIndicator()
 	if not IsTaintable() then
-		if not distanceIndicatorFrame:IsShown() and not ShouldBeHidden() and db.digsite.distanceIndicator.enabled then
+		if not distanceIndicatorFrame:IsShown() and not ShouldBeHidden() and db.digsite.distanceIndicator.enabled and distanceIndicatorActive then
 			distanceIndicatorFrame.circle:SetAlpha(1.0)
 			distanceIndicatorFrame:Show()
 		end
@@ -1915,7 +1915,7 @@ end
 function HideDistanceIndicator()
 	if not IsTaintable() then
 		if distanceIndicatorFrame:IsShown() then
-			if not ShouldBeHidden() and db.digsite.distanceIndicator.enabled then
+			if not ShouldBeHidden() and db.digsite.distanceIndicator.enabled and not distanceIndicatorActive then
 				distanceIndicatorFrame.circle:SetAlpha(0)
 			else
 				distanceIndicatorFrame:Hide()
@@ -2259,7 +2259,7 @@ function RefreshTomTom()
 	if db.general.show and db.tomtom.enabled and tomtomExists and tomtomActive then
 		UpdateTomTomPoint()
 	else
-		if not tomtomExists then db.tomtom.enabled = false; Archy:Print("TomTom doesn't exist... disabling it"); end		-- TomTom (or emulator) was disabled, disabling TomTom support
+		if db.tomtom.enabled and not tomtomExists then db.tomtom.enabled = false; Archy:Print("TomTom doesn't exist... disabling it"); end		-- TomTom (or emulator) was disabled, disabling TomTom support
 		if tomtomPoint then			-- Clear the waypoint in TomTom if we had one
 			ClearTomTomPoint()
 			tomtomPoint = nil
@@ -2805,7 +2805,7 @@ end
 --[[ Positional functions ]]--
 function Archy:UpdatePlayerPosition(force)
 	if not HasArchaeology() then return end
-	if WorldMapFrame and WorldMapFrame:IsVisible() then return end
+	if (GetCurrentMapAreaID() == -1) then return end
 	local map, level, x, y = astrolabe:GetCurrentPlayerPosition()
 	if x == 0 and y == 0 then return end
 	if not map or not level then return end
