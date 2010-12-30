@@ -2,7 +2,7 @@ package-as: Archy
 
 manual-changelog:
 	filename: CHANGELOG.txt
-	markup-type: text
+	markup-type: plain
 	
 license-output: LICENSE.txt
 
