@@ -2805,6 +2805,7 @@ end
 --[[ Positional functions ]]--
 function Archy:UpdatePlayerPosition(force)
 	if not HasArchaeology() then return end
+	if WorldMapFrame and WorldMapFrame:IsVisible() then return end
 	local map, level, x, y = astrolabe:GetCurrentPlayerPosition()
 	if x == 0 and y == 0 then return end
 	if not map or not level then return end
