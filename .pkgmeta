@@ -7,7 +7,7 @@ manual-changelog:
 license-output: LICENSE.txt
 
 tools-used:
-	astrolabe
+	- astrolabe
 
 optional-dependencies:
 	- tomtom
