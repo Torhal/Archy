@@ -108,6 +108,13 @@ local defaults = {
 			nameFontOutline = "OUTLINE",
 			keystoneFontSize = 14,
 			keystoneFontOutline = "OUTLINE",
+			fragmentBarColors = {
+				["Normal"] = { r = 1, g = 0.5, b = 0 },
+				["Solvable"] = { r = 0, g = 1, b = 0 },
+				["Rare"] = { r = 0, g = 0.4, b = 0.8 },
+				["AttachToSolve"] = { r = 1, g = 1, b = 0 },
+				["FirstTime"] = { r = 1, g = 1, b = 1 },
+			},
 		},
 		digsite = {
 			show = true,
@@ -241,18 +248,6 @@ local generalOptions = {
 			end,
 			width = "double"
 		},
-		showSkillBar = {
-			order = 5,
-			name = L["Show Archaeology Skill"],
-			desc = L["Show your Archaeology skill on the Artifacts list header"],
-			type = "toggle",
-			get = function() return db.general.showSkillBar end,
-			set = function(_, value) 
-				db.general.showSkillBar = value
-				Archy:ConfigUpdated()
-			end,
-			width = "double",
-		},	
 		easyCast = {
 			order = 6,
 			name = L["Enable EasyCast"],
@@ -378,6 +373,18 @@ local artifactOptions = {
 					end,
 					width = "full",
 				},
+				showSkillBar = {
+					order = 7,
+					name = L["Show Archaeology Skill"],
+					desc = L["Show your Archaeology skill on the Artifacts list header"],
+					type = "toggle",
+					get = function() return db.general.showSkillBar end,
+					set = function(_, value) 
+						db.general.showSkillBar = value
+						Archy:ConfigUpdated()
+					end,
+					width = "double",
+				},	
 			},
 		},
 		blacklist = {
@@ -572,6 +579,87 @@ local artifactOptions = {
 						Archy:ConfigUpdated('artifact')
 					end,
 				},
+
+
+				fragmentBarColor = {
+					order = 31,
+					name = L["Progress Bar Color"],
+					desc = L["Set the color of the progress bar for artifacts you are working on"],
+					type = "color",
+					get = function(info)
+						return db.artifact.fragmentBarColors["Normal"].r, db.artifact.fragmentBarColors["Normal"].g, db.artifact.fragmentBarColors["Normal"].b
+					end,
+					set = function(info, r, g, b)
+						db.artifact.fragmentBarColors["Normal"].r = r
+						db.artifact.fragmentBarColors["Normal"].g = g
+						db.artifact.fragmentBarColors["Normal"].b = b
+						Archy:ConfigUpdated('artifact', 'color')
+					end,
+				},
+				fragmentBarFirstTimeColor = {
+					order = 32,
+					name = L["First Time Color"],
+					desc = L["Set the color of the progress bar for artifacts you are working on for the first time"],
+					type = "color",
+					get = function(info)
+						return db.artifact.fragmentBarColors["FirstTime"].r, db.artifact.fragmentBarColors["FirstTime"].g, db.artifact.fragmentBarColors["FirstTime"].b
+					end,
+					set = function(info, r, g, b)
+						db.artifact.fragmentBarColors["FirstTime"].r = r
+						db.artifact.fragmentBarColors["FirstTime"].g = g
+						db.artifact.fragmentBarColors["FirstTime"].b = b
+						Archy:ConfigUpdated('artifact', 'color')
+					end,
+				},
+				fragmentBarSolvableColor = {
+					order = 33,
+					name = L["Solvable Color"],
+					desc = L["Set the color of the progress bar for artifacts you can solve"],
+					type = "color",
+					get = function(info)
+						return db.artifact.fragmentBarColors["Solvable"].r, db.artifact.fragmentBarColors["Solvable"].g, db.artifact.fragmentBarColors["Solvable"].b
+					end,
+					set = function(info, r, g, b)
+						db.artifact.fragmentBarColors["Solvable"].r = r
+						db.artifact.fragmentBarColors["Solvable"].g = g
+						db.artifact.fragmentBarColors["Solvable"].b = b
+						Archy:ConfigUpdated('artifact', 'color')
+					end,
+				},
+				fragmentBarRareColor = {
+					order = 34,
+					name = L["Rare Color"],
+					desc = L["Set the color of the progress bar for rare artifacts you are working on"],
+					type = "color",
+					get = function(info)
+						return db.artifact.fragmentBarColors["Rare"].r, db.artifact.fragmentBarColors["Rare"].g, db.artifact.fragmentBarColors["Rare"].b
+					end,
+					set = function(info, r, g, b)
+						db.artifact.fragmentBarColors["Rare"].r = r
+						db.artifact.fragmentBarColors["Rare"].g = g
+						db.artifact.fragmentBarColors["Rare"].b = b
+						Archy:ConfigUpdated('artifact', 'color')
+					end,
+				},
+				fragmentBarKeystoneColor = {
+					order = 35,
+					name = L["Solvable With Key Stone Color"],
+					desc = L["Set the color of the progress bar for artifacts could solve if you attach key stones to them"],
+					type = "color",
+					get = function(info)
+						return db.artifact.fragmentBarColors["AttachToSolve"].r, db.artifact.fragmentBarColors["AttachToSolve"].g, db.artifact.fragmentBarColors["AttachToSolve"].b
+					end,
+					set = function(info, r, g, b)
+						db.artifact.fragmentBarColors["AttachToSolve"].r = r
+						db.artifact.fragmentBarColors["AttachToSolve"].g = g
+						db.artifact.fragmentBarColors["AttachToSolve"].b = b
+						Archy:ConfigUpdated('artifact', 'color')
+					end,
+				},
+				
+				
+				
+				
 			},				
 		},
 	},
@@ -857,6 +945,47 @@ local digsiteOptions = {
 				},
 			},
 		},
+	},
+}
+local archyDataOptions = {
+	order = 6,
+	type = "group",
+	name = "ArchyData",
+	disabled = function() 
+		local _, _, _, enabled, _, reason, _ = GetAddOnInfo("Archy_Data")
+		return not enabled or (reason ~= nil)
+	end,
+	args = {
+		desc = {
+			order = 0,
+			type = "description",
+			name = L["Import Survey Node data from ArchyData"],
+		},
+		loadData = {
+			order = 5,
+			name = L["Import ArchyData"],
+			desc = L["Load ArchyData and import the data to your database."],
+			type = "execute",
+			func = function()
+				local loaded, reason = LoadAddOn("Archy_Data")
+				if loaded then
+					local ArchyData = LibStub("AceAddon-3.0"):GetAddon("Archy_Data")
+--					local dataVersion = tonumber(GetAddOnMetadata("Archy_Data", "X-Generated-Version"):match("%d+")) 
+					ArchyData:PerformImport(true)
+					Archy:Print(L["ArchyData has been imported."])
+					Archy:ConfigUpdated()
+					if not db.data then db.data = {} end
+--					db.data.lastImport = dataVersion
+					db.data.imported = true
+				else
+					Archy:Print(L["Failed to load ArchyData due to "]..reason)
+				end
+			end,
+			disabled = function()
+				local _, _, _, enabled, _, reason, _ = GetAddOnInfo("Archy_Data")
+				return not enabled or (reason ~= nil) or (db.data and db.data.imported)
+			end,
+		},		
 	},
 }
 local tomtomOptions = {
@@ -1548,9 +1677,13 @@ function Archy:ConfigUpdated(ns, opt)
 				UpdateRaceArtifact(rid)
 			end
 		end
-		self:UpdateRacesFrame()
-		self:RefreshRacesDisplay()
-		self:SetFramePosition(racesFrame)
+		if opt == "color" then
+			self:RefreshRacesDisplay()
+		else
+			self:UpdateRacesFrame()
+			self:RefreshRacesDisplay()
+			self:SetFramePosition(racesFrame)
+		end
 	elseif ns == "digsite" then
 		self:UpdateDigSiteFrame()
 		if opt == "font" then
@@ -1892,6 +2025,23 @@ end
 local function UpdateSiteFrame(index)
 end
 
+function Archy:ImportOldStatsDB()
+	for key, st in pairs(Archy.db.char.digsites) do
+		if key ~= "blacklist" and key ~= "stats" then
+			if siteData[key] then
+				local site = siteData[key]
+				siteStats[site.blob]['surveys'] = (siteStats[site.blob]['surveys'] or 0) + st['surveys']
+				siteStats[site.blob]['fragments'] = (siteStats[site.blob]['fragments'] or 0) + st['fragments']
+				siteStats[site.blob]['looted'] = (siteStats[site.blob]['looted'] or 0) + st['looted']
+				siteStats[site.blob]['keystones'] = (siteStats[site.blob]['keystones'] or 0) + st['keystones']
+				Archy.db.char.digsites[key] = nil
+			end
+		end
+	end
+end
+
+
+
 
 --[[ Survey Functions ]]--
 local function AddSurveyNode(siteId, map, level, x, y)
@@ -1911,6 +2061,30 @@ local function AddSurveyNode(siteId, map, level, x, y)
 	if not exists then
 		tinsert(Archy.db.global.surveyNodes[siteId], newNode)
 	end
+end
+
+function Archy:InjectSurveyNode(siteId, map, level, x, y)
+	local newNode = { m = map, f = level, x = x, y = y }
+	local exists = false
+	
+	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
+	if not Archy.db.global.surveyNodes[siteId] then Archy.db.global.surveyNodes[siteId] = {} end
+	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do	
+		local distance = astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
+		if not distance then distance = 0 end
+		if distance <= 10 then 
+			exists = true 
+			break
+		end
+	end
+	if not exists then
+		tinsert(Archy.db.global.surveyNodes[siteId], newNode)
+	end
+end
+
+function Archy:ClearSurveyNodeDB()
+	Archy.db.global.surveyNodes = {}
+	collectgarbage('collect')
 end
 
 function ShowDistanceIndicator()
@@ -2331,13 +2505,13 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
 	local perc = min((value[1] + value[2]) / value[3] * 100, 100)
 	
 	if value[7] then 
-		self.r, self.g, self.b = 0, 0.8, 0
+		self.r, self.g, self.b = db.artifact.fragmentBarColors["Solvable"].r, db.artifact.fragmentBarColors["Solvable"].g, db.artifact.fragmentBarColors["Solvable"].b
 	elseif value[8] then
-		self.r ,self.g, self.b = 1, 1, 0
+		self.r ,self.g, self.b = db.artifact.fragmentBarColors["AttachToSolve"].r, db.artifact.fragmentBarColors["AttachToSolve"].g, db.artifact.fragmentBarColors["AttachToSolve"].b
 	elseif value[9] then
-		self.r, self.g, self.b = 0, 0.4, 0.8
+		self.r, self.g, self.b = db.artifact.fragmentBarColors["Rare"].r, db.artifact.fragmentBarColors["Rare"].g, db.artifact.fragmentBarColors["Rare"].b
 	else
-		self.r, self.g, self.b = 1, .5, 0
+		self.r, self.g, self.b = db.artifact.fragmentBarColors["Normal"].r, db.artifact.fragmentBarColors["Normal"].g, db.artifact.fragmentBarColors["Normal"].b
 	end
 	bar:SetVertexColor(self.r, self.g, self.b)
 	bar:SetWidth(perc)
@@ -2571,17 +2745,20 @@ function Archy:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Dig Sites", digsiteOptions)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy TomTom", tomtomOptions)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Minimap", minimapOptions)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Data", archyDataOptions)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy General", L["General"], "Archy")
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Artifacts", L["Artifacts"], "Archy")
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Dig Sites", L["Dig Sites"], "Archy")
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy TomTom", L["TomTom Support"], "Archy")
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Minimap", L["Minimap"], "Archy")
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Data", L["Import Data"], "Archy")
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Profiles", L["Profiles"], "Archy")
 	
 	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
 	Archy.db.char.digsites = Archy.db.char.digsites or { stats = {}, blacklist = {} }
 	if not Archy.db.char.digsites.stats then Archy.db.char.digsites.stats = {} end
+	if not Archy.db.char.digsites.blacklist then Archy.db.char.digsites.blacklist = {} end
 	
 	siteStats = Archy.db.char.digsites.stats
 	setmetatable(siteStats, { __index = function(t, k) if k then t[k] = { ['surveys'] = 0, ['fragments'] = 0, ['looted'] = 0, ['keystones'] = 0, ['counter'] = 0 }; return t[k]; end end })
@@ -2590,6 +2767,8 @@ function Archy:OnInitialize()
 	setmetatable(siteBlacklist, {__index = function(t, k) if k then t[k] = false; return t[k]; end end })
 	
 	db = self.db.profile
+	if not db.data then db.data = {} end
+	db.data.imported = false
 	
 	digsiteFrame = CreateFrame("Frame", "ArchyDigSiteFrame", UIParent, "ArchyDigSiteContainer")
 	digsiteFrame.children = setmetatable({}, {
@@ -2623,6 +2802,8 @@ function Archy:OnInitialize()
 	icon:Register("ArchyLDB", ldb, db.general.icon)
 	
 	TrapWorldMouse()
+	
+	self:ImportOldStatsDB()
 end
 
 function Archy:UpdateFramePositions()
@@ -3061,18 +3242,19 @@ function Archy:RefreshRacesDisplay()
 		child.icon.texture:SetTexture(artifact['icon'])
 		local _, _, completionCount = GetArtifactStats(rid, artifact['name'])
 		child.icon.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip'] 
-			.. "\n\n" .. HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: "] .. NORMAL_FONT_COLOR_CODE .. (completionCount or "0")
+			.. "\n\n" .. HIGHLIGHT_FONT_COLOR_CODE .. string.format(L["Solved Count: %s"], NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
 			.. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 			
-
+		child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)			-- can solve with keystones if they were attached
+		local barColor
 		if artifact['rare'] then
-			child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.1953125, 0.3671875)			-- rare
+			barColor = db.artifact.fragmentBarColors["Rare"]
 			child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625)		-- rare
 		else
 			if completionCount == 0 then
-				child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0, 0.1875)						-- fragments
+				barColor = db.artifact.fragmentBarColors["FirstTime"]
 			else
-				child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)			-- can solve with keystones if they were attached
+				barColor = db.artifact.fragmentBarColors["Normal"]
 			end
 			child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875)					-- bg
 		end
@@ -3123,13 +3305,15 @@ function Archy:RefreshRacesDisplay()
 		
 		if artifact['canSolve'] or (artifact['stonesAdded'] > 0 and artifact['canSolveStone']) then
 			child.solveButton:Enable()
-			child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.6015625, 0.7578125)			-- can solve
+			barColor = db.artifact.fragmentBarColors["Solvable"]
 		else
 			if (artifact['canSolveStone']) then
-				child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.796875, 0.953125)		-- can solve with keystones if they were attached
+				barColor = db.artifact.fragmentBarColors["AttachToSolve"]
 			end
 			child.solveButton:Disable()
 		end
+
+		child.fragmentBar.barTexture:SetVertexColor(barColor.r, barColor.g, barColor.b, 1)
 		if not db.artifact.blacklist[rid] and artifact['fragTotal'] > 0 and (not db.artifact.filter or tContains(ContinentRaces(playerContinent), rid))then
 			child:ClearAllPoints()
 			if topFrame == racesFrame.container then
