@@ -4,7 +4,6 @@
 ## Notes: Archaeology assistant
 ## Author: Torhal, Myrroddin, daihenka
 ## X-Credits: Cidrei on wowinterface for fan fixes
-## X-Donate: http://tinyurl.com/3shfyr7
 ## X-Category: Archaeology
 ## SavedVariables: ArchyDB
 ## OptionalDeps: Ace3, LibDBIcon-1.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, TomTom, LibAboutPanel, LibQTip-1.0, LibBabble-DigSites-3.0
