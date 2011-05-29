@@ -1,7 +1,18 @@
-﻿--[[ Initialization Code ]] --
+﻿-----------------------------------------------------------------------
+-- Upvalued Lua API.
+-----------------------------------------------------------------------
+local _G = getfenv(0)
+
+-----------------------------------------------------------------------
+-- AddOn namespace.
+-----------------------------------------------------------------------
+local ADDON_NAME, private = ...
+
+local LibStub = _G.LibStub
+
 local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0", "LibSink-2.0")
-local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
+
 local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	type = "data source",
 	icon = "Interface\\Icons\\trade_archaeology",
@@ -3455,10 +3466,10 @@ function Archy:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileUpdate")
 
-	if LibStub:GetLibrary("LibAboutPanel", true) then
-		self.optionsFrame = LibStub:GetLibrary("LibAboutPanel").new(nil, "Archy")
-	else
-		self:Print("Lib AboutPanel not loaded.")
+	local about_panel = LibStub:GetLibrary("LibAboutPanel", true)
+
+	if about_panel then
+		self.optionsFrame = about_panel.new(nil, "Archy")
 	end
 
 	self:SetSinkStorage(Archy.db.profile.general.sinkOptions)
@@ -3474,27 +3485,58 @@ function Archy:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Minimap", minimapOptions)
 	-- LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Data", archyDataOptions)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Archy Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy General", GENERAL_LABEL, "Archy")
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Artifacts", L["Artifacts"], "Archy")
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Dig Sites", L["Dig Sites"], "Archy")
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy TomTom", L["TomTom Support"], "Archy")
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Minimap", MINIMAP_LABEL, "Archy")
-	-- LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Data", L["Import Data"], "Archy")
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Archy Profiles", L["Profiles"], "Archy")
 
-	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
-	Archy.db.char.digsites = Archy.db.char.digsites or { stats = {}, blacklist = {} }
-	if not Archy.db.char.digsites.stats then Archy.db.char.digsites.stats = {} end
-	if not Archy.db.char.digsites.blacklist then Archy.db.char.digsites.blacklist = {} end
+	local ACD = LibStub("AceConfigDialog-3.0")
+	ACD:AddToBlizOptions("Archy General", _G.GENERAL_LABEL, "Archy")
+	ACD:AddToBlizOptions("Archy Artifacts", L["Artifacts"], "Archy")
+	ACD:AddToBlizOptions("Archy Dig Sites", L["Dig Sites"], "Archy")
+	ACD:AddToBlizOptions("Archy TomTom", L["TomTom Support"], "Archy")
+	ACD:AddToBlizOptions("Archy Minimap", _G.MINIMAP_LABEL, "Archy")
+	-- ACD:AddToBlizOptions("Archy Data", L["Import Data"], "Archy")
+	ACD:AddToBlizOptions("Archy Profiles", L["Profiles"], "Archy")
+
+	if not Archy.db.global.surveyNodes then
+		Archy.db.global.surveyNodes = {}
+	end
+
+	if not Archy.db.char.digsites then
+		Archy.db.char.digsites = {
+			stats = {},
+			blacklist = {}
+		}
+	end
 
 	siteStats = Archy.db.char.digsites.stats
-	setmetatable(siteStats, { __index = function(t, k) if k then t[k] = { ['surveys'] = 0, ['fragments'] = 0, ['looted'] = 0, ['keystones'] = 0, ['counter'] = 0 }; return t[k]; end end })
+
+	setmetatable(siteStats, {
+		__index = function(t, k)
+			if k then
+				t[k] = {
+					['surveys'] = 0,
+					['fragments'] = 0,
+					['looted'] = 0,
+					['keystones'] = 0,
+					['counter'] = 0
+				}
+				return t[k]
+			end
+		end
+	})
 
 	siteBlacklist = Archy.db.char.digsites.blacklist
-	setmetatable(siteBlacklist, { __index = function(t, k) if k then t[k] = false; return t[k]; end end })
+	setmetatable(siteBlacklist, {
+		__index = function(t, k)
+			if k then
+				t[k] = false
+				return t[k]
+			end
+		end
+	})
 
 	db = self.db.profile
-	if not db.data then db.data = {} end
+	if not db.data then
+		db.data = {}
+	end
 	db.data.imported = false
 
 	digsiteFrame = CreateFrame("Frame", "ArchyDigSiteFrame", UIParent, (db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
