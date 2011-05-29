@@ -8,7 +8,7 @@ local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	iconCoords = { 0.075, 0.925, 0.075, 0.925 },
 	text = "Archy",
 })
-local icon = LibStub("LibDBIcon-1.0")
+local LDBI = LibStub("LibDBIcon-1.0")
 local astrolabe = DongleStub("Astrolabe-1.0")
 local qtip = LibStub("LibQTip-1.0")
 local lsm = LibStub("LibSharedMedia-3.0")
@@ -266,9 +266,9 @@ local generalOptions = {
 			set = function(k, v)
 				db.general.icon.hide = v;
 				if db.general.icon.hide then
-					icon:Hide("Archy")
+					LDBI:Hide("Archy")
 				else
-					icon:Show("Archy")
+					LDBI:Show("Archy")
 				end
 			end,
 			width = "double"
@@ -3528,7 +3528,7 @@ function Archy:OnInitialize()
 
 	self:UpdateFramePositions()
 
-	icon:Register("Archy", ldb, db.general.icon)
+	LDBI:Register("Archy", ldb, db.general.icon)
 
 	TrapWorldMouse()
 
