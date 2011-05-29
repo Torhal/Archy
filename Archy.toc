@@ -47,6 +47,7 @@ Locale\zhTW.lua
 Locale\Spanish.lua
 Locale\koKR.lua
 
+Digsites.lua
 Archy.xml
 Archy.lua
 Bindings.xml
