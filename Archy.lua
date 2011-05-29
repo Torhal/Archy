@@ -63,9 +63,6 @@ local zoneData, raceData, artifacts, digsites = {}, {}, {}, {}
 local tomtomPoint, tomtomActive, tomtomExists, tomtomFrame, tomtomSite
 local distanceIndicatorActive = false
 
-local emptySiteStats = { ['surveys'] = 0, ['fragments'] = 0, ['looted'] = 0, ['keystones'] = 0, ['counter'] = 0 }
-local emptySite = { ['continent'] = 0, ['map'] = 0, ['blob'] = 0, ['race'] = 0 }
-local emptyZone = { ['continent'] = 0, ['map'] = 0, ['level'] = 0, ['mapFile'] = '', ['id'] = 0, ['name'] = '' }
 local artifactSolved = { ['raceId'] = 0, ['name'] = '' }
 local continentMapToID = {}
 local mapFileToID = {}
