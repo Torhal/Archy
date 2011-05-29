@@ -1779,211 +1779,206 @@ do
 	-- And organize it by continent, listed within alphabetically
 
 	--[[ Note to author(s)
-		race numbers to race names:
-			1 = Dwarf
-			2 = Fossil
-			3 = Night Elf
-			4 = Troll
-			5 = Draenei
-			6 = Orc
-			7 = Vrykul
-			8 = Nerubian
-			9 = Tol'vir
-	]]--
+        race numbers to race names:
+            1 = Dwarf
+            2 = Draenei
+            3 = Fossil
+            4 = Night Elf
+            5 = Nerubian
+            6 = Orc
+            7 = Tol'vir
+            8 = Troll
+            9 = Vrykul
+    ]] --
 
 	-- Eastern Kingdoms
-	siteData[DS["Aerie Peak Digsite"]] = {
-		['continent'] = 2,
-		['map'] = 26,
-		['blob'] = 54136,
-		['race'] = 1
-	}
-	siteData[DS["Agol'watha Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54141, ['race'] = 4 }
-	siteData[DS["Altar of Zul Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54138, ['race'] = 4 }
-	siteData[DS["Andorhal Fossil Bank"]] = { ['continent'] = 2, ['map'] = 22, ['blob'] = 55482, ['race'] = 2 }
-	siteData[DS["Bal'lal Ruins Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55458, ['race'] = 4 }
-	siteData[DS["Balia'mah Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55460, ['race'] = 4 }
-	siteData[DS["Dreadmaul Fossil Field"]] = { ['continent'] = 2, ['map'] = 19, ['blob'] = 55436, ['race'] = 2 }
+	siteData[DS["Aerie Peak Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54136, ['race'] = 1 }
+	siteData[DS["Agol'watha Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54141, ['race'] = 8 }
+	siteData[DS["Altar of Zul Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54138, ['race'] = 8 }
+	siteData[DS["Andorhal Fossil Bank"]] = { ['continent'] = 2, ['map'] = 22, ['blob'] = 55482, ['race'] = 3 }
+	siteData[DS["Bal'lal Ruins Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55458, ['race'] = 8 }
+	siteData[DS["Balia'mah Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55460, ['race'] = 8 }
+	siteData[DS["Dreadmaul Fossil Field"]] = { ['continent'] = 2, ['map'] = 19, ['blob'] = 55436, ['race'] = 3 }
 	siteData[DS["Dun Garok Digsite"]] = { ['continent'] = 2, ['map'] = 24, ['blob'] = 54134, ['race'] = 1 }
 	siteData[DS["Dunwald Ruins Digsite"]] = { ['continent'] = 2, ['map'] = 700, ['blob'] = 56583, ['race'] = 1 }
 	siteData[DS["Eastern Ruins of Thaurissan"]] = { ['continent'] = 2, ['map'] = 29, ['blob'] = 55444, ['race'] = 1 }
-	siteData[DS["Eastern Zul'Kunda Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55454, ['race'] = 4 }
-	siteData[DS["Eastern Zul'Mamwe Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55464, ['race'] = 4 }
-	siteData[DS["Felstone Fossil Field"]] = { ['continent'] = 2, ['map'] = 22, ['blob'] = 55478, ['race'] = 2 }
-	siteData[DS["Greenwarden's Fossil Bank"]] = { ['continent'] = 2, ['map'] = 40, ['blob'] = 54127, ['race'] = 2 }
+	siteData[DS["Eastern Zul'Kunda Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55454, ['race'] = 8 }
+	siteData[DS["Eastern Zul'Mamwe Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55464, ['race'] = 8 }
+	siteData[DS["Felstone Fossil Field"]] = { ['continent'] = 2, ['map'] = 22, ['blob'] = 55478, ['race'] = 3 }
+	siteData[DS["Greenwarden's Fossil Bank"]] = { ['continent'] = 2, ['map'] = 40, ['blob'] = 54127, ['race'] = 3 }
 	siteData[DS["Grim Batol Digsite"]] = { ['continent'] = 2, ['map'] = 700, ['blob'] = 56589, ['race'] = 1 }
 	siteData[DS["Grimesilt Digsite"]] = { ['continent'] = 2, ['map'] = 28, ['blob'] = 55438, ['race'] = 1 }
-	siteData[DS["Gurubashi Arena Digsite"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55474, ['race'] = 4 }
+	siteData[DS["Gurubashi Arena Digsite"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55474, ['race'] = 8 }
 	siteData[DS["Hammertoe's Digsite"]] = { ['continent'] = 2, ['map'] = 17, ['blob'] = 54832, ['race'] = 1 }
 	siteData[DS["Humboldt Conflagration Digsite"]] = { ['continent'] = 2, ['map'] = 700, ['blob'] = 56587, ['race'] = 1 }
-	siteData[DS["Infectis Scar Fossil Field"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55452, ['race'] = 2 }
+	siteData[DS["Infectis Scar Fossil Field"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55452, ['race'] = 3 }
 	siteData[DS["Ironband's Excavation Site"]] = { ['continent'] = 2, ['map'] = 35, ['blob'] = 54097, ['race'] = 1 }
 	siteData[DS["Ironbeard's Tomb"]] = { ['continent'] = 2, ['map'] = 40, ['blob'] = 54124, ['race'] = 1 }
-	siteData[DS["Jintha'Alor Lower City Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54139, ['race'] = 4 }
-	siteData[DS["Jintha'Alor Upper City Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54140, ['race'] = 4 }
-	siteData[DS["Lakeridge Highway Fossil Bank"]] = { ['continent'] = 2, ['map'] = 36, ['blob'] = 55416, ['race'] = 2 }
-	siteData[DS["Misty Reed Fossil Bank"]] = { ['continent'] = 2, ['map'] = 38, ['blob'] = 54864, ['race'] = 2 }
-	siteData[DS["Nek'mani Wellspring Digsite"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55476, ['race'] = 4 }
-	siteData[DS["Northridge Fossil Field"]] = { ['continent'] = 2, ['map'] = 22, ['blob'] = 55480, ['race'] = 2 }
-	siteData[DS["Plaguewood Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 60444, ['race'] = 4 }
+	siteData[DS["Jintha'Alor Lower City Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54139, ['race'] = 8 }
+	siteData[DS["Jintha'Alor Upper City Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54140, ['race'] = 8 }
+	siteData[DS["Lakeridge Highway Fossil Bank"]] = { ['continent'] = 2, ['map'] = 36, ['blob'] = 55416, ['race'] = 3 }
+	siteData[DS["Misty Reed Fossil Bank"]] = { ['continent'] = 2, ['map'] = 38, ['blob'] = 54864, ['race'] = 3 }
+	siteData[DS["Nek'mani Wellspring Digsite"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55476, ['race'] = 8 }
+	siteData[DS["Northridge Fossil Field"]] = { ['continent'] = 2, ['map'] = 22, ['blob'] = 55480, ['race'] = 3 }
+	siteData[DS["Plaguewood Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 60444, ['race'] = 5 }
 	siteData[DS["Pyrox Flats Digsite"]] = { ['continent'] = 2, ['map'] = 28, ['blob'] = 55440, ['race'] = 1 }
-	siteData[DS["Quel'Lithien Lodge Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55450, ['race'] = 3 }
-	siteData[DS["Red Reaches Fossil Bank"]] = { ['continent'] = 2, ['map'] = 19, ['blob'] = 55434, ['race'] = 2 }
-	siteData[DS["Ruins of Aboraz"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55470, ['race'] = 4 }
-	siteData[DS["Ruins of Jubuwal"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55472, ['race'] = 4 }
-	siteData[DS["Savage Coast Raptor Fields"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55468, ['race'] = 2 }
-	siteData[DS["Shadra'Alor Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54137, ['race'] = 4 }
-	siteData[DS["Southshore Fossil Field"]] = { ['continent'] = 2, ['map'] = 24, ['blob'] = 54135, ['race'] = 2 }
-	siteData[DS["Sunken Temple Digsite"]] = { ['continent'] = 2, ['map'] = 38, ['blob'] = 54862, ['race'] = 4 }
-	siteData[DS["Terror Wing Fossil Field"]] = { ['continent'] = 2, ['map'] = 29, ['blob'] = 55446, ['race'] = 2 }
-	siteData[DS["Terrorweb Tunnel Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55443, ['race'] = 4 }
+	siteData[DS["Quel'Lithien Lodge Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55450, ['race'] = 4 }
+	siteData[DS["Red Reaches Fossil Bank"]] = { ['continent'] = 2, ['map'] = 19, ['blob'] = 55434, ['race'] = 3 }
+	siteData[DS["Ruins of Aboraz"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55470, ['race'] = 8 }
+	siteData[DS["Ruins of Jubuwal"]] = { ['continent'] = 2, ['map'] = 673, ['blob'] = 55472, ['race'] = 8 }
+	siteData[DS["Savage Coast Raptor Fields"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55468, ['race'] = 3 }
+	siteData[DS["Shadra'Alor Digsite"]] = { ['continent'] = 2, ['map'] = 26, ['blob'] = 54137, ['race'] = 8 }
+	siteData[DS["Southshore Fossil Field"]] = { ['continent'] = 2, ['map'] = 24, ['blob'] = 54135, ['race'] = 3 }
+	siteData[DS["Sunken Temple Digsite"]] = { ['continent'] = 2, ['map'] = 38, ['blob'] = 54862, ['race'] = 8 }
+	siteData[DS["Terror Wing Fossil Field"]] = { ['continent'] = 2, ['map'] = 29, ['blob'] = 55446, ['race'] = 3 }
+	siteData[DS["Terrorweb Tunnel Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55443, ['race'] = 5 }
 	siteData[DS["Thandol Span"]] = { ['continent'] = 2, ['map'] = 40, ['blob'] = 54133, ['race'] = 1 }
 	siteData[DS["Thoradin's Wall"]] = { ['continent'] = 2, ['map'] = 16, ['blob'] = 54129, ['race'] = 1 }
 	siteData[DS["Thundermar Ruins Digsite"]] = { ['continent'] = 2, ['map'] = 700, ['blob'] = 56585, ['race'] = 1 }
 	siteData[DS["Tomb of the Watchers Digsite"]] = { ['continent'] = 2, ['map'] = 17, ['blob'] = 54834, ['race'] = 1 }
-	siteData[DS["Twilight Grove Digsite"]] = { ['continent'] = 2, ['map'] = 34, ['blob'] = 55350, ['race'] = 3 }
+	siteData[DS["Twilight Grove Digsite"]] = { ['continent'] = 2, ['map'] = 34, ['blob'] = 55350, ['race'] = 4 }
 	siteData[DS["Uldaman Entrance Digsite"]] = { ['continent'] = 2, ['map'] = 17, ['blob'] = 54838, ['race'] = 1 }
-	siteData[DS["Vul'Gol Fossil Bank"]] = { ['continent'] = 2, ['map'] = 34, ['blob'] = 55352, ['race'] = 2 }
+	siteData[DS["Vul'Gol Fossil Bank"]] = { ['continent'] = 2, ['map'] = 34, ['blob'] = 55352, ['race'] = 3 }
 	siteData[DS["Western Ruins of Thaurissan"]] = { ['continent'] = 2, ['map'] = 29, ['blob'] = 55442, ['race'] = 1 }
-	siteData[DS["Western Zul'Kunda Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55456, ['race'] = 4 }
-	siteData[DS["Western Zul'Mamwe Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55466, ['race'] = 4 }
+	siteData[DS["Western Zul'Kunda Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55456, ['race'] = 8 }
+	siteData[DS["Western Zul'Mamwe Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55466, ['race'] = 8 }
 	siteData[DS["Whelgar's Excavation Site"]] = { ['continent'] = 2, ['map'] = 40, ['blob'] = 54126, ['race'] = 1 }
-	siteData[DS["Witherbark Digsite"]] = { ['continent'] = 2, ['map'] = 16, ['blob'] = 54132, ['race'] = 4 }
-	siteData[DS["Ziata'jai Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55462, ['race'] = 4 }
-	siteData[DS["Zul'Mashar Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55448, ['race'] = 4 }
+	siteData[DS["Witherbark Digsite"]] = { ['continent'] = 2, ['map'] = 16, ['blob'] = 54132, ['race'] = 8 }
+	siteData[DS["Ziata'jai Digsite"]] = { ['continent'] = 2, ['map'] = 37, ['blob'] = 55462, ['race'] = 8 }
+	siteData[DS["Zul'Mashar Digsite"]] = { ['continent'] = 2, ['map'] = 23, ['blob'] = 55448, ['race'] = 8 }
 
 	-- Kalimdor
-	siteData[DS["Abyssal Sands Fossil Ridge"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56375, ['race'] = 2 }
-	siteData[DS["Akhenet Fields Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56608, ['race'] = 9 }
+	siteData[DS["Abyssal Sands Fossil Ridge"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56375, ['race'] = 3 }
+	siteData[DS["Akhenet Fields Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56608, ['race'] = 7 }
 	siteData[DS["Bael Modan Digsite"]] = { ['continent'] = 1, ['map'] = 607, ['blob'] = 55410, ['race'] = 1 }
-	siteData[DS["Broken Commons Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56329, ['race'] = 3 }
-	siteData[DS["Broken Pillar Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56367, ['race'] = 4 }
-	siteData[DS["Constellas Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56343, ['race'] = 3 }
-	siteData[DS["Cursed Landing Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56609, ['race'] = 9 }
-	siteData[DS["Darkmist Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56337, ['race'] = 3 }
-	siteData[DS["Dire Maul Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56327, ['race'] = 3 }
-	siteData[DS["Dunemaul Fossil Ridge"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56373, ['race'] = 2 }
-	siteData[DS["Eastmoon Ruins Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56369, ['race'] = 4 }
-	siteData[DS["Ethel Rethor Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55420, ['race'] = 3 }
-	siteData[DS["Fields of Blood Fossil Bank"]] = { ['continent'] = 1, ['map'] = 607, ['blob'] = 56358, ['race'] = 2 }
-	siteData[DS["Forest Song Digsite"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55402, ['race'] = 3 }
-	siteData[DS["Frostwhisper Gorge Digsite"]] = { ['continent'] = 1, ['map'] = 281, ['blob'] = 56356, ['race'] = 3 }
-	siteData[DS["Grove of Aessina Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56570, ['race'] = 3 }
-	siteData[DS["Ironwood Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56349, ['race'] = 3 }
-	siteData[DS["Jaedenar Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56347, ['race'] = 3 }
-	siteData[DS["Keset Pass Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56611, ['race'] = 9 }
-	siteData[DS["Khartut's Tomb Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56591, ['race'] = 9 }
-	siteData[DS["Kodo Graveyard"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55426, ['race'] = 2 }
-	siteData[DS["Lake Kel'Theril Digsite"]] = { ['continent'] = 1, ['map'] = 281, ['blob'] = 56351, ['race'] = 3 }
-	siteData[DS["Lower Lakkari Tar Pits"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56380, ['race'] = 2 }
-	siteData[DS["Mannoroc Coven Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55424, ['race'] = 3 }
-	siteData[DS["Marshlands Fossil Bank"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56388, ['race'] = 2 }
-	siteData[DS["Morlos'Aran Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56345, ['race'] = 3 }
-	siteData[DS["Nazj'vel Digsite"]] = { ['continent'] = 1, ['map'] = 42, ['blob'] = 55354, ['race'] = 3 }
-	siteData[DS["Neferset Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56597, ['race'] = 9 }
-	siteData[DS["Nightmare Scar Digsite"]] = { ['continent'] = 1, ['map'] = 607, ['blob'] = 56362, ['race'] = 3 }
-	siteData[DS["North Isildien Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56341, ['race'] = 3 }
-	siteData[DS["Obelisk of the Stars Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60358, ['race'] = 9 }
-	siteData[DS["Oneiros Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56333, ['race'] = 3 }
-	siteData[DS["Orsis Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56599, ['race'] = 9 }
-	siteData[DS["Owl Wing Thicket Digsite"]] = { ['continent'] = 1, ['map'] = 281, ['blob'] = 56354, ['race'] = 3 }
-	siteData[DS["Quagmire Fossil Field"]] = { ['continent'] = 1, ['map'] = 141, ['blob'] = 55757, ['race'] = 2 }
-	siteData[DS["Ravenwind Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56331, ['race'] = 3 }
-	siteData[DS["River Delta Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60350, ['race'] = 9 }
-	siteData[DS["Ruins of Ahmtul Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56607, ['race'] = 9 }
-	siteData[DS["Ruins of Ammon Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56601, ['race'] = 9 }
-	siteData[DS["Ruins of Arkkoran"]] = { ['continent'] = 1, ['map'] = 181, ['blob'] = 55414, ['race'] = 3 }
-	siteData[DS["Ruins of Eldarath"]] = { ['continent'] = 1, ['map'] = 181, ['blob'] = 55412, ['race'] = 3 }
-	siteData[DS["Ruins of Eldre'Thar"]] = { ['continent'] = 1, ['map'] = 81, ['blob'] = 55406, ['race'] = 3 }
-	siteData[DS["Ruins of Khintaset Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56603, ['race'] = 9 }
-	siteData[DS["Ruins of Lar'donir Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56566, ['race'] = 3 }
-	siteData[DS["Ruins of Ordil'Aran"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55398, ['race'] = 3 }
-	siteData[DS["Ruins of Stardust"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55400, ['race'] = 3 }
-	siteData[DS["Sahket Wastes Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60361, ['race'] = 9 }
-	siteData[DS["Sanctuary of Malorne Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56572, ['race'] = 3 }
-	siteData[DS["Sargeron Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55428, ['race'] = 3 }
-	siteData[DS["Schnottz's Landing"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60363, ['race'] = 9 }
-	siteData[DS["Scorched Plain Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56574, ['race'] = 3 }
-	siteData[DS["Screaming Reaches Fossil Field"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56386, ['race'] = 2 }
-	siteData[DS["Shrine of Goldrinn Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56568, ['race'] = 3 }
-	siteData[DS["Slitherblade Shore Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55418, ['race'] = 3 }
-	siteData[DS["Solarsal Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56335, ['race'] = 3 }
-	siteData[DS["South Isildien Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56339, ['race'] = 3 }
-	siteData[DS["Southmoon Ruins Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56371, ['race'] = 4 }
-	siteData[DS["Southwind Village Digsite"]] = { ['continent'] = 1, ['map'] = 261, ['blob'] = 56390, ['race'] = 3 }
-	siteData[DS["Steps of Fate Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56595, ['race'] = 9 }
-	siteData[DS["Stonetalon Peak"]] = { ['continent'] = 1, ['map'] = 81, ['blob'] = 55404, ['race'] = 3 }
-	siteData[DS["Temple of Uldum Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56605, ['race'] = 9 }
-	siteData[DS["Terror Run Fossil Field"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56384, ['race'] = 2 }
-	siteData[DS["Tombs of the Precursors Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56593, ['race'] = 9 }
-	siteData[DS["Unearthed Grounds"]] = { ['continent'] = 1, ['map'] = 81, ['blob'] = 55408, ['race'] = 2 }
-	siteData[DS["Upper Lakkari Tar Pits"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56382, ['race'] = 2 }
-	siteData[DS["Valley of Bones"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55422, ['race'] = 2 }
-	siteData[DS["Wyrmbog Fossil Field"]] = { ['continent'] = 1, ['map'] = 141, ['blob'] = 55755, ['race'] = 2 }
-	siteData[DS["Zoram Strand Digsite"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55356, ['race'] = 3 }
-	siteData[DS["Zul'Farrak Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56364, ['race'] = 4 }
+	siteData[DS["Broken Commons Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56329, ['race'] = 4 }
+	siteData[DS["Broken Pillar Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56367, ['race'] = 8 }
+	siteData[DS["Constellas Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56343, ['race'] = 4 }
+	siteData[DS["Cursed Landing Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56609, ['race'] = 7 }
+	siteData[DS["Darkmist Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56337, ['race'] = 4 }
+	siteData[DS["Dire Maul Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56327, ['race'] = 4 }
+	siteData[DS["Dunemaul Fossil Ridge"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56373, ['race'] = 3 }
+	siteData[DS["Eastmoon Ruins Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56369, ['race'] = 8 }
+	siteData[DS["Ethel Rethor Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55420, ['race'] = 4 }
+	siteData[DS["Fields of Blood Fossil Bank"]] = { ['continent'] = 1, ['map'] = 607, ['blob'] = 56358, ['race'] = 3 }
+	siteData[DS["Forest Song Digsite"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55402, ['race'] = 4 }
+	siteData[DS["Frostwhisper Gorge Digsite"]] = { ['continent'] = 1, ['map'] = 281, ['blob'] = 56356, ['race'] = 4 }
+	siteData[DS["Grove of Aessina Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56570, ['race'] = 4 }
+	siteData[DS["Ironwood Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56349, ['race'] = 4 }
+	siteData[DS["Jaedenar Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56347, ['race'] = 4 }
+	siteData[DS["Keset Pass Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56611, ['race'] = 7 }
+	siteData[DS["Khartut's Tomb Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56591, ['race'] = 7 }
+	siteData[DS["Kodo Graveyard"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55426, ['race'] = 3 }
+	siteData[DS["Lake Kel'Theril Digsite"]] = { ['continent'] = 1, ['map'] = 281, ['blob'] = 56351, ['race'] = 4 }
+	siteData[DS["Lower Lakkari Tar Pits"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56380, ['race'] = 3 }
+	siteData[DS["Mannoroc Coven Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55424, ['race'] = 4 }
+	siteData[DS["Marshlands Fossil Bank"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56388, ['race'] = 3 }
+	siteData[DS["Morlos'Aran Digsite"]] = { ['continent'] = 1, ['map'] = 182, ['blob'] = 56345, ['race'] = 4 }
+	siteData[DS["Nazj'vel Digsite"]] = { ['continent'] = 1, ['map'] = 42, ['blob'] = 55354, ['race'] = 4 }
+	siteData[DS["Neferset Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56597, ['race'] = 7 }
+	siteData[DS["Nightmare Scar Digsite"]] = { ['continent'] = 1, ['map'] = 607, ['blob'] = 56362, ['race'] = 4 }
+	siteData[DS["North Isildien Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56341, ['race'] = 4 }
+	siteData[DS["Obelisk of the Stars Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60358, ['race'] = 7 }
+	siteData[DS["Oneiros Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56333, ['race'] = 4 }
+	siteData[DS["Orsis Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56599, ['race'] = 7 }
+	siteData[DS["Owl Wing Thicket Digsite"]] = { ['continent'] = 1, ['map'] = 281, ['blob'] = 56354, ['race'] = 4 }
+	siteData[DS["Quagmire Fossil Field"]] = { ['continent'] = 1, ['map'] = 141, ['blob'] = 55757, ['race'] = 3 }
+	siteData[DS["Ravenwind Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56331, ['race'] = 4 }
+	siteData[DS["River Delta Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60350, ['race'] = 7 }
+	siteData[DS["Ruins of Ahmtul Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56607, ['race'] = 7 }
+	siteData[DS["Ruins of Ammon Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56601, ['race'] = 7 }
+	siteData[DS["Ruins of Arkkoran"]] = { ['continent'] = 1, ['map'] = 181, ['blob'] = 55414, ['race'] = 4 }
+	siteData[DS["Ruins of Eldarath"]] = { ['continent'] = 1, ['map'] = 181, ['blob'] = 55412, ['race'] = 4 }
+	siteData[DS["Ruins of Eldre'Thar"]] = { ['continent'] = 1, ['map'] = 81, ['blob'] = 55406, ['race'] = 4 }
+	siteData[DS["Ruins of Khintaset Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56603, ['race'] = 7 }
+	siteData[DS["Ruins of Lar'donir Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56566, ['race'] = 4 }
+	siteData[DS["Ruins of Ordil'Aran"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55398, ['race'] = 4 }
+	siteData[DS["Ruins of Stardust"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55400, ['race'] = 4 }
+	siteData[DS["Sahket Wastes Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60361, ['race'] = 7 }
+	siteData[DS["Sanctuary of Malorne Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56572, ['race'] = 4 }
+	siteData[DS["Sargeron Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55428, ['race'] = 4 }
+	siteData[DS["Schnottz's Landing"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 60363, ['race'] = 7 }
+	siteData[DS["Scorched Plain Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56574, ['race'] = 4 }
+	siteData[DS["Screaming Reaches Fossil Field"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56386, ['race'] = 3 }
+	siteData[DS["Shrine of Goldrinn Digsite"]] = { ['continent'] = 1, ['map'] = 606, ['blob'] = 56568, ['race'] = 4 }
+	siteData[DS["Slitherblade Shore Digsite"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55418, ['race'] = 4 }
+	siteData[DS["Solarsal Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56335, ['race'] = 4 }
+	siteData[DS["South Isildien Digsite"]] = { ['continent'] = 1, ['map'] = 121, ['blob'] = 56339, ['race'] = 4 }
+	siteData[DS["Southmoon Ruins Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56371, ['race'] = 8 }
+	siteData[DS["Southwind Village Digsite"]] = { ['continent'] = 1, ['map'] = 261, ['blob'] = 56390, ['race'] = 4 }
+	siteData[DS["Steps of Fate Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56595, ['race'] = 7 }
+	siteData[DS["Stonetalon Peak"]] = { ['continent'] = 1, ['map'] = 81, ['blob'] = 55404, ['race'] = 4 }
+	siteData[DS["Temple of Uldum Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56605, ['race'] = 7 }
+	siteData[DS["Terror Run Fossil Field"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56384, ['race'] = 3 }
+	siteData[DS["Tombs of the Precursors Digsite"]] = { ['continent'] = 1, ['map'] = 720, ['blob'] = 56593, ['race'] = 7 }
+	siteData[DS["Unearthed Grounds"]] = { ['continent'] = 1, ['map'] = 81, ['blob'] = 55408, ['race'] = 3 }
+	siteData[DS["Upper Lakkari Tar Pits"]] = { ['continent'] = 1, ['map'] = 201, ['blob'] = 56382, ['race'] = 3 }
+	siteData[DS["Valley of Bones"]] = { ['continent'] = 1, ['map'] = 101, ['blob'] = 55422, ['race'] = 3 }
+	siteData[DS["Wyrmbog Fossil Field"]] = { ['continent'] = 1, ['map'] = 141, ['blob'] = 55755, ['race'] = 3 }
+	siteData[DS["Zoram Strand Digsite"]] = { ['continent'] = 1, ['map'] = 43, ['blob'] = 55356, ['race'] = 4 }
+	siteData[DS["Zul'Farrak Digsite"]] = { ['continent'] = 1, ['map'] = 161, ['blob'] = 56364, ['race'] = 8 }
 
 	-- Outland
 	siteData[DS["Ancestral Grounds Digsite"]] = { ['continent'] = 3, ['map'] = 477, ['blob'] = 56412, ['race'] = 6 }
-	siteData[DS["Arklon Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 479, ['blob'] = 56408, ['race'] = 5 }
+	siteData[DS["Arklon Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 479, ['blob'] = 56408, ['race'] = 2 }
 	siteData[DS["Bleeding Hollow Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56428, ['race'] = 6 }
-	siteData[DS["Boha'mu Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 467, ['blob'] = 56402, ['race'] = 5 }
-	siteData[DS["Bone Wastes Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56432, ['race'] = 5 }
+	siteData[DS["Boha'mu Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 467, ['blob'] = 56402, ['race'] = 2 }
+	siteData[DS["Bone Wastes Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56432, ['race'] = 2 }
 	siteData[DS["Bonechewer Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56430, ['race'] = 6 }
 	siteData[DS["Burning Blade Digsite"]] = { ['continent'] = 3, ['map'] = 477, ['blob'] = 56420, ['race'] = 6 }
-	siteData[DS["Coilskar Point Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56441, ['race'] = 5 }
+	siteData[DS["Coilskar Point Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56441, ['race'] = 2 }
 	siteData[DS["Dragonmaw Fortress"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56455, ['race'] = 6 }
-	siteData[DS["East Auchindoun Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56434, ['race'] = 5 }
-	siteData[DS["Eclipse Point Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56448, ['race'] = 5 }
+	siteData[DS["East Auchindoun Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56434, ['race'] = 2 }
+	siteData[DS["Eclipse Point Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56448, ['race'] = 2 }
 	siteData[DS["Gor'gaz Outpost Digsite"]] = { ['continent'] = 3, ['map'] = 465, ['blob'] = 56392, ['race'] = 6 }
 	siteData[DS["Grangol'var Village Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56424, ['race'] = 6 }
-	siteData[DS["Halaa Digsite"]] = { ['continent'] = 3, ['map'] = 477, ['blob'] = 56422, ['race'] = 5 }
+	siteData[DS["Halaa Digsite"]] = { ['continent'] = 3, ['map'] = 477, ['blob'] = 56422, ['race'] = 2 }
 	siteData[DS["Hellfire Basin Digsite"]] = { ['continent'] = 3, ['map'] = 465, ['blob'] = 56396, ['race'] = 6 }
 	siteData[DS["Hellfire Citadel Digsite"]] = { ['continent'] = 3, ['map'] = 465, ['blob'] = 56398, ['race'] = 6 }
-	siteData[DS["Illidari Point Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56439, ['race'] = 5 }
+	siteData[DS["Illidari Point Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56439, ['race'] = 2 }
 	siteData[DS["Laughing Skull Digsite"]] = { ['continent'] = 3, ['map'] = 477, ['blob'] = 56418, ['race'] = 6 }
-	siteData[DS["Ruins of Baa'ri Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56446, ['race'] = 5 }
-	siteData[DS["Ruins of Enkaat Digsite"]] = { ['continent'] = 3, ['map'] = 479, ['blob'] = 56406, ['race'] = 5 }
-	siteData[DS["Ruins of Farahlon Digsite"]] = { ['continent'] = 3, ['map'] = 479, ['blob'] = 56410, ['race'] = 5 }
-	siteData[DS["Sha'naar Digsite"]] = { ['continent'] = 3, ['map'] = 465, ['blob'] = 56400, ['race'] = 5 }
+	siteData[DS["Ruins of Baa'ri Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56446, ['race'] = 2 }
+	siteData[DS["Ruins of Enkaat Digsite"]] = { ['continent'] = 3, ['map'] = 479, ['blob'] = 56406, ['race'] = 2 }
+	siteData[DS["Ruins of Farahlon Digsite"]] = { ['continent'] = 3, ['map'] = 479, ['blob'] = 56410, ['race'] = 2 }
+	siteData[DS["Sha'naar Digsite"]] = { ['continent'] = 3, ['map'] = 465, ['blob'] = 56400, ['race'] = 2 }
 	siteData[DS["Sunspring Post Digsite"]] = { ['continent'] = 3, ['map'] = 477, ['blob'] = 56416, ['race'] = 6 }
-	siteData[DS["Tuurem Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56426, ['race'] = 5 }
-	siteData[DS["Twin Spire Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 467, ['blob'] = 56404, ['race'] = 5 }
+	siteData[DS["Tuurem Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56426, ['race'] = 2 }
+	siteData[DS["Twin Spire Ruins Digsite"]] = { ['continent'] = 3, ['map'] = 467, ['blob'] = 56404, ['race'] = 2 }
 	siteData[DS["Warden's Cage Digsite"]] = { ['continent'] = 3, ['map'] = 473, ['blob'] = 56450, ['race'] = 6 }
-	siteData[DS["West Auchindoun Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56437, ['race'] = 5 }
+	siteData[DS["West Auchindoun Digsite"]] = { ['continent'] = 3, ['map'] = 478, ['blob'] = 56437, ['race'] = 2 }
 	siteData[DS["Zeth'Gor Digsite"]] = { ['continent'] = 3, ['map'] = 465, ['blob'] = 56394, ['race'] = 6 }
 
 	-- Northrend
-	siteData[DS["Altar of Quetz'lun Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56539, ['race'] = 4 }
-	siteData[DS["Altar of Sseratus Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56533, ['race'] = 4 }
-	siteData[DS["Baleheim Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56512, ['race'] = 7 }
-	siteData[DS["Brunnhildar Village Digsite"]] = { ['continent'] = 4, ['map'] = 495, ['blob'] = 56549, ['race'] = 7 }
-	siteData[DS["Drakil'Jin Ruins Digsite"]] = { ['continent'] = 4, ['map'] = 490, ['blob'] = 56547, ['race'] = 4 }
-	siteData[DS["En'kilah Digsite"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 56522, ['race'] = 8 }
-	siteData[DS["Gjalerbron Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56516, ['race'] = 7 }
-	siteData[DS["Halgrind Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56506, ['race'] = 7 }
-	siteData[DS["Jotunheim Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56562, ['race'] = 7 }
-	siteData[DS["Kolramas Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56524, ['race'] = 8 }
-	siteData[DS["Moonrest Gardens Digsite"]] = { ['continent'] = 4, ['map'] = 488, ['blob'] = 56520, ['race'] = 3 }
-	siteData[DS["Nifflevar Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56514, ['race'] = 7 }
-	siteData[DS["Njorndar Village Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56564, ['race'] = 7 }
-	siteData[DS["Pit of Fiends Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 60367, ['race'] = 8 }
-	siteData[DS["Pit of Narjun Digsite"]] = { ['continent'] = 4, ['map'] = 488, ['blob'] = 56518, ['race'] = 8 }
-	siteData[DS["Riplash Ruins Digsite"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 56526, ['race'] = 3 }
-	siteData[DS["Ruins of Shandaral Digsite"]] = { ['continent'] = 4, ['map'] = 510, ['blob'] = 56530, ['race'] = 3 }
-	siteData[DS["Sands of Nasam"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 60369, ['race'] = 8 }
-	siteData[DS["Scourgeholme Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56555, ['race'] = 8 }
-	siteData[DS["Shield Hill Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56510, ['race'] = 7 }
-	siteData[DS["Sifreldar Village Digsite"]] = { ['continent'] = 4, ['map'] = 495, ['blob'] = 56551, ['race'] = 7 }
-	siteData[DS["Skorn Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56504, ['race'] = 7 }
-	siteData[DS["Talramas Digsite"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 56541, ['race'] = 8 }
-	siteData[DS["Valkyrion Digsite"]] = { ['continent'] = 4, ['map'] = 495, ['blob'] = 56553, ['race'] = 7 }
-	siteData[DS["Violet Stand Digsite"]] = { ['continent'] = 4, ['map'] = 510, ['blob'] = 56528, ['race'] = 3 }
-	siteData[DS["Voldrune Digsite"]] = { ['continent'] = 4, ['map'] = 490, ['blob'] = 56543, ['race'] = 7 }
-	siteData[DS["Wyrmskull Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56508, ['race'] = 7 }
-	siteData[DS["Ymirheim Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56560, ['race'] = 7 }
-	siteData[DS["Zim'Rhuk Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56535, ['race'] = 4 }
-	siteData[DS["Zol'Heb Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56537, ['race'] = 4 }
+	siteData[DS["Altar of Quetz'lun Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56539, ['race'] = 8 }
+	siteData[DS["Altar of Sseratus Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56533, ['race'] = 8 }
+	siteData[DS["Baleheim Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56512, ['race'] = 9 }
+	siteData[DS["Brunnhildar Village Digsite"]] = { ['continent'] = 4, ['map'] = 495, ['blob'] = 56549, ['race'] = 9 }
+	siteData[DS["Drakil'Jin Ruins Digsite"]] = { ['continent'] = 4, ['map'] = 490, ['blob'] = 56547, ['race'] = 8 }
+	siteData[DS["En'kilah Digsite"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 56522, ['race'] = 5 }
+	siteData[DS["Gjalerbron Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56516, ['race'] = 9 }
+	siteData[DS["Halgrind Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56506, ['race'] = 9 }
+	siteData[DS["Jotunheim Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56562, ['race'] = 9 }
+	siteData[DS["Kolramas Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56524, ['race'] = 5 }
+	siteData[DS["Moonrest Gardens Digsite"]] = { ['continent'] = 4, ['map'] = 488, ['blob'] = 56520, ['race'] = 4 }
+	siteData[DS["Nifflevar Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56514, ['race'] = 9 }
+	siteData[DS["Njorndar Village Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56564, ['race'] = 9 }
+	siteData[DS["Pit of Fiends Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 60367, ['race'] = 5 }
+	siteData[DS["Pit of Narjun Digsite"]] = { ['continent'] = 4, ['map'] = 488, ['blob'] = 56518, ['race'] = 5 }
+	siteData[DS["Riplash Ruins Digsite"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 56526, ['race'] = 4 }
+	siteData[DS["Ruins of Shandaral Digsite"]] = { ['continent'] = 4, ['map'] = 510, ['blob'] = 56530, ['race'] = 4 }
+	siteData[DS["Sands of Nasam"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 60369, ['race'] = 5 }
+	siteData[DS["Scourgeholme Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56555, ['race'] = 5 }
+	siteData[DS["Shield Hill Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56510, ['race'] = 9 }
+	siteData[DS["Sifreldar Village Digsite"]] = { ['continent'] = 4, ['map'] = 495, ['blob'] = 56551, ['race'] = 9 }
+	siteData[DS["Skorn Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56504, ['race'] = 9 }
+	siteData[DS["Talramas Digsite"]] = { ['continent'] = 4, ['map'] = 486, ['blob'] = 56541, ['race'] = 5 }
+	siteData[DS["Valkyrion Digsite"]] = { ['continent'] = 4, ['map'] = 495, ['blob'] = 56553, ['race'] = 9 }
+	siteData[DS["Violet Stand Digsite"]] = { ['continent'] = 4, ['map'] = 510, ['blob'] = 56528, ['race'] = 4 }
+	siteData[DS["Voldrune Digsite"]] = { ['continent'] = 4, ['map'] = 490, ['blob'] = 56543, ['race'] = 9 }
+	siteData[DS["Wyrmskull Digsite"]] = { ['continent'] = 4, ['map'] = 491, ['blob'] = 56508, ['race'] = 9 }
+	siteData[DS["Ymirheim Digsite"]] = { ['continent'] = 4, ['map'] = 492, ['blob'] = 56560, ['race'] = 9 }
+	siteData[DS["Zim'Rhuk Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56535, ['race'] = 8 }
+	siteData[DS["Zol'Heb Digsite"]] = { ['continent'] = 4, ['map'] = 496, ['blob'] = 56537, ['race'] = 8 }
 
 	--  Minimap size values
 	minimapSize = {
