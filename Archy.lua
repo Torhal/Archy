@@ -1388,47 +1388,51 @@ local digsiteOptions = {
 		},
 	},
 }
+
+--[[
 local archyDataOptions = {
-	order = 6,
-	type = "group",
-	name = "ArchyData",
-	disabled = function()
-		local _, _, _, enabled, _, reason, _ = GetAddOnInfo("Archy_Data")
-		return not enabled or (reason ~= nil)
-	end,
-	args = {
-		desc = {
-			order = 0,
-			type = "description",
-			name = L["Import Survey Node data from ArchyData"],
-		},
-		loadData = {
-			order = 5,
-			name = L["Import ArchyData"],
-			desc = L["Load ArchyData and import the data to your database."],
-			type = "execute",
-			func = function()
-				local loaded, reason = LoadAddOn("Archy_Data")
-				if loaded then
-					local ArchyData = LibStub("AceAddon-3.0"):GetAddon("Archy_Data")
---					local dataVersion = tonumber(GetAddOnMetadata("Archy_Data", "X-Generated-Version"):match("%d+"))
-					ArchyData:PerformImport(true)
-					Archy:Print(L["ArchyData has been imported."])
-					Archy:ConfigUpdated()
-					if not db.data then db.data = {} end
---					db.data.lastImport = dataVersion
-					db.data.imported = true
-				else
-					Archy:Print(L["Failed to load ArchyData due to "]..reason)
-				end
-			end,
-			disabled = function()
-				local _, _, _, enabled, _, reason, _ = GetAddOnInfo("Archy_Data")
-				return not enabled or (reason ~= nil) or (db.data and db.data.imported)
-			end,
-		},
-	},
+    order = 6,
+    type = "group",
+    name = "ArchyData",
+    disabled = function()
+        local _, _, _, enabled, _, reason, _ = GetAddOnInfo("Archy_Data")
+        return not enabled or (reason ~= nil)
+    end,
+    args = {
+        desc = {
+            order = 0,
+            type = "description",
+            name = L["Import Survey Node data from ArchyData"],
+        },
+        loadData = {
+            order = 5,
+            name = L["Import ArchyData"],
+            desc = L["Load ArchyData and import the data to your database."],
+            type = "execute",
+            func = function()
+                local loaded, reason = LoadAddOn("Archy_Data")
+                if loaded then
+                    local ArchyData = LibStub("AceAddon-3.0"):GetAddon("Archy_Data")
+--                    local dataVersion = tonumber(GetAddOnMetadata("Archy_Data", "X-Generated-Version"):match("%d+"))
+                    ArchyData:PerformImport(true)
+                    Archy:Print(L["ArchyData has been imported."])
+                    Archy:ConfigUpdated()
+                    if not db.data then db.data = {} end
+--                    db.data.lastImport = dataVersion
+                    db.data.imported = true
+                else
+                    Archy:Print(L["Failed to load ArchyData due to "]..reason)
+                end
+            end,
+            disabled = function()
+                local _, _, _, enabled, _, reason, _ = GetAddOnInfo("Archy_Data")
+                return not enabled or (reason ~= nil) or (db.data and db.data.imported)
+            end,
+        },
+    },
 }
+
+]] --
 local tomtomOptions = {
 	order = 4,
 	type = "group",
