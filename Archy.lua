@@ -1706,46 +1706,48 @@ setmetatable(artifacts, {
 
 
 local blobs = setmetatable({}, {
-__index = function(t, k)
-	local f = CreateFrame("ArchaeologyDigSiteFrame", "Archy" .. k .. "_Blob")
-	rawset(t, k, f)
-	f:ClearAllPoints()
-	f:EnableMouse(false)
-	f:SetFillAlpha(256 * db.minimap.blobAlpha)
-	f:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
-	f:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
-	f:EnableSmoothing(true)
-	f:SetBorderScalar(0.1)
-	f:Hide()
-	return f
-end })
+	__index = function(t, k)
+		local f = CreateFrame("ArchaeologyDigSiteFrame", "Archy" .. k .. "_Blob")
+		rawset(t, k, f)
+		f:ClearAllPoints()
+		f:EnableMouse(false)
+		f:SetFillAlpha(256 * db.minimap.blobAlpha)
+		f:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
+		f:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
+		f:EnableSmoothing(true)
+		f:SetBorderScalar(0.1)
+		f:Hide()
+		return f
+	end
+})
 
-local pois = setmetatable( {}, {
-__index = function(t, k)
-	local poi = CreateFrame("Frame", "ArchyMinimap_POI"..k, Minimap)
-	poi:SetWidth(10)
-	poi:SetHeight(10)
-	poi:SetScript("OnEnter", POI_OnEnter)
-	poi:SetScript("OnLeave", POI_OnLeave)
+local pois = setmetatable({}, {
+	__index = function(t, k)
+		local poi = CreateFrame("Frame", "ArchyMinimap_POI" .. k, Minimap)
+		poi:SetWidth(10)
+		poi:SetHeight(10)
+		poi:SetScript("OnEnter", POI_OnEnter)
+		poi:SetScript("OnLeave", POI_OnLeave)
 
-	local arrow = CreateFrame("Frame", nil, poi)
-	arrow:SetPoint("CENTER", poi)
-	arrow:SetScript("OnUpdate", Arrow_OnUpdate)
-	arrow:SetWidth(32)
-	arrow:SetHeight(32)
+		local arrow = CreateFrame("Frame", nil, poi)
+		arrow:SetPoint("CENTER", poi)
+		arrow:SetScript("OnUpdate", Arrow_OnUpdate)
+		arrow:SetWidth(32)
+		arrow:SetHeight(32)
 
-	local arrowtexture = arrow:CreateTexture(nil, "OVERLAY")
-	arrowtexture:SetTexture([[Interface\Minimap\ROTATING-MINIMAPGUIDEARROW]]) -- [[Interface\Archeology\Arch-Icon-Marker]])
-	arrowtexture:SetAllPoints(arrow)
-	arrow.texture = arrowtexture
-	arrow.t = 0
-	arrow.poi = poi
-	arrow:Hide()
-	poi.useArrow = false
-	poi.arrow = arrow
-	poi:Hide()
-	return poi
-end })
+		local arrowtexture = arrow:CreateTexture(nil, "OVERLAY")
+		arrowtexture:SetTexture([[Interface\Minimap\ROTATING-MINIMAPGUIDEARROW]]) -- [[Interface\Archeology\Arch-Icon-Marker]])
+		arrowtexture:SetAllPoints(arrow)
+		arrow.texture = arrowtexture
+		arrow.t = 0
+		arrow.poi = poi
+		arrow:Hide()
+		poi.useArrow = false
+		poi.arrow = arrow
+		poi:Hide()
+		return poi
+	end
+})
 
 
 
