@@ -1761,14 +1761,25 @@ local pois = setmetatable({}, {
 do
 	-- cache the zone/map data
 	local orig = GetCurrentMapAreaID()
+
 	for cid, cname in pairs{ GetMapContinents() } do
 		SetMapZoom(cid)
 		local mapid = GetCurrentMapAreaID()
 		continentMapToID[mapid] = cid
+
 		local cmn = GetMapInfo()
-		zoneData[mapid] = { ['continent'] = cid, ['map'] = mapid, ['level'] = 0, ['mapFile'] = cmn, ['id'] = 0, ['name'] = cname }
+
+		zoneData[mapid] = {
+			['continent'] = cid,
+			['map'] = mapid,
+			['level'] = 0,
+			['mapFile'] = cmn,
+			['id'] = 0,
+			['name'] = cname
+		}
 		mapFileToID[cmn] = mapid
 		mapIDToZoneName[mapid] = cname
+
 		for zid, zname in pairs{ GetMapZones(cid) } do
 			SetMapZoom(cid, zid)
 			local mapid = GetCurrentMapAreaID()
