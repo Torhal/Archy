@@ -2461,7 +2461,7 @@ local function GetContinentSites(cid)
 				local digsite = {
 					continent = mc,
 					zoneId = zoneID,
-					zoneName = mapIDToZoneName[mz] or L["Unknown"],
+					zoneName = mapIDToZoneName[mz] or UNKNOWN,
 					mapFile = mapFile,
 					map = mz,
 					level = fz,
@@ -3289,7 +3289,7 @@ function ldb:OnEnter()
 		elseif maxRank == MAX_ARCHAEOLOGY_RANK and rank == maxRank then
 			skill = string.format("%s%s|r", GREEN_FONT_COLOR_CODE, "MAX")
 		end
-		tooltip:SetCell(line, 1, string.format("%s%s|r%s", NORMAL_FONT_COLOR_CODE, L["Skill: "], skill), "CENTER", numCols)
+		tooltip:SetCell(line, 1, string.format("%s%s|r%s", NORMAL_FONT_COLOR_CODE, SKILL .. ": ", skill), "CENTER", numCols)
 
 		line = tooltip:AddLine("."); tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Artifacts"]), "LEFT", numCols);
 		line = tooltip:AddLine(".")
@@ -3342,7 +3342,7 @@ function ldb:OnEnter()
 				tooltip:SetCell(line, 5, NORMAL_FONT_COLOR_CODE .. ZONE .. "|r", "LEFT", 2);
 				tooltip:SetCell(line, 7, NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1);
 				tooltip:SetCell(line, 8, NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1);
-				tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. L["Frags"] .. "|r", "CENTER", 1);
+				tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1);
 				tooltip:SetCell(line, 10, NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1);
 
 				for _, site in pairs(csites) do
@@ -3427,7 +3427,7 @@ local function SlashHandler(msg, editbox)
 	elseif command == ("TomTom"):lower() then
 		db.tomtom.enabled = not db.tomtom.enabled
 		RefreshTomTom()
-	elseif command == L["minimap"]:lower() then
+	elseif command == MINIMAP_LABEL:lower() then
 		db.minimap.show = not db.minimap.show
 		Archy:ConfigUpdated('minimap')
 	elseif command == "test" then
@@ -3443,7 +3443,7 @@ local function SlashHandler(msg, editbox)
 		Archy:Print("|cFF00FF00" .. L["nearest"] .. "|r or |cFF00FF00" .. L["closest"] .. "|r - " .. L["Announces the nearest dig site to you"])
 		Archy:Print("|cFF00FF00" .. L["reset"] .. "|r - " .. L["Reset the window positions to defaults"])
 		Archy:Print("|cFF00FF00" .. "TomTom" .. "|r - " .. L["Toggles TomTom Integration"])
-		Archy:Print("|cFF00FF00" .. L["minimap"] .. "|r - " .. L["Toggles the dig site icons on the minimap"])
+		Archy:Print("|cFF00FF00" .. MINIMAP_LABEL .. "|r - " .. L["Toggles the dig site icons on the minimap"])
 	end
 end
 
