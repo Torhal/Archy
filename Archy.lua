@@ -2472,7 +2472,7 @@ end
 
 local function SetDistanceIndicatorText(distance)
 	if distance then
-		distanceIndicatorFrame.circle.distance:SetText(string.format("%1.f", distance))
+		distanceIndicatorFrame.circle.distance:SetFormattedText("%1.f", distance)
 	end
 end
 
@@ -3064,9 +3064,8 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
 	if value[2] > 0 then
 		adjust = "(+" .. tostring(value[2]) .. ")"
 	end
-	local frags = string.format("%d%s / %d", value[1], adjust, value[3])
 
-	fs:SetText(frags)
+	fs:SetFormattedText("%d%s / %d", value[1], adjust, value[3])
 	fs:Show()
 
 	return bar:GetWidth() + 2, bar:GetHeight() + 2
@@ -3523,7 +3522,7 @@ function Archy:SkillLinesChanged()
 	if racesFrame and racesFrame.skillBar then
 		racesFrame.skillBar:SetMinMaxValues(0, maxRank)
 		racesFrame.skillBar:SetValue(rank)
-		racesFrame.skillBar.text:SetText(string.format("%s : %d/%d", GetArchaeologyInfo(), rank, maxRank))
+		racesFrame.skillBar.text:SetFormattedText("%s : %d/%d", GetArchaeologyInfo(), rank, maxRank)
 	end
 end
 
@@ -3917,21 +3916,24 @@ function Archy:RefreshRacesDisplay()
 			child.fragmentBar:SetMinMaxValues(0, artifact['fragTotal'])
 			child.fragmentBar:SetValue(min(artifact['fragments'] + artifact['fragAdjust'], artifact['fragTotal']))
 			local adjust = (artifact['fragAdjust'] > 0) and string.format(" (|cFF00FF00+%d|r)", artifact['fragAdjust']) or ""
-			child.fragmentBar.fragments:SetText(string.format("%d%s / %d", artifact['fragments'], adjust, artifact['fragTotal']))
+			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact['fragments'], adjust, artifact['fragTotal'])
 			child.fragmentBar.artifact:SetText(artifact['name'])
 			child.fragmentBar.artifact:SetWordWrap(true)
+
 			local endFound = false
 			local artifactNameSize = child.fragmentBar:GetWidth() - 10
 
 			if db.artifact.style == "Compact" then
 				artifactNameSize = artifactNameSize - 40
+
 				if artifact['sockets'] > 0 then
 					child.fragmentBar.keystones.tooltip = string.format(L["%d Key stone sockets available"], artifact['sockets'])
 					                                      .. "\n" .. string.format(L["%d %ss in your inventory"], (race['keystone']['inventory'] or 0), (race['keystone']['name'] or L["Key stone"]))
 					child.fragmentBar.keystones:Show()
 					if child.fragmentBar.keystones and child.fragmentBar.keystones.count then
-						child.fragmentBar.keystones.count:SetText(string.format("%d/%d", artifact['stonesAdded'], artifact['sockets']))
+						child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact['stonesAdded'], artifact['sockets'])
 					end
+
 					if artifact['stonesAdded'] > 0 then
 						child.fragmentBar.keystones.icon:SetTexture(race['keystone']['texture'])
 					else
@@ -4254,7 +4256,7 @@ function Archy:RefreshDigSiteDisplay()
 			count = (count and tostring(count) or "0") .. "/3"
 		end
 
-		siteFrame.distance.value:SetText(string.format(L["%d yards"], site.distance))
+		siteFrame.distance.value:SetFormattedText(L["%d yards"], site.distance)
 		siteFrame.digCounter.value:SetText(count)
 		siteFrame.site.name:SetText((Archy:IsSiteBlacklisted(site.name)) and "|cFFFF0000" .. site.name or site.name)
 
