@@ -2463,14 +2463,20 @@ function ToggleDistanceIndicator()
 	end
 end
 
-local diColors = {
-	["Green"] = { 0, 0.24609375, 0, 1 },
-	["Yellow"] = { 0.24609375, 0.5, 0, 1 },
-	["Red"] = { 0.5, 0.75, 0, 1 },
+local DISTANCE_COLOR_TEXCOORDS = {
+	green = {
+		0, 0.24609375, 0, 1
+	},
+	yellow = {
+		0.24609375, 0.5, 0, 1
+	},
+	red = {
+		0.5, 0.75, 0, 1
+	},
 }
 local function SetDistanceIndicatorColor(color)
 	if color then
-		distanceIndicatorFrame.circle.texture:SetTexCoord(unpack(diColors[color]))
+		distanceIndicatorFrame.circle.texture:SetTexCoord(unpack(DISTANCE_COLOR_TEXCOORDS[color]))
 		distanceIndicatorFrame.circle:SetAlpha(1)
 	end
 	ToggleDistanceIndicator()
@@ -2490,11 +2496,11 @@ local function UpdateDistanceIndicator()
 	local redMin, redMax = yellowMax, 500
 
 	if distance >= greenMin and distance <= greenMax then
-		SetDistanceIndicatorColor("Green")
+		SetDistanceIndicatorColor("green")
 	elseif distance >= yellowMin and distance <= yellowMax then
-		SetDistanceIndicatorColor("Yellow")
+		SetDistanceIndicatorColor("yellow")
 	elseif distance >= redMin and distance <= redMax then
-		SetDistanceIndicatorColor("Red")
+		SetDistanceIndicatorColor("red")
 	else
 		ToggleDistanceIndicator()
 		return
