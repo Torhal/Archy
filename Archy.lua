@@ -2267,19 +2267,22 @@ local function CompareAndResetDigCounters(a, b)
 	end
 end
 
-local function GetContinentSites(cid)
+local DIG_LOCATION_TEXTURE = 177
+
+local function GetContinentSites(continent_id)
 	local sites, orig = {}, GetCurrentMapAreaID()
-	SetMapZoom(cid)
+	SetMapZoom(continent_id)
+
 	local totalPOIs = GetNumMapLandmarks()
+
 	for index = 1, totalPOIs do
 		local name, description, textureIndex, px, py = GetMapLandmarkInfo(index)
-		if textureIndex == 177 then
+
+		if textureIndex == DIG_LOCATION_TEXTURE then
 			local zoneName, mapFile, texPctX, texPctY, texX, texY, scrollX, scrollY = UpdateMapHighlight(px, py)
-
 			local site = DIG_SITES[name]
-
 			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
-			mc, fc = astrolabe:GetMapID(cid, 0)
+			mc, fc = astrolabe:GetMapID(continent_id, 0)
 			mz = site.map
 			zoneID = mapIDToZone[mz]
 
@@ -2313,15 +2316,21 @@ end
 
 local function UpdateSites()
 	local sites
-	for cid, cname in pairs{ GetMapContinents() } do
-		if (not digsites[cid]) then digsites[cid] = {} end
-		sites = GetContinentSites(cid)
-		if sites and (#sites > 0) and cid == continentMapToID[playerContinent] then
-			CompareAndResetDigCounters(digsites[cid], sites)
-			CompareAndResetDigCounters(sites, digsites[cid])
+
+	for continent_id, continent_name in pairs{ GetMapContinents() } do
+		if not digsites[continent_id] then
+			digsites[continent_id] = {}
+		end
+		sites = GetContinentSites(continent_id)
+
+		if sites and #sites > 0 and continent_id == continentMapToID[playerContinent] then
+			CompareAndResetDigCounters(digsites[continent_id], sites)
+			CompareAndResetDigCounters(sites, digsites[continent_id])
 		end
 
-		if (#sites > 0) then digsites[cid] = sites end
+		if #sites > 0 then
+			digsites[continent_id] = sites
+		end
 	end
 end
 
