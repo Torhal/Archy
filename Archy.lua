@@ -284,7 +284,7 @@ local generalOptions = {
 				return db.general.icon.hide
 			end,
 			set = function(k, v)
-				db.general.icon.hide = v;
+				db.general.icon.hide = v
 				if db.general.icon.hide then
 					LDBI:Hide("Archy")
 				else
@@ -2072,7 +2072,7 @@ end
 
 local function Ping()
 	if db.general.show then
-		PlaySoundFile("Interface\\AddOns\\Archy\\Media\\dingding.mp3");
+		PlaySoundFile("Interface\\AddOns\\Archy\\Media\\dingding.mp3")
 	end
 end
 
@@ -2094,7 +2094,7 @@ function UpdateRaceArtifact(rid)
 			ArchaeologyFrame_ShowArtifact(rid)
 		end
 		SetSelectedArtifact(rid)
-		local name, _, rarity, icon, spellDescription, numSockets = GetSelectedArtifactInfo();
+		local name, _, rarity, icon, spellDescription, numSockets = GetSelectedArtifactInfo()
 		local base, adjust, total = GetArtifactProgress()
 
 		local artifact = artifacts[rid]
@@ -2156,7 +2156,7 @@ function SolveRaceArtifact(rid, useStones)
 	if rid then
 		SetSelectedArtifact(rid)
 		artifactSolved['raceId'] = rid
-		artifactSolved['name'] = GetSelectedArtifactInfo();
+		artifactSolved['name'] = GetSelectedArtifactInfo()
 		keystoneLootRaceID = rid -- this is to force a refresh after the ARTIFACT_COMPLETE event
 
 		if useStones ~= nil then
@@ -3168,9 +3168,9 @@ function ldb:OnEnter()
 	local tooltip = qtip:Acquire("ArchyTooltip", numCols, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
 	self.tooltip = tooltip
 	tooltip:SetScale(1)
-	tooltip:SetAutoHideDelay(0.1, self);
-	tooltip:Hide();
-	tooltip:Clear();
+	tooltip:SetAutoHideDelay(0.1, self)
+	tooltip:Hide()
+	tooltip:Clear()
 
 	local line = tooltip:AddHeader(".")
 	tooltip:SetCell(line, 1, string.format("%s%s%s", ORANGE_FONT_COLOR_CODE, "Archy", "|r"), "CENTER", numCols)
@@ -3185,7 +3185,8 @@ function ldb:OnEnter()
 		end
 		tooltip:SetCell(line, 1, string.format("%s%s|r%s", NORMAL_FONT_COLOR_CODE, SKILL .. ": ", skill), "CENTER", numCols)
 
-		line = tooltip:AddLine("."); tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Artifacts"]), "LEFT", numCols);
+		line = tooltip:AddLine(".")
+		tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Artifacts"]), "LEFT", numCols)
 		line = tooltip:AddLine(".")
 		tooltip:SetCell(line, 1, " ", "LEFT", 1)
 		tooltip:SetCell(line, 2, NORMAL_FONT_COLOR_CODE .. RACE .. "|r", "LEFT", 1)
@@ -3199,9 +3200,9 @@ function ldb:OnEnter()
 		for rid, artifact in pairs(artifacts) do
 			if artifact['fragTotal'] > 0 then
 				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[rid]['texture']), "LEFT", 1);
+				tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[rid]['texture']), "LEFT", 1)
 				tooltip:SetCell(line, 2, raceData[rid]['name'], "LEFT", 1)
-				tooltip:SetCell(line, 3, " " .. format("|T%s:18:18|t", artifact['icon']), "LEFT", 1);
+				tooltip:SetCell(line, 3, " " .. format("|T%s:18:18|t", artifact['icon']), "LEFT", 1)
 				local artifactName = artifact['name']
 				if artifact['rare'] then artifactName = string.format("%s%s|r", "|cFF0070DD", artifactName) end
 				tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
@@ -3215,8 +3216,10 @@ function ldb:OnEnter()
 			end
 		end
 
-		line = tooltip:AddLine(" "); line = tooltip:AddLine(" ");
-		tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Dig Sites"]), "LEFT", numCols);
+		line = tooltip:AddLine(" ")
+		line = tooltip:AddLine(" ")
+		tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Dig Sites"]), "LEFT", numCols)
+
 		for cid, csites in pairs(digsites) do
 			if (#csites > 0) and (cid == continentMapToID[playerContinent] or not db.digsite.filterLDB) then
 				local continentName
@@ -3227,46 +3230,46 @@ function ldb:OnEnter()
 					end
 				end
 				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, "  " .. ORANGE_FONT_COLOR_CODE .. continentName .. "|r", "LEFT", numCols);
+				tooltip:SetCell(line, 1, "  " .. ORANGE_FONT_COLOR_CODE .. continentName .. "|r", "LEFT", numCols)
 
-				line = tooltip:AddLine(" ");
-				tooltip:SetCell(line, 1, " ", "LEFT", 1);
-				tooltip:SetCell(line, 2, NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2);
-				tooltip:SetCell(line, 4, NORMAL_FONT_COLOR_CODE .. L["Dig Site"] .. "|r", "LEFT", 1);
-				tooltip:SetCell(line, 5, NORMAL_FONT_COLOR_CODE .. ZONE .. "|r", "LEFT", 2);
-				tooltip:SetCell(line, 7, NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1);
-				tooltip:SetCell(line, 8, NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1);
-				tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1);
-				tooltip:SetCell(line, 10, NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1);
+				line = tooltip:AddLine(" ")
+				tooltip:SetCell(line, 1, " ", "LEFT", 1)
+				tooltip:SetCell(line, 2, NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
+				tooltip:SetCell(line, 4, NORMAL_FONT_COLOR_CODE .. L["Dig Site"] .. "|r", "LEFT", 1)
+				tooltip:SetCell(line, 5, NORMAL_FONT_COLOR_CODE .. ZONE .. "|r", "LEFT", 2)
+				tooltip:SetCell(line, 7, NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 8, NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 10, NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 
 				for _, site in pairs(csites) do
 					line = tooltip:AddLine(" ")
-					tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[site['raceId']]['texture']), "LEFT", 1);
-					tooltip:SetCell(line, 2, raceData[site['raceId']]['name'], "LEFT", 2);
-					tooltip:SetCell(line, 4, site['name'], "LEFT", 1);
-					tooltip:SetCell(line, 5, site['zoneName'], "LEFT", 2);
-					tooltip:SetCell(line, 7, siteStats[site['id']]['surveys'], "CENTER", 1);
-					tooltip:SetCell(line, 8, siteStats[site['id']]['looted'], "CENTER", 1);
-					tooltip:SetCell(line, 9, siteStats[site['id']]['fragments'], "CENTER", 1);
-					tooltip:SetCell(line, 10, siteStats[site['id']]['keystones'], "CENTER", 1);
+					tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[site['raceId']]['texture']), "LEFT", 1)
+					tooltip:SetCell(line, 2, raceData[site['raceId']]['name'], "LEFT", 2)
+					tooltip:SetCell(line, 4, site['name'], "LEFT", 1)
+					tooltip:SetCell(line, 5, site['zoneName'], "LEFT", 2)
+					tooltip:SetCell(line, 7, siteStats[site['id']]['surveys'], "CENTER", 1)
+					tooltip:SetCell(line, 8, siteStats[site['id']]['looted'], "CENTER", 1)
+					tooltip:SetCell(line, 9, siteStats[site['id']]['fragments'], "CENTER", 1)
+					tooltip:SetCell(line, 10, siteStats[site['id']]['keystones'], "CENTER", 1)
 				end
 				line = tooltip:AddLine(" ")
 			end
 		end
 	else
-		line = tooltip:AddLine(" ");
-		tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", numCols);
+		line = tooltip:AddLine(" ")
+		tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", numCols)
 	end
 
-	line = tooltip:AddLine(" ");
-	line = tooltip:AddLine(" "); tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", numCols);
-	line = tooltip:AddLine(" "); tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", numCols);
-	line = tooltip:AddLine(" "); tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Right-Click to lock/unlock Archy"] .. "|r", "LEFT", numCols);
-	line = tooltip:AddLine(" "); tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", numCols);
+	line = tooltip:AddLine(" ")
+	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", numCols)
+	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", numCols)
+	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Right-Click to lock/unlock Archy"] .. "|r", "LEFT", numCols)
+	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", numCols)
 
-	tooltip:EnableMouse();
-	tooltip:SmartAnchorTo(self);
-	tooltip:UpdateScrolling();
+	tooltip:EnableMouse()
+	tooltip:SmartAnchorTo(self)
+	tooltip:UpdateScrolling()
 	tooltip:Show()
 end
 
@@ -4256,8 +4259,8 @@ function Archy:ShowDigSiteTooltip(self)
 	else
 		self.tooltip = self.tooltip .. "\n" .. L["Right-Click to blacklist"]
 	end
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
-	GameTooltip:SetText(self.tooltip, NORMAL_FONT_COLOR[1], NORMAL_FONT_COLOR[2], NORMAL_FONT_COLOR[3], 1, true);
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:SetText(self.tooltip, NORMAL_FONT_COLOR[1], NORMAL_FONT_COLOR[2], NORMAL_FONT_COLOR[3], 1, true)
 end
 
 function Archy:ResizeDigSiteDisplay()
@@ -4514,16 +4517,17 @@ end
 local function NormalHijackCheck()
 	-- if ( not IsTaintable() and db.general.easyCast and not ShouldBeHidden() ) then -- karl_w_w
 	if (not IsTaintable() and db.general.easyCast and not ShouldBeHidden() and 0 ~= ArchaeologyMapUpdateAll()) then
-		return true;
+		return true
 	end
 end
 
-local HijackCheck = NormalHijackCheck;
+local HijackCheck = NormalHijackCheck
+
 local function SetHijackCheck(func)
-	if (not func) then
-		func = NormalHijackCheck;
+	if not func then
+		func = NormalHijackCheck
 	end
-	HijackCheck = func;
+	HijackCheck = func
 end
 
 local sabutton
@@ -4531,18 +4535,18 @@ local function CreateSAButton(name, postclick)
 	if sabutton then
 		return
 	end
-	local btn = CreateFrame("Button", name, UIParent, "SecureActionButtonTemplate");
-	btn:SetPoint("LEFT", UIParent, "RIGHT", 10000, 0);
-	btn:SetFrameStrata("LOW");
-	btn:EnableMouse(true);
-	btn:RegisterForClicks("RightButtonUp");
-	btn:SetScript("PostClick", postclick);
-	btn:Hide();
-	btn.name = name;
+	local btn = CreateFrame("Button", name, UIParent, "SecureActionButtonTemplate")
+	btn:SetPoint("LEFT", UIParent, "RIGHT", 10000, 0)
+	btn:SetFrameStrata("LOW")
+	btn:EnableMouse(true)
+	btn:RegisterForClicks("RightButtonUp")
+	btn:SetScript("PostClick", postclick)
+	btn:Hide()
+	btn.name = name
 
-	sabutton = btn;
+	sabutton = btn
 
-	return btn;
+	return btn
 end
 
 local function GetSurveySkillInfo()
@@ -4557,21 +4561,22 @@ end
 local ActionBarID
 local SURVEYTEXTURE = "Interface\\Icons\\INV_Misc_Shovel_01"
 local function GetSurveyActionBarID(force)
-	if (force or not ActionBarID) then
+	if force or not ActionBarID then
 		for slot = 1, 72 do
-			if (HasAction(slot) and not IsAttackAction(slot)) then
-				local t, _, _ = GetActionInfo(slot);
-				if (t == "spell") then
-					local tex = GetActionTexture(slot);
-					if (tex and tex == SURVEYTEXTURE) then
-						ActionBarID = slot;
-						break;
+			if HasAction(slot) and not IsAttackAction(slot) then
+				local t, _, _ = GetActionInfo(slot)
+
+				if t == "spell" then
+					local tex = GetActionTexture(slot)
+					if tex and tex == SURVEYTEXTURE then
+						ActionBarID = slot
+						break
 					end
 				end
 			end
 		end
 	end
-	return ActionBarID;
+	return ActionBarID
 end
 
 local function InvokeSurvey(useaction, btn)
@@ -4605,33 +4610,34 @@ end
 
 local function CentralCasting()
 	InvokeSurvey(true)
-	OverrideClick();
-	OverrideOn = true;
+	OverrideClick()
+	OverrideOn = true
 end
 
 local lastClickTime
-local ACTIONDOUBLEWAIT = 0.4;
-local MINACTIONDOUBLECLICK = 0.05;
+local ACTIONDOUBLEWAIT = 0.4
+local MINACTIONDOUBLECLICK = 0.05
 local isLooting = false
+
 local function CheckForDoubleClick()
 	if not isLooting and lastClickTime then
-		local pressTime = GetTime();
-		local doubleTime = pressTime - lastClickTime;
+		local pressTime = GetTime()
+		local doubleTime = pressTime - lastClickTime
 
-		if ((doubleTime < ACTIONDOUBLEWAIT) and (doubleTime > MINACTIONDOUBLECLICK)) then
+		if doubleTime < ACTIONDOUBLEWAIT and doubleTime > MINACTIONDOUBLECLICK then
 			lastClickTime = nil
 			return true
 		end
 	end
-	lastClickTime = GetTime();
-	return false;
+	lastClickTime = GetTime()
+	return false
 end
 
 local function ExtendDoubleClick()
 	if not lastClickTime then
 		return
 	end
-	lastClickTime = lastClickTime + ACTIONDOUBLEWAIT / 2;
+	lastClickTime = lastClickTime + ACTIONDOUBLEWAIT / 2
 end
 
 local SavedWFOnMouseDown
@@ -4642,7 +4648,7 @@ local SavedWFOnMouseDown
 -- that the mouse handler in the WorldFrame got everything first!
 local function WF_OnMouseDown(...)
 	-- Only steal 'right clicks' (self is arg #1!)
-	local button = select(2, ...);
+	local button = select(2, ...)
 
 	if button == "RightButton" and HijackCheck() then
 		if CheckForDoubleClick() then
@@ -4660,19 +4666,19 @@ local function WF_OnMouseDown(...)
 end
 
 local function SafeHookMethod(object, method, new_method)
-	local oldValue = object[method];
+	local oldValue = object[method]
 
 	if oldValue ~= _G[new_method] then
 		object[method] = new_method
-		return true;
+		return true
 	end
-	return false;
+	return false
 end
 
 local function SafeHookScript(frame, handlername, newscript)
-	local oldValue = frame:GetScript(handlername);
-	frame:SetScript(handlername, newscript);
-	return oldValue;
+	local oldValue = frame:GetScript(handlername)
+	frame:SetScript(handlername, newscript)
+	return oldValue
 end
 
 
@@ -4680,7 +4686,7 @@ function TrapWorldMouse()
 	if WorldFrame.OnMouseDown then
 		hooksecurefunc(WorldFrame, "OnMouseDown", WF_OnMouseDown)
 	else
-		SavedWFOnMouseDown = SafeHookScript(WorldFrame, "OnMouseDown", WF_OnMouseDown);
+		SavedWFOnMouseDown = SafeHookScript(WorldFrame, "OnMouseDown", WF_OnMouseDown)
 	end
 end
 
