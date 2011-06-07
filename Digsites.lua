@@ -1128,6 +1128,9 @@ local DIG_SITES = {
 	},
 }
 
+-- Workaround for Blizzard bug with GetMapLandmarkInfo()
+DIG_SITES[DS["Grimsilt Digsite"]] = DIG_SITES[DS["Grimesilt Digsite"]]
+
 local EMPTY_DIGSITE = {
 	["continent"] = 0,
 	["map"] = 0,
