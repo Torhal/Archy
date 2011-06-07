@@ -2470,20 +2470,19 @@ local function SetDistanceIndicatorColor(color)
 	ToggleDistanceIndicator()
 end
 
-local function SetDistanceIndicatorText(distance)
-	if distance then
-		distanceIndicatorFrame.circle.distance:SetFormattedText("%1.f", distance)
-	end
-end
-
 local function UpdateDistanceIndicator()
-	if surveyPosition.x == 0 and surveyPosition.y == 0 then return end
+	if surveyPosition.x == 0 and surveyPosition.y == 0 then
+		return
+	end
 	local distance = astrolabe:ComputeDistance(playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y, surveyPosition.map, surveyPosition.level, surveyPosition.x, surveyPosition.y)
-	if not distance or IsInInstance() then distance = 0 end
 
+	if not distance or IsInInstance() then
+		distance = 0
+	end
 	local greenMin, greenMax = 0, db.digsite.distanceIndicator.green
 	local yellowMin, yellowMax = greenMax, db.digsite.distanceIndicator.yellow
 	local redMin, redMax = yellowMax, 500
+
 	if distance >= greenMin and distance <= greenMax then
 		SetDistanceIndicatorColor("Green")
 	elseif distance >= yellowMin and distance <= yellowMax then
@@ -2494,7 +2493,7 @@ local function UpdateDistanceIndicator()
 		ToggleDistanceIndicator()
 		return
 	end
-	SetDistanceIndicatorText(distance)
+	distanceIndicatorFrame.circle.distance:SetFormattedText("%1.f", distance)
 end
 
 
