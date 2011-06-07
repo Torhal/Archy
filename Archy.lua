@@ -2313,15 +2313,34 @@ function Archy:ToggleSiteBlacklist(name)
 	siteBlacklist[name] = not siteBlacklist[name]
 end
 
+local function SortSitesByDistance(a, b)
+	if Archy:IsSiteBlacklisted(a.name) and not Archy:IsSiteBlacklisted(b.name) then
+		return 1 < 0
+	elseif not Archy:IsSiteBlacklisted(a.name) and Archy:IsSiteBlacklisted(b.name) then
+		return 0 < 1
+	end
+
+	if (a.distance == -1 and b.distance == -1) or (not a.distance and not b.distance) then
+		return a.zoneName .. ":" .. a.name < b.zoneName .. ":" .. b.name
+	else
+		return (a.distance or 0) < (b.distance or 0)
+	end
+end
+
+local function SortSitesByName(a, b)
+	return a.zoneName .. ":" .. a.name < b.zoneName .. ":" .. b.name
+end
+
 function Archy:UpdateSiteDistances()
 	if not digsites[continentMapToID[playerContinent]] or (#digsites[continentMapToID[playerContinent]] == 0) then
 		nearestSite = nil
 		return
 	end
-
 	local distance, nearest
+
 	for i = 1, SITES_PER_CONTINENT do
 		local site = digsites[continentMapToID[playerContinent]][i]
+
 		if site.poi then
 			site.distance = astrolabe:GetDistanceToIcon(site.poi)
 		else
@@ -2350,22 +2369,9 @@ function Archy:UpdateSiteDistances()
 	-- Sort sites
 	local sites = digsites[continentMapToID[playerContinent]]
 	if db.digsite.sortByDistance then
-		table.sort(sites, function(a, b)
-			if Archy:IsSiteBlacklisted(a.name) and not Archy:IsSiteBlacklisted(b.name) then
-				return 1 < 0
-			elseif not Archy:IsSiteBlacklisted(a.name) and Archy:IsSiteBlacklisted(b.name) then
-				return 0 < 1
-			end
-			if (a.distance == -1 and b.distance == -1) or (not a.distance and not b.distance) then
-				return a.zoneName .. ":" .. a.name < b.zoneName .. ":" .. b.name
-			else
-				return (a.distance or 0) < (b.distance or 0)
-			end
-		end)
+		table.sort(sites, SortSitesByDistance)
 	else -- sort by zone then name
-		table.sort(sites, function(a, b)
-			return a.zoneName .. ":" .. a.name < b.zoneName .. ":" .. b.name
-		end)
+		table.sort(sites, SortSitesByName)
 	end
 end
 
