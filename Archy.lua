@@ -2471,12 +2471,12 @@ local function SetDistanceIndicatorColor(color)
 end
 
 local function UpdateDistanceIndicator()
-	if surveyPosition.x == 0 and surveyPosition.y == 0 then
+	if surveyPosition.x == 0 and surveyPosition.y == 0 or IsInInstance() then
 		return
 	end
 	local distance = astrolabe:ComputeDistance(playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y, surveyPosition.map, surveyPosition.level, surveyPosition.x, surveyPosition.y)
 
-	if not distance or IsInInstance() then
+	if not distance then
 		distance = 0
 	end
 	local greenMin, greenMax = 0, db.digsite.distanceIndicator.green
