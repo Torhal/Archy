@@ -4227,23 +4227,26 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 end
 
 function Archy:RefreshDigSiteDisplay()
-	if ShouldBeHidden() then return end
+	if ShouldBeHidden() then
+		return
+	end
+	local continent_id = continentMapToID[playerContinent]
 
-	local cid = continentMapToID[playerContinent]
-	if not cid then return end
-	if not digsites[cid] or #digsites[cid] == 0 then return end
-	for _, siteFrame in pairs(digsiteFrame.children) do siteFrame:Hide() end
+	if not continent_id or not digsites[continent_id] or #digsites[continent_id] == 0 then
+		return
+	end
 
-	local hasNilDistance = false
-	for _, site in pairs(digsites[cid]) do
-		if site.distance == nil then
-			hasNilDistance = true
-			break
+	for _, siteFrame in pairs(digsiteFrame.children) do
+		siteFrame:Hide()
+	end
+
+	for _, site in pairs(digsites[continent_id]) do
+		if not site.distance then
+			return
 		end
 	end
-	if hasNilDistance then return end
 
-	for siteIndex, site in pairs(digsites[cid]) do
+	for siteIndex, site in pairs(digsites[continent_id]) do
 		local siteFrame = digsiteFrame.children[siteIndex]
 		local count = siteStats[site.id]['counter']
 
