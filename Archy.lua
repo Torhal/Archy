@@ -2475,10 +2475,8 @@ local DISTANCE_COLOR_TEXCOORDS = {
 	},
 }
 local function SetDistanceIndicatorColor(color)
-	if color then
-		distanceIndicatorFrame.circle.texture:SetTexCoord(unpack(DISTANCE_COLOR_TEXCOORDS[color]))
-		distanceIndicatorFrame.circle:SetAlpha(1)
-	end
+	distanceIndicatorFrame.circle.texture:SetTexCoord(unpack(DISTANCE_COLOR_TEXCOORDS[color]))
+	distanceIndicatorFrame.circle:SetAlpha(1)
 	ToggleDistanceIndicator()
 end
 
