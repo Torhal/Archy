@@ -4266,14 +4266,10 @@ function Archy:RefreshDigSiteDisplay()
 			siteFrame.zone.name:SetText(site.zoneName)
 			siteFrame.site.siteName = site.name
 			siteFrame.site.zoneId = site.zoneId
-			siteFrame.distance.value:SetText(string.format(L["%d yards"], site.distance))
-
 			siteFrame:SetID(site.id)
 		end
-
 		siteFrame:Show()
 	end
-
 	self:ResizeDigSiteDisplay()
 end
 
