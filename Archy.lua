@@ -3784,14 +3784,12 @@ function Archy:UpdatePlayerPosition(force)
 end
 
 function Archy:RefreshAll()
-	-- player location has changed
 	if not IsInInstance() then
 		self:UpdateSiteDistances()
 		UpdateDistanceIndicator()
 		UpdateMinimapPOIs()
 		UpdateSiteBlobs()
 	end
-	--self:UpdateDigSiteFrame()
 	self:RefreshDigSiteDisplay()
 end
 
