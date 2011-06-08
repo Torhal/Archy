@@ -1926,7 +1926,7 @@ end
 -- Toggles the lock of the panels
 local function ToggleLock()
 	db.general.locked = not db.general.locked
-	Archy:Print("is now", (db.general.locked and "" or "un") .. "locked.")
+	Archy:Print(db.general.locked and _G.LOCKED or _G.UNLOCK)
 	Archy:ConfigUpdated()
 end
 
