@@ -3737,17 +3737,15 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not db.general.show or (not HasArchaeology()) or (IsInInstance()) or (UnitIsGhost('player') == 1) then
+	if not db.general.show or not HasArchaeology() or IsInInstance() or UnitIsGhost('player') then
 		return
 	end
 
 	if GetCurrentMapAreaID() == -1 then
-		if not IsInInstance() then
-			self:UpdateSiteDistances()
-			self:UpdateDigSiteFrame()
-			self:RefreshDigSiteDisplay()
-			return
-		end
+		self:UpdateSiteDistances()
+		self:UpdateDigSiteFrame()
+		self:RefreshDigSiteDisplay()
+		return
 	end
 	local map, level, x, y = astrolabe:GetCurrentPlayerPosition()
 
@@ -3762,8 +3760,7 @@ function Archy:UpdatePlayerPosition(force)
 		self:RefreshAll()
 	end
 
-	if playerContinent ~= continent then -- we have switch continents or moved into an instance, battleground or something similar
-		--        print("---- PLAYER CHANGED CONTINENT TO : ", continent, "-----")
+	if playerContinent ~= continent then
 		playerContinent = continent
 
 		if #raceData == 0 then
