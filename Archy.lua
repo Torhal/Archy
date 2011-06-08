@@ -4019,13 +4019,11 @@ function Archy:RefreshRacesDisplay()
 			local barTexture = (lsm and lsm:Fetch('statusbar', db.artifact.fragmentBarTexture)) or DEFAULT_STATUSBAR_TEXTURE
 			child.fragmentBar.barTexture:SetTexture(barTexture)
 			child.fragmentBar.barTexture:SetHorizTile(false)
-			--[[
-            if db.artifact.fragmentBarTexture == "Archy" then
-                child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)            -- can solve with keystones if they were attached
-            else
-                child.fragmentBar.barTexture:SetTexCoord(0, 0, 0.77525001764297, 0.810546875)
-            end
-]]
+			--            if db.artifact.fragmentBarTexture == "Archy" then
+			--                child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)            -- can solve with keystones if they were attached
+			--            else
+			--                child.fragmentBar.barTexture:SetTexCoord(0, 0, 0.77525001764297, 0.810546875)
+			--            end
 
 
 			local barColor
@@ -4124,7 +4122,7 @@ function Archy:RefreshRacesDisplay()
 
 			child.crest:SetNormalTexture(raceData[rid]['texture'])
 			child.crest:SetHighlightTexture(raceData[rid]['texture'])
-			child.crest.tooltip = artifact['name'] .. "\n" .. NORMAL_FONT_COLOR_CODE .. L["Race: "] .. "|r" .. HIGHLIGHT_FONT_COLOR_CODE .. raceData[rid]['name'] .. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
+			child.crest.tooltip = artifact['name'] .. "\n" .. NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. HIGHLIGHT_FONT_COLOR_CODE .. raceData[rid]['name'] .. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 			child.artifact.text:SetText(nameColor .. artifact['name'])
 			child.artifact.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
