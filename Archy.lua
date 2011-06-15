@@ -2408,7 +2408,10 @@ function AnnounceNearestSite()
 	if not nearestSite or not nearestSite.distance or nearestSite.distance == 999999 then
 		return
 	end
-	Archy:Pour(string.format(L["Nearest Dig Site is: %s in %s (%.1f yards away)"], GREEN_FONT_COLOR_CODE .. nearestSite.name .. "|r", GREEN_FONT_COLOR_CODE .. nearestSite.zoneName .. "|r", nearestSite.distance), 1, 1, 1)
+    local site_name = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.name)
+    local site_zone = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.zoneName)
+
+	Archy:Pour(L["Nearest Dig Site is: %s in %s (%.1f yards away)"]:format(site_name, site_zone, nearestSite.distance), 1, 1, 1)
 end
 
 local function UpdateSiteFrame(index)
