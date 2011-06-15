@@ -2730,8 +2730,8 @@ function UpdateMinimapSurveyColors()
 	if not db.minimap.fragmentColorBySurveyDistance then
 		return
 	end
-	local greenMin, greenMax = 0, db.digsite.distanceIndicator.green
-	local yellowMin, yellowMax = greenMax, db.digsite.distanceIndicator.yellow
+	local greenMin, greenMax = 0, db.digsite.distanceIndicator.green or 0
+	local yellowMin, yellowMax = greenMax, db.digsite.distanceIndicator.yellow or 0
 	local redMin, redMax = yellowMax, 500
 
 	for id, poi in pairs(allPois) do
