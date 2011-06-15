@@ -29,12 +29,12 @@ local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	text = "Archy",
 })
 local LDBI = LibStub("LibDBIcon-1.0")
-local astrolabe = DongleStub("Astrolabe-1.0")
+local astrolabe = _G.DongleStub("Astrolabe-1.0")
 local qtip = LibStub("LibQTip-1.0")
 local lsm = LibStub("LibSharedMedia-3.0")
 
 if not lsm then
-	LoadAddOn("LibSharedMedia-3.0")
+	_G.LoadAddOn("LibSharedMedia-3.0")
 	lsm = LibStub("LibSharedMedia-3.0", true)
 end
 
@@ -46,7 +46,7 @@ if lsm then
 end
 
 _G["Archy"] = Archy
-Archy.version = GetAddOnMetadata("Archy", "Version")
+Archy.version = _G.GetAddOnMetadata("Archy", "Version")
 
 -----------------------------------------------------------------------
 -- Constants
@@ -115,7 +115,6 @@ local distanceIndicatorFrame = {}
 local racesFrame = {}
 
 --[[ Archy variables ]] --
-Archy.LastSurveySite = lastSite
 Archy.NearestSite = nearestSite
 Archy.PlayerPosition = playerPosition
 Archy.LastSurveyPosition = surveyPosition
@@ -248,7 +247,7 @@ local frameAnchorOptions = {
 	["BOTTOMLEFT"] = L["Bottom Left"],
 }
 local outlines = {
-	[""] = NONE,
+	[""] = _G.NONE,
 	["OUTLINE"] = L["Outline"],
 	["THICKOUTLINE"] = L["Thick Outline"],
 }
@@ -260,7 +259,7 @@ local archyThemes = {
 local generalOptions = {
 	type = "group",
 	order = 1,
-	name = GENERAL_LABEL,
+	name = _G.GENERAL_LABEL,
 	desc = L["General Options"],
 	args = {
 		desc = {
@@ -330,7 +329,7 @@ local generalOptions = {
 			get = function() return db.general.theme end,
 			set = function(_, value)
 				db.general.theme = value
-				ReloadUI()
+				_G.ReloadUI()
 			end,
 			values = archyThemes,
 		},
@@ -369,7 +368,7 @@ local artifactOptions = {
 	desc = L["Artifact Options"],
 	args = {
 		options = {
-			name = GENERAL_LABEL,
+			name = _G.GENERAL_LABEL,
 			order = 0,
 			type = "group",
 			args = {
@@ -381,7 +380,7 @@ local artifactOptions = {
 				show = {
 					order = 1,
 					type = "toggle",
-					name = SHOW,
+					name = _G.SHOW,
 					desc = L["Toggles the display of the Artifacts list"],
 					get = function() return db.artifact.show end,
 					set = function(_, value)
@@ -487,12 +486,12 @@ local artifactOptions = {
 					order = 1,
 					type = "multiselect",
 					tristate = false,
-					name = RACES,
+					name = _G.RACES,
 					desc = L["Select races to blacklist"],
 					values = function()
 						local races = {}
 						for rid, race in pairs(raceData) do
-							races[rid] = race['name']
+							races[rid] = race.name
 						end
 						return races
 					end,
@@ -519,12 +518,12 @@ local artifactOptions = {
 					order = 1,
 					type = "multiselect",
 					tristate = false,
-					name = RACES,
+					name = _G.RACES,
 					desc = L["Select races to autofill"],
 					values = function()
 						local races = {}
 						for rid, race in pairs(raceData) do
-							races[rid] = race['name']
+							races[rid] = race.name
 						end
 						return races
 					end,
@@ -561,7 +560,7 @@ local artifactOptions = {
 				alpha = {
 					order = 8,
 					type = "range",
-					name = OPACITY,
+					name = _G.OPACITY,
 					desc = L["Set how transparent or opaque the Artifacts list is"],
 					min = 0,
 					max = 1,
@@ -678,7 +677,7 @@ local artifactOptions = {
 							dialogControl = 'LSM30_Font',
 							name = L["Font"],
 							desc = L["The font that will be used"],
-							values = AceGUIWidgetLSMlists.font,
+							values = _G.AceGUIWidgetLSMlists.font,
 							get = function() return db.artifact.font.name end,
 							set = function(_, value)
 								db.artifact.font.name = value
@@ -688,7 +687,7 @@ local artifactOptions = {
 						fontSize = {
 							order = 2,
 							type = "range",
-							name = FONT_SIZE,
+							name = _G.FONT_SIZE,
 							desc = L["Control the font size"],
 							min = 4,
 							max = 30,
@@ -754,7 +753,7 @@ local artifactOptions = {
 							dialogControl = 'LSM30_Font',
 							name = L["Font"],
 							desc = L["The font that will be used"],
-							values = AceGUIWidgetLSMlists.font,
+							values = _G.AceGUIWidgetLSMlists.font,
 							get = function() return db.artifact.fragmentFont.name end,
 							set = function(_, value)
 								db.artifact.fragmentFont.name = value
@@ -764,7 +763,7 @@ local artifactOptions = {
 						fontSize = {
 							order = 2,
 							type = "range",
-							name = FONT_SIZE,
+							name = _G.FONT_SIZE,
 							desc = L["Control the font size"],
 							min = 4,
 							max = 30,
@@ -830,7 +829,7 @@ local artifactOptions = {
 							dialogControl = 'LSM30_Font',
 							name = L["Font"],
 							desc = L["The font that will be used"],
-							values = AceGUIWidgetLSMlists.font,
+							values = _G.AceGUIWidgetLSMlists.font,
 							get = function() return db.artifact.keystoneFont.name end,
 							set = function(_, value)
 								db.artifact.keystoneFont.name = value
@@ -840,7 +839,7 @@ local artifactOptions = {
 						fontSize = {
 							order = 2,
 							type = "range",
-							name = FONT_SIZE,
+							name = _G.FONT_SIZE,
 							desc = L["Control the font size"],
 							min = 4,
 							max = 30,
@@ -987,7 +986,7 @@ local digsiteOptions = {
 	desc = L["Dig Site Options"],
 	args = {
 		options = {
-			name = GENERAL_LABEL,
+			name = _G.GENERAL_LABEL,
 			order = 0,
 			type = "group",
 			args = {
@@ -999,7 +998,7 @@ local digsiteOptions = {
 				show = {
 					order = 1,
 					type = "toggle",
-					name = SHOW,
+					name = _G.SHOW,
 					desc = L["Toggles the display of the Dig Sites list"],
 					get = function() return db.digsite.show end,
 					set = function(_, value)
@@ -1084,7 +1083,7 @@ local digsiteOptions = {
 				enable = {
 					order = 1,
 					type = "toggle",
-					name = ENABLE,
+					name = _G.ENABLE,
 					desc = L["Enable the Survey Distance Indicator"],
 					get = function() return db.digsite.distanceIndicator.enabled end,
 					set = function(_, value)
@@ -1190,7 +1189,7 @@ local digsiteOptions = {
 				alpha = {
 					order = 8,
 					type = "range",
-					name = OPACITY,
+					name = _G.OPACITY,
 					desc = L["Set how transparent or opaque the Dig Site list is"],
 					min = 0,
 					max = 1,
@@ -1294,7 +1293,7 @@ local digsiteOptions = {
 							dialogControl = 'LSM30_Font',
 							name = L["Font"],
 							desc = L["The font that will be used"],
-							values = AceGUIWidgetLSMlists.font,
+							values = _G.AceGUIWidgetLSMlists.font,
 							get = function() return db.digsite.font.name end,
 							set = function(_, value)
 								db.digsite.font.name = value
@@ -1304,7 +1303,7 @@ local digsiteOptions = {
 						fontSize = {
 							order = 2,
 							type = "range",
-							name = FONT_SIZE,
+							name = _G.FONT_SIZE,
 							desc = L["Control the font size"],
 							min = 4,
 							max = 30,
@@ -1370,7 +1369,7 @@ local digsiteOptions = {
 							dialogControl = 'LSM30_Font',
 							name = L["Font"],
 							desc = L["The font that will be used"],
-							values = AceGUIWidgetLSMlists.font,
+							values = _G.AceGUIWidgetLSMlists.font,
 							get = function() return db.digsite.zoneFont.name end,
 							set = function(_, value)
 								db.digsite.zoneFont.name = value
@@ -1380,7 +1379,7 @@ local digsiteOptions = {
 						fontSize = {
 							order = 2,
 							type = "range",
-							name = FONT_SIZE,
+							name = _G.FONT_SIZE,
 							desc = L["Control the font size"],
 							min = 4,
 							max = 30,
@@ -1541,11 +1540,11 @@ local minimapOptions = {
 	order = 5,
 	type = "group",
 	childGroups = "tab",
-	name = MINIMAP_LABEL,
+	name = _G.MINIMAP_LABEL,
 	desc = L["Minimap Options"],
 	args = {
 		options = {
-			name = GENERAL_LABEL,
+			name = _G.GENERAL_LABEL,
 			order = 0,
 			type = "group",
 			args = {
@@ -1648,7 +1647,7 @@ local minimapOptions = {
 				blobAlpha = {
 					order = 6,
 					type = "range",
-					name = OPACITY,
+					name = _G.OPACITY,
 					desc = L["Set how transparent or opaque the Dig Site boundaries are"],
 					min = 0.25,
 					max = 1,
@@ -1705,11 +1704,11 @@ local GetItemInfo, InCombatLockdown, GetProfessions, GetProfessionInfo = GetItem
 --[[ Meta Tables ]] --
 setmetatable(raceData, {
 	__index = function(t, k)
-		if GetNumArchaeologyRaces() == 0 then
+		if _G.GetNumArchaeologyRaces() == 0 then
 			return
 		end
-		local raceName, raceTexture, itemID, currencyAmount = GetArchaeologyRaceInfo(k)
-		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = GetItemInfo(itemID)
+		local raceName, raceTexture, itemID, currencyAmount = _G.GetArchaeologyRaceInfo(k)
+		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(itemID)
 
 		t[k] = {
 			['name'] = raceName,
@@ -1747,8 +1746,8 @@ setmetatable(artifacts, {
 
 local blobs = setmetatable({}, {
 	__index = function(t, k)
-		local f = CreateFrame("ArchaeologyDigSiteFrame", "Archy" .. k .. "_Blob")
-		rawset(t, k, f)
+		local f = _G.CreateFrame("ArchaeologyDigSiteFrame", "Archy" .. k .. "_Blob")
+		_G.rawset(t, k, f)
 		f:ClearAllPoints()
 		f:EnableMouse(false)
 		f:SetFillAlpha(256 * db.minimap.blobAlpha)
@@ -1763,13 +1762,13 @@ local blobs = setmetatable({}, {
 
 local pois = setmetatable({}, {
 	__index = function(t, k)
-		local poi = CreateFrame("Frame", "ArchyMinimap_POI" .. k, Minimap)
+		local poi = _G.CreateFrame("Frame", "ArchyMinimap_POI" .. k, _G.Minimap)
 		poi:SetWidth(10)
 		poi:SetHeight(10)
 		poi:SetScript("OnEnter", POI_OnEnter)
 		poi:SetScript("OnLeave", POI_OnLeave)
 
-		local arrow = CreateFrame("Frame", nil, poi)
+		local arrow = _G.CreateFrame("Frame", nil, poi)
 		arrow:SetPoint("CENTER", poi)
 		arrow:SetScript("OnUpdate", Arrow_OnUpdate)
 		arrow:SetWidth(32)
@@ -1795,14 +1794,14 @@ local pois = setmetatable({}, {
 --[[ Pre load tables ]] --
 do
 	-- cache the zone/map data
-	local orig = GetCurrentMapAreaID()
+	local orig = _G.GetCurrentMapAreaID()
 
-	for cid, cname in pairs{ GetMapContinents() } do
-		SetMapZoom(cid)
-		local mapid = GetCurrentMapAreaID()
+	for cid, cname in pairs{ _G.GetMapContinents() } do
+		_G.SetMapZoom(cid)
+		local mapid = _G.GetCurrentMapAreaID()
 		continentMapToID[mapid] = cid
 
-		local cmn = GetMapInfo()
+		local cmn = _G.GetMapInfo()
 
 		zoneData[mapid] = {
 			['continent'] = cid,
@@ -1815,18 +1814,18 @@ do
 		mapFileToID[cmn] = mapid
 		mapIDToZoneName[mapid] = cname
 
-		for zid, zname in pairs{ GetMapZones(cid) } do
-			SetMapZoom(cid, zid)
-			local mapid = GetCurrentMapAreaID()
-			local level = GetCurrentMapDungeonLevel()
-			mapFileToID[GetMapInfo()] = mapid
+		for zid, zname in pairs{ _G.GetMapZones(cid) } do
+			_G.SetMapZoom(cid, zid)
+			local mapid = _G.GetCurrentMapAreaID()
+			local level = _G.GetCurrentMapDungeonLevel()
+			mapFileToID[_G.GetMapInfo()] = mapid
 			mapIDToZone[mapid] = zid
 			mapIDToZoneName[mapid] = zname
 			zoneIDToName[zid] = zname
 			zoneData[mapid] = { ['continent'] = zid, ['map'] = mapid, ['level'] = level, ['mapFile'] = GetMapInfo(), ['id'] = zid, ['name'] = zname }
 		end
 	end
-	SetMapByID(orig)
+	_G.SetMapByID(orig)
 
 	--  Minimap size values
 	minimapSize = {
@@ -1867,8 +1866,8 @@ end
 
 --[[ Function Hooks ]] --
 -- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
-local blizSolveArtifact = SolveArtifact
-SolveArtifact = function(raceIndex, useStones)
+local blizSolveArtifact = _G.SolveArtifact
+_G.SolveArtifact = function(raceIndex, useStones)
 	local rank, maxRank = GetArchaeologyRank()
 	local requiresConfirm = false
 	if db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then requiresConfirm = true end
@@ -1876,17 +1875,17 @@ SolveArtifact = function(raceIndex, useStones)
 		if not confirmArgs then confirmArgs = {} end
 		confirmArgs.race = raceIndex
 		confirmArgs.useStones = useStones
-		StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
+		_G.StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
 	else
 		return SolveRaceArtifact(raceIndex, useStones)
 	end
 end
 
 --[[ Dialog declarations ]] --
-StaticPopupDialogs["ARCHY_CONFIRM_SOLVE"] = {
+_G.StaticPopupDialogs["ARCHY_CONFIRM_SOLVE"] = {
 	text = L["Your Archaeology skill is at %d of %d.  Are you sure you would like to solve this artifact before visiting a trainer?"],
-	button1 = YES,
-	button2 = NO,
+	button1 = _G.YES,
+	button2 = _G.NO,
 	OnAccept = function()
 		if confirmArgs and confirmArgs.race then
 			SolveRaceArtifact(confirmArgs.race, confirmArgs.useStones)
@@ -1910,44 +1909,44 @@ StaticPopupDialogs["ARCHY_CONFIRM_SOLVE"] = {
 
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
-	local _, _, arch = GetProfessions()
+	local _, _, arch = _G.GetProfessions()
 	return (arch and true or false)
 end
 
 local function IsTaintable()
-	if (InCombatLockdown() or UnitAffectingCombat("player") or inCombat) then
+	if (_G.InCombatLockdown() or _G.UnitAffectingCombat("player") or inCombat) then
 		return true
 	end
 end
 
 local function ShouldBeHidden()
-	if (not db.general.show) or IsInInstance() or (not HasArchaeology()) or (not playerContinent) or (UnitIsGhost('player') == 1) then
+	if (not db.general.show) or _G.IsInInstance() or (not HasArchaeology()) or (not playerContinent) or (_G.UnitIsGhost('player') == 1) then
 		return true
 	end
 end
 
 -- opens the Blizzard_ArchaeologyUI panel
 function Archy:ShowArchaeology()
-	if IsAddOnLoaded("Blizzard_ArchaeologyUI") then
-		ShowUIPanel(ArchaeologyFrame)
+	if _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
+		_G.ShowUIPanel(_G.ArchaeologyFrame)
+		return true
+	end
+	local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
+
+	if loaded then
+		_G.ShowUIPanel(_G.ArchaeologyFrame)
 		return true
 	else
-		local loaded, reason = LoadAddOn("Blizzard_ArchaeologyUI")
-		if loaded then
-			ShowUIPanel(ArchaeologyFrame)
-			return true
-		else
-			Archy:Print(string.format(L["ArchaeologyUI not loaded: %s Try opening manually."], _G["ADDON_" .. reason]))
-			return false
-		end
+		Archy:Print(L["ArchaeologyUI not loaded: %s Try opening manually."]:format(_G["ADDON_" .. reason]))
+		return false
 	end
 end
 
 -- returns the rank and max rank for the players archaeology skill
 function GetArchaeologyRank()
-	local _, _, arch = GetProfessions()
+	local _, _, arch = _G.GetProfessions()
 	if arch then
-		local _, _, rank, maxRank = GetProfessionInfo(arch)
+		local _, _, rank, maxRank = _G.GetProfessionInfo(arch)
 		return rank, maxRank
 	end
 end
@@ -1981,43 +1980,44 @@ end
 
 -- return the player, itemlink and quantity of the item in the chat_msg_loot
 local function ParseLootMessage(msg)
-	local player = UnitName("player")
-	local item, quantity = MatchFormat(msg, LOOT_ITEM_SELF_MULTIPLE)
+	local player = _G.UnitName("player")
+	local item, quantity = MatchFormat(msg, _G.LOOT_ITEM_SELF_MULTIPLE)
 
 	if item and quantity then
 		return player, item, tonumber(quantity)
 	end
 	quantity = 1
-	item = MatchFormat(msg, LOOT_ITEM_SELF)
+	item = MatchFormat(msg, _G.LOOT_ITEM_SELF)
 
 	if item then
 		return player, item, tonumber(quantity)
 	end
-	player, item, quantity = MatchFormat(msg, LOOT_ITEM_MULTIPLE)
+	player, item, quantity = MatchFormat(msg, _G.LOOT_ITEM_MULTIPLE)
 
 	if player and item and quantity then
 		return player, item, tonumber(quantity)
 	end
 	quantity = 1
-	player, item = MatchFormat(msg, LOOT_ITEM)
+	player, item = MatchFormat(msg, _G.LOOT_ITEM)
 
 	return player, item, tonumber(quantity)
 end
 
 -- load the race related data tables
 local function LoadRaceData()
-	if GetNumArchaeologyRaces() == 0 then
+	if _G.GetNumArchaeologyRaces() == 0 then
 		return
 	end
 
-	for rid = 1, GetNumArchaeologyRaces() do
-		local race = raceData[rid] -- meta table should load the data
+	for race_id = 1, _G.GetNumArchaeologyRaces() do
+		local race = raceData[race_id] -- meta table should load the data
+
 		if race then -- we have race data
 			raceNameToID[race['name']] = rid
 			keystoneIDToRaceID[race['keystone']['id']] = rid
 		end
 	end
-	RequestArtifactCompletionHistory()
+	_G.RequestArtifactCompletionHistory()
 	raceDataLoaded = true
 end
 
@@ -2025,8 +2025,8 @@ end
 local function ContinentRaces(cid)
 	local races = {}
 	for _, site in pairs(DIG_SITES) do
-		if (site.continent == continentMapToID[cid] and not tContains(races, site.race)) then
-			tinsert(races, site.race)
+		if site.continent == continentMapToID[cid] and not _G.tContains(races, site.race) then
+			table.insert(races, site.race)
 		end
 	end
 	return races
@@ -2056,7 +2056,7 @@ function Archy:ConfigUpdated(ns, opt)
 		RefreshTomTom()
 	elseif ns == "artifact" then
 		if opt == "autofill" then
-			for rid = 1, GetNumArchaeologyRaces() do
+			for rid = 1, _G.GetNumArchaeologyRaces() do
 				UpdateRaceArtifact(rid)
 			end
 		end
@@ -2082,9 +2082,9 @@ function Archy:ConfigUpdated(ns, opt)
 		UpdateSiteBlobs()
 	elseif ns == "tomtom" then
 		if db.tomtom.enabled and tomtomExists then
-			if TomTom.profile then
-				TomTom.profile.arrow.arrival = db.tomtom.distance
-				TomTom.profile.arrow.enablePing = db.tomtom.ping
+			if _G.TomTom.profile then
+				_G.TomTom.profile.arrow.arrival = db.tomtom.distance
+				_G.TomTom.profile.arrow.enablePing = db.tomtom.ping
 			end
 		end
 		RefreshTomTom()
@@ -2101,71 +2101,76 @@ end
 
 local function Ping()
 	if db.general.show then
-		PlaySoundFile("Interface\\AddOns\\Archy\\Media\\dingding.mp3")
+		_G.PlaySoundFile("Interface\\AddOns\\Archy\\Media\\dingding.mp3")
 	end
 end
 
-function UpdateRaceArtifact(rid)
-	local race = raceData[rid]
+function UpdateRaceArtifact(race_id)
+	local race = raceData[race_id]
 	if not race then
 		--@??? Maybe use a wipe statement here
-		artifacts[rid] = nil
+		artifacts[race_id] = nil
 		return
 	end
 
-	raceData[rid]['keystone']['inventory'] = GetItemCount(raceData[rid]['keystone']['id']) or 0
+	raceData[race_id].keystone.inventory = _G.GetItemCount(raceData[race_id].keystone.id) or 0
 
-	local numProjects = GetNumArtifactsByRace(rid)
+	local numProjects = _G.GetNumArtifactsByRace(race_id)
 	if numProjects == 0 then
 		--artifacts[rid] = nil
 	else
-		if ArchaeologyFrame and ArchaeologyFrame:IsVisible() then
-			ArchaeologyFrame_ShowArtifact(rid)
+		if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
+			_G.ArchaeologyFrame_ShowArtifact(race_id)
 		end
-		SetSelectedArtifact(rid)
-		local name, _, rarity, icon, spellDescription, numSockets = GetSelectedArtifactInfo()
-		local base, adjust, total = GetArtifactProgress()
+		_G.SetSelectedArtifact(race_id)
+		local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
+		local base, adjust, total = _G.GetArtifactProgress()
 
-		local artifact = artifacts[rid]
+		local artifact = artifacts[race_id]
 
-		artifact['canSolve'] = CanSolveArtifact()
-		artifact['fragments'] = base
-		artifact['fragTotal'] = total
-		artifact['sockets'] = numSockets
+		artifact.canSolve = _G.CanSolveArtifact()
+		artifact.fragments = base
+		artifact.fragTotal = total
+		artifact.sockets = numSockets
 		artifact['icon'] = icon
 		artifact['tooltip'] = spellDescription
 		artifact['rare'] = (rarity ~= 0)
 		artifact['name'] = name
-		artifact['canSolveStone'] = false
+		artifact.canSolveStone = false
 		artifact['fragAdjust'] = 0
 		artifact['completionCount'] = 0
 
-		local prevAdded = min(artifact['stonesAdded'], raceData[rid]['keystone']['inventory'], numSockets)
-		if db.artifact.autofill[rid] then
-			prevAdded = min(raceData[rid]['keystone']['inventory'], numSockets)
-		end
-		artifact['stonesAdded'] = min(raceData[rid]['keystone']['inventory'], numSockets)
-		if artifact['stonesAdded'] > 0 and numSockets > 0 then
-			for i = 1, min(artifact['stonesAdded'], numSockets) do
-				SocketItemToArtifact()
-				if (not ItemAddedToArtifact(i)) then break end
-			end
+		local prevAdded = math.min(artifact.stonesAdded, raceData[race_id].keystone.inventory, numSockets)
 
+		if db.artifact.autofill[race_id] then
+			prevAdded = math.min(raceData[race_id].keystone.inventory, numSockets)
+		end
+		artifact.stonesAdded = math.min(raceData[race_id].keystone.inventory, numSockets)
+
+		if artifact.stonesAdded > 0 and numSockets > 0 then
+			for i = 1, math.min(artifact.stonesAdded, numSockets) do
+				SocketItemToArtifact()
+
+				if not ItemAddedToArtifact(i) then
+					break
+				end
+			end
 			base, adjust, total = GetArtifactProgress()
-			artifact['canSolveStone'] = CanSolveArtifact()
+			artifact.canSolveStone = CanSolveArtifact()
+
 			if prevAdded > 0 then
 				artifact['fragAdjust'] = adjust
 			end
 		end
-		artifact['stonesAdded'] = prevAdded
+		artifact.stonesAdded = prevAdded
 
 		RequestArtifactCompletionHistory()
-		if not db.artifact.blacklist[rid] then
-			if not artifact['ping'] and (artifact['canSolve'] or artifact['canSolveStone']) then
+		if not db.artifact.blacklist[race_id] then
+			if not artifact['ping'] and (artifact.canSolve or artifact.canSolveStone) then
 				if db.artifact.ping or db.artifact.announce then
 					artifact['ping'] = true
 					if db.artifact.announce then
-						Announce(rid)
+						Announce(race_id)
 					end
 					if db.artifact.ping then
 						Ping()
@@ -2299,8 +2304,8 @@ end
 local DIG_LOCATION_TEXTURE = 177
 
 local function GetContinentSites(continent_id)
-	local sites, orig = {}, GetCurrentMapAreaID()
-	SetMapZoom(continent_id)
+	local sites, orig = {}, _G.GetCurrentMapAreaID()
+	_G.SetMapZoom(continent_id)
 
 	local totalPOIs = GetNumMapLandmarks()
 
@@ -2319,7 +2324,7 @@ local function GetContinentSites(continent_id)
 			if site then
 				local x, y = astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
 
-				local raceName, raceCrestTexture = GetArchaeologyRaceInfo(site.race)
+				local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
 
 				local digsite = {
 					continent = mc,
@@ -2585,7 +2590,7 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 	if not poi then -- we don't have enough available pois, need to create one
 		sitePoiCount = sitePoiCount + 1
 		--        print("Creating ArchyMinimap_SitePOI" .. sitePoiCount)
-		poi = CreateFrame("Frame", "ArchyMinimap_SitePOI" .. sitePoiCount, Minimap)
+		poi = _G.CreateFrame("Frame", "ArchyMinimap_SitePOI" .. sitePoiCount, Minimap)
 		poi.index = sitePoiCount
 		poi:SetWidth(10)
 		poi:SetHeight(10)
@@ -2642,7 +2647,7 @@ local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 	local poi = table.remove(surveyPool)
 	if not poi then -- we don't have enough available pois, need to create one
 		surveyPoiCount = surveyPoiCount + 1
-		poi = CreateFrame("Frame", "ArchyMinimap_SurveyPOI" .. surveyPoiCount, Minimap)
+		poi = _G.CreateFrame("Frame", "ArchyMinimap_SurveyPOI" .. surveyPoiCount, Minimap)
 		poi.index = surveyPoiCount
 		poi:SetWidth(8)
 		poi:SetHeight(8)
@@ -2697,7 +2702,7 @@ end
 
 function CreateMinimapPOI(index, type, loc, title, siteId, surveyNum)
 	local poi = pois[index]
-	local poiButton = CreateFrame("Frame", nil, poi)
+	local poiButton = _G.CreateFrame("Frame", nil, poi)
 	poiButton.texture = poiButton:CreateTexture(nil, "OVERLAY")
 
 	if type == "site" then
@@ -2909,12 +2914,12 @@ function POI_OnEnter(self)
 	if not self.tooltip then
 		return
 	end
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
-	GameTooltip:SetText(self.tooltip, NORMAL_FONT_COLOR[1], NORMAL_FONT_COLOR[2], NORMAL_FONT_COLOR[3], 1) --, true)
+	_G.GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+	_G.GameTooltip:SetText(self.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1) --, true)
 end
 
 function POI_OnLeave(self)
-	GameTooltip:Hide()
+	_G.GameTooltip:Hide()
 end
 
 local square_half = math.sqrt(0.5)
@@ -3083,7 +3088,7 @@ function UpdateTomTomPoint()
 	end
 
 	if not tomtomFrame then
-		tomtomFrame = CreateFrame("Frame")
+		tomtomFrame = _G.CreateFrame("Frame")
 	end
 
 	if not tomtomFrame:IsShown() then
@@ -3091,7 +3096,7 @@ function UpdateTomTomPoint()
 	end
 	local waypointExists
 
-	if TomTom.WaypointExists then -- do we have the legit TomTom?
+	if _G.TomTom.WaypointExists then -- do we have the legit TomTom?
 		waypointExists = TomTom:WaypointExists(continentMapToID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName)
 	end
 
@@ -3342,7 +3347,7 @@ local function SlashHandler(msg, editbox)
 	local command = string.lower(msg) -- , args = string.match(msg:lower(), "^(%S*)%s*(.-)$")
 
 	if command == L["config"]:lower() then
-		InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
+		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
 	elseif command == L["stealth"]:lower() then
 		db.general.stealthMode = not db.general.stealthMode
 		Archy:ConfigUpdated()
@@ -3352,7 +3357,7 @@ local function SlashHandler(msg, editbox)
 	elseif command == L["artifacts"]:lower() then
 		db.artifact.show = not db.artifact.show
 		Archy:ConfigUpdated('artifact')
-	elseif command == SOLVE:lower() then
+	elseif command == _G.SOLVE:lower() then
 		Archy:SolveAnyArtifact()
 	elseif command == L["solve stone"]:lower() then
 		Archy:SolveAnyArtifact(true)
@@ -3363,7 +3368,7 @@ local function SlashHandler(msg, editbox)
 	elseif command == ("TomTom"):lower() then
 		db.tomtom.enabled = not db.tomtom.enabled
 		RefreshTomTom()
-	elseif command == MINIMAP_LABEL:lower() then
+	elseif command == _G.MINIMAP_LABEL:lower() then
 		db.minimap.show = not db.minimap.show
 		Archy:ConfigUpdated('minimap')
 	elseif command == "test" then
@@ -3374,12 +3379,12 @@ local function SlashHandler(msg, editbox)
 		Archy:Print("|cFF00FF00" .. L["stealth"] .. "|r - " .. L["Toggles the display of the Artifacts and Dig Sites lists"])
 		Archy:Print("|cFF00FF00" .. L["dig sites"] .. "|r - " .. L["Toggles the display of the Dig Sites list"])
 		Archy:Print("|cFF00FF00" .. L["artifacts"] .. "|r - " .. L["Toggles the display of the Artifacts list"])
-		Archy:Print("|cFF00FF00" .. SOLVE .. "|r - " .. L["Solves the first artifact it finds that it can solve"])
+		Archy:Print("|cFF00FF00" .. _G.SOLVE .. "|r - " .. L["Solves the first artifact it finds that it can solve"])
 		Archy:Print("|cFF00FF00" .. L["solve stone"] .. "|r - " .. L["Solves the first artifact it finds that it can solve (including key stones)"])
 		Archy:Print("|cFF00FF00" .. L["nearest"] .. "|r or |cFF00FF00" .. L["closest"] .. "|r - " .. L["Announces the nearest dig site to you"])
 		Archy:Print("|cFF00FF00" .. L["reset"] .. "|r - " .. L["Reset the window positions to defaults"])
 		Archy:Print("|cFF00FF00" .. "TomTom" .. "|r - " .. L["Toggles TomTom Integration"])
-		Archy:Print("|cFF00FF00" .. MINIMAP_LABEL .. "|r - " .. L["Toggles the dig site icons on the minimap"])
+		Archy:Print("|cFF00FF00" .. _G.MINIMAP_LABEL .. "|r - " .. L["Toggles the dig site icons on the minimap"])
 	end
 end
 
@@ -3464,22 +3469,22 @@ function Archy:OnInitialize()
 	end
 	db.data.imported = false
 
-	digsiteFrame = CreateFrame("Frame", "ArchyDigSiteFrame", UIParent, (db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
+	digsiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
 	digsiteFrame.children = setmetatable({}, {
 		__index = function(t, k)
 			if k then
-				local f = CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, digsiteFrame, (db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
+				local f = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, digsiteFrame, (db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
 				f:Show()
 				t[k] = f
 				return f
 			end
 		end
 	})
-	racesFrame = CreateFrame("Frame", "ArchyArtifactFrame", UIParent, (db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
+	racesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
 	racesFrame.children = setmetatable({}, {
 		__index = function(t, k)
 			if k then
-				local f = CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, racesFrame, (db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
+				local f = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, racesFrame, (db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
 				f:Show()
 				t[k] = f
 				return f
@@ -3487,8 +3492,8 @@ function Archy:OnInitialize()
 		end
 	})
 
-	distanceIndicatorFrame = CreateFrame("Frame", "ArchyDistanceIndicatorFrame", UIParent, "ArchyDistanceIndicator")
-	local surveySpellName = GetSpellInfo(80451)
+	distanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
+	local surveySpellName = _G.GetSpellInfo(80451)
 	distanceIndicatorFrame.surveyButton:SetText(surveySpellName)
 	distanceIndicatorFrame.surveyButton:SetWidth(distanceIndicatorFrame.surveyButton:GetTextWidth() + 20)
 	distanceIndicatorFrame.circle:SetScale(0.65)
@@ -3542,7 +3547,7 @@ function Archy:OnEnable()
 	Archy:UpdateRacesFrame()
 	ToggleDistanceIndicator()
 	tomtomActive = true
-	tomtomExists = (TomTom and TomTom.AddZWaypoint and TomTom.RemoveWaypoint) and true or false
+	tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	self:CheckForMinimapAddons()
 end
 
@@ -3647,8 +3652,8 @@ function Archy:SkillLinesChanged()
     if rank == 300 or rank == 375 or rank == 450 then
         -- Force reload of race and artifact data when outland, northrend and tol'vir become available
         LoadRaceData()
-        if GetNumArchaeologyRaces() > 0 then
-            for rid = 1,GetNumArchaeologyRaces() do
+        if _G.GetNumArchaeologyRaces() > 0 then
+            for rid = 1,_G.GetNumArchaeologyRaces() do
                 UpdateRaceArtifact(rid)
             end
             self:UpdateRacesFrame()
@@ -3660,7 +3665,7 @@ function Archy:SkillLinesChanged()
 	if racesFrame and racesFrame.skillBar then
 		racesFrame.skillBar:SetMinMaxValues(0, maxRank)
 		racesFrame.skillBar:SetValue(rank)
-		racesFrame.skillBar.text:SetFormattedText("%s : %d/%d", GetArchaeologyInfo(), rank, maxRank)
+		racesFrame.skillBar.text:SetFormattedText("%s : %d/%d", _G.GetArchaeologyInfo(), rank, maxRank)
 	end
 end
 
@@ -3707,13 +3712,13 @@ function Archy:CurrencyUpdated()
 		return
 	end
 
-	if GetNumArchaeologyRaces() == 0 then
+	if _G.GetNumArchaeologyRaces() == 0 then
 		return
 	end
 
-	for rid = 1, GetNumArchaeologyRaces() do
-		local _, _, _, currencyAmount = GetArchaeologyRaceInfo(rid)
-		local diff = currencyAmount - (raceData[rid]['currency'] or 0)
+	for race_id = 1, _G.GetNumArchaeologyRaces() do
+		local _, _, _, currencyAmount = _G.GetArchaeologyRaceInfo(race_id)
+		local diff = currencyAmount - (raceData[race_id].currency or 0)
 
 		raceData[rid]['currency'] = currencyAmount
 
@@ -3773,7 +3778,7 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	if GetCurrentMapAreaID() == -1 then
+	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
 		self:UpdateDigSiteFrame()
 		self:RefreshDigSiteDisplay()
@@ -3802,8 +3807,8 @@ function Archy:UpdatePlayerPosition(force)
 		RefreshTomTom()
 		UpdateSites()
 
-		if GetNumArchaeologyRaces() > 0 then
-			for race_id = 1, GetNumArchaeologyRaces() do
+		if _G.GetNumArchaeologyRaces() > 0 then
+			for race_id = 1, _G.GetNumArchaeologyRaces() do
 				UpdateRaceArtifact(race_id)
 			end
 			self:UpdateRacesFrame()
@@ -4004,7 +4009,7 @@ function Archy:UpdateRacesFrame()
 end
 
 function Archy:RefreshRacesDisplay()
-	if ShouldBeHidden() or GetNumArchaeologyRaces() == 0 then
+	if ShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
 		return
 	end
 	local maxWidth, maxHeight = 0, 0
@@ -4029,17 +4034,17 @@ function Archy:RefreshRacesDisplay()
 		child:SetID(rid)
 
 		if db.general.theme == "Graphical" then
-			child.solveButton:SetText(SOLVE)
+			child.solveButton:SetText(_G.SOLVE)
 			child.solveButton:SetWidth(child.solveButton:GetTextWidth() + 20)
-			child.solveButton.tooltip = SOLVE
+			child.solveButton.tooltip = _G.SOLVE
 
 			if child.style ~= db.artifact.style then
 				TransformRaceFrame(child)
 			end
 
 			child.crest.texture:SetTexture(race['texture'])
-			child.crest.tooltip = race['name'] .. "\n" .. NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race['keystone']['inventory']
-			child.crest.text:SetText(race['name'])
+			child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
+			child.crest.text:SetText(race.name)
 			child.icon.texture:SetTexture(artifact['icon'])
 			child.icon.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
 			                     .. "\n\n" .. HIGHLIGHT_FONT_COLOR_CODE .. string.format(L["Solved Count: %s"], NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
@@ -4101,8 +4106,8 @@ function Archy:RefreshRacesDisplay()
 					child.fragmentBar.keystones:Hide()
 				end
 			else
-				for ki = 1, (ARCHAEOLOGY_MAX_STONES or 4) do
-					if ki > artifact['sockets'] or not race['keystone']['name'] then
+				for ki = 1, (_G.ARCHAEOLOGY_MAX_STONES or 4) do
+					if ki > artifact.sockets or not race.keystone.name then
 						child.fragmentBar["keystone" .. ki]:Hide()
 					else
 						child.fragmentBar["keystone" .. ki].icon:SetTexture(race['keystone']['texture'])
@@ -4168,8 +4173,9 @@ function Archy:RefreshRacesDisplay()
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
 
-		if not db.artifact.blacklist[rid] and artifact['fragTotal'] > 0 and (not db.artifact.filter or tContains(ContinentRaces(playerContinent), rid)) then
+		if not db.artifact.blacklist[rid] and artifact.fragTotal > 0 and (not db.artifact.filter or _G.tContains(ContinentRaces(playerContinent), rid)) then
 			child:ClearAllPoints()
+
 			if topFrame == racesFrame.container then
 				child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
 			else
@@ -4293,8 +4299,8 @@ function Archy:ShowDigSiteTooltip(self)
 	else
 		self.tooltip = self.tooltip .. "\n" .. L["Right-Click to blacklist"]
 	end
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-	GameTooltip:SetText(self.tooltip, NORMAL_FONT_COLOR[1], NORMAL_FONT_COLOR[2], NORMAL_FONT_COLOR[3], 1, true)
+	_G.GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	_G.GameTooltip:SetText(self.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1, true)
 end
 
 function Archy:ResizeDigSiteDisplay()
@@ -4444,7 +4450,7 @@ function Archy:SetFramePosition(frame)
 	local bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs
 
 	if not frame.isMoving then
-		bRelativeTo = UIParent
+		bRelativeTo = _G.UIParent
 		if frame == digsiteFrame then
 			bPoint, bRelativePoint, bXofs, bYofs = unpack(db.digsite.position)
 		elseif frame == racesFrame then
@@ -4455,7 +4461,7 @@ function Archy:SetFramePosition(frame)
 				bPoint, bRelativePoint, bXofs, bYofs = "CENTER", "TOPLEFT", 50, -5
 				frame:SetParent(digsiteFrame)
 			else
-				frame:SetParent(UIParent)
+				frame:SetParent(_G.UIParent)
 				bPoint, bRelativePoint, bXofs, bYofs = unpack(db.digsite.distanceIndicator.position)
 			end
 		end
@@ -4463,7 +4469,7 @@ function Archy:SetFramePosition(frame)
 		frame:ClearAllPoints()
 		frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
 		frame:SetFrameLevel(2)
-		if frame:GetParent() == UIParent and not IsTaintable() and not db.general.locked then
+		if frame:GetParent() == _G.UIParent and not IsTaintable() and not db.general.locked then
 			frame:SetUserPlaced(false)
 		end
 	end
@@ -4550,7 +4556,7 @@ end
 -- handle option keys for enabling casting
 local function NormalHijackCheck()
 	-- if ( not IsTaintable() and db.general.easyCast and not ShouldBeHidden() ) then -- karl_w_w
-	if (not IsTaintable() and db.general.easyCast and not ShouldBeHidden() and 0 ~= ArchaeologyMapUpdateAll()) then
+	if (not IsTaintable() and db.general.easyCast and not ShouldBeHidden() and 0 ~= _G.ArchaeologyMapUpdateAll()) then
 		return true
 	end
 end
@@ -4569,8 +4575,8 @@ local function CreateSAButton(name, postclick)
 	if sabutton then
 		return
 	end
-	local btn = CreateFrame("Button", name, UIParent, "SecureActionButtonTemplate")
-	btn:SetPoint("LEFT", UIParent, "RIGHT", 10000, 0)
+	local btn = _G.CreateFrame("Button", name, _G.UIParent, "SecureActionButtonTemplate")
+	btn:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
 	btn:SetFrameStrata("LOW")
 	btn:EnableMouse(true)
 	btn:RegisterForClicks("RightButtonUp")
@@ -4584,12 +4590,13 @@ local function CreateSAButton(name, postclick)
 end
 
 local function GetSurveySkillInfo()
-	local _, _, arch = GetProfessions()
-	if (arch) then
-		local name = GetProfessionInfo(arch)
+	local _, _, arch = _G.GetProfessions()
+
+	if arch then
+		local name = _G.GetProfessionInfo(arch)
 		return true, name
 	end
-	return false, PROFESSIONS_ARCHAEOLOGY
+	return false, _G.PROFESSIONS_ARCHAEOLOGY
 end
 
 local ActionBarID
@@ -4597,11 +4604,12 @@ local SURVEYTEXTURE = "Interface\\Icons\\INV_Misc_Shovel_01"
 local function GetSurveyActionBarID(force)
 	if force or not ActionBarID then
 		for slot = 1, 72 do
-			if HasAction(slot) and not IsAttackAction(slot) then
-				local t, _, _ = GetActionInfo(slot)
+			if _G.HasAction(slot) and not _G.IsAttackAction(slot) then
+				local action_type, _, _ = _G.GetActionInfo(slot)
 
-				if t == "spell" then
-					local tex = GetActionTexture(slot)
+				if action_type == "spell" then
+					local tex = _G.GetActionTexture(slot)
+
 					if tex and tex == SURVEYTEXTURE then
 						ActionBarID = slot
 						break
@@ -4639,7 +4647,7 @@ local function OverrideClick(btn)
 	if not sabutton then
 		return
 	end
-	SetOverrideBindingClick(btn, true, "BUTTON2", btn.name)
+	_G.SetOverrideBindingClick(btn, true, "BUTTON2", btn.name)
 end
 
 local function CentralCasting()
@@ -4655,7 +4663,7 @@ local isLooting = false
 
 local function CheckForDoubleClick()
 	if not isLooting and lastClickTime then
-		local pressTime = GetTime()
+		local pressTime = _G.GetTime()
 		local doubleTime = pressTime - lastClickTime
 
 		if doubleTime < ACTIONDOUBLEWAIT and doubleTime > MINACTIONDOUBLECLICK then
@@ -4663,7 +4671,7 @@ local function CheckForDoubleClick()
 			return true
 		end
 	end
-	lastClickTime = GetTime()
+	lastClickTime = _G.GetTime()
 	return false
 end
 
@@ -4744,15 +4752,17 @@ function Archy:OnPlayerLooting(event, ...)
 	end
 
 	if isLooting and db.general.autoLoot then
-		for slotNum = 1, GetNumLootItems() do
-			if LootSlotIsCurrency(slotNum) then
-				LootSlot(slotNum)
-			elseif LootSlotIsItem(slotNum) then
-				local link = GetLootSlotLink(slotNum)
+		for slotNum = 1, _G.GetNumLootItems() do
+			if _G.LootSlotIsCurrency(slotNum) then
+				_G.LootSlot(slotNum)
+			elseif _G.LootSlotIsItem(slotNum) then
+				local link = _G.GetLootSlotLink(slotNum)
+
 				if link then
 					local itemID = GetIDFromLink(link)
+
 					if itemID and keystoneIDToRaceID[itemID] then
-						LootSlot(slotNum)
+						_G.LootSlot(slotNum)
 					end
 				end
 			end
