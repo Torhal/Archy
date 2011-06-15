@@ -1969,7 +1969,7 @@ end
 
 -- deformat substitute
 local function MatchFormat(msg, pattern)
-	return string.match(msg, string.gsub(string.gsub(pattern, "(%%s)", "(.+)"), "(%%d)", "(.+)"))
+	return msg:match(pattern:gsub("(%%s)", "(.+)"):gsub("(%%d)", "(.+)"))
 end
 
 -- extract the itemid from the itemlink
@@ -1977,13 +1977,13 @@ local function GetIDFromLink(link)
 	if not link then
 		return
 	end
-	local found, _, str = string.find(link, "^|c%x+|H(.+)|h%[.+%]")
+	local found, _, str = link:find("^|c%x+|H(.+)|h%[.+%]")
 
 	if not found then
 		return
 	end
 
-	local _, id = strsplit(":", str)
+	local _, id = (":"):split(str)
 	return tonumber(id)
 end
 
@@ -2101,9 +2101,9 @@ function Archy:ConfigUpdated(ns, opt)
 end
 
 --[[ Artifact Functions ]] --
-local function Announce(rid)
+local function Announce(race_id)
 	if db.general.show then
-		local text = string.format(L["You can solve %s Artifact - %s (Fragments: %d of %d)"], "|cFFFFFF00" .. raceData[rid]['name'] .. "|r", "|cFFFFFF00" .. artifacts[rid]['name'] .. "|r", artifacts[rid]['fragments'] + artifacts[rid]['fragAdjust'], artifacts[rid]['fragTotal'])
+		local text = L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. raceData[race_id].name .. "|r", "|cFFFFFF00" .. artifacts[race_id].name .. "|r", artifacts[race_id].fragments + artifacts[race_id]['fragAdjust'], artifacts[race_id]['fragTotal'])
 		Archy:Pour(text, 1, 1, 1)
 	end
 end
@@ -2234,7 +2234,7 @@ function Archy:SolveAnyArtifact(useStones)
 	local found = false
 	for rid, artifact in pairs(artifacts) do
 		if not db.artifact.blacklist[rid] then
-			if (artifact['canSolve'] or (useStones and artifact['canSolveStone'])) then
+			if (artifact.canSolve or (useStones and artifact.canSolveStone)) then
 				SolveRaceArtifact(rid, useStones)
 				found = true
 				break
@@ -2350,7 +2350,7 @@ local function GetContinentSites(continent_id)
 					id = site.blob,
 					distance = 999999,
 				}
-				tinsert(sites, digsite)
+				table.insert(sites, digsite)
 			end
 		end
 	end
@@ -2452,8 +2452,8 @@ function AnnounceNearestSite()
 	if not nearestSite or not nearestSite.distance or nearestSite.distance == 999999 then
 		return
 	end
-    local site_name = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.name)
-    local site_zone = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.zoneName)
+	local site_name = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.name)
+	local site_zone = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.zoneName)
 
 	Archy:Pour(L["Nearest Dig Site is: %s in %s (%.1f yards away)"]:format(site_name, site_zone, nearestSite.distance), 1, 1, 1)
 end
@@ -2495,7 +2495,7 @@ local function AddSurveyNode(siteId, map, level, x, y)
 		end
 	end
 	if not exists then
-		tinsert(Archy.db.global.surveyNodes[siteId], newNode)
+		table.insert(Archy.db.global.surveyNodes[siteId], newNode)
 	end
 end
 
@@ -2514,7 +2514,7 @@ function Archy:InjectSurveyNode(siteId, map, level, x, y)
 		end
 	end
 	if not exists then
-		tinsert(Archy.db.global.surveyNodes[siteId], newNode)
+		table.insert(Archy.db.global.surveyNodes[siteId], newNode)
 	end
 end
 
@@ -2821,7 +2821,7 @@ local function GetContinentSiteIDs()
 
 	if digsites[continentMapToID[playerContinent]] then
 		for _, site in pairs(digsites[continentMapToID[playerContinent]]) do
-			tinsert(validSiteIDs, site.id)
+			table.insert(validSiteIDs, site.id)
 		end
 	end
 	return validSiteIDs
@@ -3181,7 +3181,7 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
     9 artifact['rare'] }
 ]]
 
-	local perc = min((value[1] + value[2]) / value[3] * 100, 100)
+	local perc = math.min((value[1] + value[2]) / value[3] * 100, 100)
 
 	if value[7] then
 		self.r, self.g, self.b = db.artifact.fragmentBarColors["Solvable"].r, db.artifact.fragmentBarColors["Solvable"].g, db.artifact.fragmentBarColors["Solvable"].b
@@ -3229,38 +3229,46 @@ function ldb:OnEnter()
 	tooltip:Clear()
 
 	local line = tooltip:AddHeader(".")
-	tooltip:SetCell(line, 1, string.format("%s%s%s", ORANGE_FONT_COLOR_CODE, "Archy", "|r"), "CENTER", numCols)
+	tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r"), "CENTER", numCols)
+
 	if HasArchaeology() then
 		line = tooltip:AddLine(".")
 		local rank, maxRank = GetArchaeologyRank()
-		local skill = string.format("%d/%d", rank, maxRank)
+		local skill = ("%d/%d"):format(rank, maxRank)
+
 		if maxRank < MAX_ARCHAEOLOGY_RANK and (maxRank - rank) <= 25 then
-			skill = string.format("%s - |cFFFF0000%s|r", skill, L["Visit a trainer!"])
+			skill = ("%s - |cFFFF0000%s|r"):format(skill, L["Visit a trainer!"])
 		elseif maxRank == MAX_ARCHAEOLOGY_RANK and rank == maxRank then
-			skill = string.format("%s%s|r", GREEN_FONT_COLOR_CODE, "MAX")
+			skill = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, "MAX")
 		end
-		tooltip:SetCell(line, 1, string.format("%s%s|r%s", NORMAL_FONT_COLOR_CODE, SKILL .. ": ", skill), "CENTER", numCols)
+		tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.SKILL .. ": ", skill), "CENTER", numCols)
 
 		line = tooltip:AddLine(".")
-		tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Artifacts"]), "LEFT", numCols)
+		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", numCols)
+
 		line = tooltip:AddLine(".")
 		tooltip:SetCell(line, 1, " ", "LEFT", 1)
-		tooltip:SetCell(line, 2, NORMAL_FONT_COLOR_CODE .. RACE .. "|r", "LEFT", 1)
+		tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
 		tooltip:SetCell(line, 3, " ", "LEFT", 1)
-		tooltip:SetCell(line, 4, NORMAL_FONT_COLOR_CODE .. L["Artifact"] .. "|r", "LEFT", 2)
-		tooltip:SetCell(line, 6, NORMAL_FONT_COLOR_CODE .. L["Progress"] .. "|r", "CENTER", 1)
-		tooltip:SetCell(line, 7, NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
-		tooltip:SetCell(line, 8, NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
-		tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
+		tooltip:SetCell(line, 4, _G.NORMAL_FONT_COLOR_CODE .. L["Artifact"] .. "|r", "LEFT", 2)
+		tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Progress"] .. "|r", "CENTER", 1)
+		tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
+		tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
+		tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 		for rid, artifact in pairs(artifacts) do
 			if artifact.fragTotal > 0 then
 				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[rid]['texture']), "LEFT", 1)
-				tooltip:SetCell(line, 2, raceData[rid]['name'], "LEFT", 1)
-				tooltip:SetCell(line, 3, " " .. format("|T%s:18:18|t", artifact['icon']), "LEFT", 1)
+				tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(raceData[rid].texture), "LEFT", 1)
+				tooltip:SetCell(line, 2, raceData[rid].name, "LEFT", 1)
+				tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(artifact['icon']), "LEFT", 1)
+
 				local artifactName = artifact['name']
-				if artifact['rare'] then artifactName = string.format("%s%s|r", "|cFF0070DD", artifactName) end
+
+				if artifact['rare'] then
+					artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
+				end
+
 				tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
 
 				tooltip:SetCell(line, 6, {
@@ -3284,7 +3292,7 @@ function ldb:OnEnter()
 
 		line = tooltip:AddLine(" ")
 		line = tooltip:AddLine(" ")
-		tooltip:SetCell(line, 1, string.format("%s%s|r", "|cFFFFFF00", L["Dig Sites"]), "LEFT", numCols)
+		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", numCols)
 
 		for cid, csites in pairs(digsites) do
 			if (#csites > 0) and (cid == continentMapToID[playerContinent] or not db.digsite.filterLDB) then
@@ -3364,7 +3372,7 @@ end
 
 --[[ Slash command handler ]] --
 local function SlashHandler(msg, editbox)
-	local command = string.lower(msg) -- , args = string.match(msg:lower(), "^(%S*)%s*(.-)$")
+	local command = msg:lower()
 
 	if command == L["config"]:lower() then
 		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
@@ -3581,13 +3589,15 @@ function Archy:CheckForMinimapAddons()
 
 	if MBF.db.profile.MinimapIcons then
 		for i, button in pairs(MBF.db.profile.MinimapIcons) do
-			if string.lower(button) == "archyminimap" or string.lower(button) == "archyminimap_" then
+			local lower_button = button:lower()
+
+			if lower_button == "archyminimap" or lower_button == "archyminimap_" then
 				foundMBF = true
 				break
 			end
 		end
 		if not foundMBF then
-			tinsert(MBF.db.profile.MinimapIcons, "ArchyMinimap")
+			table.insert(MBF.db.profile.MinimapIcons, "ArchyMinimap")
 			self:Print("Adding Archy to the MinimapButtonFrame protected items list")
 		end
 	end
@@ -4087,14 +4097,14 @@ function Archy:RefreshRacesDisplay()
 			child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
 			child.crest.text:SetText(race.name)
 			child.icon.texture:SetTexture(artifact['icon'])
-			child.icon.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
-			                     .. "\n\n" .. HIGHLIGHT_FONT_COLOR_CODE .. string.format(L["Solved Count: %s"], NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
-			                     .. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+			child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
+				.. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
+				.. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 
 
 			-- setup the bar texture here
-			local barTexture = (lsm and lsm:Fetch('statusbar', db.artifact.fragmentBarTexture)) or DEFAULT_STATUSBAR_TEXTURE
+			local barTexture = (lsm and lsm:Fetch('statusbar', db.artifact.fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
 			child.fragmentBar.barTexture:SetTexture(barTexture)
 			child.fragmentBar.barTexture:SetHorizTile(false)
 			--            if db.artifact.fragmentBarTexture == "Archy" then
@@ -4116,11 +4126,11 @@ function Archy:RefreshRacesDisplay()
 				end
 				child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875) -- bg
 			end
-			child.fragmentBar:SetMinMaxValues(0, artifact['fragTotal'])
-			child.fragmentBar:SetValue(min(artifact['fragments'] + artifact['fragAdjust'], artifact['fragTotal']))
+			child.fragmentBar:SetMinMaxValues(0, artifact.fragTotal)
+			child.fragmentBar:SetValue(math.min(artifact.fragments + artifact['fragAdjust'], artifact.fragTotal))
 
-			local adjust = (artifact['fragAdjust'] > 0) and string.format(" (|cFF00FF00+%d|r)", artifact['fragAdjust']) or ""
-			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact['fragments'], adjust, artifact['fragTotal'])
+			local adjust = (artifact['fragAdjust'] > 0) and (" (|cFF00FF00+%d|r)"):format(artifact['fragAdjust']) or ""
+			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact.fragments, adjust, artifact.fragTotal)
 			child.fragmentBar.artifact:SetText(artifact['name'])
 			child.fragmentBar.artifact:SetWordWrap(true)
 
@@ -4130,16 +4140,17 @@ function Archy:RefreshRacesDisplay()
 			if db.artifact.style == "Compact" then
 				artifactNameSize = artifactNameSize - 40
 
-				if artifact['sockets'] > 0 then
-					child.fragmentBar.keystones.tooltip = string.format(L["%d Key stone sockets available"], artifact['sockets'])
-					                                      .. "\n" .. string.format(L["%d %ss in your inventory"], (race['keystone']['inventory'] or 0), (race['keystone']['name'] or L["Key stone"]))
+				if artifact.sockets > 0 then
+					child.fragmentBar.keystones.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets)
+						.. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
 					child.fragmentBar.keystones:Show()
+
 					if child.fragmentBar.keystones and child.fragmentBar.keystones.count then
-						child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact['stonesAdded'], artifact['sockets'])
+						child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact.stonesAdded, artifact.sockets)
 					end
 
-					if artifact['stonesAdded'] > 0 then
-						child.fragmentBar.keystones.icon:SetTexture(race['keystone']['texture'])
+					if artifact.stonesAdded > 0 then
+						child.fragmentBar.keystones.icon:SetTexture(race.keystone.texture)
 					else
 						child.fragmentBar.keystones.icon:SetTexture(nil)
 					end
@@ -4154,11 +4165,11 @@ function Archy:RefreshRacesDisplay()
 						child.fragmentBar["keystone" .. ki].icon:SetTexture(race.keystone.texture)
 						if ki <= artifact.stonesAdded then
 							child.fragmentBar["keystone" .. ki].icon:Show()
-							child.fragmentBar["keystone" .. ki].tooltip = string.format(ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP, race['keystone']['name'])
+							child.fragmentBar["keystone" .. ki].tooltip = _G.ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP:format(race.keystone.name)
 							child.fragmentBar["keystone" .. ki]:Enable()
 						else
 							child.fragmentBar["keystone" .. ki].icon:Hide()
-							child.fragmentBar["keystone" .. ki].tooltip = string.format(ARCHAEOLOGY_KEYSTONE_ADD_TOOLTIP, race['keystone']['name'])
+							child.fragmentBar["keystone" .. ki].tooltip = _G.ARCHAEOLOGY_KEYSTONE_ADD_TOOLTIP:format(race.keystone.name)
 							child.fragmentBar["keystone" .. ki]:Enable()
 							if endFound then
 								child.fragmentBar["keystone" .. ki]:Disable()
@@ -4186,13 +4197,12 @@ function Archy:RefreshRacesDisplay()
 			child.fragmentBar.artifact:SetWidth(artifactNameSize)
 
 		else
-			local fragmentColor = (artifact['canSolve'] and "|cFF00FF00" or (artifact['canSolveStone'] and "|cFFFFFF00" or ""))
-			local nameColor = (artifact['rare'] and "|cFF0070DD" or ((completionCount and completionCount > 0) and GRAY_FONT_COLOR_CODE or ""))
-			child.fragments.text:SetText(fragmentColor .. artifact['fragments'] .. "/" .. artifact['fragTotal'])
-			if (raceData[rid]['keystone']['inventory'] > 0 or artifact['sockets'] > 0) then
-				child.sockets.text:SetText(raceData[rid]['keystone']['inventory'] .. "/" .. artifact['sockets'])
-				child.sockets.tooltip = string.format(L["%d Key stone sockets available"], artifact['sockets'])
-				                        .. "\n" .. string.format(L["%d %ss in your inventory"], (race['keystone']['inventory'] or 0), (race['keystone']['name'] or L["Key stone"]))
+			local fragmentColor = (artifact.canSolve and "|cFF00FF00" or (artifact.canSolveStone and "|cFFFFFF00" or ""))
+			local nameColor = (artifact['rare'] and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
+			child.fragments.text:SetText(fragmentColor .. artifact.fragments .. "/" .. artifact.fragTotal)
+			if (raceData[rid].keystone.inventory > 0 or artifact.sockets > 0) then
+				child.sockets.text:SetText(raceData[rid].keystone.inventory .. "/" .. artifact.sockets)
+				child.sockets.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
 			else
 				child.sockets.text:SetText("")
 				child.sockets.tooltip = nil
@@ -4203,9 +4213,9 @@ function Archy:RefreshRacesDisplay()
 			child.crest.tooltip = artifact['name'] .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. raceData[rid].name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 			child.artifact.text:SetText(nameColor .. artifact['name'])
-			child.artifact.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
-			                         .. "\n\n" .. HIGHLIGHT_FONT_COLOR_CODE .. string.format(L["Solved Count: %s"], NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
-			                         .. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+			child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
+				.. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
+				.. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 
 
@@ -4326,14 +4336,17 @@ function Archy:UpdateDigSiteFrame()
 end
 
 function Archy:ShowDigSiteTooltip(self)
-	local siteId = self:GetParent():GetID()
+	local site_id = self:GetParent():GetID()
+	local normal_font = _G.NORMAL_FONT_COLOR_CODE
+	local highlight_font = _G.HIGHLIGHT_FONT_COLOR_CODE
+
 	self.tooltip = self.name:GetText()
-	self.tooltip = self.tooltip .. string.format("\n%s%s%s%s|r", NORMAL_FONT_COLOR_CODE, ZONE .. ": ", HIGHLIGHT_FONT_COLOR_CODE, self:GetParent().zone.name:GetText())
-	self.tooltip = self.tooltip .. string.format("\n\n%s%s %s%s|r", NORMAL_FONT_COLOR_CODE, L["Surveys:"], HIGHLIGHT_FONT_COLOR_CODE, (siteStats[siteId].surveys or 0))
-	self.tooltip = self.tooltip .. string.format("\n%s%s %s%s|r", NORMAL_FONT_COLOR_CODE, L["Digs"] .. ": ", HIGHLIGHT_FONT_COLOR_CODE, (siteStats[siteId].looted or 0))
-	self.tooltip = self.tooltip .. string.format("\n%s%s %s%s|r", NORMAL_FONT_COLOR_CODE, ARCHAEOLOGY_RUNE_STONES .. ": ", HIGHLIGHT_FONT_COLOR_CODE, (siteStats[siteId].fragments or 0))
-	self.tooltip = self.tooltip .. string.format("\n%s%s %s%s|r", NORMAL_FONT_COLOR_CODE, L["Key Stones:"], HIGHLIGHT_FONT_COLOR_CODE, (siteStats[siteId].keystones or 0))
-	self.tooltip = self.tooltip .. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
+	self.tooltip = self.tooltip .. ("\n%s%s%s%s|r"):format(normal_font, _G.ZONE .. ": ", highlight_font, self:GetParent().zone.name:GetText())
+	self.tooltip = self.tooltip .. ("%s\n\n%s%s %s%s|r"):format(normal_font, L["Surveys:"], highlight_font, siteStats[site_id].surveys or 0)
+	self.tooltip = self.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Digs"] .. ": ", highlight_font, siteStats[site_id].looted or 0)
+	self.tooltip = self.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlight_font, siteStats[site_id].fragments or 0)
+	self.tooltip = self.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Key Stones:"], highlight_font, siteStats[site_id].keystones or 0)
+	self.tooltip = self.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
 
 	if Archy:IsSiteBlacklisted(self.siteName) then
 		self.tooltip = self.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
