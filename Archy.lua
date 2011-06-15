@@ -3654,7 +3654,7 @@ function Archy:PlayerCastSurvey(event, unit, spell, _, _, spellid)
 	end
 	surveyPosition = playerPosition and { x = playerPosition.x, y = playerPosition.y, map = playerPosition.map, level = playerPosition.level } or nil
 
-	if surveyPosition then
+	if surveyPosition and nearestSite then
 		lastSite = nearestSite
 		siteStats[lastSite.id]['surveys'] = siteStats[lastSite.id]['surveys'] + 1
 
