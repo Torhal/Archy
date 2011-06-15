@@ -1694,13 +1694,6 @@ local minimapOptions = {
 	},
 }
 
---[[ Function locals ]] --
-local floor = floor
-local GetCurrentMapContinent, GetCurrentMapAreaID, GetCurrentMapDungeonLevel, GetMapContinents, GetMapInfo, GetMapZones, IsInInstance, GetNumMapLandmarks, GetMapLandmarkInfo, UpdateMapHighlight = GetCurrentMapContinent, GetCurrentMapAreaID, GetCurrentMapDungeonLevel, GetMapContinents, GetMapInfo, GetMapZones, IsInInstance, GetNumMapLandmarks, GetMapLandmarkInfo, UpdateMapHighlight
-local GetNumArchaeologyRaces, GetNumArtifactsByRace, GetArchaeologyRaceInfo, ArchaeologyMapUpdateAll, ArcheologyGetVisibleBlobID, RequestArtifactCompletionHistory = GetNumArchaeologyRaces, GetNumArtifactsByRace, GetArchaeologyRaceInfo, ArchaeologyMapUpdateAll, ArcheologyGetVisibleBlobID, RequestArtifactCompletionHistory
-local GetItemInfo, InCombatLockdown, GetProfessions, GetProfessionInfo = GetItemInfo, InCombatLockdown, GetProfessions, GetProfessionInfo
-
-
 --[[ Meta Tables ]] --
 setmetatable(raceData, {
 	__index = function(t, k)
