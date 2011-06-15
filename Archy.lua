@@ -3942,7 +3942,7 @@ local function TransformRaceFrame(frame)
 	end
 end
 
-function SetMovableState(self, value)
+local function SetMovableState(self, value)
 	self:SetMovable(value)
 	self:EnableMouse(value)
 
