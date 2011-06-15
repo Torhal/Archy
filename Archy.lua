@@ -3,6 +3,15 @@
 -----------------------------------------------------------------------
 local _G = getfenv(0)
 
+local math = _G.math
+local table = _G.table
+
+local pairs = _G.pairs
+local setmetatable = _G.setmetatable
+local tonumber = _G.tonumber
+local tostring = _G.tostring
+local unpack = _G.unpack
+
 -----------------------------------------------------------------------
 -- AddOn namespace.
 -----------------------------------------------------------------------
