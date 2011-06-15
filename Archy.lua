@@ -67,12 +67,32 @@ local archRelatedBagUpdate = false
 local keystoneLootRaceID
 local playerContinent
 local siteStats, siteBlacklist
-local lastSite, nearestSite, playerPosition, surveyPosition = {}, nil, { map = 0, level = 0, x = 0, y = 0 }, { map = 0, level = 0, x = 0, y = 0 }
 local zoneData, raceData, artifacts, digsites = {}, {}, {}, {}
 local tomtomPoint, tomtomActive, tomtomExists, tomtomFrame, tomtomSite
 local distanceIndicatorActive = false
 
-local artifactSolved = { ['raceId'] = 0, ['name'] = '' }
+local nearestSite
+local lastSite = {}
+
+local playerPosition = {
+	map = 0,
+	level = 0,
+	x = 0,
+	y = 0
+}
+
+local surveyPosition = {
+	map = 0,
+	level = 0,
+	x = 0,
+	y = 0
+}
+
+local artifactSolved = {
+	raceId = 0,
+	name = ""
+}
+
 local continentMapToID = {}
 local mapFileToID = {}
 local mapIDToZone = {}
