@@ -1704,10 +1704,15 @@ setmetatable(raceData, {
 		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(itemID)
 
 		t[k] = {
-			['name'] = raceName,
-			['currency'] = currencyAmount,
-			['texture'] = raceTexture,
-			['keystone'] = { ['id'] = itemID, ['name'] = itemName, ['texture'] = itemTexture, ['inventory'] = 0 }
+			name = raceName,
+			currency = currencyAmount,
+			texture = raceTexture,
+			keystone = {
+				id = itemID,
+				name = itemName,
+				texture = itemTexture,
+				inventory = 0
+			}
 		}
 		return t[k]
 	end
@@ -1718,18 +1723,18 @@ setmetatable(artifacts, {
 	__index = function(t, k)
 		if k then
 			t[k] = {
-				['name'] = '',
-				['rare'] = false,
-				['tooltip'] = '',
-				['icon'] = '',
-				['sockets'] = 0,
-				['stonesAdded'] = 0,
-				['fragments'] = 0,
-				['fragAdjust'] = 0,
-				['fragTotal'] = 0,
-				['canSolve'] = false,
-				['canSolveStone'] = false,
-				['ping'] = false
+				name = "",
+				rare = false,
+				tooltip = "",
+				icon = "",
+				sockets = 0,
+				stonesAdded = 0,
+				fragments = 0,
+				fragAdjust = 0,
+				fragTotal = 0,
+				canSolve = false,
+				canSolveStone = false,
+				ping = false
 			}
 			return t[k]
 		end
@@ -1815,7 +1820,14 @@ do
 			mapIDToZone[mapid] = zid
 			mapIDToZoneName[mapid] = zname
 			zoneIDToName[zid] = zname
-			zoneData[mapid] = { ['continent'] = zid, ['map'] = mapid, ['level'] = level, ['mapFile'] = GetMapInfo(), ['id'] = zid, ['name'] = zname }
+			zoneData[mapid] = {
+				['continent'] = zid,
+				['map'] = mapid,
+				['level'] = level,
+				['mapFile'] = _G.GetMapInfo(),
+				['id'] = zid,
+				['name'] = zname
+			}
 		end
 	end
 	_G.SetMapByID(orig)
@@ -1863,7 +1875,11 @@ local blizSolveArtifact = _G.SolveArtifact
 _G.SolveArtifact = function(raceIndex, useStones)
 	local rank, maxRank = GetArchaeologyRank()
 	local requiresConfirm = false
-	if db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then requiresConfirm = true end
+
+	if db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
+		requiresConfirm = true
+	end
+
 	if requiresConfirm then
 		if not confirmArgs then confirmArgs = {} end
 		confirmArgs.race = raceIndex
@@ -2006,8 +2022,8 @@ local function LoadRaceData()
 		local race = raceData[race_id] -- meta table should load the data
 
 		if race then -- we have race data
-			raceNameToID[race['name']] = rid
-			keystoneIDToRaceID[race['keystone']['id']] = rid
+			raceNameToID[race.name] = race_id
+			keystoneIDToRaceID[race.keystone.id] = race_id
 		end
 	end
 	_G.RequestArtifactCompletionHistory()
@@ -2174,34 +2190,37 @@ function UpdateRaceArtifact(race_id)
 	end
 end
 
-local function UpdateRace(rid)
-	UpdateRaceArtifact(rid)
-	UpdateArtifactFrame(rid)
+local function UpdateRace(race_id)
+	UpdateRaceArtifact(race_id)
+	UpdateArtifactFrame(race_id)
 end
 
-function SolveRaceArtifact(rid, useStones)
-	if rid then
-		SetSelectedArtifact(rid)
-		artifactSolved['raceId'] = rid
+function SolveRaceArtifact(race_id, useStones)
+	if race_id then
+		SetSelectedArtifact(race_id)
+		artifactSolved['raceId'] = race_id
 		artifactSolved['name'] = GetSelectedArtifactInfo()
-		keystoneLootRaceID = rid -- this is to force a refresh after the ARTIFACT_COMPLETE event
+		keystoneLootRaceID = race_id -- this is to force a refresh after the ARTIFACT_COMPLETE event
 
 		if useStones ~= nil then
 			if useStones then
-				artifacts[rid]['stonesAdded'] = min(raceData[rid]['keystone']['inventory'], artifacts[rid]['sockets'])
+				artifacts[race_id].stonesAdded = math.min(raceData[race_id].keystone.inventory, artifacts[race_id].sockets)
 			else
-				artifacts[rid]['stonesAdded'] = 0
+				artifacts[race_id].stonesAdded = 0
 			end
 		end
 
-		if artifacts[rid]['stonesAdded'] > 0 then
-			for i = 1, artifacts[rid]['stonesAdded'] do
+		if artifacts[race_id].stonesAdded > 0 then
+			for index = 1, artifacts[race_id].stonesAdded do
 				SocketItemToArtifact()
-				if not ItemAddedToArtifact(i) then break end
+
+				if not ItemAddedToArtifact(index) then
+					break
+				end
 			end
 		else
-			if artifacts[rid]['sockets'] > 0 then
-				for i = 1, artifacts[rid]['stonesAdded'] do
+			if artifacts[race_id].sockets > 0 then
+				for index = 1, artifacts[race_id].stonesAdded do
 					RemoveItemFromArtifact()
 				end
 			end
@@ -2246,20 +2265,18 @@ local function UpdateArtifactFrame(rid)
 end
 
 function Archy:SocketClicked(self, button, down)
-	local rid = self:GetParent():GetParent():GetID()
-	local keystoneIndex = self:GetID()
+	local race_id = self:GetParent():GetParent():GetID()
 
-	if (button == "LeftButton") then
-		if (artifacts[rid]['stonesAdded'] < artifacts[rid]['sockets']) and (artifacts[rid]['stonesAdded'] < raceData[rid]['keystone']['inventory']) then
-			artifacts[rid]['stonesAdded'] = artifacts[rid]['stonesAdded'] + 1
+	if button == "LeftButton" then
+		if (artifacts[race_id].stonesAdded < artifacts[race_id].sockets) and (artifacts[race_id].stonesAdded < raceData[race_id].keystone.inventory) then
+			artifacts[race_id].stonesAdded = artifacts[race_id].stonesAdded + 1
 		end
 	else
-		if (artifacts[rid]['stonesAdded'] > 0) then
-			artifacts[rid]['stonesAdded'] = artifacts[rid]['stonesAdded'] - 1
+		if artifacts[race_id].stonesAdded > 0 then
+			artifacts[race_id].stonesAdded = artifacts[race_id].stonesAdded - 1
 		end
 	end
-
-	UpdateRaceArtifact(rid)
+	UpdateRaceArtifact(race_id)
 	Archy:RefreshRacesDisplay()
 end
 
@@ -2267,11 +2284,11 @@ end
 
 --[[ Dig Site List Functions ]] --
 local function ResetDigCounter(id)
-	siteStats[id]['counter'] = 0
+	siteStats[id].counter = 0
 end
 
 local function IncrementDigCounter(id)
-	siteStats[id]['counter'] = (siteStats[id]['counter'] or 0) + 1
+	siteStats[id].counter = (siteStats[id].counter or 0) + 1
 end
 
 local function CompareAndResetDigCounters(a, b)
@@ -2449,10 +2466,10 @@ function Archy:ImportOldStatsDB()
 		if key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" then
 			if DIG_SITES[key] then
 				local site = DIG_SITES[key]
-				siteStats[site.blob]['surveys'] = (siteStats[site.blob]['surveys'] or 0) + (st['surveys'] or 0)
-				siteStats[site.blob]['fragments'] = (siteStats[site.blob]['fragments'] or 0) + (st['fragments'] or 0)
-				siteStats[site.blob]['looted'] = (siteStats[site.blob]['looted'] or 0) + (st['looted'] or 0)
-				siteStats[site.blob]['keystones'] = (siteStats[site.blob]['keystones'] or 0) + (st['keystones'] or 0)
+				siteStats[site.blob].surveys = (siteStats[site.blob].surveys or 0) + (st['surveys'] or 0)
+				siteStats[site.blob].fragments = (siteStats[site.blob].fragments or 0) + (st['fragments'] or 0)
+				siteStats[site.blob].looted = (siteStats[site.blob].looted or 0) + (st['looted'] or 0)
+				siteStats[site.blob].keystones = (siteStats[site.blob].keystones or 0) + (st['keystones'] or 0)
 				Archy.db.char.digsites[key] = nil
 			end
 		end
@@ -3153,14 +3170,14 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
 	local bar = self.bar
 	local fs = self.fs
 	--[[    {
-    1 artifact['fragments'],
+    1 artifact.fragments,
     2 artifact['fragAdjust'],
-    3 artifact['fragTotal'],
-    4 raceData[rid]['keystone']['inventory'],
-    5 artifact['sockets'],
-    6 artifact['stonesAdded'],
-    7 artifact['canSolve'],
-    8 artifact['canSolveStone'],
+    3 artifact.fragTotal,
+    4 raceData[rid].keystone.inventory,
+    5 artifact.sockets,
+    6 artifact.stonesAdded,
+    7 artifact.canSolve,
+    8 artifact.canSolveStone,
     9 artifact['rare'] }
 ]]
 
@@ -3237,7 +3254,7 @@ function ldb:OnEnter()
 		tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 		for rid, artifact in pairs(artifacts) do
-			if artifact['fragTotal'] > 0 then
+			if artifact.fragTotal > 0 then
 				line = tooltip:AddLine(" ")
 				tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[rid]['texture']), "LEFT", 1)
 				tooltip:SetCell(line, 2, raceData[rid]['name'], "LEFT", 1)
@@ -3246,9 +3263,19 @@ function ldb:OnEnter()
 				if artifact['rare'] then artifactName = string.format("%s%s|r", "|cFF0070DD", artifactName) end
 				tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
 
-				tooltip:SetCell(line, 6, { artifact['fragments'], artifact['fragAdjust'], artifact['fragTotal'], raceData[rid]['keystone']['inventory'], artifact['sockets'], artifact['stonesAdded'], artifact['canSolve'], artifact['canSolveStone'], artifact['rare'] }, myProvider, 1, 0, 0)
-				tooltip:SetCell(line, 7, (raceData[rid]['keystone']['inventory'] > 0) and raceData[rid]['keystone']['inventory'] or "", "CENTER", 1)
-				tooltip:SetCell(line, 8, (artifact['sockets'] > 0) and artifact['sockets'] or "", "CENTER", 1)
+				tooltip:SetCell(line, 6, {
+					artifact.fragments,
+					artifact['fragAdjust'],
+					artifact.fragTotal,
+					raceData[rid].keystone.inventory,
+					artifact.sockets,
+					artifact.stonesAdded,
+					artifact.canSolve,
+					artifact.canSolveStone,
+					artifact['rare']
+				}, myProvider, 1, 0, 0)
+				tooltip:SetCell(line, 7, (raceData[rid].keystone.inventory > 0) and raceData[rid].keystone.inventory or "", "CENTER", 1)
+				tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
 
 				local _, _, completionCount = GetArtifactStats(rid, artifact['name'])
 				tooltip:SetCell(line, 9, (completionCount or "unknown"), "CENTER", 2)
@@ -3269,28 +3296,28 @@ function ldb:OnEnter()
 					end
 				end
 				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, "  " .. ORANGE_FONT_COLOR_CODE .. continentName .. "|r", "LEFT", numCols)
+				tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continentName .. "|r", "LEFT", numCols)
 
 				line = tooltip:AddLine(" ")
 				tooltip:SetCell(line, 1, " ", "LEFT", 1)
-				tooltip:SetCell(line, 2, NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
-				tooltip:SetCell(line, 4, NORMAL_FONT_COLOR_CODE .. L["Dig Site"] .. "|r", "LEFT", 1)
-				tooltip:SetCell(line, 5, NORMAL_FONT_COLOR_CODE .. ZONE .. "|r", "LEFT", 2)
-				tooltip:SetCell(line, 7, NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1)
-				tooltip:SetCell(line, 8, NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1)
-				tooltip:SetCell(line, 9, NORMAL_FONT_COLOR_CODE .. ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
-				tooltip:SetCell(line, 10, NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
+				tooltip:SetCell(line, 4, _G.NORMAL_FONT_COLOR_CODE .. L["Dig Site"] .. "|r", "LEFT", 1)
+				tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ZONE .. "|r", "LEFT", 2)
+				tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. _G.ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
+				tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 
 				for _, site in pairs(csites) do
 					line = tooltip:AddLine(" ")
-					tooltip:SetCell(line, 1, " " .. format("|T%s:18:18:0:1:128:128:4:60:4:60|t", raceData[site['raceId']]['texture']), "LEFT", 1)
-					tooltip:SetCell(line, 2, raceData[site['raceId']]['name'], "LEFT", 2)
+					tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(raceData[site['raceId']].texture), "LEFT", 1)
+					tooltip:SetCell(line, 2, raceData[site['raceId']].name, "LEFT", 2)
 					tooltip:SetCell(line, 4, site['name'], "LEFT", 1)
 					tooltip:SetCell(line, 5, site['zoneName'], "LEFT", 2)
-					tooltip:SetCell(line, 7, siteStats[site['id']]['surveys'], "CENTER", 1)
-					tooltip:SetCell(line, 8, siteStats[site['id']]['looted'], "CENTER", 1)
-					tooltip:SetCell(line, 9, siteStats[site['id']]['fragments'], "CENTER", 1)
-					tooltip:SetCell(line, 10, siteStats[site['id']]['keystones'], "CENTER", 1)
+					tooltip:SetCell(line, 7, siteStats[site['id']].surveys, "CENTER", 1)
+					tooltip:SetCell(line, 8, siteStats[site['id']].looted, "CENTER", 1)
+					tooltip:SetCell(line, 9, siteStats[site['id']].fragments, "CENTER", 1)
+					tooltip:SetCell(line, 10, siteStats[site['id']].keystones, "CENTER", 1)
 				end
 				line = tooltip:AddLine(" ")
 			end
@@ -3672,7 +3699,7 @@ function Archy:LootReceived(event, msg)
 	local race_id = keystoneIDToRaceID[itemID]
 
 	if race_id then
-		siteStats[lastSite.id]['keystones'] = siteStats[lastSite.id]['keystones'] + 1
+		siteStats[lastSite.id].keystones = siteStats[lastSite.id].keystones + 1
 		keystoneLootRaceID = race_id
 		archRelatedBagUpdate = true
 	end
@@ -3686,7 +3713,7 @@ function Archy:PlayerCastSurvey(event, unit, spell, _, _, spellid)
 
 	if surveyPosition and nearestSite then
 		lastSite = nearestSite
-		siteStats[lastSite.id]['surveys'] = siteStats[lastSite.id]['surveys'] + 1
+		siteStats[lastSite.id].surveys = siteStats[lastSite.id].surveys + 1
 
 		distanceIndicatorActive = true
 		ToggleDistanceIndicator()
@@ -3713,21 +3740,21 @@ function Archy:CurrencyUpdated()
 		local _, _, _, currencyAmount = _G.GetArchaeologyRaceInfo(race_id)
 		local diff = currencyAmount - (raceData[race_id].currency or 0)
 
-		raceData[rid]['currency'] = currencyAmount
+		raceData[race_id].currency = currencyAmount
 
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
-			artifacts[rid]['stonesAdded'] = 0
+			artifacts[race_id].stonesAdded = 0
 
 			if artifactSolved['raceId'] > 0 then
 				-- announce that we have solved an artifact
-				local _, _, completionCount = GetArtifactStats(rid, artifactSolved['name'])
-				local text = string.format(L["You have solved %s Artifact - %s (Times completed: %d)"], "|cFFFFFF00" .. raceData[rid]['name'] .. "|r", "|cFFFFFF00" .. artifactSolved['name'] .. "|r", (completionCount or 0))
+				local _, _, completionCount = GetArtifactStats(race_id, artifactSolved['name'])
+				local text = L["You have solved %s Artifact - %s (Times completed: %d)"]:format("|cFFFFFF00" .. raceData[race_id].name .. "|r", "|cFFFFFF00" .. artifactSolved['name'] .. "|r", completionCount or 0)
 				self:Pour(text, 1, 1, 1)
 
 				-- reset it since we know it's been solved
 				artifactSolved['raceId'] = 0
-				artifactSolved['name'] = ''
+				artifactSolved['name'] = ""
 				self:RefreshRacesDisplay()
 			end
 
@@ -3735,7 +3762,7 @@ function Archy:CurrencyUpdated()
 			-- we've gained fragments, aka. Successfully dug at a dig site
 
 			-- update the artifact info
-			UpdateRaceArtifact(rid)
+			UpdateRaceArtifact(race_id)
 
 			-- deactivate the distance indicator
 			distanceIndicatorActive = false
@@ -3943,40 +3970,61 @@ function Archy:UpdateRacesFrame()
 	racesFrame:SetScale(db.artifact.scale)
 	racesFrame:SetAlpha(db.artifact.alpha)
 	--    racesFrame:ClearAllPoints()
-	--    racesFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", db.artifact.positionX, db.artifact.positionY)
+	--    racesFrame:SetPoint("TOPLEFT", _G.UIParent, "TOPLEFT", db.artifact.positionX, db.artifact.positionY)
 	SetMovableState(racesFrame, (not db.general.locked))
 
-	local font = lsm:Fetch("font", db.artifact.font.name)
-	local fragmentFont = lsm:Fetch("font", db.artifact.fragmentFont.name)
-	local keystoneFont = lsm:Fetch("font", db.artifact.keystoneFont.name)
+	local artifact_font_data = db.artifact.font
+	local artifact_fragment_font_data = db.artifact.fragmentFont
 
-	for _, f in pairs(racesFrame.children) do
+	local font = lsm:Fetch("font", artifact_font_data.name)
+	local fragment_font = lsm:Fetch("font", artifact_fragment_font_data.name)
+	local keystone_font = lsm:Fetch("font", db.artifact.keystoneFont.name)
+
+	for _, child in pairs(racesFrame.children) do
 		if db.general.theme == "Graphical" then
-			f.fragmentBar.artifact:SetFont(font, db.artifact.font.size, db.artifact.font.outline)
-			f.fragmentBar.artifact:SetTextColor(db.artifact.font.color.r, db.artifact.font.color.g, db.artifact.font.color.b, db.artifact.font.color.a)
-			f.fragmentBar.fragments:SetFont(fragmentFont, db.artifact.fragmentFont.size, db.artifact.fragmentFont.outline)
-			f.fragmentBar.fragments:SetTextColor(db.artifact.fragmentFont.color.r, db.artifact.fragmentFont.color.g, db.artifact.fragmentFont.color.b, db.artifact.fragmentFont.color.a)
-			f.fragmentBar.keystones.count:SetFont(keystoneFont, db.artifact.keystoneFont.size, db.artifact.keystoneFont.outline)
-			f.fragmentBar.keystones.count:SetTextColor(db.artifact.keystoneFont.color.r, db.artifact.keystoneFont.color.g, db.artifact.keystoneFont.color.b, db.artifact.keystoneFont.color.a)
-			ApplyShadowToFontString(f.fragmentBar.artifact, db.artifact.font.shadow)
-			ApplyShadowToFontString(f.fragmentBar.fragments, db.artifact.fragmentFont.shadow)
-			ApplyShadowToFontString(f.fragmentBar.keystones.count, db.artifact.keystoneFont.shadow)
+			child.fragmentBar.artifact:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
+			child.fragmentBar.artifact:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+
+			child.fragmentBar.fragments:SetFont(fragment_font, artifact_fragment_font_data.size, artifact_fragment_font_data.outline)
+			child.fragmentBar.fragments:SetTextColor(artifact_fragment_font_data.color.r, artifact_fragment_font_data.color.g, artifact_fragment_font_data.color.b, artifact_fragment_font_data.color.a)
+
+			child.fragmentBar.keystones.count:SetFont(keystone_font, db.artifact.keystoneFont.size, db.artifact.keystoneFont.outline)
+			child.fragmentBar.keystones.count:SetTextColor(db.artifact.keystoneFont.color.r, db.artifact.keystoneFont.color.g, db.artifact.keystoneFont.color.b, db.artifact.keystoneFont.color.a)
+
+			ApplyShadowToFontString(child.fragmentBar.artifact, artifact_font_data.shadow)
+			ApplyShadowToFontString(child.fragmentBar.fragments, artifact_fragment_font_data.shadow)
+			ApplyShadowToFontString(child.fragmentBar.keystones.count, db.artifact.keystoneFont.shadow)
 		else
-			f.fragments.text:SetFont(font, db.artifact.font.size, db.artifact.font.outline)
-			f.sockets.text:SetFont(font, db.artifact.font.size, db.artifact.font.outline)
-			f.artifact.text:SetFont(font, db.artifact.font.size, db.artifact.font.outline)
-			f.fragments.text:SetTextColor(db.artifact.font.color.r, db.artifact.font.color.g, db.artifact.font.color.b, db.artifact.font.color.a)
-			f.sockets.text:SetTextColor(db.artifact.font.color.r, db.artifact.font.color.g, db.artifact.font.color.b, db.artifact.font.color.a)
-			f.artifact.text:SetTextColor(db.artifact.font.color.r, db.artifact.font.color.g, db.artifact.font.color.b, db.artifact.font.color.a)
-			ApplyShadowToFontString(f.fragments.text, db.artifact.font.shadow)
-			ApplyShadowToFontString(f.sockets.text, db.artifact.font.shadow)
-			ApplyShadowToFontString(f.artifact.text, db.artifact.font.shadow)
+			child.fragments.text:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
+			child.fragments.text:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+
+			child.sockets.text:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
+			child.sockets.text:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+
+			child.artifact.text:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
+			child.artifact.text:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+
+			ApplyShadowToFontString(child.fragments.text, artifact_font_data.shadow)
+			ApplyShadowToFontString(child.sockets.text, artifact_font_data.shadow)
+			ApplyShadowToFontString(child.artifact.text, artifact_font_data.shadow)
 		end
 	end
 
 	local borderTexture = lsm:Fetch('border', db.artifact.borderTexture) or [[Interface\None]]
 	local backgroundTexture = lsm:Fetch('background', db.artifact.backgroundTexture) or [[Interface\None]]
-	racesFrame:SetBackdrop({ bgFile = backgroundTexture, edgeFile = borderTexture, tile = false, edgeSize = 8, tileSize = 8, insets = { left = 2, top = 2, right = 2, bottom = 2 } })
+	racesFrame:SetBackdrop({
+		bgFile = backgroundTexture,
+		edgeFile = borderTexture,
+		tile = false,
+		edgeSize = 8,
+		tileSize = 8,
+		insets = {
+			left = 2,
+			top = 2,
+			right = 2,
+			bottom = 2
+		}
+	})
 	racesFrame:SetBackdropColor(1, 1, 1, db.artifact.bgAlpha)
 	racesFrame:SetBackdropBorderColor(1, 1, 1, db.artifact.borderAlpha)
 
@@ -4103,8 +4151,8 @@ function Archy:RefreshRacesDisplay()
 					if ki > artifact.sockets or not race.keystone.name then
 						child.fragmentBar["keystone" .. ki]:Hide()
 					else
-						child.fragmentBar["keystone" .. ki].icon:SetTexture(race['keystone']['texture'])
-						if ki <= artifact['stonesAdded'] then
+						child.fragmentBar["keystone" .. ki].icon:SetTexture(race.keystone.texture)
+						if ki <= artifact.stonesAdded then
 							child.fragmentBar["keystone" .. ki].icon:Show()
 							child.fragmentBar["keystone" .. ki].tooltip = string.format(ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP, race['keystone']['name'])
 							child.fragmentBar["keystone" .. ki]:Enable()
@@ -4122,11 +4170,11 @@ function Archy:RefreshRacesDisplay()
 				end
 			end
 
-			if artifact['canSolve'] or (artifact['stonesAdded'] > 0 and artifact['canSolveStone']) then
+			if artifact.canSolve or (artifact.stonesAdded > 0 and artifact.canSolveStone) then
 				child.solveButton:Enable()
 				barColor = db.artifact.fragmentBarColors["Solvable"]
 			else
-				if (artifact['canSolveStone']) then
+				if (artifact.canSolveStone) then
 					barColor = db.artifact.fragmentBarColors["AttachToSolve"]
 				end
 				child.solveButton:Disable()
@@ -4150,9 +4198,9 @@ function Archy:RefreshRacesDisplay()
 				child.sockets.tooltip = nil
 			end
 
-			child.crest:SetNormalTexture(raceData[rid]['texture'])
-			child.crest:SetHighlightTexture(raceData[rid]['texture'])
-			child.crest.tooltip = artifact['name'] .. "\n" .. NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. HIGHLIGHT_FONT_COLOR_CODE .. raceData[rid]['name'] .. "\n\n" .. GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
+			child.crest:SetNormalTexture(raceData[rid].texture)
+			child.crest:SetHighlightTexture(raceData[rid].texture)
+			child.crest.tooltip = artifact['name'] .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. raceData[rid].name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 			child.artifact.text:SetText(nameColor .. artifact['name'])
 			child.artifact.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. artifact['name'] .. "|r\n" .. NORMAL_FONT_COLOR_CODE .. artifact['tooltip']
@@ -4411,7 +4459,7 @@ function Archy:RefreshDigSiteDisplay()
 
 	for siteIndex, site in pairs(digsites[continent_id]) do
 		local siteFrame = digsiteFrame.children[siteIndex]
-		local count = siteStats[site.id]['counter']
+		local count = siteStats[site.id].counter
 
 		if db.general.theme == "Graphical" then
 			if siteFrame.style ~= db.digsite.style then
@@ -4427,8 +4475,8 @@ function Archy:RefreshDigSiteDisplay()
 		siteFrame.site.name:SetText((Archy:IsSiteBlacklisted(site.name)) and "|cFFFF0000" .. site.name or site.name)
 
 		if siteFrame.site.siteName ~= site.name then
-			siteFrame.crest.icon:SetTexture(raceData[site.raceId]['texture'])
-			siteFrame.crest.tooltip = raceData[site.raceId]['name']
+			siteFrame.crest.icon:SetTexture(raceData[site.raceId].texture)
+			siteFrame.crest.tooltip = raceData[site.raceId].name
 			siteFrame.zone.name:SetText(site.zoneName)
 			siteFrame.site.siteName = site.name
 			siteFrame.site.zoneId = site.zoneId
