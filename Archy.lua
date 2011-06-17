@@ -3249,6 +3249,8 @@ function cellPrototype:getContentHeight()
 	return self.bar:GetHeight() + 2
 end
 
+local progress_data = {}
+
 function ldb:OnEnter()
 	local numCols, colIndex, line = 10, 0, 0
 	local tooltip = qtip:Acquire("ArchyTooltip", numCols, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
@@ -3303,17 +3305,17 @@ function ldb:OnEnter()
 
 				tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
 
-				tooltip:SetCell(line, 6, {
-					artifact.fragments,
-					artifact.fragAdjust,
-					artifact.fragTotal,
-					raceData[rid].keystone.inventory,
-					artifact.sockets,
-					artifact.stonesAdded,
-					artifact.canSolve,
-					artifact.canSolveStone,
-					artifact.rare
-				}, myProvider, 1, 0, 0)
+				progress_data[1] = artifact.fragments
+				progress_data[2] = artifact.fragAdjust
+				progress_data[3] = artifact.fragTotal
+				progress_data[4] = raceData[rid].keystone.inventory
+				progress_data[5] = artifact.sockets
+				progress_data[6] = artifact.stonesAdded
+				progress_data[7] = artifact.canSolve
+				progress_data[8] = artifact.canSolveStone
+				progress_data[9] = artifact.rare
+
+				tooltip:SetCell(line, 6, progress_data, myProvider, 1, 0, 0)
 				tooltip:SetCell(line, 7, (raceData[rid].keystone.inventory > 0) and raceData[rid].keystone.inventory or "", "CENTER", 1)
 				tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
 
