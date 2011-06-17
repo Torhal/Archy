@@ -2824,19 +2824,8 @@ function UpdateMinimapEdges()
 	end
 end
 
-function ClearMinimapSurveyColors()
-	if not db.minimap.fragmentColorBySurveyDistance and db.minimap.fragmentIcon ~= "CyanDot" then
-		return
-	end
-
-	for id, poi in pairs(allPois) do
-		if poi.active and poi.type == "survey" then
-			poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
-		end
-	end
-end
-
 local lastNearestSite
+
 local function GetContinentSiteIDs()
 	local validSiteIDs = {}
 
@@ -2943,8 +2932,14 @@ function UpdateMinimapPOIs(force)
 			Arrow_OnUpdate(site.poi, 5)
 		end
 		--UpdateMinimapEdges()
-		ClearMinimapSurveyColors()
-		--            print("Calling collectgarbage for UpdateMinimapPOIs(force = ", force,")")
+		if db.minimap.fragmentColorBySurveyDistance and db.minimap.fragmentIcon ~= "CyanDot" then
+			for id, poi in pairs(allPois) do
+				if poi.active and poi.type == "survey" then
+					poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
+				end
+			end
+		end
+		-- print("Calling collectgarbage for UpdateMinimapPOIs(force = ", force,")")
 		collectgarbage('collect')
 	else
 		--        if lastNearestSite then UpdateMinimapEdges() end
