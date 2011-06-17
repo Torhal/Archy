@@ -1728,7 +1728,6 @@ setmetatable(artifacts, {
 		if k then
 			t[k] = {
 				name = "",
-				rare = false,
 				tooltip = "",
 				icon = "",
 				sockets = 0,
@@ -1736,9 +1735,6 @@ setmetatable(artifacts, {
 				fragments = 0,
 				fragAdjust = 0,
 				fragTotal = 0,
-				canSolve = false,
-				canSolveStone = false,
-				ping = false
 			}
 			return t[k]
 		end
@@ -2134,6 +2130,7 @@ end
 
 function UpdateRaceArtifact(race_id)
 	local race = raceData[race_id]
+
 	if not race then
 		--@??? Maybe use a wipe statement here
 		artifacts[race_id] = nil
@@ -2164,7 +2161,7 @@ function UpdateRaceArtifact(race_id)
 		artifact.tooltip = spellDescription
 		artifact.rare = (rarity ~= 0)
 		artifact.name = name
-		artifact.canSolveStone = false
+		artifact.canSolveStone = nil
 		artifact.fragAdjust = 0
 		artifact.completionCount = 0
 
@@ -2217,9 +2214,9 @@ end
 
 function SolveRaceArtifact(race_id, useStones)
 	if race_id then
-		SetSelectedArtifact(race_id)
+		_G.SetSelectedArtifact(race_id)
 		artifactSolved.raceId = race_id
-		artifactSolved.name = GetSelectedArtifactInfo()
+		artifactSolved.name = _G.GetSelectedArtifactInfo()
 		keystoneLootRaceID = race_id -- this is to force a refresh after the ARTIFACT_COMPLETE event
 
 		if useStones ~= nil then
