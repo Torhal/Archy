@@ -2425,8 +2425,8 @@ function Archy:UpdateSiteDistances()
 	end
 	local distance, nearest
 
-	for i = 1, SITES_PER_CONTINENT do
-		local site = digsites[continentMapToID[playerContinent]][i]
+	for index = 1, SITES_PER_CONTINENT do
+		local site = digsites[continentMapToID[playerContinent]][index]
 
 		if site.poi then
 			site.distance = astrolabe:GetDistanceToIcon(site.poi)
@@ -3252,9 +3252,10 @@ end
 function ldb:OnEnter()
 	local numCols, colIndex, line = 10, 0, 0
 	local tooltip = qtip:Acquire("ArchyTooltip", numCols, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
-	self.tooltip = tooltip
 	tooltip:SetScale(1)
-	tooltip:SetAutoHideDelay(0.1, self)
+	tooltip:SetAutoHideDelay(0.25, self)
+	tooltip:EnableMouse()
+	tooltip:SmartAnchorTo(self)
 	tooltip:Hide()
 	tooltip:Clear()
 
@@ -3275,6 +3276,7 @@ function ldb:OnEnter()
 
 		line = tooltip:AddLine(".")
 		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", numCols)
+		tooltip:AddSeparator()
 
 		line = tooltip:AddLine(".")
 		tooltip:SetCell(line, 1, " ", "LEFT", 1)
@@ -3323,6 +3325,7 @@ function ldb:OnEnter()
 		line = tooltip:AddLine(" ")
 		line = tooltip:AddLine(" ")
 		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", numCols)
+		tooltip:AddSeparator()
 
 		for cid, csites in pairs(digsites) do
 			if (#csites > 0) and (cid == continentMapToID[playerContinent] or not db.digsite.filterLDB) then
@@ -3371,15 +3374,11 @@ function ldb:OnEnter()
 	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Right-Click to lock/unlock Archy"] .. "|r", "LEFT", numCols)
 	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", numCols)
 
-	tooltip:EnableMouse()
-	tooltip:SmartAnchorTo(self)
 	tooltip:UpdateScrolling()
 	tooltip:Show()
 end
 
 function ldb:OnLeave()
-	qtip:Release(self.tooltip)
-	self.tooltip = nil
 end
 
 function ldb:OnClick(button, down)
