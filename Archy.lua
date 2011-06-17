@@ -56,6 +56,9 @@ local SITES_PER_CONTINENT = 4
 
 local DIG_SITES = private.dig_sites
 
+-- Populated later.
+local ARTIFACT_NAME_TO_RACE_ID_MAP = {}
+
 -----------------------------------------------------------------------
 -- Variables
 -----------------------------------------------------------------------
@@ -1873,18 +1876,21 @@ end
 --[[ Function Hooks ]] --
 -- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
 local blizSolveArtifact = _G.SolveArtifact
-_G.SolveArtifact = function(raceIndex, useStones)
+_G.SolveArtifact = function(race_index, use_stones)
+	if not race_index then
+		race_index = ARTIFACT_NAME_TO_RACE_ID_MAP[_G.GetSelectedArtifactInfo()]
+	end
 	local rank, maxRank = GetArchaeologyRank()
 
 	if db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
 		if not confirmArgs then
 			confirmArgs = {}
 		end
-		confirmArgs.race = raceIndex
-		confirmArgs.useStones = useStones
+		confirmArgs.race = race_index
+		confirmArgs.useStones = use_stones
 		_G.StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
 	else
-		return SolveRaceArtifact(raceIndex, useStones)
+		return SolveRaceArtifact(race_index, use_stones)
 	end
 end
 
@@ -2146,8 +2152,9 @@ function UpdateRaceArtifact(race_id)
 		_G.SetSelectedArtifact(race_id)
 		local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 		local base, adjust, total = _G.GetArtifactProgress()
-
 		local artifact = artifacts[race_id]
+
+		ARTIFACT_NAME_TO_RACE_ID_MAP[name] = race_id
 
 		artifact.canSolve = _G.CanSolveArtifact()
 		artifact.fragments = base
