@@ -66,7 +66,8 @@ local raceDataLoaded = false
 local archRelatedBagUpdate = false
 local keystoneLootRaceID
 local playerContinent
-local siteStats, siteBlacklist
+local siteStats
+local blacklisted_sites
 local zoneData, raceData, artifacts, digsites = {}, {}, {}, {}
 local tomtomPoint, tomtomActive, tomtomExists, tomtomFrame, tomtomSite
 local distanceIndicatorActive = false
@@ -2394,11 +2395,11 @@ local function UpdateSites()
 end
 
 function Archy:IsSiteBlacklisted(name)
-	return siteBlacklist[name]
+	return blacklisted_sites[name]
 end
 
 function Archy:ToggleSiteBlacklist(name)
-	siteBlacklist[name] = not siteBlacklist[name]
+	blacklisted_sites[name] = not blacklisted_sites[name]
 end
 
 local function SortSitesByDistance(a, b)
@@ -3514,8 +3515,8 @@ function Archy:OnInitialize()
 		end
 	})
 
-	siteBlacklist = Archy.db.char.digsites.blacklist
-	setmetatable(siteBlacklist, {
+	blacklisted_sites = Archy.db.char.digsites.blacklist
+	setmetatable(blacklisted_sites, {
 		__index = function(t, k)
 			if k then
 				t[k] = false
@@ -4156,8 +4157,6 @@ function Archy:RefreshRacesDisplay()
 				.. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
 				.. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
-
-
 			-- setup the bar texture here
 			local barTexture = (lsm and lsm:Fetch('statusbar', db.artifact.fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
 			child.fragmentBar.barTexture:SetTexture(barTexture)
@@ -4254,25 +4253,23 @@ function Archy:RefreshRacesDisplay()
 		else
 			local fragmentColor = (artifact.canSolve and "|cFF00FF00" or (artifact.canSolveStone and "|cFFFFFF00" or ""))
 			local nameColor = (artifact.rare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
-			child.fragments.text:SetText(fragmentColor .. artifact.fragments .. "/" .. artifact.fragTotal)
-			if (raceData[rid].keystone.inventory > 0 or artifact.sockets > 0) then
-				child.sockets.text:SetText(raceData[rid].keystone.inventory .. "/" .. artifact.sockets)
+			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragTotal)
+
+			if raceData[rid].keystone.inventory > 0 or artifact.sockets > 0 then
+				child.sockets.text:SetFormattedText("%d/%d", raceData[rid].keystone.inventory, artifact.sockets)
 				child.sockets.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
 			else
 				child.sockets.text:SetText("")
 				child.sockets.tooltip = nil
 			end
-
 			child.crest:SetNormalTexture(raceData[rid].texture)
 			child.crest:SetHighlightTexture(raceData[rid].texture)
 			child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. raceData[rid].name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
-			child.artifact.text:SetText(nameColor .. artifact.name)
+			child.artifact.text:SetFormattedText("%s%s", nameColor, artifact.name)
 			child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip
 				.. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r")
 				.. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
-
-
 
 			child.artifact:SetWidth(child.artifact.text:GetStringWidth())
 			child.artifact:SetHeight(child.artifact.text:GetStringHeight())
@@ -4540,7 +4537,12 @@ function Archy:RefreshDigSiteDisplay()
 
 		siteFrame.distance.value:SetFormattedText(L["%d yards"], site.distance)
 		siteFrame.digCounter.value:SetText(count)
-		siteFrame.site.name:SetText((Archy:IsSiteBlacklisted(site.name)) and "|cFFFF0000" .. site.name or site.name)
+
+		if Archy:IsSiteBlacklisted(site.name) then
+			siteFrame.site.name:SetFormattedText("|cFFFF0000%s", site.name)
+		else
+			siteFrame.site.name:SetText(site.name)
+		end
 
 		if siteFrame.site.siteName ~= site.name then
 			siteFrame.crest.icon:SetTexture(raceData[site.raceId].texture)
