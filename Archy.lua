@@ -2782,32 +2782,6 @@ function UpdateMinimapEdges()
 	end
 end
 
-function UpdateMinimapSurveyColors()
-	if not db.minimap.fragmentColorBySurveyDistance then
-		return
-	end
-	local greenMin, greenMax = 0, db.digsite.distanceIndicator.green or 0
-	local yellowMin, yellowMax = greenMax, db.digsite.distanceIndicator.yellow or 0
-	local redMin, redMax = yellowMax, 500
-
-	for id, poi in pairs(allPois) do
-		if poi.active and poi.type == "survey" then
-			local distance = astrolabe:GetDistanceToIcon(poi)
-
-			if distance >= greenMin and distance <= greenMax then
-				poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
-				--                poi.poiButton.texture:SetVertexColor(0,1,0,1)
-			elseif distance >= yellowMin and distance <= yellowMax then
-				poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
-				--                poi.poiButton.texture:SetVertexColor(1,1,0,1)
-			elseif distance >= redMin and distance <= redMax then
-				poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
-				--                poi.poiButton.texture:SetVertexColor(1,0,0,1)
-			end
-		end
-	end
-end
-
 function ClearMinimapSurveyColors()
 	if not db.minimap.fragmentColorBySurveyDistance and db.minimap.fragmentIcon ~= "CyanDot" then
 		return
@@ -3732,25 +3706,49 @@ function Archy:LootReceived(event, msg)
 end
 
 function Archy:PlayerCastSurvey(event, unit, spell, _, _, spellid)
-	if unit ~= "player" or spellid ~= 80451 then
+	if not playerPosition or not nearestSite or unit ~= "player" or spellid ~= 80451 then
+		surveyPosition = nil
 		return
 	end
-	surveyPosition = playerPosition and { x = playerPosition.x, y = playerPosition.y, map = playerPosition.map, level = playerPosition.level } or nil
+	surveyPosition = {
+		x = playerPosition.x,
+		y = playerPosition.y,
+		map = playerPosition.map,
+		level = playerPosition.level
+	}
 
-	if surveyPosition and nearestSite then
-		lastSite = nearestSite
-		siteStats[lastSite.id].surveys = siteStats[lastSite.id].surveys + 1
+	distanceIndicatorActive = true
+	lastSite = nearestSite
+	siteStats[lastSite.id].surveys = siteStats[lastSite.id].surveys + 1
 
-		distanceIndicatorActive = true
-		ToggleDistanceIndicator()
-		UpdateDistanceIndicator()
+	ToggleDistanceIndicator()
+	UpdateDistanceIndicator()
 
-		UpdateMinimapSurveyColors()
+	if db.minimap.fragmentColorBySurveyDistance then
+		local min_green, max_green = 0, db.digsite.distanceIndicator.green or 0
+		local min_yellow, max_yellow = max_green, db.digsite.distanceIndicator.yellow or 0
+		local min_red, max_red = max_yellow, 500
 
-		tomtomActive = false
-		RefreshTomTom()
-		self:RefreshDigSiteDisplay()
+		for id, poi in pairs(allPois) do
+			if poi.active and poi.type == "survey" then
+				local distance = astrolabe:GetDistanceToIcon(poi)
+
+				if distance >= min_green and distance <= max_green then
+					poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
+					--                poi.poiButton.texture:SetVertexColor(0,1,0,1)
+				elseif distance >= min_yellow and distance <= max_yellow then
+					poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
+					--                poi.poiButton.texture:SetVertexColor(1,1,0,1)
+				elseif distance >= min_red and distance <= max_red then
+					poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+					--                poi.poiButton.texture:SetVertexColor(1,0,0,1)
+				end
+			end
+		end
 	end
+	tomtomActive = false
+	RefreshTomTom()
+	self:RefreshDigSiteDisplay()
 end
 
 function Archy:CurrencyUpdated()
