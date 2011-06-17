@@ -2167,14 +2167,14 @@ function UpdateRaceArtifact(race_id)
 
 		if artifact.stonesAdded > 0 and numSockets > 0 then
 			for i = 1, math.min(artifact.stonesAdded, numSockets) do
-				SocketItemToArtifact()
+				_G.SocketItemToArtifact()
 
-				if not ItemAddedToArtifact(i) then
+				if not _G.ItemAddedToArtifact(i) then
 					break
 				end
 			end
-			base, adjust, total = GetArtifactProgress()
-			artifact.canSolveStone = CanSolveArtifact()
+			base, adjust, total = _G.GetArtifactProgress()
+			artifact.canSolveStone = _G.CanSolveArtifact()
 
 			if prevAdded > 0 then
 				artifact['fragAdjust'] = adjust
@@ -2182,14 +2182,17 @@ function UpdateRaceArtifact(race_id)
 		end
 		artifact.stonesAdded = prevAdded
 
-		RequestArtifactCompletionHistory()
+		_G.RequestArtifactCompletionHistory()
+
 		if not db.artifact.blacklist[race_id] then
 			if not artifact['ping'] and (artifact.canSolve or artifact.canSolveStone) then
 				if db.artifact.ping or db.artifact.announce then
 					artifact['ping'] = true
+
 					if db.artifact.announce then
 						Announce(race_id)
 					end
+
 					if db.artifact.ping then
 						Ping()
 					end
@@ -2277,7 +2280,7 @@ function Archy:SocketClicked(self, button, down)
 	local race_id = self:GetParent():GetParent():GetID()
 
 	if button == "LeftButton" then
-		if (artifacts[race_id].stonesAdded < artifacts[race_id].sockets) and (artifacts[race_id].stonesAdded < raceData[race_id].keystone.inventory) then
+		if artifacts[race_id].stonesAdded < artifacts[race_id].sockets and artifacts[race_id].stonesAdded < raceData[race_id].keystone.inventory then
 			artifacts[race_id].stonesAdded = artifacts[race_id].stonesAdded + 1
 		end
 	else
@@ -2288,8 +2291,6 @@ function Archy:SocketClicked(self, button, down)
 	UpdateRaceArtifact(race_id)
 	Archy:RefreshRacesDisplay()
 end
-
-
 
 --[[ Dig Site List Functions ]] --
 local function ResetDigCounter(id)
@@ -2326,13 +2327,13 @@ local function GetContinentSites(continent_id)
 	local sites, orig = {}, _G.GetCurrentMapAreaID()
 	_G.SetMapZoom(continent_id)
 
-	local totalPOIs = GetNumMapLandmarks()
+	local totalPOIs = _G.GetNumMapLandmarks()
 
 	for index = 1, totalPOIs do
-		local name, description, textureIndex, px, py = GetMapLandmarkInfo(index)
+		local name, description, textureIndex, px, py = _G.GetMapLandmarkInfo(index)
 
 		if textureIndex == DIG_LOCATION_TEXTURE then
-			local zoneName, mapFile, texPctX, texPctY, texX, texY, scrollX, scrollY = UpdateMapHighlight(px, py)
+			local zoneName, mapFile, texPctX, texPctY, texX, texY, scrollX, scrollY = _G.UpdateMapHighlight(px, py)
 			local site = DIG_SITES[name]
 			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
 			mc, fc = astrolabe:GetMapID(continent_id, 0)
@@ -2348,7 +2349,7 @@ local function GetContinentSites(continent_id)
 				local digsite = {
 					continent = mc,
 					zoneId = zoneID,
-					zoneName = mapIDToZoneName[mz] or UNKNOWN,
+					zoneName = mapIDToZoneName[mz] or _G.UNKNOWN,
 					mapFile = mapFile,
 					map = mz,
 					level = fz,
@@ -2363,14 +2364,14 @@ local function GetContinentSites(continent_id)
 			end
 		end
 	end
-	SetMapByID(orig)
+	_G.SetMapByID(orig)
 	return sites
 end
 
 local function UpdateSites()
 	local sites
 
-	for continent_id, continent_name in pairs{ GetMapContinents() } do
+	for continent_id, continent_name in pairs{ _G.GetMapContinents() } do
 		if not digsites[continent_id] then
 			digsites[continent_id] = {}
 		end
@@ -2571,7 +2572,7 @@ local function SetDistanceIndicatorColor(color)
 end
 
 local function UpdateDistanceIndicator()
-	if surveyPosition.x == 0 and surveyPosition.y == 0 or IsInInstance() then
+	if surveyPosition.x == 0 and surveyPosition.y == 0 or _G.IsInInstance() then
 		return
 	end
 	local distance = astrolabe:ComputeDistance(playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y, surveyPosition.map, surveyPosition.level, surveyPosition.x, surveyPosition.y)
@@ -2941,7 +2942,7 @@ function Arrow_OnUpdate(self, elapsed)
 	end
 	self.t = 0
 
-	if IsInInstance() then
+	if _G.IsInInstance() then
 		self:Hide()
 		return
 	end
@@ -3006,7 +3007,7 @@ function MinimapBlobSetPositionAndSize(f)
 	local mapHeight = f:GetParent():GetHeight()
 	local mapSizePix = math.min(mapWidth, mapHeight)
 
-	local indoors = GetCVar("minimapZoom") + 0 == _G.Minimap:GetZoom() and "outdoor" or "indoor"
+	local indoors = _G.GetCVar("minimapZoom") + 0 == _G.Minimap:GetZoom() and "outdoor" or "indoor"
 	local zoom = _G.Minimap:GetZoom()
 	local mapSizeYards = minimapSize[indoors][zoom]
 
@@ -3108,12 +3109,12 @@ function UpdateTomTomPoint()
 	local waypointExists
 
 	if _G.TomTom.WaypointExists then -- do we have the legit TomTom?
-		waypointExists = TomTom:WaypointExists(continentMapToID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName)
+		waypointExists = _G.TomTom:WaypointExists(continentMapToID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName)
 	end
 
 	if not waypointExists then -- waypoint doesn't exist or we have a TomTom emulator
 		ClearTomTomPoint()
-		tomtomPoint = TomTom:AddZWaypoint(continentMapToID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName, false, false, false, false, false, true)
+		tomtomPoint = _G.TomTom:AddZWaypoint(continentMapToID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName, false, false, false, false, false, true)
 	end
 end
 
@@ -3160,7 +3161,7 @@ function cellPrototype:InitializeCell()
 	local fs = self:CreateFontString(nil, "OVERLAY")
 	self.fs = fs
 	fs:SetAllPoints(self)
-	fs:SetFontObject(GameTooltipText)
+	fs:SetFontObject(_G.GameTooltipText)
 	fs:SetShadowColor(0, 0, 0)
 	fs:SetShadowOffset(1, -1)
 	self.r, self.g, self.b = 1, 1, 1
@@ -3354,11 +3355,11 @@ function ldb:OnLeave()
 end
 
 function ldb:OnClick(button, down)
-	if button == "LeftButton" and IsShiftKeyDown() then
+	if button == "LeftButton" and _G.IsShiftKeyDown() then
 		db.general.stealthMode = not db.general.stealthMode
 		Archy:ConfigUpdated()
-	elseif button == "LeftButton" and IsControlKeyDown() then
-		InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
+	elseif button == "LeftButton" and _G.IsControlKeyDown() then
+		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
 	elseif button == "LeftButton" then
 		db.general.show = not db.general.show
 		Archy:ConfigUpdated()
