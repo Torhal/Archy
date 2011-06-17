@@ -2138,72 +2138,71 @@ function UpdateRaceArtifact(race_id)
 	end
 	raceData[race_id].keystone.inventory = _G.GetItemCount(raceData[race_id].keystone.id) or 0
 
-	local numProjects = _G.GetNumArtifactsByRace(race_id)
+	if _G.GetNumArtifactsByRace(race_id) == 0 then
+		return
+	end
 
-	if numProjects == 0 then
-		--artifacts[rid] = nil
-	else
-		if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
-			_G.ArchaeologyFrame_ShowArtifact(race_id)
-		end
-		_G.SetSelectedArtifact(race_id)
-		local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
-		local base, adjust, total = _G.GetArtifactProgress()
-		local artifact = artifacts[race_id]
+	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
+		_G.ArchaeologyFrame_ShowArtifact(race_id)
+	end
+	_G.SetSelectedArtifact(race_id)
 
-		ARTIFACT_NAME_TO_RACE_ID_MAP[name] = race_id
+	local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
+	local base, adjust, total = _G.GetArtifactProgress()
+	local artifact = artifacts[race_id]
 
-		artifact.canSolve = _G.CanSolveArtifact()
-		artifact.fragments = base
-		artifact.fragTotal = total
-		artifact.sockets = numSockets
-		artifact.icon = icon
-		artifact.tooltip = spellDescription
-		artifact.rare = (rarity ~= 0)
-		artifact.name = name
-		artifact.canSolveStone = nil
-		artifact.fragAdjust = 0
-		artifact.completionCount = 0
+	ARTIFACT_NAME_TO_RACE_ID_MAP[name] = race_id
 
-		local prevAdded = math.min(artifact.stonesAdded, raceData[race_id].keystone.inventory, numSockets)
+	artifact.canSolve = _G.CanSolveArtifact()
+	artifact.fragments = base
+	artifact.fragTotal = total
+	artifact.sockets = numSockets
+	artifact.icon = icon
+	artifact.tooltip = spellDescription
+	artifact.rare = (rarity ~= 0)
+	artifact.name = name
+	artifact.canSolveStone = nil
+	artifact.fragAdjust = 0
+	artifact.completionCount = 0
 
-		if db.artifact.autofill[race_id] then
-			prevAdded = math.min(raceData[race_id].keystone.inventory, numSockets)
-		end
-		artifact.stonesAdded = math.min(raceData[race_id].keystone.inventory, numSockets)
+	local prevAdded = math.min(artifact.stonesAdded, raceData[race_id].keystone.inventory, numSockets)
 
-		if artifact.stonesAdded > 0 and numSockets > 0 then
-			for i = 1, math.min(artifact.stonesAdded, numSockets) do
-				_G.SocketItemToArtifact()
+	if db.artifact.autofill[race_id] then
+		prevAdded = math.min(raceData[race_id].keystone.inventory, numSockets)
+	end
+	artifact.stonesAdded = math.min(raceData[race_id].keystone.inventory, numSockets)
 
-				if not _G.ItemAddedToArtifact(i) then
-					break
-				end
-			end
-			base, adjust, total = _G.GetArtifactProgress()
-			artifact.canSolveStone = _G.CanSolveArtifact()
+	if artifact.stonesAdded > 0 and numSockets > 0 then
+		for i = 1, math.min(artifact.stonesAdded, numSockets) do
+			_G.SocketItemToArtifact()
 
-			if prevAdded > 0 then
-				artifact.fragAdjust = adjust
+			if not _G.ItemAddedToArtifact(i) then
+				break
 			end
 		end
-		artifact.stonesAdded = prevAdded
+		base, adjust, total = _G.GetArtifactProgress()
+		artifact.canSolveStone = _G.CanSolveArtifact()
 
-		_G.RequestArtifactCompletionHistory()
-
-		if db.artifact.blacklist[race_id] then
-			return
+		if prevAdded > 0 then
+			artifact.fragAdjust = adjust
 		end
+	end
+	artifact.stonesAdded = prevAdded
 
-		if not artifact.has_announced and ((db.artifact.announce and artifact.canSolve) or (db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
-			artifact.has_announced = true
-			Announce(race_id)
-		end
+	_G.RequestArtifactCompletionHistory()
 
-		if not artifact.has_pinged and ((db.artifact.ping and artifact.canSolve) or (db.artifact.keystonePing and artifact.canSolveStone)) then
-			artifact.has_pinged = true
-			Ping()
-		end
+	if db.artifact.blacklist[race_id] then
+		return
+	end
+
+	if not artifact.has_announced and ((db.artifact.announce and artifact.canSolve) or (db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
+		artifact.has_announced = true
+		Announce(race_id)
+	end
+
+	if not artifact.has_pinged and ((db.artifact.ping and artifact.canSolve) or (db.artifact.keystonePing and artifact.canSolveStone)) then
+		artifact.has_pinged = true
+		Ping()
 	end
 end
 
