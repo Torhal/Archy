@@ -2187,20 +2187,18 @@ function UpdateRaceArtifact(race_id)
 
 		_G.RequestArtifactCompletionHistory()
 
-		if not db.artifact.blacklist[race_id] then
-			if not artifact.ping and (artifact.canSolve or artifact.canSolveStone) then
-				if db.artifact.ping or db.artifact.announce then
-					artifact.ping = true
+		if db.artifact.blacklist[race_id] then
+			return
+		end
 
-					if db.artifact.announce then
-						Announce(race_id)
-					end
+		if not artifact.has_announced and ((db.artifact.announce and artifact.canSolve) or (db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
+			artifact.has_announced = true
+			Announce(race_id)
+		end
 
-					if db.artifact.ping then
-						Ping()
-					end
-				end
-			end
+		if not artifact.has_pinged and ((db.artifact.ping and artifact.canSolve) or (db.artifact.keystonePing and artifact.canSolveStone)) then
+			artifact.has_pinged = true
+			Ping()
 		end
 	end
 end
