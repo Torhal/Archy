@@ -110,7 +110,7 @@ local minimapSize = {}
 local Arrow_OnUpdate, POI_OnEnter, POI_OnLeave, GetArchaeologyRank, SolveRaceArtifact
 local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local RefreshBlobInfo, MinimapBlobSetPositionAndSize, UpdateSiteBlobs
-local CreateMinimapPOI, UpdateMinimapEdges, UpdateMinimapPOIs
+local UpdateMinimapEdges, UpdateMinimapPOIs
 local AnnounceNearestSite, ResetPositions, UpdateRaceArtifact, ToggleDistanceIndicator
 local inCombat = false
 local TrapWorldMouse
@@ -2702,7 +2702,7 @@ local function ClearSitePOI(poi)
 	table.insert(sitePool, poi)
 end
 
-local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
+local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 	local poi = table.remove(surveyPool)
 
 	if not poi then
@@ -2742,7 +2742,6 @@ local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 	}
 	poi.active = true
 	poi.siteId = siteId
-	poi.surveyNum = surveyNum
 	poi.t = 0
 	return poi
 end
@@ -2754,10 +2753,9 @@ local function ClearSurveyPOI(poi)
 	astrolabe:RemoveIconFromMinimap(poi)
 	poi.icon:Hide()
 	poi:Hide()
-	poi.active = false
+	poi.active = nil
 	poi.tooltip = nil
 	poi.siteId = nil
-	poi.surveyNum = nil
 	poi.location = nil
 	poi:SetScript("OnEnter", nil)
 	poi:SetScript("OnLeave", nil)
@@ -2765,7 +2763,8 @@ local function ClearSurveyPOI(poi)
 	table.insert(surveyPool, poi)
 end
 
-function CreateMinimapPOI(index, type, loc, title, siteId, surveyNum)
+-- TODO: Figure out if this should be used somewhere - it currently is not, and should maybe be removed.
+local function CreateMinimapPOI(index, type, loc, title, siteId)
 	local poi = pois[index]
 	local poiButton = _G.CreateFrame("Frame", nil, poi)
 	poiButton.texture = poiButton:CreateTexture(nil, "OVERLAY")
@@ -2798,7 +2797,6 @@ function CreateMinimapPOI(index, type, loc, title, siteId, surveyNum)
 	poi.location = loc
 	poi.active = true
 	poi.siteId = siteId
-	poi.surveyNum = surveyNum
 	pois[index] = poi
 	return poi
 end
@@ -2913,10 +2911,10 @@ function UpdateMinimapPOIs(force)
 				end
 
 				if Archy.db.global.surveyNodes[site.id] and db.minimap.fragmentNodes then
-					for surveyNum, node in pairs(Archy.db.global.surveyNodes[site.id]) do
-						site.surveyPOIs[surveyNum] = GetSurveyPOI(site.id, surveyNum, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], surveyNum, site.name, site.zoneName))
+					for index, node in pairs(Archy.db.global.surveyNodes[site.id]) do
+						site.surveyPOIs[index] = GetSurveyPOI(site.id, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, site.name, site.zoneName))
 
-						local POI = site.surveyPOIs[surveyNum]
+						local POI = site.surveyPOIs[index]
 						POI.active = true
 
 						astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
