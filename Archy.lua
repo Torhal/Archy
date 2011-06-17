@@ -2599,8 +2599,7 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 
 	if not poi then
 		sitePoiCount = sitePoiCount + 1
-		--        print("Creating ArchyMinimap_SitePOI" .. sitePoiCount)
-		poi = _G.CreateFrame("Frame", "ArchyMinimap_SitePOI" .. sitePoiCount, Minimap)
+		poi = _G.CreateFrame("Frame", "ArchyMinimap_SitePOI" .. sitePoiCount, _G.Minimap)
 		poi.index = sitePoiCount
 		poi:SetWidth(10)
 		poi:SetHeight(10)
@@ -2627,7 +2626,12 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 	poi:SetScript("OnUpdate", Arrow_OnUpdate)
 	poi.type = "site"
 	poi.tooltip = tooltip
-	poi.location = { map, level, x, y }
+	poi.location = {
+		map,
+		level,
+		x,
+		y
+	}
 	poi.active = true
 	poi.siteId = siteId
 	poi.t = 0
@@ -2657,7 +2661,7 @@ local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 
 	if not poi then
 		surveyPoiCount = surveyPoiCount + 1
-		poi = _G.CreateFrame("Frame", "ArchyMinimap_SurveyPOI" .. surveyPoiCount, Minimap)
+		poi = _G.CreateFrame("Frame", "ArchyMinimap_SurveyPOI" .. surveyPoiCount, _G.Minimap)
 		poi.index = surveyPoiCount
 		poi:SetWidth(8)
 		poi:SetHeight(8)
@@ -2684,7 +2688,12 @@ local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 	poi:SetScript("OnUpdate", Arrow_OnUpdate)
 	poi.type = "survey"
 	poi.tooltip = tooltip
-	poi.location = { map, level, x, y }
+	poi.location = {
+		map,
+		level,
+		x,
+		y
+	}
 	poi.active = true
 	poi.siteId = siteId
 	poi.surveyNum = surveyNum
@@ -2854,7 +2863,7 @@ local function ClearInvalidPOIs()
 end
 
 function UpdateMinimapPOIs(force)
-	if WorldMapButton:IsVisible() then
+	if _G.WorldMapButton:IsVisible() then
 		return
 	end
 
@@ -2862,7 +2871,8 @@ function UpdateMinimapPOIs(force)
 		lastNearestSite = nearestSite
 		local validSiteIDs = GetContinentSiteIDs()
 		local sites = digsites[continentMapToID[playerContinent]]
-		if not sites or (#sites == 0) or IsInInstance() then
+
+		if not sites or #sites == 0 or _G.IsInInstance() then
 			ClearAllPOIs()
 			return
 		else
@@ -2875,7 +2885,7 @@ function UpdateMinimapPOIs(force)
 		local i = 1
 
 		for _, site in pairs(sites) do
-			site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, site.name .. "\n" .. ZONE .. site.zoneName)
+			site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
 			site.poi.active = true
 
 			astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
@@ -2889,22 +2899,28 @@ function UpdateMinimapPOIs(force)
 			end
 
 			if nearestSite and nearestSite.id == site.id then
-				if (not site.surveyPOIs) then site.surveyPOIs = {} end
+				if not site.surveyPOIs then
+					site.surveyPOIs = {}
+				end
+
 				if Archy.db.global.surveyNodes[site.id] and db.minimap.fragmentNodes then
 					for surveyNum, node in pairs(Archy.db.global.surveyNodes[site.id]) do
-						site.surveyPOIs[surveyNum] = GetSurveyPOI(site.id, surveyNum, node.m, node.f, node.x, node.y, L["Survey"] .. " #" .. surveyNum .. "\n" .. site.name .. "\n" .. ZONE .. site.zoneName)
-						site.surveyPOIs[surveyNum].active = true
-						astrolabe:PlaceIconOnMinimap(site.surveyPOIs[surveyNum], node.m, node.f, node.x, node.y)
+						site.surveyPOIs[surveyNum] = GetSurveyPOI(site.id, surveyNum, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], surveyNum, site.name, site.zoneName))
+
+						local POI = site.surveyPOIs[surveyNum]
+						POI.active = true
+
+						astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
 
 						if db.general.show then
-							site.surveyPOIs[surveyNum]:Show()
-							site.surveyPOIs[surveyNum].icon:Show()
+							POI:Show()
+							POI.icon:Show()
 						else
-							site.surveyPOIs[surveyNum]:Hide()
-							site.surveyPOIs[surveyNum].icon:Hide()
+							POI:Hide()
+							POI.icon:Hide()
 						end
 
-						Arrow_OnUpdate(site.surveyPOIs[surveyNum], 5)
+						Arrow_OnUpdate(POI, 5)
 					end
 				end
 			end
