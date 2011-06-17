@@ -53,6 +53,7 @@ Archy.version = _G.GetAddOnMetadata("Archy", "Version")
 -----------------------------------------------------------------------
 local MAX_ARCHAEOLOGY_RANK = 525
 local SITES_PER_CONTINENT = 4
+local SURVEY_SPELL_ID = 80451
 
 local DIG_SITES = private.dig_sites
 
@@ -85,7 +86,7 @@ local playerPosition = {
 	y = 0
 }
 
-local surveyPosition = {
+local survey_location = {
 	map = 0,
 	level = 0,
 	x = 0,
@@ -121,7 +122,6 @@ local racesFrame = {}
 --[[ Archy variables ]] --
 Archy.NearestSite = nearestSite
 Archy.PlayerPosition = playerPosition
-Archy.LastSurveyPosition = surveyPosition
 Archy.RaceData = raceData
 Archy.ZoneData = zoneData
 Archy.CurrentSites = digsites
@@ -2608,10 +2608,10 @@ local function SetDistanceIndicatorColor(color)
 end
 
 local function UpdateDistanceIndicator()
-	if surveyPosition.x == 0 and surveyPosition.y == 0 or _G.IsInInstance() then
+	if survey_location.x == 0 and survey_location.y == 0 or _G.IsInInstance() then
 		return
 	end
-	local distance = astrolabe:ComputeDistance(playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y, surveyPosition.map, surveyPosition.level, surveyPosition.x, surveyPosition.y)
+	local distance = astrolabe:ComputeDistance(playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y, survey_location.map, survey_location.level, survey_location.x, survey_location.y)
 
 	if not distance then
 		distance = 0
@@ -3750,16 +3750,21 @@ function Archy:LootReceived(event, msg)
 end
 
 function Archy:PlayerCastSurvey(event, unit, spell, _, _, spellid)
-	if not playerPosition or not nearestSite or unit ~= "player" or spellid ~= 80451 then
-		surveyPosition = nil
+	if unit ~= "player" or spellid ~= SURVEY_SPELL_ID then
 		return
 	end
-	surveyPosition = {
-		x = playerPosition.x,
-		y = playerPosition.y,
-		map = playerPosition.map,
-		level = playerPosition.level
-	}
+
+	if not playerPosition or not nearestSite then
+		survey_location.map = 0
+		survey_location.level = 0
+		survey_location.x = 0
+		survey_location.y = 0
+		return
+	end
+	survey_location.x = playerPosition.x
+	survey_location.y = playerPosition.y
+	survey_location.map = playerPosition.map
+	survey_location.level = playerPosition.level
 
 	distanceIndicatorActive = true
 	lastSite = nearestSite
@@ -3838,7 +3843,12 @@ function Archy:CurrencyUpdated()
 			siteStats[lastSite.id].fragments = siteStats[lastSite.id].fragments + diff
 
 			AddSurveyNode(lastSite.id, playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y)
-			surveyPosition.map, surveyPosition.level, surveyPosition.x, surveyPosition.y = 0, 0, 0, 0 -- clear the last survey position
+
+			survey_location.map = 0
+			survey_location.level = 0
+			survey_location.x = 0
+			survey_location.y = 0
+
 			UpdateMinimapPOIs(true)
 			self:RefreshRacesDisplay()
 			self:RefreshDigSiteDisplay()
