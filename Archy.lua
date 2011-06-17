@@ -1949,11 +1949,13 @@ end
 
 -- returns the rank and max rank for the players archaeology skill
 function GetArchaeologyRank()
-	local _, _, arch = _G.GetProfessions()
-	if arch then
-		local _, _, rank, maxRank = _G.GetProfessionInfo(arch)
-		return rank, maxRank
+	local _, _, archaeology_index = _G.GetProfessions()
+
+	if not archaeology_index then
+		return
 	end
+	local _, _, rank, maxRank = _G.GetProfessionInfo(archaeology_index)
+	return rank, maxRank
 end
 
 -- Toggles the lock of the panels
@@ -1961,11 +1963,6 @@ local function ToggleLock()
 	db.general.locked = not db.general.locked
 	Archy:Print(db.general.locked and _G.LOCKED or _G.UNLOCK)
 	Archy:ConfigUpdated()
-end
-
--- deformat substitute
-local function MatchFormat(msg, pattern)
-	return msg:match(pattern:gsub("(%%s)", "(.+)"):gsub("(%%d)", "(.+)"))
 end
 
 -- extract the itemid from the itemlink
@@ -1982,6 +1979,12 @@ local function GetIDFromLink(link)
 	local _, id = (":"):split(str)
 	return tonumber(id)
 end
+
+-- deformat substitute
+local function MatchFormat(msg, pattern)
+	return msg:match(pattern:gsub("(%%s)", "(.+)"):gsub("(%%d)", "(.+)"))
+end
+
 
 -- return the player, itemlink and quantity of the item in the chat_msg_loot
 local function ParseLootMessage(msg)
@@ -2948,9 +2951,9 @@ function Arrow_OnUpdate(self, elapsed)
 			local angle = astrolabe:GetDirectionToIcon(self)
 			angle = angle + rad_135
 
-			if GetCVar("rotateMinimap") == "1" then
+			if _G.GetCVar("rotateMinimap") == "1" then
 				--local cring = MiniMapCompassRing:GetFacing()
-				local cring = GetPlayerFacing()
+				local cring = _G.GetPlayerFacing()
 				angle = angle - cring
 			end
 
@@ -2972,9 +2975,10 @@ end
 --[[ Blob Functions ]] --
 function RefreshBlobInfo(f)
 	f:DrawNone()
-	local numEntries = ArchaeologyMapUpdateAll()
+	local numEntries = _G.ArchaeologyMapUpdateAll()
+
 	for i = 1, numEntries do
-		local blobID = ArcheologyGetVisibleBlobID(i)
+		local blobID = _G.ArcheologyGetVisibleBlobID(i)
 		f:DrawBlob(blobID, true)
 	end
 end
@@ -2986,14 +2990,14 @@ function MinimapBlobSetPositionAndSize(f)
 	local dx = (playerPosition.x - 0.5) * f:GetWidth()
 	local dy = (playerPosition.y - 0.5) * f:GetHeight()
 	f:ClearAllPoints()
-	f:SetPoint("CENTER", Minimap, "CENTER", -dx, dy)
+	f:SetPoint("CENTER", _G.Minimap, "CENTER", -dx, dy)
 
 	local mapWidth = f:GetParent():GetWidth()
 	local mapHeight = f:GetParent():GetHeight()
 	local mapSizePix = math.min(mapWidth, mapHeight)
 
-	local indoors = GetCVar("minimapZoom") + 0 == Minimap:GetZoom() and "outdoor" or "indoor"
-	local zoom = Minimap:GetZoom()
+	local indoors = GetCVar("minimapZoom") + 0 == _G.Minimap:GetZoom() and "outdoor" or "indoor"
+	local zoom = _G.Minimap:GetZoom()
 	local mapSizeYards = minimapSize[indoors][zoom]
 
 	if not playerPosition.map or playerPosition.map == -1 then
@@ -3021,14 +3025,14 @@ function UpdateSiteBlobs()
 		return
 	end
 
-	if BattlefieldMinimap then
-		if db.minimap.zoneBlob and db.general.show and not IsInInstance() then
+	if _G.BattlefieldMinimap then
+		if db.minimap.zoneBlob and db.general.show and not _G.IsInInstance() then
 			local blob = blobs["Battlefield"]
-			if blob:GetParent() ~= BattlefieldMinimap then -- set the battlefield map parent
-				blob:SetParent(BattlefieldMinimap)
+			if blob:GetParent() ~= _G.BattlefieldMinimap then -- set the battlefield map parent
+				blob:SetParent(_G.BattlefieldMinimap)
 				blob:ClearAllPoints()
-				blob:SetAllPoints(BattlefieldMinimap)
-				blob:SetFrameLevel(BattlefieldMinimap:GetFrameLevel() + 2)
+				blob:SetAllPoints(_G.BattlefieldMinimap)
+				blob:SetFrameLevel(_G.BattlefieldMinimap:GetFrameLevel() + 2)
 			end
 			RefreshBlobInfo(blob)
 			if not blob:IsShown() then blob:Show() end
@@ -3037,11 +3041,12 @@ function UpdateSiteBlobs()
 		end
 	end
 
-	if db.minimap.show and db.minimap.blob and db.general.show and not IsInInstance() then
+	if db.minimap.show and db.minimap.blob and db.general.show and not _G.IsInInstance() then
 		local blob = blobs["Minimap"]
-		if blob:GetParent() ~= Minimap then -- set the minimap parent
-			blob:SetParent(Minimap)
-			blob:SetFrameLevel(Minimap:GetFrameLevel() + 2)
+
+		if blob:GetParent() ~= _G.Minimap then -- set the minimap parent
+			blob:SetParent(_G.Minimap)
+			blob:SetFrameLevel(_G.Minimap:GetFrameLevel() + 2)
 		end
 
 		if (db.minimap.useBlobDistance and nearestSite and nearestSite.distance and (nearestSite.distance > db.minimap.blobDistance)) then
@@ -3067,7 +3072,7 @@ function ClearTomTomPoint()
 	if not tomtomPoint then
 		return
 	end
-	tomtomPoint = TomTom:RemoveWaypoint(tomtomPoint)
+	tomtomPoint = _G.TomTom:RemoveWaypoint(tomtomPoint)
 end
 
 function UpdateTomTomPoint()
@@ -3573,8 +3578,8 @@ function Archy:CheckForMinimapAddons()
 	end
 	local foundMBF = false
 
-	if MBF.db.profile.MinimapIcons then
-		for i, button in pairs(MBF.db.profile.MinimapIcons) do
+	if _G.MBF.db.profile.MinimapIcons then
+		for i, button in pairs(_G.MBF.db.profile.MinimapIcons) do
 			local lower_button = button:lower()
 
 			if lower_button == "archyminimap" or lower_button == "archyminimap_" then
@@ -3583,14 +3588,13 @@ function Archy:CheckForMinimapAddons()
 			end
 		end
 		if not foundMBF then
-			table.insert(MBF.db.profile.MinimapIcons, "ArchyMinimap")
+			table.insert(_G.MBF.db.profile.MinimapIcons, "ArchyMinimap")
 			self:Print("Adding Archy to the MinimapButtonFrame protected items list")
 		end
 	end
 end
 
 function Archy:OnDisable()
-
 	--    self:UnregisterEvent("ARTIFACT_HISTORY_READY")
 	--    self:UnregisterEvent("ARTIFACT_UPDATE")
 	self:UnregisterEvent("ARTIFACT_COMPLETE")
@@ -3748,11 +3752,7 @@ function Archy:PlayerCastSurvey(event, unit, spell, _, _, spellid)
 end
 
 function Archy:CurrencyUpdated()
-	if not playerContinent then
-		return
-	end
-
-	if _G.GetNumArchaeologyRaces() == 0 then
+	if not playerContinent or _G.GetNumArchaeologyRaces() == 0 then
 		return
 	end
 
@@ -3814,7 +3814,7 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not db.general.show or not HasArchaeology() or IsInInstance() or UnitIsGhost('player') then
+	if not db.general.show or not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
 		return
 	end
 
