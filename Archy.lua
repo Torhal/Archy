@@ -1919,19 +1919,15 @@ _G.StaticPopupDialogs["ARCHY_CONFIRM_SOLVE"] = {
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
 	local _, _, arch = _G.GetProfessions()
-	return (arch and true or false)
+	return arch
 end
 
 local function IsTaintable()
-	if (_G.InCombatLockdown() or _G.UnitAffectingCombat("player") or inCombat) then
-		return true
-	end
+	return (inCombat or _G.InCombatLockdown() or _G.UnitAffectingCombat("player"))
 end
 
 local function ShouldBeHidden()
-	if (not db.general.show) or _G.IsInInstance() or (not HasArchaeology()) or (not playerContinent) or (_G.UnitIsGhost('player') == 1) then
-		return true
-	end
+	return (not db.general.show or not playerContinent or _G.UnitIsGhost("player") or _G.IsInInstance() or not HasArchaeology())
 end
 
 -- opens the Blizzard_ArchaeologyUI panel
