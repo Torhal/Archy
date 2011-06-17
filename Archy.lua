@@ -4392,26 +4392,26 @@ function Archy:UpdateDigSiteFrame()
 	end
 end
 
-function Archy:ShowDigSiteTooltip(self)
-	local site_id = self:GetParent():GetID()
+function Archy:ShowDigSiteTooltip(digsite)
+	local site_id = digsite:GetParent():GetID()
 	local normal_font = _G.NORMAL_FONT_COLOR_CODE
 	local highlight_font = _G.HIGHLIGHT_FONT_COLOR_CODE
 
-	self.tooltip = self.name:GetText()
-	self.tooltip = self.tooltip .. ("\n%s%s%s%s|r"):format(normal_font, _G.ZONE .. ": ", highlight_font, self:GetParent().zone.name:GetText())
-	self.tooltip = self.tooltip .. ("\n\n%s%s %s%s|r"):format(normal_font, L["Surveys:"], highlight_font, siteStats[site_id].surveys or 0)
-	self.tooltip = self.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Digs"] .. ": ", highlight_font, siteStats[site_id].looted or 0)
-	self.tooltip = self.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlight_font, siteStats[site_id].fragments or 0)
-	self.tooltip = self.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Key Stones:"], highlight_font, siteStats[site_id].keystones or 0)
-	self.tooltip = self.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
+	digsite.tooltip = digsite.name:GetText()
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s%s%s|r"):format(normal_font, _G.ZONE .. ": ", highlight_font, digsite:GetParent().zone.name:GetText())
+	digsite.tooltip = digsite.tooltip .. ("\n\n%s%s %s%s|r"):format(normal_font, L["Surveys:"], highlight_font, siteStats[site_id].surveys or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Digs"] .. ": ", highlight_font, siteStats[site_id].looted or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlight_font, siteStats[site_id].fragments or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Key Stones:"], highlight_font, siteStats[site_id].keystones or 0)
+	digsite.tooltip = digsite.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
 
-	if Archy:IsSiteBlacklisted(self.siteName) then
-		self.tooltip = self.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
+	if Archy:IsSiteBlacklisted(digsite.siteName) then
+		digsite.tooltip = digsite.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
 	else
-		self.tooltip = self.tooltip .. "\n" .. L["Right-Click to blacklist"]
+		digsite.tooltip = digsite.tooltip .. "\n" .. L["Right-Click to blacklist"]
 	end
-	_G.GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-	_G.GameTooltip:SetText(self.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1, true)
+	_G.GameTooltip:SetOwner(digsite, "ANCHOR_BOTTOMRIGHT")
+	_G.GameTooltip:SetText(digsite.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1, true)
 end
 
 function Archy:ResizeDigSiteDisplay()
