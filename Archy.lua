@@ -2105,7 +2105,7 @@ function Archy:ConfigUpdated(namespace, option)
 		UpdateSiteBlobs()
 		RefreshTomTom()
 	else
-		CONFIG_UPDATE_FUNCTIONS(option)
+		CONFIG_UPDATE_FUNCTIONS[namespace](option)
 	end
 end
 
