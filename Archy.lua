@@ -3532,6 +3532,8 @@ function Archy:UpdateFramePositions()
 	self:SetFramePosition(racesFrame)
 end
 
+local timer_handle
+
 function Archy:OnEnable()
 	--@TODO Setup and register the options table
 
@@ -3558,7 +3560,8 @@ function Archy:OnEnable()
 	self:ScheduleTimer("UpdateDigSiteFrame", 1)
 	self:ScheduleTimer("UpdateRacesFrame", 1)
 	self:ScheduleTimer("RefreshAll", 1)
-	timerID = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
+
+	timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
 
 	db.general.locked = false
 
@@ -3604,7 +3607,7 @@ function Archy:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_LOOT")
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:CancelTimer(timerID)
+	self:CancelTimer(timer_handle)
 	--self:SecureHook("SetCVar")
 end
 
