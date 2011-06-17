@@ -2052,43 +2052,37 @@ function ResetPositions()
 	Archy:UpdateFramePositions()
 end
 
-function Archy:ConfigUpdated(ns, opt)
-	db = self.db.profile
-	if not ns then
-		self:UpdateRacesFrame()
-		self:RefreshRacesDisplay()
-		self:UpdateDigSiteFrame()
-		self:RefreshDigSiteDisplay()
-		UpdateMinimapPOIs(true)
-		UpdateSiteBlobs()
-		RefreshTomTom()
-	elseif ns == "artifact" then
-		if opt == "autofill" then
-			for rid = 1, _G.GetNumArchaeologyRaces() do
-				UpdateRaceArtifact(rid)
+local CONFIG_UPDATE_FUNCTIONS = {
+	artifact = function(option)
+		if option == "autofill" then
+			for race_id = 1, _G.GetNumArchaeologyRaces() do
+				UpdateRaceArtifact(race_id)
 			end
-		end
-		if opt == "color" then
-			self:RefreshRacesDisplay()
+		elseif option == "color" then
+			Archy:RefreshRacesDisplay()
 		else
-			self:UpdateRacesFrame()
-			self:RefreshRacesDisplay()
-			self:SetFramePosition(racesFrame)
+			Archy:UpdateRacesFrame()
+			Archy:RefreshRacesDisplay()
+			Archy:SetFramePosition(racesFrame)
 		end
-	elseif ns == "digsite" then
-		self:UpdateDigSiteFrame()
-		if opt == "font" then
-			self:ResizeDigSiteDisplay()
+	end,
+	digsite = function(option)
+		Archy:UpdateDigSiteFrame()
+
+		if option == "font" then
+			Archy:ResizeDigSiteDisplay()
 		else
-			self:RefreshDigSiteDisplay()
+			Archy:RefreshDigSiteDisplay()
 		end
-		self:SetFramePosition(digsiteFrame)
-		self:SetFramePosition(distanceIndicatorFrame)
+		Archy:SetFramePosition(digsiteFrame)
+		Archy:SetFramePosition(distanceIndicatorFrame)
 		ToggleDistanceIndicator()
-	elseif ns == "minimap" then
+	end,
+	minimap = function(option)
 		UpdateMinimapPOIs(true)
 		UpdateSiteBlobs()
-	elseif ns == "tomtom" then
+	end,
+	tomtom = function(option)
 		if db.tomtom.enabled and tomtomExists then
 			if _G.TomTom.profile then
 				_G.TomTom.profile.arrow.arrival = db.tomtom.distance
@@ -2096,6 +2090,22 @@ function Archy:ConfigUpdated(ns, opt)
 			end
 		end
 		RefreshTomTom()
+	end,
+}
+
+function Archy:ConfigUpdated(namespace, option)
+	db = self.db.profile
+
+	if not namespace then
+		self:UpdateRacesFrame()
+		self:RefreshRacesDisplay()
+		self:UpdateDigSiteFrame()
+		self:RefreshDigSiteDisplay()
+		UpdateMinimapPOIs(true)
+		UpdateSiteBlobs()
+		RefreshTomTom()
+	else
+		CONFIG_UPDATE_FUNCTIONS(option)
 	end
 end
 
