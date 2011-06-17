@@ -2597,7 +2597,7 @@ local sitePoiCount, surveyPoiCount = 0, 0
 local function GetSitePOI(siteId, map, level, x, y, tooltip)
 	local poi = table.remove(sitePool)
 
-	if not poi then -- we don't have enough available pois, need to create one
+	if not poi then
 		sitePoiCount = sitePoiCount + 1
 		--        print("Creating ArchyMinimap_SitePOI" .. sitePoiCount)
 		poi = _G.CreateFrame("Frame", "ArchyMinimap_SitePOI" .. sitePoiCount, Minimap)
@@ -2622,7 +2622,6 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 		poi.arrow:Hide()
 		poi:Hide()
 	end
-
 	poi:SetScript("OnEnter", POI_OnEnter)
 	poi:SetScript("OnLeave", POI_OnLeave)
 	poi:SetScript("OnUpdate", Arrow_OnUpdate)
@@ -2655,7 +2654,8 @@ end
 
 local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 	local poi = table.remove(surveyPool)
-	if not poi then -- we don't have enough available pois, need to create one
+
+	if not poi then
 		surveyPoiCount = surveyPoiCount + 1
 		poi = _G.CreateFrame("Frame", "ArchyMinimap_SurveyPOI" .. surveyPoiCount, Minimap)
 		poi.index = surveyPoiCount
@@ -2666,6 +2666,7 @@ local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 
 		poi.icon = poi:CreateTexture("BACKGROUND")
 		poi.icon:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
+
 		if db.minimap.fragmentIcon == "Cross" then
 			poi.icon:SetTexCoord(0, 0.46875, 0, 0.453125)
 		else
@@ -2678,7 +2679,6 @@ local function GetSurveyPOI(siteId, surveyNum, map, level, x, y, tooltip)
 
 		poi:Hide()
 	end
-
 	poi:SetScript("OnEnter", POI_OnEnter)
 	poi:SetScript("OnLeave", POI_OnLeave)
 	poi:SetScript("OnUpdate", Arrow_OnUpdate)
@@ -2861,7 +2861,6 @@ function UpdateMinimapPOIs(force)
 	if lastNearestSite ~= nearestSite or force then
 		lastNearestSite = nearestSite
 		local validSiteIDs = GetContinentSiteIDs()
-
 		local sites = digsites[continentMapToID[playerContinent]]
 		if not sites or (#sites == 0) or IsInInstance() then
 			ClearAllPOIs()
@@ -2878,6 +2877,7 @@ function UpdateMinimapPOIs(force)
 		for _, site in pairs(sites) do
 			site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, site.name .. "\n" .. ZONE .. site.zoneName)
 			site.poi.active = true
+
 			astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
 
 			if ((not db.minimap.nearest) or (nearestSite and nearestSite.id == site.id)) and db.general.show and db.minimap.show then
