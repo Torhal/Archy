@@ -2491,14 +2491,29 @@ end
 
 --[[ Survey Functions ]] --
 local function AddSurveyNode(siteId, map, level, x, y)
-	local newNode = { m = map, f = level, x = x, y = y }
+	local newNode = {
+		m = map,
+		f = level,
+		x = x,
+		y = y
+	}
 	local exists = false
 
-	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
-	if not Archy.db.global.surveyNodes[siteId] then Archy.db.global.surveyNodes[siteId] = {} end
+	if not Archy.db.global.surveyNodes then
+		Archy.db.global.surveyNodes = {}
+	end
+
+	if not Archy.db.global.surveyNodes[siteId] then
+		Archy.db.global.surveyNodes[siteId] = {}
+	end
+
 	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do
 		local distance = astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
-		if not distance or IsInInstance() then distance = 0 end
+
+		if not distance or _G.IsInInstance() then
+			distance = 0
+		end
+
 		if distance <= 10 then
 			exists = true
 			break
@@ -2510,14 +2525,28 @@ local function AddSurveyNode(siteId, map, level, x, y)
 end
 
 function Archy:InjectSurveyNode(siteId, map, level, x, y)
-	local newNode = { m = map, f = level, x = x, y = y }
+	local newNode = {
+		m = map,
+		f = level,
+		x = x,
+		y = y
+	}
 	local exists = false
 
-	if not Archy.db.global.surveyNodes then Archy.db.global.surveyNodes = {} end
-	if not Archy.db.global.surveyNodes[siteId] then Archy.db.global.surveyNodes[siteId] = {} end
+	if not Archy.db.global.surveyNodes then
+		Archy.db.global.surveyNodes = {}
+	end
+
+	if not Archy.db.global.surveyNodes[siteId] then
+		Archy.db.global.surveyNodes[siteId] = {}
+	end
+
 	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do
 		local distance = astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
-		if not distance then distance = 0 end
+		if not distance then
+			distance = 0
+		end
+
 		if distance <= 10 then
 			exists = true
 			break
@@ -2542,9 +2571,12 @@ function ToggleDistanceIndicator()
 		distanceIndicatorFrame:Hide()
 		return
 	end
-
 	distanceIndicatorFrame:Show()
-	if distanceIndicatorActive then distanceIndicatorFrame.circle:SetAlpha(1) else distanceIndicatorFrame.circle:SetAlpha(0) end
+
+	if distanceIndicatorActive then
+		distanceIndicatorFrame.circle:SetAlpha(1) else distanceIndicatorFrame.circle:SetAlpha(0)
+	end
+
 	if db.digsite.distanceIndicator.showSurveyButton then
 		distanceIndicatorFrame.surveyButton:Show()
 		distanceIndicatorFrame:SetWidth(52 + distanceIndicatorFrame.surveyButton:GetWidth())
@@ -2903,7 +2935,6 @@ function UpdateMinimapPOIs(force)
 							POI:Hide()
 							POI.icon:Hide()
 						end
-
 						Arrow_OnUpdate(POI, 5)
 					end
 				end
