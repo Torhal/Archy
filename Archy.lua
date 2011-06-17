@@ -1875,14 +1875,11 @@ end
 local blizSolveArtifact = _G.SolveArtifact
 _G.SolveArtifact = function(raceIndex, useStones)
 	local rank, maxRank = GetArchaeologyRank()
-	local requiresConfirm = false
 
 	if db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
-		requiresConfirm = true
-	end
-
-	if requiresConfirm then
-		if not confirmArgs then confirmArgs = {} end
+		if not confirmArgs then
+			confirmArgs = {}
+		end
 		confirmArgs.race = raceIndex
 		confirmArgs.useStones = useStones
 		_G.StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
