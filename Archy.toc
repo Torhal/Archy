@@ -1,7 +1,11 @@
 ## Interface: 40200
 ## Title: Archy - Archaeology Assistant
+## Title-zhCN: Archy - 考古学助手
+## Title-zhTW: Archy - 考古學助手
 ## Version: @project-version@
 ## Notes: Archaeology assistant
+## Notes-zhCN: 考古学助手
+## Notes-zhTW: 考古學助手
 ## Author: Torhal, Myrroddin, daihenka
 ## X-Credits: Cidrei on wowinterface for fan fixes
 ## X-Category: Archaeology
@@ -44,6 +48,7 @@ Locale\deDE.lua
 Locale\frFR.lua
 Locale\koKR.lua
 Locale\ruRU.lua
+Locale\zhCN.lua
 Locale\zhTW.lua
 
 Digsites.lua
