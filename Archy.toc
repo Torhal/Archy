@@ -1,4 +1,4 @@
-## Interface: 40100
+## Interface: 40200
 ## Title: Archy - Archaeology Assistant
 ## Version: @project-version@
 ## Notes: Archaeology assistant
@@ -7,8 +7,6 @@
 ## X-Category: Archaeology
 ## SavedVariables: ArchyDB
 ## OptionalDeps: Ace3, LibDBIcon-1.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, TomTom, LibAboutPanel, LibQTip-1.0, LibBabble-DigSites-3.0
-## X-WoWIPortal: daihenka
-## X-WoWIPortal: myrroddin
 
 #@no-lib-strip@
 Libs\LibStub\LibStub.lua
