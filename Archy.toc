@@ -54,4 +54,5 @@ Locale\zhTW.lua
 Digsites.lua
 Archy.xml
 Archy.lua
+Config.lua
 Bindings.xml
