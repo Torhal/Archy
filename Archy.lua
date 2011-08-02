@@ -6,6 +6,7 @@ local _G = getfenv(0)
 local math = _G.math
 local table = _G.table
 
+local ipairs = _G.ipairs
 local pairs = _G.pairs
 local setmetatable = _G.setmetatable
 local tonumber = _G.tonumber
@@ -24,7 +25,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 
 local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	type = "data source",
-	icon = "Interface\\Icons\\trade_archaeology",
+	icon = [[Interface\Icons\trade_archaeology]],
 	iconCoords = { 0.075, 0.925, 0.075, 0.925 },
 	text = "Archy",
 })
@@ -2071,8 +2072,7 @@ function Archy:OnInitialize()
 	})
 
 	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
-	local surveySpellName = _G.GetSpellInfo(80451)
-	private.distance_indicator_frame.surveyButton:SetText(surveySpellName)
+	private.distance_indicator_frame.surveyButton:SetText(_G.GetSpellInfo(SURVEY_SPELL_ID))
 	private.distance_indicator_frame.surveyButton:SetWidth(private.distance_indicator_frame.surveyButton:GetTextWidth() + 20)
 	private.distance_indicator_frame.circle:SetScale(0.65)
 
@@ -3293,7 +3293,7 @@ local function InvokeSurvey(useaction, btn)
 
 	if not useaction or not findid then
 		btn:SetAttribute("type", "spell")
-		btn:SetAttribute("spell", 80451)
+		btn:SetAttribute("spell", SURVEY_SPELL_ID)
 		btn:SetAttribute("action", nil)
 	else
 		btn:SetAttribute("type", "action")
