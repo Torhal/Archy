@@ -2007,9 +2007,7 @@ function Archy:OnInitialize()
 	if about_panel then
 		self.optionsFrame = about_panel.new(nil, "Archy")
 	end
-
 	self:SetSinkStorage(Archy.db.profile.general.sinkOptions)
-
 	self:SetupOptions()
 
 	if not self.db.global.surveyNodes then
@@ -2054,6 +2052,24 @@ function Archy:OnInitialize()
 	end
 	private.db.data.imported = false
 
+	LDBI:Register("Archy", ldb, private.db.general.icon)
+
+	TrapWorldMouse()
+
+	self:ImportOldStatsDB()
+end
+
+function Archy:UpdateFramePositions()
+	self:SetFramePosition(private.distance_indicator_frame)
+	self:SetFramePosition(private.digsite_frame)
+	self:SetFramePosition(private.races_frame)
+end
+
+local function InitializeFrames()
+	if _G.InCombatLockdown() then
+		private.create_frames = true
+		return
+	end
 	private.digsite_frame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
 	private.digsite_frame.children = setmetatable({}, {
 		__index = function(t, k)
@@ -2082,21 +2098,10 @@ function Archy:OnInitialize()
 	private.distance_indicator_frame.surveyButton:SetWidth(private.distance_indicator_frame.surveyButton:GetTextWidth() + 20)
 	private.distance_indicator_frame.circle:SetScale(0.65)
 
-	self:UpdateFramePositions()
-
-	LDBI:Register("Archy", ldb, private.db.general.icon)
-
-	TrapWorldMouse()
-
-	self:ImportOldStatsDB()
+	Archy:UpdateFramePositions()
+	Archy:UpdateDigSiteFrame()
+	Archy:UpdateRacesFrame()
 end
-
-function Archy:UpdateFramePositions()
-	self:SetFramePosition(private.distance_indicator_frame)
-	self:SetFramePosition(private.digsite_frame)
-	self:SetFramePosition(private.races_frame)
-end
-
 local timer_handle
 
 function Archy:OnEnable()
@@ -2130,8 +2135,7 @@ function Archy:OnEnable()
 
 	private.db.general.locked = false
 
-	Archy:UpdateDigSiteFrame()
-	Archy:UpdateRacesFrame()
+	InitializeFrames()
 	ToggleDistanceIndicator()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
@@ -2388,6 +2392,10 @@ function Archy:CombatStateChanged(event)
 		blobs["Minimap"]:DrawNone()
 	elseif event == "PLAYER_REGEN_ENABLED" then
 		inCombat = false
+
+		if private.create_frames then
+			InitializeFrames()
+		end
 	end
 end
 
