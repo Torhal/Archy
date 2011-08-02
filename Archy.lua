@@ -1796,9 +1796,12 @@ end
 local progress_data = {}
 
 function ldb:OnEnter()
+	if _G.InCombatLockdown() then
+		return
+	end
 	local numCols, colIndex, line = 10, 0, 0
 	local tooltip = qtip:Acquire("ArchyTooltip", numCols, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
-	tooltip:SetScale(1)
+	tooltip:SetScale(private.db.tooltip.scale)
 	tooltip:SetAutoHideDelay(0.25, self)
 	tooltip:EnableMouse()
 	tooltip:SmartAnchorTo(self)
