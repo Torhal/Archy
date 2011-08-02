@@ -190,7 +190,6 @@ local defaults = {
 				showSurveyButton = true,
 				font = { name = "Friz Quadrata TT", size = 16, shadow = false, outline = "OUTLINE", color = { r = 1, g = 1, b = 1, a = 1 } },
 			},
-			filterLDB = false,
 			borderAlpha = 1,
 			bgAlpha = 0.5,
 			font = { name = "Friz Quadrata TT", size = 18, shadow = true, outline = "", color = { r = 1, g = 1, b = 1, a = 1 } },
@@ -214,6 +213,10 @@ local defaults = {
 			blobAlpha = 0.25,
 			blobDistance = 400,
 			useBlobDistance = true,
+		},
+		tooltip = {
+			filter_continent = false,
+			scale = 1,
 		},
 		tomtom = {
 			enabled = true,
@@ -1872,7 +1875,7 @@ function ldb:OnEnter()
 		tooltip:AddSeparator()
 
 		for cid, csites in pairs(digsites) do
-			if (#csites > 0) and (cid == continentMapToID[playerContinent] or not private.db.digsite.filterLDB) then
+			if (#csites > 0) and (cid == continentMapToID[playerContinent] or not private.db.tooltip.filter_continent) then
 				local continentName
 				for _, zone in pairs(zoneData) do
 					if zone.continent == cid and zone.id == 0 then
@@ -2149,6 +2152,7 @@ function Archy:CheckForMinimapAddons()
 				break
 			end
 		end
+
 		if not foundMBF then
 			table.insert(_G.MBF.db.profile.MinimapIcons, "ArchyMinimap")
 			self:Print("Adding Archy to the MinimapButtonFrame protected items list")

@@ -817,17 +817,6 @@ local function GetDigSiteOptions()
 								Archy:ConfigUpdated('digsite')
 							end,
 						},
-						filterLDB = {
-							order = 1.5,
-							type = "toggle",
-							name = L["Filter LDB to Continent"],
-							desc = L["Filter the LDB tooltip to only include the current continent"],
-							get = function() return db.digsite.filterLDB end,
-							set = function(_, value)
-								db.digsite.filterLDB = value
-								Archy:ConfigUpdated('digsite')
-							end,
-						},
 						sortByDistance = {
 							order = 2,
 							type = "toggle",
@@ -1499,6 +1488,53 @@ local function GetMinimapOptions()
 	return minimap_options
 end
 
+local tooltip_options
+
+local function GetTooltipOptions()
+	if not tooltip_options then
+		local db = private.db
+
+		tooltip_options = {
+			order = 6,
+			type = "group",
+			name = "Tooltips",
+			desc = L["Tooltip Options"],
+			args = {
+				filterLDB = {
+					order = 1,
+					type = "toggle",
+					name = L["Filter tooltip to Continent"],
+					desc = L["Filter the tooltip to only include the current continent"],
+					get = function()
+						return db.tooltip.filter_continent
+					end,
+					set = function(_, value)
+						db.tooltip.filter_continent = value
+						Archy:ConfigUpdated('digsite')
+					end,
+				},
+				scale = {
+					order	= 2,
+					type	= "range",
+					width	= "full",
+					name	= L["Tooltip Scale"],
+					desc	= L["Move the slider to adjust the scale of the tooltip."],
+					min	= 0.5,
+					max	= 1.5,
+					step	= 0.01,
+					get	= function()
+							  return db.tooltip.scale
+						  end,
+					set	= function(info, value)
+							  db.tooltip.scale = _G.math.max(0.5, _G.math.min(1.5, value))
+						  end,
+				},
+			},
+		}
+	end
+	return tooltip_options
+end
+
 function Archy:SetupOptions()
 	local ACFG = LibStub("AceConfig-3.0")
 	ACFG:RegisterOptionsTable("Archy General", GetGeneralOptions)
@@ -1506,6 +1542,7 @@ function Archy:SetupOptions()
 	ACFG:RegisterOptionsTable("Archy Dig Sites", GetDigSiteOptions)
 	ACFG:RegisterOptionsTable("Archy TomTom", GetTomTomOptions)
 	ACFG:RegisterOptionsTable("Archy Minimap", GetMinimapOptions)
+	ACFG:RegisterOptionsTable("Archy Tooltips", GetTooltipOptions)
 	ACFG:RegisterOptionsTable("Archy Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 
 	local ACD = LibStub("AceConfigDialog-3.0")
@@ -1514,5 +1551,6 @@ function Archy:SetupOptions()
 	ACD:AddToBlizOptions("Archy Dig Sites", L["Dig Sites"], "Archy")
 	ACD:AddToBlizOptions("Archy TomTom", L["TomTom Support"], "Archy")
 	ACD:AddToBlizOptions("Archy Minimap", _G.MINIMAP_LABEL, "Archy")
+	ACD:AddToBlizOptions("Archy Tooltips", L["Tooltip"], "Archy")
 	ACD:AddToBlizOptions("Archy Profiles", L["Profiles"], "Archy")
 end
