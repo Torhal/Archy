@@ -282,6 +282,7 @@ L["Toggles the display of the Minimap Icon"] = true
 L["Toggles the minimap icon of this add-on"] = true
 L["TomTom Options"] = true
 L["TomTom Support"] = true
+L["Tooltip"] = true
 L["Tooltip Options"] = true
 L["Tooltip Scale"] = true
 L["Top Left"] = true
