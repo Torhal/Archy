@@ -69,8 +69,6 @@ local raceDataLoaded = false
 local archRelatedBagUpdate = false
 local keystoneLootRaceID
 local playerContinent
-local siteStats
-local blacklisted_sites
 local zoneData, artifacts, digsites = {}, {}, {}
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 local distanceIndicatorActive = false
@@ -836,11 +834,12 @@ end
 
 --[[ Dig Site List Functions ]] --
 local function ResetDigCounter(id)
-	siteStats[id].counter = 0
+	Archy.db.char.digsites.stats[id].counter = 0
 end
 
 local function IncrementDigCounter(id)
-	siteStats[id].counter = (siteStats[id].counter or 0) + 1
+	local site_stats = Archy.db.char.digsites.stats
+	site_stats[id].counter = (site_stats[id].counter or 0) + 1
 end
 
 local function CompareAndResetDigCounters(a, b)
@@ -931,11 +930,11 @@ local function UpdateSites()
 end
 
 function Archy:IsSiteBlacklisted(name)
-	return blacklisted_sites[name]
+	return self.db.char.digsites.blacklist[name]
 end
 
 function Archy:ToggleSiteBlacklist(name)
-	blacklisted_sites[name] = not blacklisted_sites[name]
+	self.db.char.digsites.blacklist[name] = not self.db.char.digsites.blacklist[name]
 end
 
 local function SortSitesByDistance(a, b)
@@ -1014,15 +1013,17 @@ local function UpdateSiteFrame(index)
 end
 
 function Archy:ImportOldStatsDB()
-	for key, st in pairs(Archy.db.char.digsites) do
+	local site_stats = self.db.char.digsites.stats
+
+	for key, st in pairs(self.db.char.digsites) do
 		if key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" then
 			if DIG_SITES[key] then
 				local site = DIG_SITES[key]
-				siteStats[site.blob].surveys = (siteStats[site.blob].surveys or 0) + (st.surveys or 0)
-				siteStats[site.blob].fragments = (siteStats[site.blob].fragments or 0) + (st.fragments or 0)
-				siteStats[site.blob].looted = (siteStats[site.blob].looted or 0) + (st.looted or 0)
-				siteStats[site.blob].keystones = (siteStats[site.blob].keystones or 0) + (st.keystones or 0)
-				Archy.db.char.digsites[key] = nil
+				site_stats[site.blob].surveys = (site_stats[site.blob].surveys or 0) + (st.surveys or 0)
+				site_stats[site.blob].fragments = (site_stats[site.blob].fragments or 0) + (st.fragments or 0)
+				site_stats[site.blob].looted = (site_stats[site.blob].looted or 0) + (st.looted or 0)
+				site_stats[site.blob].keystones = (site_stats[site.blob].keystones or 0) + (st.keystones or 0)
+				self.db.char.digsites[key] = nil
 			end
 		end
 	end
@@ -1862,6 +1863,7 @@ function ldb:OnEnter()
 				tooltip:SetCell(line, 9, (completionCount or "unknown"), "CENTER", 2)
 			end
 		end
+		local site_stats = Archy.db.char.digsites.stats
 
 		line = tooltip:AddLine(" ")
 		line = tooltip:AddLine(" ")
@@ -1896,10 +1898,10 @@ function ldb:OnEnter()
 					tooltip:SetCell(line, 2, race_data[site.raceId].name, "LEFT", 2)
 					tooltip:SetCell(line, 4, site.name, "LEFT", 1)
 					tooltip:SetCell(line, 5, site.zoneName, "LEFT", 2)
-					tooltip:SetCell(line, 7, siteStats[site.id].surveys, "CENTER", 1)
-					tooltip:SetCell(line, 8, siteStats[site.id].looted, "CENTER", 1)
-					tooltip:SetCell(line, 9, siteStats[site.id].fragments, "CENTER", 1)
-					tooltip:SetCell(line, 10, siteStats[site.id].keystones, "CENTER", 1)
+					tooltip:SetCell(line, 7, site_stats[site.id].surveys, "CENTER", 1)
+					tooltip:SetCell(line, 8, site_stats[site.id].looted, "CENTER", 1)
+					tooltip:SetCell(line, 9, site_stats[site.id].fragments, "CENTER", 1)
+					tooltip:SetCell(line, 10, site_stats[site.id].keystones, "CENTER", 1)
 				end
 				line = tooltip:AddLine(" ")
 			end
@@ -1908,7 +1910,6 @@ function ldb:OnEnter()
 		line = tooltip:AddLine(" ")
 		tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", numCols)
 	end
-
 	line = tooltip:AddLine(" ")
 	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", numCols)
 	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", numCols)
@@ -2015,9 +2016,7 @@ function Archy:OnInitialize()
 		}
 	end
 
-	siteStats = self.db.char.digsites.stats
-
-	setmetatable(siteStats, {
+	setmetatable(self.db.char.digsites.stats, {
 		__index = function(t, k)
 			if k then
 				t[k] = {
@@ -2032,8 +2031,7 @@ function Archy:OnInitialize()
 		end
 	})
 
-	blacklisted_sites = self.db.char.digsites.blacklist
-	setmetatable(blacklisted_sites, {
+	setmetatable(self.db.char.digsites.blacklist, {
 		__index = function(t, k)
 			if k then
 				t[k] = false
@@ -2043,6 +2041,7 @@ function Archy:OnInitialize()
 	})
 
 	private.db = self.db.profile
+
 	if not private.db.data then
 		private.db.data = {}
 	end
@@ -2264,7 +2263,7 @@ function Archy:LootReceived(event, msg)
 	local race_id = keystoneIDToRaceID[itemID]
 
 	if race_id then
-		siteStats[lastSite.id].keystones = siteStats[lastSite.id].keystones + 1
+		self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
 		keystoneLootRaceID = race_id
 		archRelatedBagUpdate = true
 	end
@@ -2289,7 +2288,7 @@ function Archy:PlayerCastSurvey(event, unit, spell, _, _, spellid)
 
 	distanceIndicatorActive = true
 	lastSite = nearestSite
-	siteStats[lastSite.id].surveys = siteStats[lastSite.id].surveys + 1
+	self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
 
 	ToggleDistanceIndicator()
 	UpdateDistanceIndicator()
@@ -2349,19 +2348,18 @@ function Archy:CurrencyUpdated()
 			end
 
 		elseif diff > 0 then
+			local site_stats = self.db.char.digsites.stats
 			-- we've gained fragments, aka. Successfully dug at a dig site
 
 			-- update the artifact info
 			UpdateRaceArtifact(race_id)
 
-			-- deactivate the distance indicator
 			distanceIndicatorActive = false
 			ToggleDistanceIndicator()
 
-			-- Increment the site stats
 			IncrementDigCounter(lastSite.id)
-			siteStats[lastSite.id].looted = (siteStats[lastSite.id].looted or 0) + 1
-			siteStats[lastSite.id].fragments = siteStats[lastSite.id].fragments + diff
+			site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
+			site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
 
 			AddSurveyNode(lastSite.id, playerPosition.map, playerPosition.level, playerPosition.x, playerPosition.y)
 
@@ -2926,16 +2924,17 @@ function Archy:ShowDigSiteTooltip(digsite)
 	local site_id = digsite:GetParent():GetID()
 	local normal_font = _G.NORMAL_FONT_COLOR_CODE
 	local highlight_font = _G.HIGHLIGHT_FONT_COLOR_CODE
+	local site_stats = self.db.char.digsites.stats
 
 	digsite.tooltip = digsite.name:GetText()
 	digsite.tooltip = digsite.tooltip .. ("\n%s%s%s%s|r"):format(normal_font, _G.ZONE .. ": ", highlight_font, digsite:GetParent().zone.name:GetText())
-	digsite.tooltip = digsite.tooltip .. ("\n\n%s%s %s%s|r"):format(normal_font, L["Surveys:"], highlight_font, siteStats[site_id].surveys or 0)
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Digs"] .. ": ", highlight_font, siteStats[site_id].looted or 0)
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlight_font, siteStats[site_id].fragments or 0)
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Key Stones:"], highlight_font, siteStats[site_id].keystones or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n\n%s%s %s%s|r"):format(normal_font, L["Surveys:"], highlight_font, site_stats[site_id].surveys or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Digs"] .. ": ", highlight_font, site_stats[site_id].looted or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlight_font, site_stats[site_id].fragments or 0)
+	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Key Stones:"], highlight_font, site_stats[site_id].keystones or 0)
 	digsite.tooltip = digsite.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
 
-	if Archy:IsSiteBlacklisted(digsite.siteName) then
+	if self:IsSiteBlacklisted(digsite.siteName) then
 		digsite.tooltip = digsite.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
 	else
 		digsite.tooltip = digsite.tooltip .. "\n" .. L["Right-Click to blacklist"]
@@ -3069,7 +3068,7 @@ function Archy:RefreshDigSiteDisplay()
 
 	for siteIndex, site in pairs(digsites[continent_id]) do
 		local siteFrame = private.digsite_frame.children[siteIndex]
-		local count = siteStats[site.id].counter
+		local count = self.db.char.digsites.stats[site.id].counter
 
 		if private.db.general.theme == "Graphical" then
 			if siteFrame.style ~= private.db.digsite.style then
@@ -3083,7 +3082,7 @@ function Archy:RefreshDigSiteDisplay()
 		siteFrame.distance.value:SetFormattedText(L["%d yards"], site.distance)
 		siteFrame.digCounter.value:SetText(count)
 
-		if Archy:IsSiteBlacklisted(site.name) then
+		if self:IsSiteBlacklisted(site.name) then
 			siteFrame.site.name:SetFormattedText("|cFFFF0000%s", site.name)
 		else
 			siteFrame.site.name:SetText(site.name)
