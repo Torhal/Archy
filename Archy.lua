@@ -2863,7 +2863,9 @@ function Archy:RefreshRacesDisplay()
 	end
 
 	if not IsTaintable() then
-		if count == 0 then races_frame:Hide() end
+		if count == 0 then
+			races_frame:Hide()
+		end
 		races_frame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
 		races_frame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
 	end
@@ -2963,6 +2965,7 @@ function Archy:ResizeMinimalDigSiteDisplay()
 	local topFrame = private.digsite_frame.container
 	local siteIndex = 0
 	local maxNameWidth, maxZoneWidth, maxDistWidth, maxDigCounterWidth = 0, 0, 70, 20
+
 	for _, siteFrame in pairs(private.digsite_frame.children) do
 		siteIndex = siteIndex + 1
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
@@ -3002,12 +3005,12 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteFrame.distance:SetAlpha(private.db.digsite.minimal.showDistance and 1 or 0)
 		siteFrame.zone:SetAlpha(private.db.digsite.minimal.showZone and 1 or 0)
 	end
-	local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
-
 	private.digsite_frame.container:SetWidth(maxWidth)
-
 	private.digsite_frame.container:SetHeight(maxHeight)
+
 	if not IsTaintable() then
+		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
+
 		-- private.digsite_frame:SetHeight(private.digsite_frame.container:GetHeight() + cyOfs + 40)
 		private.digsite_frame:SetHeight(maxHeight + cyOfs + 40)
 		private.digsite_frame:SetWidth(maxWidth + cxOfs + 30)
@@ -3018,35 +3021,46 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 	local maxWidth, maxHeight = 0, 0
 	local topFrame = private.digsite_frame.container
 	local siteIndex = 0
+
 	for _, siteFrame in pairs(private.digsite_frame.children) do
 		siteIndex = siteIndex + 1
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
 		siteFrame.site:SetWidth(siteFrame.site.name:GetStringWidth())
+
 		local width
 		local nameWidth = siteFrame.site:GetWidth()
 		local zoneWidth = siteFrame.zone:GetWidth() + 10
+
 		if nameWidth > zoneWidth then
 			width = siteFrame.crest:GetWidth() + nameWidth + siteFrame.digCounter:GetWidth() + 6
 		else
 			width = siteFrame.crest:GetWidth() + zoneWidth + siteFrame.distance:GetWidth() + 6
 		end
-		if width > maxWidth then maxWidth = width end
+
+		if width > maxWidth then
+			maxWidth = width
+		end
 		maxHeight = maxHeight + siteFrame:GetHeight() + 5
 
 		siteFrame:ClearAllPoints()
-		if siteIndex == 1 then siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0) else siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5) end
+
+		if siteIndex == 1 then
+			siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
+		else
+			siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
+		end
 		topFrame = siteFrame
 	end
+
 	for _, siteFrame in pairs(private.digsite_frame.children) do
 		siteFrame:SetWidth(maxWidth)
 	end
-	local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
-
 	private.digsite_frame.container:SetWidth(maxWidth)
-
 	private.digsite_frame.container:SetHeight(maxHeight)
+
 	if not IsTaintable() then
+		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
 		-- private.digsite_frame:SetHeight(private.digsite_frame.container:GetHeight() + cyOfs + 40) -- masahikatao on wowinterface
 		private.digsite_frame:SetHeight(maxHeight + cyOfs + 40)
 		private.digsite_frame:SetWidth(maxWidth + cxOfs + 30)
@@ -3109,32 +3123,32 @@ function Archy:RefreshDigSiteDisplay()
 end
 
 function Archy:SetFramePosition(frame)
-	local bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs
+	if frame.isMoving then
+		return
+	end
+	local bPoint, bRelativePoint, bXofs, bYofs
+	local bRelativeTo = _G.UIParent
 
-	if not frame.isMoving then
-		bRelativeTo = _G.UIParent
-		if frame == private.digsite_frame then
-			bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.position)
-		elseif frame == private.races_frame then
-			bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.artifact.position)
-		elseif frame == private.distance_indicator_frame then
-			if not private.db.digsite.distanceIndicator.undocked then
-				bRelativeTo = private.digsite_frame
-				bPoint, bRelativePoint, bXofs, bYofs = "CENTER", "TOPLEFT", 50, -5
-				frame:SetParent(private.digsite_frame)
-			else
-				frame:SetParent(_G.UIParent)
-				bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.distanceIndicator.position)
-			end
+	if frame == private.digsite_frame then
+		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.position)
+	elseif frame == private.races_frame then
+		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.artifact.position)
+	elseif frame == private.distance_indicator_frame then
+		if not private.db.digsite.distanceIndicator.undocked then
+			bRelativeTo = private.digsite_frame
+			bPoint, bRelativePoint, bXofs, bYofs = "CENTER", "TOPLEFT", 50, -5
+			frame:SetParent(private.digsite_frame)
+		else
+			frame:SetParent(_G.UIParent)
+			bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.distanceIndicator.position)
 		end
+	end
+	frame:ClearAllPoints()
+	frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
+	frame:SetFrameLevel(2)
 
-		frame:ClearAllPoints()
-		frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
-		frame:SetFrameLevel(2)
-
-		if frame:GetParent() == _G.UIParent and not IsTaintable() and not private.db.general.locked then
-			frame:SetUserPlaced(false)
-		end
+	if frame:GetParent() == _G.UIParent and not IsTaintable() and not private.db.general.locked then
+		frame:SetUserPlaced(false)
 	end
 end
 
@@ -3419,19 +3433,21 @@ function Archy:OnPlayerLooting(event, ...)
 		return
 	end
 
-	if isLooting and private.db.general.autoLoot then
-		for slotNum = 1, _G.GetNumLootItems() do
-			if _G.LootSlotIsCurrency(slotNum) then
-				_G.LootSlot(slotNum)
-			elseif _G.LootSlotIsItem(slotNum) then
-				local link = _G.GetLootSlotLink(slotNum)
+	if not isLooting or not private.db.general.autoLoot then
+		return
+	end
 
-				if link then
-					local itemID = GetIDFromLink(link)
+	for slotNum = 1, _G.GetNumLootItems() do
+		if _G.LootSlotIsCurrency(slotNum) then
+			_G.LootSlot(slotNum)
+		elseif _G.LootSlotIsItem(slotNum) then
+			local link = _G.GetLootSlotLink(slotNum)
 
-					if itemID and keystoneIDToRaceID[itemID] then
-						_G.LootSlot(slotNum)
-					end
+			if link then
+				local itemID = GetIDFromLink(link)
+
+				if itemID and keystoneIDToRaceID[itemID] then
+					_G.LootSlot(slotNum)
 				end
 			end
 		end
