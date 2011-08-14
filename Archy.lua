@@ -902,10 +902,10 @@ end
 local function UpdateArtifactFrame(rid)
 end
 
-function Archy:SocketClicked(self, button, down)
-	local race_id = self:GetParent():GetParent():GetID()
+function Archy:SocketClicked(keystone_button, mouse_button, down)
+	local race_id = keystone_button:GetParent():GetParent():GetID()
 
-	if button == "LeftButton" then
+	if mouse_button == "LeftButton" then
 		if artifacts[race_id].stonesAdded < artifacts[race_id].sockets and artifacts[race_id].stonesAdded < race_data[race_id].keystone.inventory then
 			artifacts[race_id].stonesAdded = artifacts[race_id].stonesAdded + 1
 		end
