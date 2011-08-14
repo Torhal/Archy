@@ -128,7 +128,9 @@ local defaults = {
 			enabled = true,
 			show = true,
 			stealthMode = false,
-			icon = { hide = false },
+			icon = {
+				hide = false
+			},
 			locked = false,
 			confirmSolve = true,
 			showSkillBar = true,
@@ -139,7 +141,12 @@ local defaults = {
 		},
 		artifact = {
 			show = true,
-			position = { "TOPRIGHT", "TOPRIGHT", -200, -425 },
+			position = {
+				"TOPRIGHT",
+				"TOPRIGHT",
+				-200,
+				-425
+			},
 			anchor = "TOPRIGHT",
 			positionX = 100,
 			positionY = -300,
@@ -155,15 +162,68 @@ local defaults = {
 			style = "Compact",
 			borderAlpha = 1,
 			bgAlpha = 0.5,
-			font = { name = "Friz Quadrata TT", size = 14, shadow = true, outline = "", color = { r = 1, g = 1, b = 1, a = 1 } },
-			fragmentFont = { name = "Friz Quadrata TT", size = 14, shadow = true, outline = "", color = { r = 1, g = 1, b = 1, a = 1 } },
-			keystoneFont = { name = "Friz Quadrata TT", size = 12, shadow = true, outline = "", color = { r = 1, g = 1, b = 1, a = 1 } },
+			font = {
+				name = "Friz Quadrata TT",
+				size = 14,
+				shadow = true,
+				outline = "",
+				color = {
+					r = 1,
+					g = 1,
+					b = 1,
+					a = 1
+				}
+			},
+			fragmentFont = {
+				name = "Friz Quadrata TT",
+				size = 14,
+				shadow = true,
+				outline = "",
+				color = {
+					r = 1,
+					g = 1,
+					b = 1,
+					a = 1
+				}
+			},
+			keystoneFont = {
+				name = "Friz Quadrata TT",
+				size = 12,
+				shadow = true,
+				outline = "",
+				color = {
+					r = 1,
+					g = 1,
+					b = 1,
+					a = 1
+				}
+			},
 			fragmentBarColors = {
-				["Normal"] = { r = 1, g = 0.5, b = 0 },
-				["Solvable"] = { r = 0, g = 1, b = 0 },
-				["Rare"] = { r = 0, g = 0.4, b = 0.8 },
-				["AttachToSolve"] = { r = 1, g = 1, b = 0 },
-				["FirstTime"] = { r = 1, g = 1, b = 1 },
+				["Normal"] = {
+					r = 1,
+					g = 0.5,
+					b = 0
+				},
+				["Solvable"] = {
+					r = 0,
+					g = 1,
+					b = 0
+				},
+				["Rare"] = {
+					r = 0,
+					g = 0.4,
+					b = 0.8
+				},
+				["AttachToSolve"] = {
+					r = 1,
+					g = 1,
+					b = 0
+				},
+				["FirstTime"] = {
+					r = 1,
+					g = 1,
+					b = 1
+				},
 			},
 			fragmentBarTexture = "Blizzard Parchment",
 			borderTexture = "Blizzard Dialog Gold",
@@ -184,16 +244,54 @@ local defaults = {
 				enabled = true,
 				green = 40,
 				yellow = 80,
-				position = { "CENTER", "CENTER", 0, 0 },
+				position = {
+					"CENTER",
+					"CENTER",
+					0,
+					0
+				},
 				anchor = "TOPLEFT",
 				undocked = false,
 				showSurveyButton = true,
-				font = { name = "Friz Quadrata TT", size = 16, shadow = false, outline = "OUTLINE", color = { r = 1, g = 1, b = 1, a = 1 } },
+				font = {
+					name = "Friz Quadrata TT",
+					size = 16,
+					shadow = false,
+					outline = "OUTLINE",
+					color = {
+						r = 1,
+						g = 1,
+						b = 1,
+						a = 1
+					}
+				},
 			},
 			borderAlpha = 1,
 			bgAlpha = 0.5,
-			font = { name = "Friz Quadrata TT", size = 18, shadow = true, outline = "", color = { r = 1, g = 1, b = 1, a = 1 } },
-			zoneFont = { name = "Friz Quadrata TT", size = 14, shadow = true, outline = "", color = { r = 1, g = 0.82, b = 0, a = 1 } },
+			font = {
+				name = "Friz Quadrata TT",
+				size = 18,
+				shadow = true,
+				outline = "",
+				color = {
+					r = 1,
+					g = 1,
+					b = 1,
+					a = 1
+				}
+			},
+			zoneFont = {
+				name = "Friz Quadrata TT",
+				size = 14,
+				shadow = true,
+				outline = "",
+				color = {
+					r = 1,
+					g = 0.82,
+					b = 0,
+					a = 1
+				}
+			},
 			minimal = {
 				showDistance = false,
 				showZone = false,
@@ -797,8 +895,9 @@ function Archy:SolveAnyArtifact(useStones)
 			end
 		end
 	end
+
 	if not found then
-		Archy:Print(L["No artifacts were solvable"])
+		self:Print(L["No artifacts were solvable"])
 	end
 end
 
@@ -2102,6 +2201,7 @@ local function InitializeFrames()
 	Archy:UpdateDigSiteFrame()
 	Archy:UpdateRacesFrame()
 end
+
 local timer_handle
 
 function Archy:OnEnable()
