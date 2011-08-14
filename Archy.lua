@@ -509,24 +509,7 @@ end
 
 --[[ Function Hooks ]] --
 -- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
-local blizSolveArtifact = SolveArtifact
-SolveArtifact = function(race_index, use_stones)
-	if not race_index then
-		race_index = ARTIFACT_NAME_TO_RACE_ID_MAP[_G.GetSelectedArtifactInfo()]
-	end
-	local rank, maxRank = GetArchaeologyRank()
-
-	if private.db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
-		if not confirmArgs then
-			confirmArgs = {}
-		end
-		confirmArgs.race = race_index
-		confirmArgs.useStones = use_stones
-		_G.StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
-	else
-		return SolveRaceArtifact(race_index, use_stones)
-	end
-end
+local blizSolveArtifact
 
 --[[ Dialog declarations ]] --
 _G.StaticPopupDialogs["ARCHY_CONFIRM_SOLVE"] = {
@@ -2240,6 +2223,28 @@ function Archy:OnEnable()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	self:CheckForMinimapAddons()
+
+	if not blizSolveArtifact then
+		blizSolveArtifact = SolveArtifact
+
+		function SolveArtifact(race_index, use_stones)
+			if not race_index then
+				race_index = ARTIFACT_NAME_TO_RACE_ID_MAP[_G.GetSelectedArtifactInfo()]
+			end
+			local rank, maxRank = GetArchaeologyRank()
+
+			if private.db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
+				if not confirmArgs then
+					confirmArgs = {}
+				end
+				confirmArgs.race = race_index
+				confirmArgs.useStones = use_stones
+				_G.StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
+			else
+				return SolveRaceArtifact(race_index, use_stones)
+			end
+		end
+	end
 end
 
 function Archy:CheckForMinimapAddons()
