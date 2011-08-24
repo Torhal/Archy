@@ -2273,17 +2273,7 @@ function Archy:CheckForMinimapAddons()
 end
 
 function Archy:OnDisable()
-	--    self:UnregisterEvent("ARTIFACT_HISTORY_READY")
-	--    self:UnregisterEvent("ARTIFACT_UPDATE")
-	self:UnregisterEvent("ARTIFACT_COMPLETE")
-	self:UnregisterEvent("ARTIFACT_DIG_SITE_UPDATED")
-	self:UnregisterEvent("BAG_UPDATE")
-	self:UnregisterEvent("SKILL_LINES_CHANGED")
-	self:UnregisterEvent("CHAT_MSG_LOOT")
-	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
 	self:CancelTimer(timer_handle)
-	--self:SecureHook("SetCVar")
 end
 
 function Archy:OnProfileUpdate()
