@@ -2475,10 +2475,10 @@ function Archy:CurrencyUpdated()
 			survey_location.y = 0
 
 			UpdateMinimapPOIs(true)
-			self:RefreshRacesDisplay()
 			self:RefreshDigSiteDisplay()
 		end
 	end
+	self:RefreshRacesDisplay()
 end
 
 function Archy:CombatStateChanged(event)
