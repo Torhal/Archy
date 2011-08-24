@@ -2313,8 +2313,7 @@ function Archy:BAG_UPDATE()
 	-- perform an artifact refresh here
 	if keystoneLootRaceID then
 		UpdateRaceArtifact(keystoneLootRaceID)
-		print("Scheduling RefreshRacesDisplay")
-		self:ScheduleTimer("RefreshRacesDisplay", 0.5)
+		self:RefreshRacesDisplay()
 		keystoneLootRaceID = nil
 	end
 end
