@@ -25,6 +25,7 @@ Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\AceHook-3.0\AceHook-3.0.xml
 Libs\AceLocale-3.0\AceLocale-3.0.xml
 Libs\AceTimer-3.0\AceTimer-3.0.xml
+Libs\AceBucket-3.0\AceBucket-3.0.xml
 
 Libs\LibSink-2.0\lib.xml
 Libs\LibSharedMedia-3.0\lib.xml

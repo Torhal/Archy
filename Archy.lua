@@ -20,7 +20,7 @@ local ADDON_NAME, private = ...
 
 local LibStub = _G.LibStub
 
-local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0", "LibSink-2.0")
+local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceBucket-3.0", "AceTimer-3.0", "LibSink-2.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 
 local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
@@ -2194,7 +2194,6 @@ function Archy:OnEnable()
 	_G.SlashCmdList["ARCHY"] = SlashHandler
 	--self:SecureHook("SetCVar")
 
-	self:RegisterEvent("ARTIFACT_HISTORY_READY", "ArtifactHistoryReady")
 	--    self:RegisterEvent("ARTIFACT_UPDATE", "ArtifactUpdated")
 	self:RegisterEvent("LOOT_OPENED", "OnPlayerLooting")
 	self:RegisterEvent("LOOT_CLOSED", "OnPlayerLooting")
@@ -2208,6 +2207,8 @@ function Archy:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT", "LootReceived")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "PlayerCastSurvey")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "CurrencyUpdated")
+
+	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
 	self:ScheduleTimer("UpdatePlayerPosition", 1, true)
 	self:ScheduleTimer("UpdateDigSiteFrame", 1)
@@ -2283,13 +2284,14 @@ function Archy:OnProfileUpdate()
 end
 
 --[[ Event Handlers ]] --
-function Archy:ArtifactHistoryReady()
+function Archy:ARTIFACT_HISTORY_READY()
 	for rid, artifact in pairs(artifacts) do
 		local _, _, completionCount = GetArtifactStats(rid, artifact.name)
 		if completionCount then
 			artifact.completionCount = completionCount
 		end
 	end
+	print("Called ARTIFACT_HISTORY_READY")
 	self:RefreshRacesDisplay()
 end
 
