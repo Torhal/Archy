@@ -67,7 +67,6 @@ local ARTIFACT_NAME_TO_RACE_ID_MAP = {}
 local rank, maxRank
 local confirmArgs
 local raceDataLoaded = false
-local archRelatedBagUpdate = false
 local keystoneLootRaceID
 local playerContinent
 local zoneData, artifacts, digsites = {}, {}, {}
@@ -2198,15 +2197,14 @@ function Archy:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerLogin")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "CombatStateChanged")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "CombatStateChanged")
-	self:RegisterEvent("ARTIFACT_COMPLETE", "ArtifactCompleted")
 	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED", "DigSitesUpdated")
-	self:RegisterEvent("BAG_UPDATE", "BagUpdated")
 	self:RegisterEvent("SKILL_LINES_CHANGED", "SkillLinesChanged")
 	self:RegisterEvent("CHAT_MSG_LOOT", "LootReceived")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "PlayerCastSurvey")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "CurrencyUpdated")
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
+	self:RegisterBucketEvent("BAG_UPDATE", 0.2)
 
 	self:ScheduleTimer("UpdatePlayerPosition", 1, true)
 	self:ScheduleTimer("UpdateDigSiteFrame", 1)
@@ -2298,10 +2296,6 @@ function Archy:ArtifactUpdated()
 	-- Would have been nice if Blizzard passed the race index or artifact name with the event
 end
 
-function Archy:ArtifactCompleted()
-	archRelatedBagUpdate = true
-end
-
 function Archy:DigSitesUpdated()
 	if not playerContinent then
 		return
@@ -2311,23 +2305,18 @@ function Archy:DigSitesUpdated()
 	self:RefreshDigSiteDisplay()
 end
 
-function Archy:BagUpdated()
+function Archy:BAG_UPDATE()
 	if not playerContinent then
-		return
-	end
-
-	if not archRelatedBagUpdate then
 		return
 	end
 
 	-- perform an artifact refresh here
 	if keystoneLootRaceID then
 		UpdateRaceArtifact(keystoneLootRaceID)
+		print("Scheduling RefreshRacesDisplay")
 		self:ScheduleTimer("RefreshRacesDisplay", 0.5)
 		keystoneLootRaceID = nil
 	end
-
-	archRelatedBagUpdate = false
 end
 
 function Archy:SkillLinesChanged()
@@ -2371,7 +2360,6 @@ function Archy:LootReceived(event, msg)
 	if race_id then
 		self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
 		keystoneLootRaceID = race_id
-		archRelatedBagUpdate = true
 	end
 end
 
