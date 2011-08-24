@@ -839,12 +839,10 @@ function SolveRaceArtifact(race_id, useStones)
 		artifactSolved.name = _G.GetSelectedArtifactInfo()
 		keystoneLootRaceID = race_id -- this is to force a refresh after the ARTIFACT_COMPLETE event
 
-		if useStones ~= nil then
-			if useStones then
-				artifacts[race_id].stonesAdded = math.min(race_data[race_id].keystone.inventory, artifacts[race_id].sockets)
-			else
-				artifacts[race_id].stonesAdded = 0
-			end
+		if useStones then
+			artifacts[race_id].stonesAdded = math.min(race_data[race_id].keystone.inventory, artifacts[race_id].sockets)
+		else
+			artifacts[race_id].stonesAdded = 0
 		end
 
 		if artifacts[race_id].stonesAdded > 0 then
