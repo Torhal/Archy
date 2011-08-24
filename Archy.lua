@@ -2442,15 +2442,11 @@ function Archy:CurrencyUpdated()
 			artifacts[race_id].stonesAdded = 0
 
 			if artifactSolved.raceId > 0 then
-				-- announce that we have solved an artifact
 				local _, _, completionCount = GetArtifactStats(race_id, artifactSolved.name)
-				local text = L["You have solved %s Artifact - %s (Times completed: %d)"]:format("|cFFFFFF00" .. race_data[race_id].name .. "|r", "|cFFFFFF00" .. artifactSolved.name .. "|r", completionCount or 0)
-				self:Pour(text, 1, 1, 1)
+				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race_data[race_id].name, artifactSolved.name, completionCount or 0), 1, 1, 1)
 
-				-- reset it since we know it's been solved
 				artifactSolved.raceId = 0
 				artifactSolved.name = ""
-				self:RefreshRacesDisplay()
 			end
 
 		elseif diff > 0 then
@@ -2774,11 +2770,11 @@ function Archy:RefreshRacesDisplay()
 		child:Hide()
 	end
 
-	for rid, race in pairs(race_data) do
-		local child = races_frame.children[rid]
-		local artifact = artifacts[rid]
-		local _, _, completionCount = GetArtifactStats(rid, artifact.name)
-		child:SetID(rid)
+	for race_id, race in pairs(race_data) do
+		local child = races_frame.children[race_id]
+		local artifact = artifacts[race_id]
+		local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
+		child:SetID(race_id)
 
 		if private.db.general.theme == "Graphical" then
 			child.solveButton:SetText(_G.SOLVE)
@@ -2895,16 +2891,16 @@ function Archy:RefreshRacesDisplay()
 			local nameColor = (artifact.rare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
 			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragTotal)
 
-			if race_data[rid].keystone.inventory > 0 or artifact.sockets > 0 then
-				child.sockets.text:SetFormattedText("%d/%d", race_data[rid].keystone.inventory, artifact.sockets)
+			if race_data[race_id].keystone.inventory > 0 or artifact.sockets > 0 then
+				child.sockets.text:SetFormattedText("%d/%d", race_data[race_id].keystone.inventory, artifact.sockets)
 				child.sockets.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
 			else
 				child.sockets.text:SetText("")
 				child.sockets.tooltip = nil
 			end
-			child.crest:SetNormalTexture(race_data[rid].texture)
-			child.crest:SetHighlightTexture(race_data[rid].texture)
-			child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race_data[rid].name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
+			child.crest:SetNormalTexture(race_data[race_id].texture)
+			child.crest:SetHighlightTexture(race_data[race_id].texture)
+			child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race_data[race_id].name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 			child.artifact.text:SetFormattedText("%s%s", nameColor, artifact.name)
 			child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip
@@ -2916,7 +2912,7 @@ function Archy:RefreshRacesDisplay()
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
 
-		if not private.db.artifact.blacklist[rid] and artifact.fragTotal > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(playerContinent), rid)) then
+		if not private.db.artifact.blacklist[race_id] and artifact.fragTotal > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(playerContinent), race_id)) then
 			child:ClearAllPoints()
 
 			if topFrame == races_frame.container then
