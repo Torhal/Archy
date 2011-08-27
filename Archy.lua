@@ -67,7 +67,7 @@ local ARTIFACT_NAME_TO_RACE_ID_MAP = {}
 local rank, maxRank
 local confirmArgs
 local raceDataLoaded = false
-local keystoneLootRaceID
+local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local playerContinent
 local zoneData, artifacts, digsites = {}, {}, {}
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
@@ -368,7 +368,7 @@ setmetatable(artifacts, {
 				tooltip = "",
 				icon = "",
 				sockets = 0,
-				stonesAdded = 0,
+				keystones_added = 0,
 				fragments = 0,
 				fragAdjust = 0,
 				fragTotal = 0,
@@ -785,15 +785,15 @@ function UpdateRaceArtifact(race_id)
 	artifact.fragAdjust = 0
 	artifact.completionCount = 0
 
-	local prevAdded = math.min(artifact.stonesAdded, race_data[race_id].keystone.inventory, numSockets)
+	local prevAdded = math.min(artifact.keystones_added, race_data[race_id].keystone.inventory, numSockets)
 
 	if private.db.artifact.autofill[race_id] then
 		prevAdded = math.min(race_data[race_id].keystone.inventory, numSockets)
 	end
-	artifact.stonesAdded = math.min(race_data[race_id].keystone.inventory, numSockets)
+	artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, numSockets)
 
-	if artifact.stonesAdded > 0 and numSockets > 0 then
-		for i = 1, math.min(artifact.stonesAdded, numSockets) do
+	if artifact.keystones_added > 0 and numSockets > 0 then
+		for i = 1, math.min(artifact.keystones_added, numSockets) do
 			_G.SocketItemToArtifact()
 
 			if not _G.ItemAddedToArtifact(i) then
@@ -807,7 +807,7 @@ function UpdateRaceArtifact(race_id)
 			artifact.fragAdjust = adjust
 		end
 	end
-	artifact.stonesAdded = prevAdded
+	artifact.keystones_added = prevAdded
 
 	_G.RequestArtifactCompletionHistory()
 
@@ -831,45 +831,47 @@ local function UpdateRace(race_id)
 	UpdateArtifactFrame(race_id)
 end
 
-function SolveRaceArtifact(race_id, useStones)
+function SolveRaceArtifact(race_id, use_stones)
 	if race_id then
 		_G.SetSelectedArtifact(race_id)
 		artifactSolved.raceId = race_id
 		artifactSolved.name = _G.GetSelectedArtifactInfo()
-		keystoneLootRaceID = race_id -- this is to force a refresh after the ARTIFACT_COMPLETE event
+		keystoneLootRaceID = race_id
 
-		if useStones then
-			artifacts[race_id].stonesAdded = math.min(race_data[race_id].keystone.inventory, artifacts[race_id].sockets)
-		else
-			artifacts[race_id].stonesAdded = 0
+		if _G.type(use_stones) == "boolean" then
+			if use_stones then
+				artifacts[race_id].keystones_added = math.min(race_data[race_id].keystone.inventory, artifacts[race_id].sockets)
+			else
+				artifacts[race_id].keystones_added = 0
+			end
 		end
 
-		if artifacts[race_id].stonesAdded > 0 then
-			for index = 1, artifacts[race_id].stonesAdded do
-				SocketItemToArtifact()
+		if artifacts[race_id].keystones_added > 0 then
+			for index = 1, artifacts[race_id].keystones_added do
+				_G.SocketItemToArtifact()
 
-				if not ItemAddedToArtifact(index) then
+				if not _G.ItemAddedToArtifact(index) then
 					break
 				end
 			end
 		else
 			if artifacts[race_id].sockets > 0 then
-				for index = 1, artifacts[race_id].stonesAdded do
-					RemoveItemFromArtifact()
+				for index = 1, artifacts[race_id].keystones_added do
+					_G.RemoveItemFromArtifact()
 				end
 			end
 		end
-		GetArtifactProgress()
+		_G.GetArtifactProgress()
 	end
 	blizSolveArtifact()
 end
 
-function Archy:SolveAnyArtifact(useStones)
+function Archy:SolveAnyArtifact(use_stones)
 	local found = false
-	for rid, artifact in pairs(artifacts) do
-		if not private.db.artifact.blacklist[rid] then
-			if (artifact.canSolve or (useStones and artifact.canSolveStone)) then
-				SolveRaceArtifact(rid, useStones)
+	for race_id, artifact in pairs(artifacts) do
+		if not private.db.artifact.blacklist[race_id] then
+			if (artifact.canSolve or (use_stones and artifact.canSolveStone)) then
+				SolveRaceArtifact(race_id, use_stones)
 				found = true
 				break
 			end
@@ -903,12 +905,12 @@ function Archy:SocketClicked(keystone_button, mouse_button, down)
 	local race_id = keystone_button:GetParent():GetParent():GetID()
 
 	if mouse_button == "LeftButton" then
-		if artifacts[race_id].stonesAdded < artifacts[race_id].sockets and artifacts[race_id].stonesAdded < race_data[race_id].keystone.inventory then
-			artifacts[race_id].stonesAdded = artifacts[race_id].stonesAdded + 1
+		if artifacts[race_id].keystones_added < artifacts[race_id].sockets and artifacts[race_id].keystones_added < race_data[race_id].keystone.inventory then
+			artifacts[race_id].keystones_added = artifacts[race_id].keystones_added + 1
 		end
 	else
-		if artifacts[race_id].stonesAdded > 0 then
-			artifacts[race_id].stonesAdded = artifacts[race_id].stonesAdded - 1
+		if artifacts[race_id].keystones_added > 0 then
+			artifacts[race_id].keystones_added = artifacts[race_id].keystones_added - 1
 		end
 	end
 	UpdateRaceArtifact(race_id)
@@ -1827,7 +1829,7 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
     3 artifact.fragTotal,
     4 raceData[rid].keystone.inventory,
     5 artifact.sockets,
-    6 artifact.stonesAdded,
+    6 artifact.keystones_added,
     7 artifact.canSolve,
     8 artifact.canSolveStone,
     9 artifact.rare }
@@ -1936,7 +1938,7 @@ function ldb:OnEnter()
 				progress_data[3] = artifact.fragTotal
 				progress_data[4] = race_data[rid].keystone.inventory
 				progress_data[5] = artifact.sockets
-				progress_data[6] = artifact.stonesAdded
+				progress_data[6] = artifact.keystones_added
 				progress_data[7] = artifact.canSolve
 				progress_data[8] = artifact.canSolveStone
 				progress_data[9] = artifact.rare
@@ -2426,7 +2428,7 @@ function Archy:CurrencyUpdated()
 
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
-			artifacts[race_id].stonesAdded = 0
+			artifacts[race_id].keystones_added = 0
 
 			if artifactSolved.raceId > 0 then
 				local _, _, completionCount = GetArtifactStats(race_id, artifactSolved.name)
@@ -2823,10 +2825,10 @@ function Archy:RefreshRacesDisplay()
 					child.fragmentBar.keystones:Show()
 
 					if child.fragmentBar.keystones and child.fragmentBar.keystones.count then
-						child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact.stonesAdded, artifact.sockets)
+						child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact.keystones_added, artifact.sockets)
 					end
 
-					if artifact.stonesAdded > 0 then
+					if artifact.keystones_added > 0 then
 						child.fragmentBar.keystones.icon:SetTexture(race.keystone.texture)
 					else
 						child.fragmentBar.keystones.icon:SetTexture(nil)
@@ -2840,7 +2842,7 @@ function Archy:RefreshRacesDisplay()
 						child.fragmentBar["keystone" .. ki]:Hide()
 					else
 						child.fragmentBar["keystone" .. ki].icon:SetTexture(race.keystone.texture)
-						if ki <= artifact.stonesAdded then
+						if ki <= artifact.keystones_added then
 							child.fragmentBar["keystone" .. ki].icon:Show()
 							child.fragmentBar["keystone" .. ki].tooltip = _G.ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP:format(race.keystone.name)
 							child.fragmentBar["keystone" .. ki]:Enable()
@@ -2858,7 +2860,7 @@ function Archy:RefreshRacesDisplay()
 				end
 			end
 
-			if artifact.canSolve or (artifact.stonesAdded > 0 and artifact.canSolveStone) then
+			if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then
 				child.solveButton:Enable()
 				barColor = private.db.artifact.fragmentBarColors["Solvable"]
 			else
