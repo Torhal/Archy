@@ -2289,7 +2289,6 @@ function Archy:ARTIFACT_HISTORY_READY()
 			artifact.completionCount = completionCount
 		end
 	end
-	print("Called ARTIFACT_HISTORY_READY")
 	self:RefreshRacesDisplay()
 end
 
