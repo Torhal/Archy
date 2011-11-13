@@ -219,6 +219,7 @@ L["Show the locations where you have collected fragments"] = true
 L["Show your Archaeology skill on the Artifacts list header"] = true
 L["Show your dig sites on the minimap"] = true
 L["Shows a Survey button with the Distance Indicator."] = true
+L["Shows messages in a toast window."] = true
 L["Shows the Options"] = true
 L["Shows the configuration window"] = true
 L["Size"] = true
