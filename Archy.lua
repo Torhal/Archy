@@ -2072,7 +2072,7 @@ end
 Toast:Register("Archy_Toast", function(toast, ...)
 	toast:SetTitle(ADDON_NAME)
 	toast:SetText(...)
-	toast:SetIconTexture([[Interface\Archaeology\Arch-Icon-Marker]])
+	toast:SetIconTexture([[Interface\Archeology\Arch-Icon-Marker]])
 end)
 
 local function SpawnToast(source, text, r, g, b, ...)
