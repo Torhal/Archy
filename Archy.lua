@@ -371,7 +371,7 @@ setmetatable(artifacts, {
 				keystones_added = 0,
 				fragments = 0,
 				fragAdjust = 0,
-				fragTotal = 0,
+				fragments_required = 0,
 			}
 			return t[k]
 		end
@@ -737,7 +737,7 @@ local function Announce(race_id)
 	local race_name = "|cFFFFFF00" .. race_data[race_id].name .. "|r"
 	local artifact = artifacts[race_id]
 	local artifact_name = "|cFFFFFF00" .. artifact.name .. "|r"
-	local text = L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format(race_name, artifact_name, artifact.fragments + artifact.fragAdjust, artifact.fragTotal)
+	local text = L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format(race_name, artifact_name, artifact.fragments + artifact.fragAdjust, artifact.fragments_required)
 	Archy:Pour(text, 1, 1, 1)
 end
 
@@ -775,7 +775,7 @@ function UpdateRaceArtifact(race_id)
 
 	artifact.canSolve = _G.CanSolveArtifact()
 	artifact.fragments = base
-	artifact.fragTotal = total
+	artifact.fragments_required = total
 	artifact.sockets = numSockets
 	artifact.icon = icon
 	artifact.tooltip = spellDescription
@@ -1823,7 +1823,7 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
 	--[[    {
     1 artifact.fragments,
     2 artifact.fragAdjust,
-    3 artifact.fragTotal,
+    3 artifact.fragments_required,
     4 raceData[rid].keystone.inventory,
     5 artifact.sockets,
     6 artifact.keystones_added,
@@ -1916,7 +1916,7 @@ function ldb:OnEnter()
 		tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 		for rid, artifact in pairs(artifacts) do
-			if artifact.fragTotal > 0 then
+			if artifact.fragments_required > 0 then
 				line = tooltip:AddLine(" ")
 				tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[rid].texture), "LEFT", 1)
 				tooltip:SetCell(line, 2, race_data[rid].name, "LEFT", 1)
@@ -1932,7 +1932,7 @@ function ldb:OnEnter()
 
 				progress_data[1] = artifact.fragments
 				progress_data[2] = artifact.fragAdjust
-				progress_data[3] = artifact.fragTotal
+				progress_data[3] = artifact.fragments_required
 				progress_data[4] = race_data[rid].keystone.inventory
 				progress_data[5] = artifact.sockets
 				progress_data[6] = artifact.keystones_added
@@ -2800,11 +2800,11 @@ function Archy:RefreshRacesDisplay()
 				end
 				child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875) -- bg
 			end
-			child.fragmentBar:SetMinMaxValues(0, artifact.fragTotal)
-			child.fragmentBar:SetValue(math.min(artifact.fragments + artifact.fragAdjust, artifact.fragTotal))
+			child.fragmentBar:SetMinMaxValues(0, artifact.fragments_required)
+			child.fragmentBar:SetValue(math.min(artifact.fragments + artifact.fragAdjust, artifact.fragments_required))
 
 			local adjust = (artifact.fragAdjust > 0) and (" (|cFF00FF00+%d|r)"):format(artifact.fragAdjust) or ""
-			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact.fragments, adjust, artifact.fragTotal)
+			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact.fragments, adjust, artifact.fragments_required)
 			child.fragmentBar.artifact:SetText(artifact.name)
 			child.fragmentBar.artifact:SetWordWrap(true)
 
@@ -2873,7 +2873,7 @@ function Archy:RefreshRacesDisplay()
 		else
 			local fragmentColor = (artifact.canSolve and "|cFF00FF00" or (artifact.canSolveStone and "|cFFFFFF00" or ""))
 			local nameColor = (artifact.rare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
-			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragTotal)
+			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragments_required)
 
 			if race_data[race_id].keystone.inventory > 0 or artifact.sockets > 0 then
 				child.sockets.text:SetFormattedText("%d/%d", race_data[race_id].keystone.inventory, artifact.sockets)
@@ -2896,7 +2896,7 @@ function Archy:RefreshRacesDisplay()
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
 
-		if not private.db.artifact.blacklist[race_id] and artifact.fragTotal > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(playerContinent), race_id)) then
+		if not private.db.artifact.blacklist[race_id] and artifact.fragments_required > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(playerContinent), race_id)) then
 			child:ClearAllPoints()
 
 			if topFrame == races_frame.container then
