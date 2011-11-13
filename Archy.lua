@@ -23,6 +23,8 @@ local LibStub = _G.LibStub
 local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceBucket-3.0", "AceTimer-3.0", "LibSink-2.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 
+local Dialog = LibStub("LibDialog-1.0")
+
 local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	type = "data source",
 	icon = [[Interface\Icons\trade_archaeology]],
@@ -62,7 +64,6 @@ local DIG_SITES = private.dig_sites
 -- Variables
 -----------------------------------------------------------------------
 local rank, maxRank
-local confirmArgs
 local raceDataLoaded = false
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local playerContinent
@@ -503,34 +504,33 @@ do
 	}
 end
 
---[[ Function Hooks ]] --
 -- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
 local blizSolveArtifact
 
---[[ Dialog declarations ]] --
-_G.StaticPopupDialogs["ARCHY_CONFIRM_SOLVE"] = {
-	text = L["Your Archaeology skill is at %d of %d.  Are you sure you would like to solve this artifact before visiting a trainer?"],
-	button1 = _G.YES,
-	button2 = _G.NO,
-	OnAccept = function()
-		if confirmArgs and confirmArgs.race then
-			SolveRaceArtifact(confirmArgs.race, confirmArgs.useStones)
-			confirmArgs = nil
-		else
-			blizSolveArtifact()
-			confirmArgs = nil
-		end
+Dialog:Register("ArchyConfirmSolve", {
+	text = "",
+	on_show = function(self, data)
+		self.text:SetFormattedText(L["Your Archaeology skill is at %d of %d.  Are you sure you would like to solve this artifact before visiting a trainer?"], data.rank, data.max_rank)
 	end,
-	OnCancel = function()
-		confirmArgs = nil
-	end,
-	timeout = 0,
+	buttons = {
+		{
+			text = _G.YES,
+			on_click = function(self, data)
+				if data.race_index then
+					SolveRaceArtifact(data.race_index, data.use_stones)
+				else
+					blizSolveArtifact()
+				end
+			end,
+		},
+		{
+			text = _G.NO,
+		},
+	},
 	sound = "levelup2",
-	whileDead = false,
-	hideOnEscape = true,
-}
-
-
+	show_while_dead = false,
+	hide_on_escape = true,
+})
 --[[ Local Helper Functions ]] --
 
 -- Returns true if the player has the archaeology secondary skill
@@ -826,6 +826,7 @@ local function UpdateRace(race_id)
 end
 
 function SolveRaceArtifact(race_id, use_stones)
+	-- The check for race_id exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
 	if race_id then
 		_G.SetSelectedArtifact(race_id)
 		artifactSolved.raceId = race_id
@@ -874,17 +875,17 @@ function Archy:SolveAnyArtifact(use_stones)
 	end
 end
 
-local function GetArtifactStats(rid, name)
-	local numArtifacts = GetNumArtifactsByRace(rid)
+local function GetArtifactStats(race_id, name)
+	local numArtifacts = _G.GetNumArtifactsByRace(race_id)
 
 	if not numArtifacts then
 		return
 	end
 
-	for artifactIndex = 1, numArtifacts do
-		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = GetArtifactInfoByRace(rid, artifactIndex)
+	for artifact_index = 1, numArtifacts do
+		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
 		if name == artifactName then
-			return artifactIndex, firstCompletionTime, completionCount
+			return artifact_index, firstCompletionTime, completionCount
 		end
 	end
 end
@@ -2218,15 +2219,15 @@ function Archy:OnEnable()
 		blizSolveArtifact = _G.SolveArtifact
 
 		function _G.SolveArtifact(race_index, use_stones)
-			local rank, maxRank = GetArchaeologyRank()
+			local rank, max_rank = GetArchaeologyRank()
 
-			if private.db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
-				if not confirmArgs then
-					confirmArgs = {}
-				end
-				confirmArgs.race = race_index
-				confirmArgs.useStones = use_stones
-				_G.StaticPopup_Show("ARCHY_CONFIRM_SOLVE", rank, maxRank)
+			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
+				Dialog:Spawn("ArchyConfirmSolve", {
+					race_index = race_index,
+					use_stones = use_stones,
+					rank = rank,
+					max_rank = max_rank
+				})
 			else
 				return SolveRaceArtifact(race_index, use_stones)
 			end
