@@ -58,9 +58,6 @@ local SURVEY_SPELL_ID = 80451
 
 local DIG_SITES = private.dig_sites
 
--- Populated later.
-local ARTIFACT_NAME_TO_RACE_ID_MAP = {}
-
 -----------------------------------------------------------------------
 -- Variables
 -----------------------------------------------------------------------
@@ -770,8 +767,6 @@ function UpdateRaceArtifact(race_id)
 	local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local base, adjust, total = _G.GetArtifactProgress()
 	local artifact = artifacts[race_id]
-
-	ARTIFACT_NAME_TO_RACE_ID_MAP[name] = race_id
 
 	artifact.canSolve = _G.CanSolveArtifact()
 	artifact.fragments = base
@@ -2221,12 +2216,12 @@ function Archy:OnEnable()
 	self:CheckForMinimapAddons()
 
 	if not blizSolveArtifact then
-		blizSolveArtifact = SolveArtifact
+		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
+			_G.LoadAddOn("Blizzard_ArchaeologyUI")
+		end
+		blizSolveArtifact = _G.SolveArtifact
 
-		function SolveArtifact(race_index, use_stones)
-			if not race_index then
-				race_index = ARTIFACT_NAME_TO_RACE_ID_MAP[_G.GetSelectedArtifactInfo()]
-			end
+		function _G.SolveArtifact(race_index, use_stones)
 			local rank, maxRank = GetArchaeologyRank()
 
 			if private.db.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
@@ -2919,7 +2914,6 @@ function Archy:RefreshRacesDisplay()
 		maxHeight = maxHeight + 10
 		containerXofs = -10
 	end
-
 
 	races_frame.container:SetHeight(maxHeight)
 	races_frame.container:SetWidth(maxWidth)
