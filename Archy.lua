@@ -1618,12 +1618,10 @@ function Arrow_OnUpdate(self, elapsed)
 			if not self.icon:IsShown() then self.icon:Show() end
 			if self.arrow:IsShown() then self.arrow:Hide() end
 		end
+	elseif edge then
+		if self.icon:IsShown() then self.icon:Hide() end
 	else
-		if edge then
-			if self.icon:IsShown() then self.icon:Hide() end
-		else
-			if not self.icon:IsShown() then self.icon:Show() end
-		end
+		if not self.icon:IsShown() then self.icon:Show() end
 	end
 end
 
@@ -1638,42 +1636,46 @@ function RefreshBlobInfo(f)
 	end
 end
 
-function MinimapBlobSetPositionAndSize(f)
-	if not f or not playerPosition.x or not playerPosition.y then
-		return
+do
+	local old_pw, old_ph
+
+	function MinimapBlobSetPositionAndSize(blob)
+		if not blob or not playerPosition.x or not playerPosition.y then
+			return
+		end
+		local dx = (playerPosition.x - 0.5) * blob:GetWidth()
+		local dy = (playerPosition.y - 0.5) * blob:GetHeight()
+		blob:ClearAllPoints()
+		blob:SetPoint("CENTER", _G.Minimap, "CENTER", -dx, dy)
+
+		local mapWidth = blob:GetParent():GetWidth()
+		local mapHeight = blob:GetParent():GetHeight()
+		local mapSizePix = math.min(mapWidth, mapHeight)
+
+		local indoors = _G.GetCVar("minimapZoom") + 0 == _G.Minimap:GetZoom() and "outdoor" or "indoor"
+		local zoom = _G.Minimap:GetZoom()
+		local mapSizeYards = minimapSize[indoors][zoom]
+
+		if not playerPosition.map or playerPosition.map == -1 then
+			return
+		end
+
+		local _, _, yw, yh, _, _ = astrolabe:GetMapInfo(playerPosition.map, playerPosition.level)
+		local pw = yw * mapSizePix / mapSizeYards
+		local ph = yh * mapSizePix / mapSizeYards
+
+		if pw == old_pw and ph == old_ph then
+			return
+		end
+		old_pw, old_ph = pw, ph
+
+		blob:SetSize(pw, ph)
+
+		blob:SetFillAlpha(256 * private.db.minimap.blobAlpha)
+		--    f:SetFrameStrata("LOW")
+		--    f:SetFrameLevel(f:GetParent():GetFrameLevel() + 7)
 	end
-	local dx = (playerPosition.x - 0.5) * f:GetWidth()
-	local dy = (playerPosition.y - 0.5) * f:GetHeight()
-	f:ClearAllPoints()
-	f:SetPoint("CENTER", _G.Minimap, "CENTER", -dx, dy)
-
-	local mapWidth = f:GetParent():GetWidth()
-	local mapHeight = f:GetParent():GetHeight()
-	local mapSizePix = math.min(mapWidth, mapHeight)
-
-	local indoors = _G.GetCVar("minimapZoom") + 0 == _G.Minimap:GetZoom() and "outdoor" or "indoor"
-	local zoom = _G.Minimap:GetZoom()
-	local mapSizeYards = minimapSize[indoors][zoom]
-
-	if not playerPosition.map or playerPosition.map == -1 then
-		return
-	end
-
-	local _, _, yw, yh, _, _ = astrolabe:GetMapInfo(playerPosition.map, playerPosition.level)
-	local pw = yw * mapSizePix / mapSizeYards
-	local ph = yh * mapSizePix / mapSizeYards
-
-	if pw == old_pw and ph == oldph then
-		return
-	end
-	old_pw, old_ph = pw, ph
-
-	f:SetSize(pw, ph)
-
-	f:SetFillAlpha(256 * private.db.minimap.blobAlpha)
-	--    f:SetFrameStrata("LOW")
-	--    f:SetFrameLevel(f:GetParent():GetFrameLevel() + 7)
-end
+end -- do-block
 
 function UpdateSiteBlobs()
 	if IsTaintable() then
