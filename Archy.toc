@@ -34,6 +34,7 @@ Libs\LibAboutPanel\lib.xml
 Libs\LibQTip-1.0\LibQTip-1.0.lua
 Libs\LibBabble-DigSites-3.0\lib.xml
 Libs\LibDialog-1.0\lib.xml
+Libs\LibToast-1.0\lib.xml
 #@end-no-lib-strip@
 
 Libs\Astrolabe-1.0\Load.xml

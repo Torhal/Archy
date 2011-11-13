@@ -24,6 +24,7 @@ local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEv
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 
 local Dialog = LibStub("LibDialog-1.0")
+local Toast = LibStub("LibToast-1.0")
 
 local ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	type = "data source",
@@ -131,7 +132,9 @@ local defaults = {
 			locked = false,
 			confirmSolve = true,
 			showSkillBar = true,
-			sinkOptions = {},
+			sinkOptions = {
+				sink20OutputSink = L["Toast"],
+			},
 			easyCast = false,
 			autoLoot = true,
 			theme = "Graphical",
@@ -2064,6 +2067,15 @@ local function SlashHandler(msg, editbox)
 	end
 end
 
+Toast:Register("Archy_Toast", function(toast, ...)
+	toast:SetTitle(ADDON_NAME)
+	toast:SetText(...)
+	toast:SetIconTexture([[Interface\Archaeology\Arch-Icon-Marker]])
+end)
+
+local function SpawnToast(source, text, r, g, b, ...)
+	Toast:Spawn("Archy_Toast", text)
+end
 
 --[[ AddOn Initialization ]] --
 function Archy:OnInitialize()
@@ -2077,6 +2089,11 @@ function Archy:OnInitialize()
 	if about_panel then
 		self.optionsFrame = about_panel.new(nil, "Archy")
 	end
+
+	self:RegisterSink(L["Toast"],
+		L["Toast"],
+		L["Shows messages in a toast window."],
+		SpawnToast)
 	self:SetSinkStorage(Archy.db.profile.general.sinkOptions)
 	self:SetupOptions()
 

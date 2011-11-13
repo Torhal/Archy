@@ -264,6 +264,7 @@ L[ [=[This setting will control the distance at which the minimap blob will beco
 NOTE: This is a semi-workaround for the boundaries exceeding the minimap area.]=] ] = true
 L[ [=[This setting will control the distance at which the waypoint arrow switches to a downwards arrow, indicating you have arrived at your destination.
 NOTE: This may not work with emulation addons if they do not support this.]=] ] = true
+L["Toast"] = true
 L["Toggle if Archy will send the nearest dig site waypoint information to TomTom"] = true
 L["Toggle if Artifacts will be shown"] = true
 L["Toggle if Dig Sites will be shown"] = true
