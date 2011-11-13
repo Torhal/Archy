@@ -823,7 +823,6 @@ end
 
 local function UpdateRace(race_id)
 	UpdateRaceArtifact(race_id)
-	UpdateArtifactFrame(race_id)
 end
 
 function SolveRaceArtifact(race_id, use_stones)
@@ -888,9 +887,6 @@ local function GetArtifactStats(rid, name)
 			return artifactIndex, firstCompletionTime, completionCount
 		end
 	end
-end
-
-local function UpdateArtifactFrame(rid)
 end
 
 function Archy:SocketClicked(keystone_button, mouse_button, down)
