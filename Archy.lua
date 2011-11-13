@@ -370,7 +370,7 @@ setmetatable(artifacts, {
 				sockets = 0,
 				keystones_added = 0,
 				fragments = 0,
-				fragAdjust = 0,
+				keystone_adjustment = 0,
 				fragments_required = 0,
 			}
 			return t[k]
@@ -737,7 +737,7 @@ local function Announce(race_id)
 	local race_name = "|cFFFFFF00" .. race_data[race_id].name .. "|r"
 	local artifact = artifacts[race_id]
 	local artifact_name = "|cFFFFFF00" .. artifact.name .. "|r"
-	local text = L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format(race_name, artifact_name, artifact.fragments + artifact.fragAdjust, artifact.fragments_required)
+	local text = L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format(race_name, artifact_name, artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required)
 	Archy:Pour(text, 1, 1, 1)
 end
 
@@ -782,7 +782,7 @@ function UpdateRaceArtifact(race_id)
 	artifact.rare = (rarity ~= 0)
 	artifact.name = name
 	artifact.canSolveStone = nil
-	artifact.fragAdjust = 0
+	artifact.keystone_adjustment = 0
 	artifact.completionCount = 0
 
 	local prevAdded = math.min(artifact.keystones_added, race_data[race_id].keystone.inventory, numSockets)
@@ -804,7 +804,7 @@ function UpdateRaceArtifact(race_id)
 		artifact.canSolveStone = _G.CanSolveArtifact()
 
 		if prevAdded > 0 then
-			artifact.fragAdjust = adjust
+			artifact.keystone_adjustment = adjust
 		end
 	end
 	artifact.keystones_added = prevAdded
@@ -1822,7 +1822,7 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
 	local fs = self.fs
 	--[[    {
     1 artifact.fragments,
-    2 artifact.fragAdjust,
+    2 artifact.keystone_adjustment,
     3 artifact.fragments_required,
     4 raceData[rid].keystone.inventory,
     5 artifact.sockets,
@@ -1931,7 +1931,7 @@ function ldb:OnEnter()
 				tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
 
 				progress_data[1] = artifact.fragments
-				progress_data[2] = artifact.fragAdjust
+				progress_data[2] = artifact.keystone_adjustment
 				progress_data[3] = artifact.fragments_required
 				progress_data[4] = race_data[rid].keystone.inventory
 				progress_data[5] = artifact.sockets
@@ -2801,9 +2801,9 @@ function Archy:RefreshRacesDisplay()
 				child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875) -- bg
 			end
 			child.fragmentBar:SetMinMaxValues(0, artifact.fragments_required)
-			child.fragmentBar:SetValue(math.min(artifact.fragments + artifact.fragAdjust, artifact.fragments_required))
+			child.fragmentBar:SetValue(math.min(artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required))
 
-			local adjust = (artifact.fragAdjust > 0) and (" (|cFF00FF00+%d|r)"):format(artifact.fragAdjust) or ""
+			local adjust = (artifact.keystone_adjustment > 0) and (" (|cFF00FF00+%d|r)"):format(artifact.keystone_adjustment) or ""
 			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact.fragments, adjust, artifact.fragments_required)
 			child.fragmentBar.artifact:SetText(artifact.name)
 			child.fragmentBar.artifact:SetWordWrap(true)
