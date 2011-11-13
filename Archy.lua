@@ -861,7 +861,6 @@ function SolveRaceArtifact(race_id, use_stones)
 				end
 			end
 		end
-		_G.GetArtifactProgress()
 	end
 	blizSolveArtifact()
 end
