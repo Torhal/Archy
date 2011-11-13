@@ -2194,9 +2194,9 @@ function Archy:OnEnable()
 	self:RegisterEvent("LOOT_OPENED", "OnPlayerLooting")
 	self:RegisterEvent("LOOT_CLOSED", "OnPlayerLooting")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerLogin")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", "CombatStateChanged")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", "CombatStateChanged")
-	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED", "DigSitesUpdated")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("SKILL_LINES_CHANGED", "SkillLinesChanged")
 	self:RegisterEvent("CHAT_MSG_LOOT", "LootReceived")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "PlayerCastSurvey")
@@ -2294,7 +2294,7 @@ function Archy:ArtifactUpdated()
 	-- Would have been nice if Blizzard passed the race index or artifact name with the event
 end
 
-function Archy:DigSitesUpdated()
+function Archy:ARTIFACT_DIG_SITE_UPDATED()
 	if not playerContinent then
 		return
 	end
@@ -2462,19 +2462,18 @@ function Archy:CurrencyUpdated()
 	self:RefreshRacesDisplay()
 end
 
-function Archy:CombatStateChanged(event)
-	if event == "PLAYER_REGEN_DISABLED" then
-		inCombat = true
-		blobs["Minimap"]:DrawNone()
-	elseif event == "PLAYER_REGEN_ENABLED" then
-		inCombat = false
-
-		if private.create_frames then
-			InitializeFrames()
-		end
-	end
+function Archy:PLAYER_REGEN_DISABLED()
+	inCombat = true
+	blobs["Minimap"]:DrawNone()
 end
 
+function Archy:PLAYER_REGEN_ENABLED()
+	inCombat = false
+
+	if private.create_frames then
+		InitializeFrames()
+	end
+end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
