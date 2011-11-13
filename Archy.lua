@@ -2319,7 +2319,6 @@ function Archy:BAG_UPDATE()
 		return
 	end
 
-	-- perform an artifact refresh here
 	if keystoneLootRaceID then
 		UpdateRaceArtifact(keystoneLootRaceID)
 		self:RefreshRacesDisplay()
@@ -2333,20 +2332,6 @@ function Archy:SkillLinesChanged()
 	end
 
 	local rank, maxRank = GetArchaeologyRank()
-	--[[
-    if rank == 300 or rank == 375 or rank == 450 then
-        -- Force reload of race and artifact data when outland, northrend and tol'vir become available
-        LoadRaceData()
-        if _G.GetNumArchaeologyRaces() > 0 then
-            for rid = 1,_G.GetNumArchaeologyRaces() do
-                UpdateRaceArtifact(rid)
-            end
-            self:UpdateRacesFrame()
-            self:RefreshRacesDisplay()
-        end
-    end
-]]
-
 	local races_frame = private.races_frame
 
 	if races_frame and races_frame.skillBar then
@@ -2568,9 +2553,6 @@ end
 
 local function TransformRaceFrame(frame)
 	if private.db.artifact.style == "Compact" then
-		--[[
-        frame.icon:Hide()
-]]
 
 		frame.crest:ClearAllPoints()
 		frame.crest:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
@@ -2581,9 +2563,6 @@ local function TransformRaceFrame(frame)
 		frame.icon:SetHeight(32)
 		frame.icon.texture:SetWidth(32)
 		frame.icon.texture:SetHeight(32)
-		--        frame.fragmentBar:ClearAllPoints()
-		--        frame.fragmentBar:SetPoint("LEFT", frame.icon, "RIGHT", 5, 0)
-
 
 		frame.crest.text:Hide()
 		frame.crest:SetWidth(36)
@@ -2665,8 +2644,6 @@ function Archy:UpdateRacesFrame()
 
 	races_frame:SetScale(private.db.artifact.scale)
 	races_frame:SetAlpha(private.db.artifact.alpha)
-	--    private.races_frame:ClearAllPoints()
-	--    private.races_frame:SetPoint("TOPLEFT", _G.UIParent, "TOPLEFT", db.artifact.positionX, db.artifact.positionY)
 	SetMovableState(races_frame, (not private.db.general.locked))
 
 	local artifact_font_data = private.db.artifact.font
@@ -3345,23 +3322,24 @@ local function SetHijackCheck(func)
 	HijackCheck = func
 end
 
-local sabutton
-local function CreateSAButton(name, postclick)
-	if sabutton then
+local secure_action_button
+
+local function CreateSecureActionButton(name, postclick)
+	if secure_action_button then
 		return
 	end
-	local btn = _G.CreateFrame("Button", name, _G.UIParent, "SecureActionButtonTemplate")
-	btn:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
-	btn:SetFrameStrata("LOW")
-	btn:EnableMouse(true)
-	btn:RegisterForClicks("RightButtonUp")
-	btn:SetScript("PostClick", postclick)
-	btn:Hide()
-	btn.name = name
+	local button = _G.CreateFrame("Button", name, _G.UIParent, "SecureActionButtonTemplate")
+	button:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
+	button:SetFrameStrata("LOW")
+	button:EnableMouse(true)
+	button:RegisterForClicks("RightButtonUp")
+	button:SetScript("PostClick", postclick)
+	button:Hide()
+	button.name = name
 
-	sabutton = btn
+	secure_action_button = button
 
-	return btn
+	return button
 end
 
 local function GetSurveySkillInfo()
@@ -3397,7 +3375,7 @@ local function GetSurveyActionBarID(force)
 end
 
 local function InvokeSurvey(useaction, btn)
-	btn = btn or sabutton
+	btn = btn or secure_action_button
 
 	if not btn then
 		return
@@ -3417,18 +3395,12 @@ local function InvokeSurvey(useaction, btn)
 end
 
 local function OverrideClick(btn)
-	btn = btn or sabutton
+	btn = btn or secure_action_button
 
-	if not sabutton then
+	if not secure_action_button then
 		return
 	end
 	_G.SetOverrideBindingClick(btn, true, "BUTTON2", btn.name)
-end
-
-local function CentralCasting()
-	InvokeSurvey(true)
-	OverrideClick()
-	OverrideOn = true
 end
 
 local lastClickTime
@@ -3457,28 +3429,30 @@ local function ExtendDoubleClick()
 	lastClickTime = lastClickTime + ACTIONDOUBLEWAIT / 2
 end
 
+local function CentralCasting()
+	InvokeSurvey(true)
+	OverrideClick()
+end
+
 local SavedWFOnMouseDown
 
 -- handle mouse up and mouse down in the WorldFrame so that we can steal
 -- the hardware events to implement 'Easy Cast'
 -- Thanks to the Cosmos team for figuring this one out -- I didn't realize
 -- that the mouse handler in the WorldFrame got everything first!
-local function WF_OnMouseDown(...)
-	-- Only steal 'right clicks' (self is arg #1!)
-	local button = select(2, ...)
-
+local function WF_OnMouseDown(self, button, down)
 	if button == "RightButton" and HijackCheck() then
 		if CheckForDoubleClick() then
 			-- We're stealing the mouse-up event, make sure we exit MouseLook
-			if IsMouselooking() and not InCombatLockdown() then
-				MouselookStop()
+			if _G.IsMouselooking() and not _G.InCombatLockdown() then
+				_G.MouselookStop()
 			end
 			CentralCasting()
 		end
 	end
 
 	if SavedWFOnMouseDown then
-		SavedWFOnMouseDown(...)
+		SavedWFOnMouseDown(self, button, down)
 	end
 end
 
@@ -3500,22 +3474,21 @@ end
 
 
 function TrapWorldMouse()
-	if WorldFrame.OnMouseDown then
-		hooksecurefunc(WorldFrame, "OnMouseDown", WF_OnMouseDown)
+	if _G.WorldFrame:GetScript("OnMouseDown") then
+		_G.hooksecurefunc(_G.WorldFrame, "OnMouseDown", WF_OnMouseDown)
 	else
-		SavedWFOnMouseDown = SafeHookScript(WorldFrame, "OnMouseDown", WF_OnMouseDown)
+		SavedWFOnMouseDown = SafeHookScript(_G.WorldFrame, "OnMouseDown", WF_OnMouseDown)
 	end
 end
 
 function Archy:CheckOverride()
 	if not IsTaintable() then
-		ClearOverrideBindings(Archy_SurveyButton)
+		_G.ClearOverrideBindings(_G.Archy_SurveyButton)
 	end
-	OverrideOn = false
 end
 
 function Archy:OnPlayerLogin()
-	CreateSAButton("Archy_SurveyButton", Archy.CheckOverride)
+	CreateSecureActionButton("Archy_SurveyButton", Archy.CheckOverride)
 end
 
 function Archy:OnPlayerLooting(event, ...)
