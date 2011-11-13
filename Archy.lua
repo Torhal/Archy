@@ -868,12 +868,10 @@ end
 function Archy:SolveAnyArtifact(use_stones)
 	local found = false
 	for race_id, artifact in pairs(artifacts) do
-		if not private.db.artifact.blacklist[race_id] then
-			if (artifact.canSolve or (use_stones and artifact.canSolveStone)) then
-				SolveRaceArtifact(race_id, use_stones)
-				found = true
-				break
-			end
+		if not private.db.artifact.blacklist[race_id] and (artifact.canSolve or (use_stones and artifact.canSolveStone)) then
+			SolveRaceArtifact(race_id, use_stones)
+			found = true
+			break
 		end
 	end
 
