@@ -64,7 +64,6 @@ local DIG_SITES = private.dig_sites
 -----------------------------------------------------------------------
 -- Variables
 -----------------------------------------------------------------------
-local rank, maxRank
 local raceDataLoaded = false
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local playerContinent
