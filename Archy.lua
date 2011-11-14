@@ -55,7 +55,7 @@ Archy.version = _G.GetAddOnMetadata("Archy", "Version")
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
-local MAX_ARCHAEOLOGY_RANK = 525
+local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[#_G.PROFESSION_RANKS][1]
 local SITES_PER_CONTINENT = 4
 local SURVEY_SPELL_ID = 80451
 
