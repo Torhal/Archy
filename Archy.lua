@@ -506,7 +506,7 @@ do
 end
 
 -- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
-local blizSolveArtifact
+local Blizzard_SolveArtifact
 
 Dialog:Register("ArchyConfirmSolve", {
 	text = "",
@@ -520,7 +520,7 @@ Dialog:Register("ArchyConfirmSolve", {
 				if data.race_index then
 					SolveRaceArtifact(data.race_index, data.use_stones)
 				else
-					blizSolveArtifact()
+					Blizzard_SolveArtifact()
 				end
 			end,
 		},
@@ -840,7 +840,7 @@ function SolveRaceArtifact(race_id, use_stones)
 			end
 		end
 	end
-	blizSolveArtifact()
+	Blizzard_SolveArtifact()
 end
 
 function Archy:SolveAnyArtifact(use_stones)
@@ -2211,11 +2211,11 @@ function Archy:OnEnable()
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	self:CheckForMinimapAddons()
 
-	if not blizSolveArtifact then
+	if not Blizzard_SolveArtifact then
 		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
 			_G.LoadAddOn("Blizzard_ArchaeologyUI")
 		end
-		blizSolveArtifact = _G.SolveArtifact
+		Blizzard_SolveArtifact = _G.SolveArtifact
 
 		function _G.SolveArtifact(race_index, use_stones)
 			local rank, max_rank = GetArchaeologyRank()
