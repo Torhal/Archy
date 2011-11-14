@@ -10,7 +10,7 @@
 ## X-Credits: Cidrei on wowinterface for fan fixes
 ## X-Category: Archaeology
 ## SavedVariables: ArchyDB
-## OptionalDeps: Ace3, LibDBIcon-1.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, TomTom, LibAboutPanel, LibQTip-1.0, LibBabble-DigSites-3.0
+## OptionalDeps: Ace3, LibDBIcon-1.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, TomTom, LibAboutPanel, LibQTip-1.0, LibBabble-DigSites-3.0, LibDialog-1.0, LibToast-1.0
 
 #@no-lib-strip@
 Libs\LibStub\LibStub.lua
