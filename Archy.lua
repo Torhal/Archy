@@ -64,7 +64,6 @@ local DIG_SITES = private.dig_sites
 -----------------------------------------------------------------------
 -- Variables
 -----------------------------------------------------------------------
-local raceDataLoaded = false
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local playerContinent
 local zoneData, artifacts, digsites = {}, {}, {}
@@ -628,24 +627,6 @@ local function ParseLootMessage(msg)
 	player, item = MatchFormat(msg, _G.LOOT_ITEM)
 
 	return player, item, tonumber(quantity)
-end
-
--- load the race related data tables
-local function LoadRaceData()
-	if _G.GetNumArchaeologyRaces() == 0 then
-		return
-	end
-
-	for race_id = 1, _G.GetNumArchaeologyRaces() do
-		local race = race_data[race_id] -- meta table should load the data
-
-		if race then -- we have race data
-			raceNameToID[race.name] = race_id
-			keystoneIDToRaceID[race.keystone.id] = race_id
-		end
-	end
-	_G.RequestArtifactCompletionHistory()
-	raceDataLoaded = true
 end
 
 -- returns a list of race ids for the continent map id
@@ -2499,7 +2480,15 @@ function Archy:UpdatePlayerPosition(force)
 		playerContinent = continent
 
 		if #race_data == 0 then
-			LoadRaceData()
+			for race_id = 1, _G.GetNumArchaeologyRaces() do
+				local race = race_data[race_id] -- metatable should load the data
+
+				if race then
+					raceNameToID[race.name] = race_id
+					keystoneIDToRaceID[race.keystone.id] = race_id
+				end
+			end
+			_G.RequestArtifactCompletionHistory()
 		end
 		ClearTomTomPoint()
 		RefreshTomTom()
