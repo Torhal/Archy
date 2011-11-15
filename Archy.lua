@@ -582,65 +582,6 @@ local function ShouldBeHidden()
 	return (not private.db.general.show or not current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or not HasArchaeology())
 end
 
-local function SolveRaceArtifact(race_id, use_stones)
-	-- The check for race_id exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
-	if race_id then
-		local artifact = artifacts[race_id]
-
-		_G.SetSelectedArtifact(race_id)
-		artifactSolved.raceId = race_id
-		artifactSolved.name = _G.GetSelectedArtifactInfo()
-		keystoneLootRaceID = race_id
-
-		if _G.type(use_stones) == "boolean" then
-			if use_stones then
-				artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, artifact.sockets)
-			else
-				artifact.keystones_added = 0
-			end
-		end
-
-		if artifact.keystones_added > 0 then
-			for index = 1, artifact.keystones_added do
-				_G.SocketItemToArtifact()
-
-				if not _G.ItemAddedToArtifact(index) then
-					break
-				end
-			end
-		elseif artifact.sockets > 0 then
-			for index = 1, artifact.keystones_added do
-				_G.RemoveItemFromArtifact()
-			end
-		end
-	end
-	Blizzard_SolveArtifact()
-end
-
-local function ToggleDistanceIndicator()
-	if IsTaintable() then
-		return
-	end
-
-	if not private.db.digsite.distanceIndicator.enabled or ShouldBeHidden() then
-		private.distance_indicator_frame:Hide()
-		return
-	end
-	private.distance_indicator_frame:Show()
-
-	if distanceIndicatorActive then
-		private.distance_indicator_frame.circle:SetAlpha(1) else private.distance_indicator_frame.circle:SetAlpha(0)
-	end
-
-	if private.db.digsite.distanceIndicator.showSurveyButton then
-		private.distance_indicator_frame.surveyButton:Show()
-		private.distance_indicator_frame:SetWidth(52 + private.distance_indicator_frame.surveyButton:GetWidth())
-	else
-		private.distance_indicator_frame.surveyButton:Hide()
-		private.distance_indicator_frame:SetWidth(42)
-	end
-end
-
 local function UpdateRaceArtifact(race_id)
 	local race = race_data[race_id]
 
@@ -702,20 +643,82 @@ local function UpdateRaceArtifact(race_id)
 
 	_G.RequestArtifactCompletionHistory()
 
-	if private.db.artifact.blacklist[race_id] then
+	if not private.db.general.show or private.db.artifact.blacklist[race_id] then
 		return
 	end
 
-	if private.db.general.show then
-		if not artifact.has_announced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
-			artifact.has_announced = true
-			Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race_data[race_id].name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
+	if not artifact.has_announced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
+		artifact.has_announced = true
+		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race_data[race_id].name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
+	end
+
+	if not artifact.has_pinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveStone)) then
+		artifact.has_pinged = true
+		_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+	end
+end
+
+local function SolveRaceArtifact(race_id, use_stones)
+	-- The check for race_id exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
+	if race_id then
+		Archy:ScheduleTimer(function()
+			UpdateRaceArtifact(race_id)
+			Archy:RefreshRacesDisplay()
+		end, 1)
+
+		local artifact = artifacts[race_id]
+
+		_G.SetSelectedArtifact(race_id)
+		artifactSolved.raceId = race_id
+		artifactSolved.name = _G.GetSelectedArtifactInfo()
+		keystoneLootRaceID = race_id
+
+		if _G.type(use_stones) == "boolean" then
+			if use_stones then
+				artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, artifact.sockets)
+			else
+				artifact.keystones_added = 0
+			end
 		end
 
-		if not artifact.has_pinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveStone)) then
-			artifact.has_pinged = true
-			_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+		if artifact.keystones_added > 0 then
+			for index = 1, artifact.keystones_added do
+				_G.SocketItemToArtifact()
+
+				if not _G.ItemAddedToArtifact(index) then
+					break
+				end
+			end
+		elseif artifact.sockets > 0 then
+			for index = 1, artifact.keystones_added do
+				_G.RemoveItemFromArtifact()
+			end
 		end
+	end
+	Blizzard_SolveArtifact()
+end
+
+local function ToggleDistanceIndicator()
+	if IsTaintable() then
+		return
+	end
+
+	if not private.db.digsite.distanceIndicator.enabled or ShouldBeHidden() then
+		private.distance_indicator_frame:Hide()
+		return
+	end
+	private.distance_indicator_frame:Show()
+
+	if distanceIndicatorActive then
+		private.distance_indicator_frame.circle:SetAlpha(1) else private.distance_indicator_frame.circle:SetAlpha(0)
+	end
+
+	if private.db.digsite.distanceIndicator.showSurveyButton then
+		private.distance_indicator_frame.surveyButton:Show()
+		private.distance_indicator_frame:SetWidth(52 + private.distance_indicator_frame.surveyButton:GetWidth())
+	else
+		private.distance_indicator_frame.surveyButton:Hide()
+		private.distance_indicator_frame:SetWidth(42)
 	end
 end
 
@@ -1168,9 +1171,6 @@ end
 
 local DIG_LOCATION_TEXTURE = 177
 local function GetContinentSites(continent_id)
-	local orig = _G.GetCurrentMapAreaID()
-	_G.SetMapZoom(continent_id)
-
 	local new_sites = {}
 
 	for index = 1, _G.GetNumMapLandmarks() do
@@ -1207,27 +1207,28 @@ local function GetContinentSites(continent_id)
 			end
 		end
 	end
-	_G.SetMapByID(orig)
 	return new_sites
 end
 
 local function UpdateSites()
-	local sites
+	local origial_map_id = _G.GetCurrentMapAreaID()
 
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		if continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
-			sites = GetContinentSites(continent_id)
+			_G.SetMapZoom(continent_id)
 
-			if digsites[continent_id] and #sites > 0 then
-				CompareAndResetDigCounters(digsites[continent_id], sites)
-				CompareAndResetDigCounters(sites, digsites[continent_id])
-			end
+			local sites = GetContinentSites(continent_id)
 
 			if #sites > 0 then
+				if digsites[continent_id] then
+					CompareAndResetDigCounters(digsites[continent_id], sites)
+					CompareAndResetDigCounters(sites, digsites[continent_id])
+				end
 				digsites[continent_id] = sites
 			end
 		end
 	end
+	_G.SetMapByID(origial_map_id)
 end
 
 function Archy:IsSiteBlacklisted(name)
