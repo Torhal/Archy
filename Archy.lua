@@ -1671,7 +1671,6 @@ function UpdateMinimapPOIs(force)
 	if _G.WorldMapButton:IsVisible() then
 		return
 	end
-
 	if lastNearestSite == nearestSite and not force then
 		return
 	end
@@ -1740,8 +1739,6 @@ function UpdateMinimapPOIs(force)
 			end
 		end
 	end
-	-- print("Calling collectgarbage for UpdateMinimapPOIs(force = ", force,")")
-	collectgarbage('collect')
 end
 
 --[[ Blob Functions ]] --
