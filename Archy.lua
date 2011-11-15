@@ -1672,77 +1672,76 @@ function UpdateMinimapPOIs(force)
 		return
 	end
 
-	if lastNearestSite ~= nearestSite or force then
-		lastNearestSite = nearestSite
-		local sites = digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
-
-		if not sites or #sites == 0 or _G.IsInInstance() then
-			ClearAllPOIs()
-			return
-		else
-			ClearInvalidPOIs()
-		end
-
-		if not player_position.x and not player_position.y then
-			return
-		end
-		local i = 1
-
-		for _, site in pairs(sites) do
-			site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
-			site.poi.active = true
-
-			Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
-
-			if ((not private.db.minimap.nearest) or (nearestSite and nearestSite.id == site.id)) and private.db.general.show and private.db.minimap.show then
-				site.poi:Show()
-				site.poi.icon:Show()
-			else
-				site.poi:Hide()
-				site.poi.icon:Hide()
-			end
-
-			if nearestSite and nearestSite.id == site.id then
-				if not site.surveyPOIs then
-					site.surveyPOIs = {}
-				end
-
-				if Archy.db.global.surveyNodes[site.id] and private.db.minimap.fragmentNodes then
-					for index, node in pairs(Archy.db.global.surveyNodes[site.id]) do
-						site.surveyPOIs[index] = GetSurveyPOI(site.id, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, site.name, site.zoneName))
-
-						local POI = site.surveyPOIs[index]
-						POI.active = true
-
-						Astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
-
-						if private.db.general.show then
-							POI:Show()
-							POI.icon:Show()
-						else
-							POI:Hide()
-							POI.icon:Hide()
-						end
-						Arrow_OnUpdate(POI, 5)
-					end
-				end
-			end
-
-			Arrow_OnUpdate(site.poi, 5)
-		end
-		--UpdateMinimapEdges()
-		if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
-			for id, poi in pairs(allPois) do
-				if poi.active and poi.type == "survey" then
-					poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
-				end
-			end
-		end
-		-- print("Calling collectgarbage for UpdateMinimapPOIs(force = ", force,")")
-		collectgarbage('collect')
-	else
-		--        if lastNearestSite then UpdateMinimapEdges() end
+	if lastNearestSite == nearestSite and not force then
+		return
 	end
+	lastNearestSite = nearestSite
+
+	local sites = digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
+
+	if not sites or #sites == 0 or _G.IsInInstance() then
+		ClearAllPOIs()
+		return
+	end
+	ClearInvalidPOIs()
+
+	if not player_position.x and not player_position.y then
+		return
+	end
+	local i = 1
+
+	for _, site in pairs(sites) do
+		site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
+		site.poi.active = true
+
+		Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
+
+		if (not private.db.minimap.nearest or (nearestSite and nearestSite.id == site.id)) and private.db.general.show and private.db.minimap.show then
+			site.poi:Show()
+			site.poi.icon:Show()
+		else
+			site.poi:Hide()
+			site.poi.icon:Hide()
+		end
+
+		if nearestSite and nearestSite.id == site.id then
+			if not site.surveyPOIs then
+				site.surveyPOIs = {}
+			end
+
+			if Archy.db.global.surveyNodes[site.id] and private.db.minimap.fragmentNodes then
+				for index, node in pairs(Archy.db.global.surveyNodes[site.id]) do
+					site.surveyPOIs[index] = GetSurveyPOI(site.id, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, site.name, site.zoneName))
+
+					local POI = site.surveyPOIs[index]
+					POI.active = true
+
+					Astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
+
+					if private.db.general.show then
+						POI:Show()
+						POI.icon:Show()
+					else
+						POI:Hide()
+						POI.icon:Hide()
+					end
+					Arrow_OnUpdate(POI, 5)
+				end
+			end
+		end
+
+		Arrow_OnUpdate(site.poi, 5)
+	end
+	--UpdateMinimapEdges()
+	if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
+		for id, poi in pairs(allPois) do
+			if poi.active and poi.type == "survey" then
+				poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
+			end
+		end
+	end
+	-- print("Calling collectgarbage for UpdateMinimapPOIs(force = ", force,")")
+	collectgarbage('collect')
 end
 
 --[[ Blob Functions ]] --
