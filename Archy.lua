@@ -661,10 +661,11 @@ end
 local function SolveRaceArtifact(race_id, use_stones)
 	-- The check for race_id exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
 	if race_id then
-		Archy:ScheduleTimer(function()
-			UpdateRaceArtifact(race_id)
-			Archy:RefreshRacesDisplay()
-		end, 1)
+		--TODO: Make this shit work. FFS.
+		--		Archy:ScheduleTimer(function()
+		--			UpdateRaceArtifact(race_id)
+		--			Archy:RefreshRacesDisplay()
+		--		end, 1)
 
 		local artifact = artifacts[race_id]
 
@@ -1164,6 +1165,7 @@ local function CompareAndResetDigCounters(a, b)
 		end
 
 		if not exists then
+			--			print(("CompareAndResetDigCounters: Resetting counter for %s"):format(siteA.id))
 			Archy.db.char.digsites.stats[siteA.id].counter = 0
 		end
 	end
