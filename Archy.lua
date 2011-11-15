@@ -354,7 +354,6 @@ local Blizzard_SolveArtifact
 local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local UpdateMinimapPOIs
 local UpdateSiteBlobs
-local TrapWorldMouse
 
 -----------------------------------------------------------------------
 -- Metatables.
@@ -1388,11 +1387,6 @@ function Archy:InjectSurveyNode(siteId, map, level, x, y)
 	end
 end
 
-function Archy:ClearSurveyNodeDB()
-	Archy.db.global.surveyNodes = {}
-	collectgarbage('collect')
-end
-
 local DISTANCE_COLOR_TEXCOORDS = {
 	green = {
 		0, 0.24609375, 0, 1
@@ -1680,7 +1674,6 @@ function UpdateMinimapPOIs(force)
 
 	if lastNearestSite ~= nearestSite or force then
 		lastNearestSite = nearestSite
-		local validSiteIDs = GetContinentSiteIDs()
 		local sites = digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
 
 		if not sites or #sites == 0 or _G.IsInInstance() then
