@@ -58,6 +58,7 @@ end
 local DIG_SITES = private.dig_sites
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[#_G.PROFESSION_RANKS][1]
 local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in OnInitialize()
+local MAP_CONTINENTS = { _G.GetMapContinents() }
 local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_ZONE_NAME = {} -- Popupated in OnInitialize()
@@ -1166,17 +1167,16 @@ local function CompareAndResetDigCounters(a, b)
 end
 
 local DIG_LOCATION_TEXTURE = 177
-
 local function GetContinentSites(continent_id)
-	local sites, orig = {}, _G.GetCurrentMapAreaID()
+	local orig = _G.GetCurrentMapAreaID()
 	_G.SetMapZoom(continent_id)
 
-	local totalPOIs = _G.GetNumMapLandmarks()
+	local new_sites = {}
 
-	for index = 1, totalPOIs do
-		local name, description, textureIndex, px, py = _G.GetMapLandmarkInfo(index)
+	for index = 1, _G.GetNumMapLandmarks() do
+		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
 
-		if textureIndex == DIG_LOCATION_TEXTURE then
+		if texture_index == DIG_LOCATION_TEXTURE then
 			local zone_name, map_file, texPctX, texPctY, texX, texY, scrollX, scrollY = _G.UpdateMapHighlight(px, py)
 			local site = DIG_SITES[name]
 			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
@@ -1203,30 +1203,29 @@ local function GetContinentSites(continent_id)
 					id = site.blob,
 					distance = 999999,
 				}
-				table.insert(sites, digsite)
+				table.insert(new_sites, digsite)
 			end
 		end
 	end
 	_G.SetMapByID(orig)
-	return sites
+	return new_sites
 end
 
 local function UpdateSites()
 	local sites
 
-	for continent_id, continent_name in pairs{ _G.GetMapContinents() } do
-		if not digsites[continent_id] then
-			digsites[continent_id] = {}
-		end
-		sites = GetContinentSites(continent_id)
+	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
+		if continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
+			sites = GetContinentSites(continent_id)
 
-		if #sites > 0 and continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
-			CompareAndResetDigCounters(digsites[continent_id], sites)
-			CompareAndResetDigCounters(sites, digsites[continent_id])
-		end
+			if digsites[continent_id] and #sites > 0 then
+				CompareAndResetDigCounters(digsites[continent_id], sites)
+				CompareAndResetDigCounters(sites, digsites[continent_id])
+			end
 
-		if #sites > 0 then
-			digsites[continent_id] = sites
+			if #sites > 0 then
+				digsites[continent_id] = sites
+			end
 		end
 	end
 end
@@ -2054,7 +2053,7 @@ function Archy:OnInitialize()
 	-- Cache the zone/map data so it can be restored after populating the constant tables.
 	local orig = _G.GetCurrentMapAreaID()
 
-	for continent_id, continent_name in pairs{ _G.GetMapContinents() } do
+	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		_G.SetMapZoom(continent_id)
 		local map_id = _G.GetCurrentMapAreaID()
 		local map_file_name = _G.GetMapInfo()
@@ -2425,15 +2424,16 @@ function Archy:UpdateSkillBar()
 	if not current_continent then
 		return
 	end
-
-	local rank, maxRank = GetArchaeologyRank()
 	local races_frame = private.races_frame
 
-	if races_frame and races_frame.skillBar then
-		races_frame.skillBar:SetMinMaxValues(0, maxRank)
-		races_frame.skillBar:SetValue(rank)
-		races_frame.skillBar.text:SetFormattedText("%s : %d/%d", _G.GetArchaeologyInfo(), rank, maxRank)
+	if not races_frame or not races_frame.skillBar then
+		return
 	end
+	local rank, maxRank = GetArchaeologyRank()
+
+	races_frame.skillBar:SetMinMaxValues(0, maxRank)
+	races_frame.skillBar:SetValue(rank)
+	races_frame.skillBar.text:SetFormattedText("%s : %d/%d", _G.GetArchaeologyInfo(), rank, maxRank)
 end
 
 --[[ Positional functions ]] --
@@ -2775,25 +2775,29 @@ function Archy:RefreshRacesDisplay()
 					child.fragmentBar.keystones:Hide()
 				end
 			else
-				for ki = 1, (_G.ARCHAEOLOGY_MAX_STONES or 4) do
-					if ki > artifact.sockets or not race.keystone.name then
-						child.fragmentBar["keystone" .. ki]:Hide()
+				for keystone_index = 1, (_G.ARCHAEOLOGY_MAX_STONES or 4) do
+					local field = "keystone" .. keystone_index
+
+					if keystone_index > artifact.sockets or not race.keystone.name then
+						child.fragmentBar[field]:Hide()
 					else
-						child.fragmentBar["keystone" .. ki].icon:SetTexture(race.keystone.texture)
-						if ki <= artifact.keystones_added then
-							child.fragmentBar["keystone" .. ki].icon:Show()
-							child.fragmentBar["keystone" .. ki].tooltip = _G.ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP:format(race.keystone.name)
-							child.fragmentBar["keystone" .. ki]:Enable()
+						child.fragmentBar[field].icon:SetTexture(race.keystone.texture)
+
+						if keystone_index <= artifact.keystones_added then
+							child.fragmentBar[field].icon:Show()
+							child.fragmentBar[field].tooltip = _G.ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP:format(race.keystone.name)
+							child.fragmentBar[field]:Enable()
 						else
-							child.fragmentBar["keystone" .. ki].icon:Hide()
-							child.fragmentBar["keystone" .. ki].tooltip = _G.ARCHAEOLOGY_KEYSTONE_ADD_TOOLTIP:format(race.keystone.name)
-							child.fragmentBar["keystone" .. ki]:Enable()
+							child.fragmentBar[field].icon:Hide()
+							child.fragmentBar[field].tooltip = _G.ARCHAEOLOGY_KEYSTONE_ADD_TOOLTIP:format(race.keystone.name)
+							child.fragmentBar[field]:Enable()
+
 							if endFound then
-								child.fragmentBar["keystone" .. ki]:Disable()
+								child.fragmentBar[field]:Disable()
 							end
 							endFound = true
 						end
-						child.fragmentBar["keystone" .. ki]:Show()
+						child.fragmentBar[field]:Show()
 					end
 				end
 			end
