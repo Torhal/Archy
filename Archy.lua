@@ -3137,13 +3137,12 @@ function Archy:RefreshDigSiteDisplay()
 					site_frame:SetHeight(40)
 				end
 			end
-			count = (count and count > 0) and tostring(count) or ""
+			site_frame.digCounter.value:SetText(count or "")
 		else
-			count = (count and tostring(count) or "0") .. "/3"
+			site_frame.digCounter.value:SetFormattedText("%d/3", count or 0)
 		end
 
 		site_frame.distance.value:SetFormattedText(L["%d yards"], site.distance)
-		site_frame.digCounter.value:SetText(count)
 
 		if self:IsSiteBlacklisted(site.name) then
 			site_frame.site.name:SetFormattedText("|cFFFF0000%s", site.name)
