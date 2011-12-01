@@ -283,10 +283,6 @@ local PROFILE_DEFAULTS = {
 			fragmentNodes = true,
 			fragmentIcon = "CyanDot",
 			fragmentColorBySurveyDistance = true,
-			blob = false,
-			zoneBlob = false,
-			blobAlpha = 0.25,
-			blobDistance = 400,
 			useBlobDistance = true,
 		},
 		tooltip = {
@@ -354,7 +350,6 @@ local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 local Blizzard_SolveArtifact
 local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local UpdateMinimapPOIs
-local UpdateSiteBlobs
 
 -----------------------------------------------------------------------
 -- Metatables.
@@ -400,23 +395,6 @@ setmetatable(artifacts, {
 			}
 			return t[k]
 		end
-	end
-})
-
-
-local blobs = setmetatable({}, {
-	__index = function(t, k)
-		local f = _G.CreateFrame("ArchaeologyDigSiteFrame", "Archy" .. k .. "_Blob")
-		_G.rawset(t, k, f)
-		f:ClearAllPoints()
-		f:EnableMouse(false)
-		f:SetFillAlpha(256 * private.db.minimap.blobAlpha)
-		f:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
-		f:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
-		f:EnableSmoothing(true)
-		f:SetBorderScalar(0.1)
-		f:Hide()
-		return f
 	end
 })
 
@@ -1083,7 +1061,6 @@ local CONFIG_UPDATE_FUNCTIONS = {
 	end,
 	minimap = function(option)
 		UpdateMinimapPOIs(true)
-		UpdateSiteBlobs()
 	end,
 	tomtom = function(option)
 		local db = private.db
@@ -1107,7 +1084,6 @@ function Archy:ConfigUpdated(namespace, option)
 		self:UpdateDigSiteFrame()
 		self:RefreshDigSiteDisplay()
 		UpdateMinimapPOIs(true)
-		UpdateSiteBlobs()
 		RefreshTomTom()
 	end
 end
@@ -1287,7 +1263,6 @@ function Archy:UpdateSiteDistances()
 		nearestSite = nearest
 		tomtomActive = true
 		RefreshTomTom()
-		UpdateSiteBlobs()
 		UpdateMinimapPOIs()
 
 		if private.db.digsite.announceNearest and private.db.general.show then
@@ -1742,105 +1717,6 @@ function UpdateMinimapPOIs(force)
 		end
 	end
 end
-
---[[ Blob Functions ]] --
-local MinimapBlobSetPositionAndSize
-do
-	local old_pw, old_ph
-
-	function MinimapBlobSetPositionAndSize(blob)
-		if not blob or not player_position.x or not player_position.y then
-			return
-		end
-		local dx = (player_position.x - 0.5) * blob:GetWidth()
-		local dy = (player_position.y - 0.5) * blob:GetHeight()
-		blob:ClearAllPoints()
-		blob:SetPoint("CENTER", _G.Minimap, "CENTER", -dx, dy)
-
-		local mapWidth = blob:GetParent():GetWidth()
-		local mapHeight = blob:GetParent():GetHeight()
-		local mapSizePix = math.min(mapWidth, mapHeight)
-
-		local indoors = _G.GetCVar("minimapZoom") + 0 == _G.Minimap:GetZoom() and "outdoor" or "indoor"
-		local zoom = _G.Minimap:GetZoom()
-		local mapSizeYards = MINIMAP_SIZES[indoors][zoom]
-
-		if not player_position.map or player_position.map == -1 then
-			return
-		end
-
-		local _, _, yw, yh, _, _ = Astrolabe:GetMapInfo(player_position.map, player_position.level)
-		local pw = yw * mapSizePix / mapSizeYards
-		local ph = yh * mapSizePix / mapSizeYards
-
-		if pw == old_pw and ph == old_ph then
-			return
-		end
-		old_pw, old_ph = pw, ph
-
-		blob:SetSize(pw, ph)
-
-		blob:SetFillAlpha(256 * private.db.minimap.blobAlpha)
-	end
-end -- do-block
-
-local function RefreshBlobInfo(f)
-	f:DrawNone()
-	local numEntries = _G.ArchaeologyMapUpdateAll()
-
-	for i = 1, numEntries do
-		local blobID = _G.ArcheologyGetVisibleBlobID(i)
-		f:DrawBlob(blobID, true)
-	end
-end
-
-function UpdateSiteBlobs()
-	if IsTaintable() then
-		return
-	end
-
-	if _G.BattlefieldMinimap then
-		if private.db.minimap.zoneBlob and private.db.general.show and not _G.IsInInstance() then
-			local blob = blobs["Battlefield"]
-			if blob:GetParent() ~= _G.BattlefieldMinimap then -- set the battlefield map parent
-				blob:SetParent(_G.BattlefieldMinimap)
-				blob:ClearAllPoints()
-				blob:SetAllPoints(_G.BattlefieldMinimap)
-				blob:SetFrameLevel(_G.BattlefieldMinimap:GetFrameLevel() + 2)
-			end
-			RefreshBlobInfo(blob)
-			if not blob:IsShown() then blob:Show()
-			end
-		elseif blobs["Battlefield"]:IsShown() then
-			blobs["Battlefield"]:Hide()
-		end
-	end
-
-	if private.db.minimap.show and private.db.minimap.blob and private.db.general.show and not _G.IsInInstance() then
-		local blob = blobs["Minimap"]
-
-		if blob:GetParent() ~= _G.Minimap then -- set the minimap parent
-			blob:SetParent(_G.Minimap)
-			blob:SetFrameLevel(_G.Minimap:GetFrameLevel() + 2)
-		end
-
-		if (private.db.minimap.useBlobDistance and nearestSite and nearestSite.distance and (nearestSite.distance > private.db.minimap.blobDistance)) then
-			if blob:IsShown() then blob:Hide()
-			end
-			return
-		end
-
-		RefreshBlobInfo(blob)
-		MinimapBlobSetPositionAndSize(blob)
-
-		if not blob:IsShown() then
-			blob:Show()
-		end
-	elseif blobs["Minimap"]:IsShown() then
-		blobs["Minimap"]:Hide()
-	end
-end
-
 
 --[[ TomTom Functions ]] --
 -- clear the waypoint we gave tomtom
@@ -2364,7 +2240,6 @@ end
 
 function Archy:PLAYER_REGEN_DISABLED()
 	in_combat = true
-	blobs["Minimap"]:DrawNone()
 end
 
 function Archy:PLAYER_REGEN_ENABLED()
@@ -2501,7 +2376,6 @@ function Archy:RefreshAll()
 		self:UpdateSiteDistances()
 		UpdateDistanceIndicator()
 		UpdateMinimapPOIs()
-		UpdateSiteBlobs()
 	end
 	self:RefreshDigSiteDisplay()
 end

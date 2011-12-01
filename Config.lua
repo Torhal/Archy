@@ -1313,174 +1313,77 @@ local function GetMinimapOptions()
 		minimap_options = {
 			order = 5,
 			type = "group",
-			childGroups = "tab",
 			name = _G.MINIMAP_LABEL,
 			desc = L["Minimap Options"],
 			args = {
-				options = {
-					name = _G.GENERAL_LABEL,
+				desc = {
 					order = 0,
-					type = "group",
-					args = {
-						desc = {
-							order = 0,
-							type = "description",
-							name = L["Control various aspects of Minimap options"],
-						},
-						show = {
-							order = 1,
-							type = "toggle",
-							name = L["Show Dig Sites"],
-							desc = L["Show your dig sites on the minimap"],
-							get = function() return db.minimap.show end,
-							set = function(_, value)
-								db.minimap.show = value
-								Archy:ConfigUpdated('minimap')
-							end,
-						},
-						nearest = {
-							order = 2,
-							type = "toggle",
-							name = L["Nearest only"],
-							desc = L["Show only the nearest dig site on the minimap"],
-							get = function() return db.minimap.nearest end,
-							set = function(_, value)
-								db.minimap.nearest = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							disabled = function() return not db.minimap.show end,
-						},
-						fragmentNodes = {
-							order = 3,
-							type = "toggle",
-							name = L["Show Fragment Nodes"],
-							desc = L["Show the locations where you have collected fragments"],
-							get = function() return db.minimap.fragmentNodes end,
-							set = function(_, value)
-								db.minimap.fragmentNodes = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							width = "double",
-						},
-						fragmentIcon = {
-							order = 3.5,
-							name = L["Node Icon"],
-							desc = L["Icon to use for the fragment node icon"],
-							type = "select",
-							values = {
-								["CyanDot"] = L["Light Blue Dot"],
-								["Cross"] = L["Cross"],
-							},
-							get = function()
-								return db.minimap.fragmentIcon
-							end,
-							set = function(_, value)
-								db.minimap.fragmentIcon = value
-								Archy:ConfigUpdated('minimap')
-							end,
-						},
-						fragmentColorBySurveyDistance = {
-							order = 4,
-							name = L["Color Node Icons On Survey"],
-							desc = L["Color code the fragment node icon based on the survey distance"],
-							type = "toggle",
-							get = function() return db.minimap.fragmentColorBySurveyDistance end,
-							set = function(_, value)
-								db.minimap.fragmentColorBySurveyDistance = value
-								Archy:ConfigUpdated('minimap')
-							end,
-						},
-					},
+					type = "description",
+					name = L["Control various aspects of Minimap options"],
 				},
-				blobs = {
-					name = L["Dig Site Boundaries"],
+				show = {
 					order = 1,
-					type = "group",
-					args = {
-						blob = {
-							order = 4,
-							type = "toggle",
-							name = L["Show Dig Site Boundaries on minimap"],
-							desc = L["Show the dig site boundaries on the minimap"],
-							width = "double",
-							get = function() return db.minimap.blob end,
-							set = function(_, value)
-								db.minimap.blob = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							width = "full",
-						},
-						zoneMapBlob = {
-							order = 5,
-							type = "toggle",
-							name = L["Show Dig Site Boundaries on battlefield map"],
-							desc = L["Show the dig site boundaries on the battlefield map"],
-							width = "double",
-							get = function() return db.minimap.zoneBlob end,
-							set = function(_, value)
-								db.minimap.zoneBlob = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							width = "full",
-						},
-						blobAlpha = {
-							order = 6,
-							type = "range",
-							name = _G.OPACITY,
-							desc = L["Set how transparent or opaque the Dig Site boundaries are"],
-							min = 0.25,
-							max = 1,
-							step = 0.01,
-							bigStep = 0.05,
-							get = function()
-								return db.minimap.blobAlpha
-							end,
-							set = function(_, value)
-								db.minimap.blobAlpha = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							disabled = function()
-								return not db.minimap.blob and not db.minimap.zoneBlob
-							end,
-						},
-						useBlobDistance = {
-							order = 4.4,
-							type = "toggle",
-							name = L["Enable \"Arrival Distance\""],
-							desc = L["This setting will control the distance at which the minimap blob will become visible.\nNOTE: This is a semi-workaround for the boundaries exceeding the minimap area."],
-							get = function()
-								return db.minimap.useBlobDistance
-							end,
-							set = function(_, value)
-								db.minimap.useBlobDistance = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							disabled = function()
-								return not db.minimap.blob
-							end,
-							width = "full",
-						},
-						blobDistance = {
-							order = 4.5,
-							type = "range",
-							name = L["\"Arrival Distance\""],
-							desc = L["This setting will control the distance at which the minimap blob will become visible.\nNOTE: This is a semi-workaround for the boundaries exceeding the minimap area."],
-							min = 0,
-							max = 550,
-							step = 5,
-							get = function()
-								return db.minimap.blobDistance
-							end,
-							set = function(_, value)
-								db.minimap.blobDistance = value
-								Archy:ConfigUpdated('minimap')
-							end,
-							disabled = function()
-								return not db.minimap.blob or not db.minimap.useBlobDistance
-							end,
-							--                    width = "double"
-						},
+					type = "toggle",
+					name = L["Show Dig Sites"],
+					desc = L["Show your dig sites on the minimap"],
+					get = function() return db.minimap.show end,
+					set = function(_, value)
+						db.minimap.show = value
+						Archy:ConfigUpdated('minimap')
+					end,
+				},
+				nearest = {
+					order = 2,
+					type = "toggle",
+					name = L["Nearest only"],
+					desc = L["Show only the nearest dig site on the minimap"],
+					get = function() return db.minimap.nearest end,
+					set = function(_, value)
+						db.minimap.nearest = value
+						Archy:ConfigUpdated('minimap')
+					end,
+					disabled = function() return not db.minimap.show end,
+				},
+				fragmentNodes = {
+					order = 3,
+					type = "toggle",
+					width = "full",
+					name = L["Show Fragment Nodes"],
+					desc = L["Show the locations where you have collected fragments"],
+					get = function() return db.minimap.fragmentNodes end,
+					set = function(_, value)
+						db.minimap.fragmentNodes = value
+						Archy:ConfigUpdated('minimap')
+					end,
+				},
+				fragmentColorBySurveyDistance = {
+					order = 3.5,
+					name = L["Color Node Icons On Survey"],
+					desc = L["Color code the fragment node icon based on the survey distance"],
+					type = "toggle",
+					width = "double",
+					get = function() return db.minimap.fragmentColorBySurveyDistance end,
+					set = function(_, value)
+						db.minimap.fragmentColorBySurveyDistance = value
+						Archy:ConfigUpdated('minimap')
+					end,
+				},
+				fragmentIcon = {
+					order = 4,
+					name = L["Node Icon"],
+					desc = L["Icon to use for the fragment node icon"],
+					type = "select",
+					values = {
+						["CyanDot"] = L["Light Blue Dot"],
+						["Cross"] = L["Cross"],
 					},
+					get = function()
+						return db.minimap.fragmentIcon
+					end,
+					set = function(_, value)
+						db.minimap.fragmentIcon = value
+						Archy:ConfigUpdated('minimap')
+					end,
 				},
 			},
 		}
@@ -1503,6 +1406,7 @@ local function GetTooltipOptions()
 				filterLDB = {
 					order = 1,
 					type = "toggle",
+					width = "full",
 					name = L["Filter tooltip to Continent"],
 					desc = L["Filter the tooltip to only include the current continent"],
 					get = function()
@@ -1514,20 +1418,20 @@ local function GetTooltipOptions()
 					end,
 				},
 				scale = {
-					order	= 2,
-					type	= "range",
-					width	= "full",
-					name	= L["Tooltip Scale"],
-					desc	= L["Move the slider to adjust the scale of the tooltip."],
-					min	= 0.5,
-					max	= 1.5,
-					step	= 0.01,
-					get	= function()
-							  return db.tooltip.scale
-						  end,
-					set	= function(info, value)
-							  db.tooltip.scale = _G.math.max(0.5, _G.math.min(1.5, value))
-						  end,
+					order = 2,
+					type = "range",
+					width = "full",
+					name = L["Tooltip Scale"],
+					desc = L["Move the slider to adjust the scale of the tooltip."],
+					min = 0.5,
+					max = 1.5,
+					step = 0.01,
+					get = function()
+						return db.tooltip.scale
+					end,
+					set = function(info, value)
+						db.tooltip.scale = _G.math.max(0.5, _G.math.min(1.5, value))
+					end,
 				},
 			},
 		}

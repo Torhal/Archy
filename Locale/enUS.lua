@@ -261,8 +261,6 @@ L["The outline that the header text will use"] = true
 L["The outline that the zone and distance will use"] = true
 L["The style of display for Archy.  This will reload your UI after selecting"] = true
 L["Thick Outline"] = true
-L[ [=[This setting will control the distance at which the minimap blob will become visible.
-NOTE: This is a semi-workaround for the boundaries exceeding the minimap area.]=] ] = true
 L[ [=[This setting will control the distance at which the waypoint arrow switches to a downwards arrow, indicating you have arrived at your destination.
 NOTE: This may not work with emulation addons if they do not support this.]=] ] = true
 L["Toast"] = true
