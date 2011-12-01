@@ -1202,7 +1202,7 @@ local function GetContinentSites(continent_id)
 					y = y,
 					name = name,
 					raceId = site.race,
-					id = site.blob,
+					id = site.blob_id,
 					distance = 999999,
 				}
 				table.insert(new_sites, digsite)
@@ -1311,10 +1311,10 @@ function Archy:ImportOldStatsDB()
 		if key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" then
 			if DIG_SITES[key] then
 				local site = DIG_SITES[key]
-				site_stats[site.blob].surveys = (site_stats[site.blob].surveys or 0) + (st.surveys or 0)
-				site_stats[site.blob].fragments = (site_stats[site.blob].fragments or 0) + (st.fragments or 0)
-				site_stats[site.blob].looted = (site_stats[site.blob].looted or 0) + (st.looted or 0)
-				site_stats[site.blob].keystones = (site_stats[site.blob].keystones or 0) + (st.keystones or 0)
+				site_stats[site.blob_id].surveys = (site_stats[site.blob_id].surveys or 0) + (st.surveys or 0)
+				site_stats[site.blob_id].fragments = (site_stats[site.blob_id].fragments or 0) + (st.fragments or 0)
+				site_stats[site.blob_id].looted = (site_stats[site.blob_id].looted or 0) + (st.looted or 0)
+				site_stats[site.blob_id].keystones = (site_stats[site.blob_id].keystones or 0) + (st.keystones or 0)
 				self.db.char.digsites[key] = nil
 			end
 		end
