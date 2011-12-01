@@ -542,15 +542,15 @@ local function GetArchaeologyRank()
 end
 
 local function GetArtifactStats(race_id, name)
-	local numArtifacts = _G.GetNumArtifactsByRace(race_id)
+	local num_artifacts = _G.GetNumArtifactsByRace(race_id)
 
-	if not numArtifacts then
+	if not num_artifacts then
 		return
 	end
 
-	for artifact_index = 1, numArtifacts do
-		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
-		if name == artifactName then
+	for artifact_index = 1, num_artifacts do
+		local artifact_name, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
+		if name == artifact_name then
 			return artifact_index, firstCompletionTime, completionCount
 		end
 	end
