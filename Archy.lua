@@ -673,6 +673,7 @@ end
 
 local function ToggleDistanceIndicator()
 	if IsTaintable() then
+		private.toggle_distance = true
 		return
 	end
 
@@ -2253,6 +2254,18 @@ function Archy:PLAYER_REGEN_ENABLED()
 	if private.create_frames then
 		InitializeFrames()
 	end
+
+	if private.toggle_distance then
+		ToggleDistanceIndicator()
+	end
+
+	if private.update_races then
+		self:UpdateRacesFrame()
+	end
+
+	if private.update_digsites then
+		self:UpdateDigSiteFrame()
+	end
 end
 
 function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
@@ -2399,6 +2412,7 @@ end
 
 function Archy:UpdateRacesFrame()
 	if IsTaintable() then
+		private.update_races = true
 		return
 	end
 	local races_frame = private.races_frame
@@ -2782,6 +2796,7 @@ end
 
 function Archy:UpdateDigSiteFrame()
 	if IsTaintable() then
+		private.update_digsites = true
 		return
 	end
 	private.digsite_frame:SetScale(private.db.digsite.scale)
