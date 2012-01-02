@@ -2015,6 +2015,7 @@ function Archy:OnEnable()
 	_G.SlashCmdList["ARCHY"] = SlashHandler
 
 	--    self:RegisterEvent("ARTIFACT_UPDATE", "ArtifactUpdated")
+	self:RegisterEvent("ARTIFACT_COMPLETE")
 	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("CHAT_MSG_LOOT", "LootReceived")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
@@ -2097,6 +2098,16 @@ end
 -----------------------------------------------------------------------
 -- Event handlers.
 -----------------------------------------------------------------------
+function Archy:ARTIFACT_COMPLETE(event, name)
+	for race_id, artifact in pairs(artifacts) do
+		if artifact.name == name then
+			UpdateRaceArtifact(race_id)
+			break
+		end
+	end
+	self:RefreshRacesDisplay()
+end
+
 function Archy:ARTIFACT_HISTORY_READY()
 	for race_id, artifact in pairs(artifacts) do
 		local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
