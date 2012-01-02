@@ -319,7 +319,7 @@ local artifactSolved = {
 }
 
 local current_continent
-local digsites = {}
+local continent_digsites = {}
 local distanceIndicatorActive = false
 local is_looting = false
 local keystoneIDToRaceID = {}
@@ -887,17 +887,17 @@ function LDB_object:OnEnter()
 		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", num_columns)
 		tooltip:AddSeparator()
 
-		for continent_id, continent_sites in pairs(digsites) do
-			if #continent_sites > 0 and (continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] or not private.db.tooltip.filter_continent) then
-				local continentName
+		for continent_id, continent_sites in pairs(continent_digsites) do
+			if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == MAP_ID_TO_CONTINENT_ID[current_continent]) then
+				local continent_name
 				for _, zone in pairs(ZONE_DATA) do
 					if zone.continent == continent_id and zone.id == 0 then
-						continentName = zone.name
+						continent_name = zone.name
 						break
 					end
 				end
 				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continentName .. "|r", "LEFT", num_columns)
+				tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns)
 
 				line = tooltip:AddLine(" ")
 				tooltip:SetCell(line, 1, " ", "LEFT", 1)
@@ -1182,22 +1182,32 @@ local function GetContinentSites(continent_id)
 	return new_sites
 end
 
-local function UpdateSites()
+local function UpdateSite(continent_id)
+	_G.SetMapZoom(continent_id)
+
+	local sites = GetContinentSites(continent_id)
+
+	if #sites > 0 then
+		if continent_digsites[continent_id] then
+			CompareAndResetDigCounters(continent_digsites[continent_id], sites)
+			CompareAndResetDigCounters(sites, continent_digsites[continent_id])
+		end
+		continent_digsites[continent_id] = sites
+	end
+end
+
+local function UpdateAllSites()
+	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
 	local origial_map_id = _G.GetCurrentMapAreaID()
 
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
-		if continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
-			_G.SetMapZoom(continent_id)
-
-			local sites = GetContinentSites(continent_id)
-
-			if #sites > 0 then
-				if digsites[continent_id] then
-					CompareAndResetDigCounters(digsites[continent_id], sites)
-					CompareAndResetDigCounters(sites, digsites[continent_id])
-				end
-				digsites[continent_id] = sites
+		if private.db.tooltip.filter_continent then
+			if continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
+				UpdateSite(continent_id)
+				break
 			end
+		else
+			UpdateSite(continent_id)
 		end
 	end
 	_G.SetMapByID(origial_map_id)
@@ -1230,14 +1240,14 @@ local function SortSitesByName(a, b)
 end
 
 function Archy:UpdateSiteDistances()
-	if not digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] or (#digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] == 0) then
+	if not continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] or (#continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] == 0) then
 		nearestSite = nil
 		return
 	end
 	local distance, nearest
 
 	for index = 1, SITES_PER_CONTINENT do
-		local site = digsites[MAP_ID_TO_CONTINENT_ID[current_continent]][index]
+		local site = continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]][index]
 
 		if site.poi then
 			site.distance = Astrolabe:GetDistanceToIcon(site.poi)
@@ -1265,7 +1275,7 @@ function Archy:UpdateSiteDistances()
 	end
 
 	-- Sort sites
-	local sites = digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
+	local sites = continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
 	if private.db.digsite.sortByDistance then
 		table.sort(sites, SortSitesByDistance)
 	else -- sort by zone then name
@@ -1604,8 +1614,8 @@ local function GetContinentSiteIDs()
 		return validSiteIDs
 	end
 
-	if digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] then
-		for _, site in pairs(digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]) do
+	if continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] then
+		for _, site in pairs(continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]) do
 			table.insert(validSiteIDs, site.id)
 		end
 	end
@@ -1647,7 +1657,7 @@ function UpdateMinimapPOIs(force)
 	end
 	lastNearestSite = nearestSite
 
-	local sites = digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
+	local sites = continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
 
 	if not sites or #sites == 0 or _G.IsInInstance() then
 		ClearAllPOIs()
@@ -2127,7 +2137,7 @@ function Archy:ARTIFACT_DIG_SITE_UPDATED()
 	if not current_continent then
 		return
 	end
-	UpdateSites()
+	UpdateAllSites()
 	self:UpdateSiteDistances()
 	self:RefreshDigSiteDisplay()
 end
@@ -2377,7 +2387,7 @@ function Archy:UpdatePlayerPosition(force)
 	end
 	ClearTomTomPoint()
 	RefreshTomTom()
-	UpdateSites()
+	UpdateAllSites()
 
 	if _G.GetNumArchaeologyRaces() > 0 then
 		for race_id = 1, _G.GetNumArchaeologyRaces() do
@@ -2844,11 +2854,11 @@ function Archy:UpdateDigSiteFrame()
 	local continent_id = MAP_ID_TO_CONTINENT_ID[current_continent]
 
 	if private.digsite_frame:IsVisible() then
-		if private.db.general.stealthMode or not private.db.digsite.show or ShouldBeHidden() or not digsites[continent_id] or #digsites[continent_id] == 0 then
+		if private.db.general.stealthMode or not private.db.digsite.show or ShouldBeHidden() or not continent_digsites[continent_id] or #continent_digsites[continent_id] == 0 then
 			private.digsite_frame:Hide()
 		end
 	else
-		if not private.db.general.stealthMode and private.db.digsite.show and not ShouldBeHidden() and digsites[continent_id] and #digsites[continent_id] > 0 then
+		if not private.db.general.stealthMode and private.db.digsite.show and not ShouldBeHidden() and continent_digsites[continent_id] and #continent_digsites[continent_id] > 0 then
 			private.digsite_frame:Show()
 		end
 	end
@@ -3002,7 +3012,7 @@ function Archy:RefreshDigSiteDisplay()
 	end
 	local continent_id = MAP_ID_TO_CONTINENT_ID[current_continent]
 
-	if not continent_id or not digsites[continent_id] or #digsites[continent_id] == 0 then
+	if not continent_id or not continent_digsites[continent_id] or #continent_digsites[continent_id] == 0 then
 		return
 	end
 
@@ -3010,13 +3020,13 @@ function Archy:RefreshDigSiteDisplay()
 		site_frame:Hide()
 	end
 
-	for _, site in pairs(digsites[continent_id]) do
+	for _, site in pairs(continent_digsites[continent_id]) do
 		if not site.distance then
 			return
 		end
 	end
 
-	for site_index, site in pairs(digsites[continent_id]) do
+	for site_index, site in pairs(continent_digsites[continent_id]) do
 		local site_frame = private.digsite_frame.children[site_index]
 		local count = self.db.char.digsites.stats[site.id].counter
 
