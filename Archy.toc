@@ -51,6 +51,7 @@ Locale\deDE.lua
 Locale\frFR.lua
 Locale\koKR.lua
 Locale\ruRU.lua
+Locale\ptBR.lua
 Locale\zhCN.lua
 Locale\zhTW.lua
 
