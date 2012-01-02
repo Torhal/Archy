@@ -2337,7 +2337,7 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not private.db.general.show or not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
+	if not force and (not private.db.general.show or not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player")) then
 		return
 	end
 
