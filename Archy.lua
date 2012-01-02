@@ -321,7 +321,6 @@ local artifactSolved = {
 local current_continent
 local digsites = {}
 local distanceIndicatorActive = false
-local in_combat = false
 local is_looting = false
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
@@ -541,7 +540,7 @@ local function HasArchaeology()
 end
 
 local function IsTaintable()
-	return (in_combat or _G.InCombatLockdown() or _G.UnitAffectingCombat("player"))
+	return (private.in_combat or _G.InCombatLockdown() or _G.UnitAffectingCombat("player"))
 end
 
 local function ResetPositions()
@@ -673,7 +672,7 @@ end
 
 local function ToggleDistanceIndicator()
 	if IsTaintable() then
-		private.toggle_distance = true
+		private.regen_toggle_distance = true
 		return
 	end
 
@@ -1973,7 +1972,7 @@ end
 
 local function InitializeFrames()
 	if _G.InCombatLockdown() then
-		private.create_frames = true
+		private.regen_create_frames = true
 		return
 	end
 	private.digsite_frame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
@@ -2245,25 +2244,29 @@ function Archy:PLAYER_ENTERING_WORLD()
 end
 
 function Archy:PLAYER_REGEN_DISABLED()
-	in_combat = true
+	private.in_combat = true
 end
 
 function Archy:PLAYER_REGEN_ENABLED()
-	in_combat = false
+	private.in_combat = nil
 
-	if private.create_frames then
+	if private.regen_create_frames then
+		private.regen_create_frames = nil
 		InitializeFrames()
 	end
 
-	if private.toggle_distance then
+	if private.regen_toggle_distance then
+		private.regen_toggle_distance = nil
 		ToggleDistanceIndicator()
 	end
 
-	if private.update_races then
+	if private.regen_update_races then
+		private.regen_update_races = nil
 		self:UpdateRacesFrame()
 	end
 
-	if private.update_digsites then
+	if private.regen_update_digsites then
+		private.regen_update_digsites = nil
 		self:UpdateDigSiteFrame()
 	end
 end
@@ -2412,7 +2415,7 @@ end
 
 function Archy:UpdateRacesFrame()
 	if IsTaintable() then
-		private.update_races = true
+		private.regen_update_races = true
 		return
 	end
 	local races_frame = private.races_frame
@@ -2796,7 +2799,7 @@ end
 
 function Archy:UpdateDigSiteFrame()
 	if IsTaintable() then
-		private.update_digsites = true
+		private.regen_update_digsites = true
 		return
 	end
 	private.digsite_frame:SetScale(private.db.digsite.scale)
