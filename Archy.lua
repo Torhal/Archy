@@ -543,14 +543,14 @@ local function IsTaintable()
 	return (private.in_combat or _G.InCombatLockdown() or _G.UnitAffectingCombat("player"))
 end
 
-local function ResetPositions()
-	private.db.digsite.distanceIndicator.position = { unpack(PROFILE_DEFAULTS.profile.digsite.distanceIndicator.position) }
-	private.db.digsite.distanceIndicator.anchor = PROFILE_DEFAULTS.profile.digsite.distanceIndicator.anchor
-	private.db.digsite.distanceIndicator.undocked = PROFILE_DEFAULTS.profile.digsite.distanceIndicator.undocked
-	private.db.digsite.position = { unpack(PROFILE_DEFAULTS.profile.digsite.position) }
-	private.db.digsite.anchor = PROFILE_DEFAULTS.profile.digsite.anchor
-	private.db.artifact.position = { unpack(PROFILE_DEFAULTS.profile.artifact.position) }
-	private.db.artifact.anchor = PROFILE_DEFAULTS.profile.artifact.anchor
+function private:ResetPositions()
+	self.db.digsite.distanceIndicator.position = { unpack(PROFILE_DEFAULTS.profile.digsite.distanceIndicator.position) }
+	self.db.digsite.distanceIndicator.anchor = PROFILE_DEFAULTS.profile.digsite.distanceIndicator.anchor
+	self.db.digsite.distanceIndicator.undocked = PROFILE_DEFAULTS.profile.digsite.distanceIndicator.undocked
+	self.db.digsite.position = { unpack(PROFILE_DEFAULTS.profile.digsite.position) }
+	self.db.digsite.anchor = PROFILE_DEFAULTS.profile.digsite.anchor
+	self.db.artifact.position = { unpack(PROFILE_DEFAULTS.profile.artifact.position) }
+	self.db.artifact.anchor = PROFILE_DEFAULTS.profile.artifact.anchor
 	Archy:ConfigUpdated()
 	Archy:UpdateFramePositions()
 end
@@ -1799,7 +1799,7 @@ local function SlashHandler(msg, editbox)
 	elseif command == L["nearest"]:lower() or command == L["closest"]:lower() then
 		AnnounceNearestSite()
 	elseif command == L["reset"]:lower() then
-		ResetPositions()
+		private:ResetPositions()
 	elseif command == ("TomTom"):lower() then
 		private.db.tomtom.enabled = not private.db.tomtom.enabled
 		RefreshTomTom()
