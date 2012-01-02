@@ -2228,6 +2228,7 @@ function Archy:PLAYER_ENTERING_WORLD()
 
 	SECURE_ACTION_BUTTON = button
 
+	SetMapToCurrentZone()
 	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
 	self:ScheduleTimer(function()
 		self:UpdateDigSiteFrame()
@@ -2235,9 +2236,7 @@ function Archy:PLAYER_ENTERING_WORLD()
 		timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
 	end, 1)
 
-	self:ScheduleTimer(function()
-		self:UpdatePlayerPosition(true)
-	end, 2)
+	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self.PLAYER_ENTERING_WORLD = nil
