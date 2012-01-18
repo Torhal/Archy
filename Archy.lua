@@ -600,23 +600,28 @@ local function UpdateRaceArtifact(race_id)
 		prevAdded = math.min(race_data[race_id].keystone.inventory, numSockets)
 	end
 	artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, numSockets) -- Drii: sets it to keystones in inventory
-
+	-- Drii: this whole section looks like a needlessly convoluted way of doing things but hey 'if it's not broken don't fix it' 
+	-- cosmetic changes only; don't fancy wading through 10 tail calls if I break something :P
 	if artifact.keystones_added > 0 and numSockets > 0 then
-		for i = 1, math.min(artifact.keystones_added, numSockets) do
-			_G.SocketItemToArtifact() -- Drii: adds any available keystones regardless of autofill settings
-
+		for i = 1, math.min(artifact.keystones_added, numSockets) do -- Drii: adds any available keystones regardless of autofill settings
+			_G.SocketItemToArtifact() 
 			if not _G.ItemAddedToArtifact(i) then
 				break
 			end
+			if i == prevAdded then
+				_, adjust = _G.GetArtifactProgress()
+				artifact.keystone_adjustment = adjust -- Drii: set adjustment to actual user selection and move along
+				artifact.canSolveStone = _G.CanSolveArtifact()
+			end
 		end
-		base, adjust, total = _G.GetArtifactProgress()
-		artifact.canSolveStone = _G.CanSolveArtifact()
 
-		if prevAdded > 0 then
+		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then -- Drii: keep our user value if there's one
+			_, adjust = _G.GetArtifactProgress() -- Drii: or get the current fill if not
 			artifact.keystone_adjustment = adjust
+			artifact.canSolveStone = _G.CanSolveArtifact()
 		end
 	end
-	artifact.keystones_added = prevAdded -- Drii: and here it sets it back to what the user chose by clicking Archy socket and relies on the overridden SolveArtifact to remove the keystones back out.
+	artifact.keystones_added = prevAdded -- Drii: and here it sets it back to what the user chose by clicking Archy socket and relies on the overridden SolveArtifact to remove the extra keystones back out when solving.
 
 	_G.RequestArtifactCompletionHistory()
 
