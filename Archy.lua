@@ -540,7 +540,7 @@ local function HasArchaeology()
 end
 
 local function IsTaintable()
-	return (private.in_combat or _G.InCombatLockdown() or _G.UnitAffectingCombat("player"))
+	return (private.in_combat or _G.InCombatLockdown() or (_G.UnitAffectingCombat("player") or _G.UnitAffectingCombat("pet")))
 end
 
 function private:ResetPositions()
@@ -563,7 +563,7 @@ local function UpdateRaceArtifact(race_id)
 	local race = race_data[race_id]
 
 	if not race then
-		--@??? Maybe use a wipe statement here
+		-- @??? Maybe use a wipe statement here
 		artifacts[race_id] = nil
 		return
 	end
@@ -599,11 +599,11 @@ local function UpdateRaceArtifact(race_id)
 	if private.db.artifact.autofill[race_id] then
 		prevAdded = math.min(race_data[race_id].keystone.inventory, numSockets)
 	end
-	artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, numSockets)
+	artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, numSockets) -- Drii: sets it to keystones in inventory
 
 	if artifact.keystones_added > 0 and numSockets > 0 then
 		for i = 1, math.min(artifact.keystones_added, numSockets) do
-			_G.SocketItemToArtifact()
+			_G.SocketItemToArtifact() -- Drii: adds any available keystones regardless of autofill settings
 
 			if not _G.ItemAddedToArtifact(i) then
 				break
@@ -616,7 +616,7 @@ local function UpdateRaceArtifact(race_id)
 			artifact.keystone_adjustment = adjust
 		end
 	end
-	artifact.keystones_added = prevAdded
+	artifact.keystones_added = prevAdded -- Drii: and here it sets it back to what the user chose by clicking Archy socket and relies on the overridden SolveArtifact to remove the keystones back out.
 
 	_G.RequestArtifactCompletionHistory()
 
@@ -643,6 +643,7 @@ local function SolveRaceArtifact(race_id, use_stones)
 		_G.SetSelectedArtifact(race_id)
 		artifactSolved.raceId = race_id
 		artifactSolved.name = _G.GetSelectedArtifactInfo()
+		artifact.name = artifactSolved.name
 		keystoneLootRaceID = race_id
 
 		if _G.type(use_stones) == "boolean" then
@@ -662,7 +663,7 @@ local function SolveRaceArtifact(race_id, use_stones)
 				end
 			end
 		elseif artifact.sockets > 0 then
-			for index = 1, artifact.keystones_added do
+			for index = 1, artifact.sockets do
 				_G.RemoveItemFromArtifact()
 			end
 		end
@@ -806,7 +807,7 @@ end
 local progress_data = {}
 
 function LDB_object:OnEnter()
-	if _G.InCombatLockdown() then
+	if IsTaintable() then
 		return
 	end
 	local num_columns, column_index, line = 10, 0, 0
@@ -1923,7 +1924,7 @@ function Archy:OnInitialize()
 
 				if perform_survey then
 					-- We're stealing the mouse-up event, make sure we exit MouseLook
-					if _G.IsMouselooking() and not _G.InCombatLockdown() then
+					if _G.IsMouselooking() and not IsTaintable() then
 						_G.MouselookStop()
 					end
 					_G.SetOverrideBindingClick(SECURE_ACTION_BUTTON, true, "BUTTON2", SECURE_ACTION_BUTTON.name)
@@ -1981,7 +1982,7 @@ function Archy:UpdateFramePositions()
 end
 
 local function InitializeFrames()
-	if _G.InCombatLockdown() then
+	if IsTaintable() then
 		private.regen_create_frames = true
 		return
 	end
@@ -2049,38 +2050,36 @@ function Archy:OnEnable()
 
 	-- Check for minimap AddOns.
 	local mbf = LibStub("AceAddon-3.0"):GetAddon("Minimap Button Frame", true)
-
-	if not mbf then
-		return
-	end
-	local foundMBF = false
-
-	if _G.MBF.db.profile.MinimapIcons then
-		for i, button in pairs(_G.MBF.db.profile.MinimapIcons) do
-			local lower_button = button:lower()
-
-			if lower_button == "archyminimap" or lower_button == "archyminimap_" then
-				foundMBF = true
-				break
+	if mbf then
+		local foundMBF = false
+		if _G.MBF.db.profile.MinimapIcons then
+			for i, button in pairs(_G.MBF.db.profile.MinimapIcons) do
+				local lower_button = button:lower()
+	
+				if lower_button == "archyminimap" or lower_button == "archyminimap_" then
+					foundMBF = true
+					break
+				end
 			end
-		end
-
-		if not foundMBF then
-			table.insert(_G.MBF.db.profile.MinimapIcons, "ArchyMinimap")
-			self:Print("Adding Archy to the MinimapButtonFrame protected items list")
-		end
+	
+			if not foundMBF then
+				table.insert(_G.MBF.db.profile.MinimapIcons, "ArchyMinimap")
+				self:Print("Adding Archy to the MinimapButtonFrame protected items list")
+			end
+		end		
 	end
 
 	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
 	if not Blizzard_SolveArtifact then
-		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
-			_G.LoadAddOn("Blizzard_ArchaeologyUI")
+		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then 
+			local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
+			if not loaded then
+				Archy:Print(L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."]:format(_G["ADDON_" .. reason]))
+			end
 		end
 		Blizzard_SolveArtifact = _G.SolveArtifact
-
 		function _G.SolveArtifact(race_index, use_stones)
 			local rank, max_rank = GetArchaeologyRank()
-
 			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
 				Dialog:Spawn("ArchyConfirmSolve", {
 					race_index = race_index,
@@ -2108,14 +2107,15 @@ end
 -----------------------------------------------------------------------
 -- Event handlers.
 -----------------------------------------------------------------------
+
 function Archy:ARTIFACT_COMPLETE(event, name)
 	for race_id, artifact in pairs(artifacts) do
-		if artifact.name == name then
-			UpdateRaceArtifact(race_id)
+		if artifact.name == name then 
+			UpdateRaceArtifact(race_id) -- this is still the artifact that was just solved when the event fires
+			self:ScheduleTimer(function() UpdateRaceArtifact(race_id) Archy:RefreshRacesDisplay() end, 2)
 			break
 		end
 	end
-	self:RefreshRacesDisplay()
 end
 
 function Archy:ARTIFACT_HISTORY_READY()
@@ -2346,7 +2346,10 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not force and (not private.db.general.show or not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player")) then
+	if not private.db.general.show and not force then
+		return
+	end
+	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
 		return
 	end
 
