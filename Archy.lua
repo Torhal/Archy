@@ -2074,29 +2074,7 @@ function Archy:OnEnable()
 		end		
 	end
 
-	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
-	if not Blizzard_SolveArtifact then
-		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then 
-			local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
-			if not loaded then
-				Archy:Print(L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."]:format(_G["ADDON_" .. reason]))
-			end
-		end
-		Blizzard_SolveArtifact = _G.SolveArtifact
-		function _G.SolveArtifact(race_index, use_stones)
-			local rank, max_rank = GetArchaeologyRank()
-			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
-				Dialog:Spawn("ArchyConfirmSolve", {
-					race_index = race_index,
-					use_stones = use_stones,
-					rank = rank,
-					max_rank = max_rank
-				})
-			else
-				return SolveRaceArtifact(race_index, use_stones)
-			end
-		end
-	end
+ 	self:RegisterEvent("PLAYER_ALIVE") -- Drii: delay loading Blizzard_ArchaeologyUI until PLAYER_ALIVE so races main page doesn't bug.
 end
 
 function Archy:OnDisable()
@@ -2220,6 +2198,34 @@ function Archy:LootReceived(event, msg)
 		self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
 		keystoneLootRaceID = race_id
 	end
+end
+
+function Archy:PLAYER_ALIVE()
+	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
+	if not Blizzard_SolveArtifact then
+		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then 
+			local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
+			if not loaded then
+				Archy:Print(L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."]:format(_G["ADDON_" .. reason]))
+			end
+		end
+		Blizzard_SolveArtifact = _G.SolveArtifact
+		function _G.SolveArtifact(race_index, use_stones)
+			local rank, max_rank = GetArchaeologyRank()
+			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
+				Dialog:Spawn("ArchyConfirmSolve", {
+					race_index = race_index,
+					use_stones = use_stones,
+					rank = rank,
+					max_rank = max_rank
+				})
+			else
+				return SolveRaceArtifact(race_index, use_stones)
+			end
+		end
+	end	
+	self:UnregisterEvent("PLAYER_ALIVE")
+	self.PLAYER_ALIVE = nil
 end
 
 function Archy:PLAYER_ENTERING_WORLD()
