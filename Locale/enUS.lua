@@ -18,6 +18,7 @@ L["Announce when solvable"] = true
 L["Announcements Output"] = true
 L["Announces the nearest dig site to you"] = true
 L["Announces the nearest dig site when it is found"] = true
+L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."] = true
 L["ArchaeologyUI not loaded: %s Try opening manually."] = true
 L["Artifact"] = true
 L["Artifact Options"] = true
