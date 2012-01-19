@@ -2334,7 +2334,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 end
 
 function Archy:UpdateSkillBar()
-	if not current_continent then
+	if not current_continent or not not HasArchaeology() then
 		return
 	end
 	local races_frame = private.races_frame
