@@ -341,6 +341,8 @@ local survey_location = {
 	y = 0
 }
 
+local has_announced, has_pinged = {}, {}
+
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 
 -----------------------------------------------------------------------
@@ -629,13 +631,13 @@ local function UpdateRaceArtifact(race_id)
 		return
 	end
 
-	if not artifact.has_announced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
-		artifact.has_announced = true
+	if not has_announced[artifact.name] and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
+		has_announced[artifact.name] = true
 		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race_data[race_id].name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
 	end
 
-	if not artifact.has_pinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveStone)) then
-		artifact.has_pinged = true
+	if not has_pinged[artifact.name] and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveStone)) then
+		has_pinged[artifact.name] = true
 		_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
 	end
 end
