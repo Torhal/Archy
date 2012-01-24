@@ -299,6 +299,7 @@ local PROFILE_DEFAULTS = {
 local SECURE_ACTION_BUTTON -- Populated in PLAYER_ENTERING_WORLD
 local SITES_PER_CONTINENT = 4
 local SURVEY_SPELL_ID = 80451
+local FISHING_SPELL_NAME = (GetSpellInfo(7620)) or ""
 local ZONE_DATA = {}
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
 
@@ -322,8 +323,10 @@ local current_continent
 local continent_digsites = {}
 local distanceIndicatorActive = false
 local is_looting = false
+local overrideOn = false
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
+local digsitesTrackingID -- set in HasArchaeology()
 local lastSite = {}
 local nearestSite
 local player_position = {
@@ -538,6 +541,14 @@ end
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
 	local _, _, arch = _G.GetProfessions()
+	if arch then
+		for i=1, _G.GetNumTrackingTypes() do
+			if (_G.GetTrackingInfo(i))==_G.MINIMAP_TRACKING_DIGSITES then
+				digsitesTrackingID = i
+				break
+			end
+		end
+	end
 	return arch
 end
 
@@ -975,13 +986,21 @@ end
 -----------------------------------------------------------------------
 function Archy:ShowArchaeology()
 	if _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
-		_G.ShowUIPanel(_G.ArchaeologyFrame)
+		if _G.ArchaeologyFrame:IsShown() then
+			_G.HideUIPanel(_G.ArchaeologyFrame)
+		else
+			_G.ShowUIPanel(_G.ArchaeologyFrame)
+		end
 		return true
 	end
 	local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
 
 	if loaded then
-		_G.ShowUIPanel(_G.ArchaeologyFrame)
+		if _G.ArchaeologyFrame:IsShown() then
+			_G.HideUIPanel(_G.ArchaeologyFrame)
+		else
+			_G.ShowUIPanel(_G.ArchaeologyFrame)
+		end
 		return true
 	else
 		Archy:Print(L["ArchaeologyUI not loaded: %s Try opening manually."]:format(_G["ADDON_" .. reason]))
@@ -1085,6 +1104,7 @@ function Archy:ConfigUpdated(namespace, option)
 		self:RefreshRacesDisplay()
 		self:UpdateDigSiteFrame()
 		self:RefreshDigSiteDisplay()
+		self:UpdateTracking()
 		UpdateMinimapPOIs(true)
 		RefreshTomTom()
 	end
@@ -1152,7 +1172,17 @@ end
 local DIG_LOCATION_TEXTURE = 177
 local function GetContinentSites(continent_id)
 	local new_sites = {}
-
+	-- Drii: and this solves the mystery of "location of the digsite is gone missing" ticket 351; 
+	-- function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
+	-- So make sure we enable and show blobs and restore the setting at the end.
+	local showDig = _G.GetCVarBool("digSites")
+	if not showDig then
+		_G.SetCVar("digSites","1")
+		_G.WorldMapArchaeologyDigSites:Show()
+		_G.WorldMapShowDigSites:SetChecked(1)
+		_G.RefreshWorldMap()
+		showDig = "0"
+	end
 	for index = 1, _G.GetNumMapLandmarks() do
 		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
 
@@ -1187,6 +1217,12 @@ local function GetContinentSites(continent_id)
 			end
 		end
 	end
+	if showDig == "0" then -- restore initial setting
+		_G.SetCVar("digSites",showDig)
+		_G.WorldMapArchaeologyDigSites:Hide()
+		_G.WorldMapShowDigSites:SetChecked(nil)
+		_G.RefreshWorldMap()
+	end
 	return new_sites
 end
 
@@ -1206,7 +1242,7 @@ end
 
 local function UpdateAllSites()
 	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
-	local origial_map_id = _G.GetCurrentMapAreaID()
+	local original_map_id = _G.GetCurrentMapAreaID()
 
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		if private.db.tooltip.filter_continent then
@@ -1218,7 +1254,7 @@ local function UpdateAllSites()
 			UpdateSite(continent_id)
 		end
 	end
-	_G.SetMapByID(origial_map_id)
+	_G.SetMapByID(original_map_id)
 end
 
 function Archy:IsSiteBlacklisted(name)
@@ -1915,7 +1951,7 @@ function Archy:OnInitialize()
 		local MIN_ACTION_DOUBLECLICK = 0.05
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() then
+			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() and not IsUsableSpell(FISHING_SPELL_NAME) then
 				local perform_survey = false
 
 				if not is_looting and clicked_time then
@@ -1935,6 +1971,7 @@ function Archy:OnInitialize()
 						_G.MouselookStop()
 					end
 					_G.SetOverrideBindingClick(SECURE_ACTION_BUTTON, true, "BUTTON2", SECURE_ACTION_BUTTON.name)
+					overrideOn = true
 				end
 			end
 		end)
@@ -2225,7 +2262,8 @@ function Archy:PLAYER_ALIVE()
 				return SolveRaceArtifact(race_index, use_stones)
 			end
 		end
-	end	
+	end
+	Archy:ConfigUpdated()
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self.PLAYER_ALIVE = nil
 end
@@ -2246,6 +2284,9 @@ function Archy:PLAYER_ENTERING_WORLD()
 	button:SetScript("PostClick", function()
 		if not IsTaintable() then
 			_G.ClearOverrideBindings(_G[button_name])
+			overrideOn = false
+		else
+			private.regen_clear_override = true
 		end
 	end)
 
@@ -2291,6 +2332,13 @@ function Archy:PLAYER_REGEN_ENABLED()
 		private.regen_update_digsites = nil
 		self:UpdateDigSiteFrame()
 	end
+	
+	if private.regen_clear_override then
+		private.regen_clear_override = nil
+		_G.ClearOverrideBindings(SECURE_ACTION_BUTTON.name)
+		overrideOn = false
+	end
+	
 end
 
 function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
@@ -2436,6 +2484,25 @@ local function FontString_SetShadow(fs, hasShadow)
 		fs:SetShadowColor(0, 0, 0, 0)
 		fs:SetShadowOffset(0, 0)
 	end
+end
+
+function Archy:UpdateTracking()
+	-- maybe add some options to control this behaviour? for now tracking just mirrors Archy show/hide.
+	-- manage minimap tracking
+	if not HasArchaeology() then return end
+	if digsitesTrackingID then
+		_G.SetTracking(digsitesTrackingID, private.db.general.show)
+	end
+	-- manage worldmap digsites display
+	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
+	local showDig = _G.GetCVarBool("digSites")
+	if showDig then 
+		_G.WorldMapArchaeologyDigSites:Show()
+	else
+		_G.WorldMapArchaeologyDigSites:Hide()
+	end
+	_G.WorldMapShowDigSites:SetChecked(showDig)
+	_G.RefreshWorldMap()
 end
 
 function Archy:UpdateRacesFrame()
