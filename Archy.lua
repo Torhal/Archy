@@ -928,7 +928,7 @@ function Archy:LDBTooltipShow()
 	Archy_LDB_Tooltip:Clear()
 
 	local line = Archy_LDB_Tooltip:AddHeader(".")
-	Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r"), "CENTER", num_columns)
+	Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r") .. "*", "CENTER", num_columns)
 	Archy_LDB_Tooltip:SetCellScript(line, 1, "OnMouseDown", Archy_cell_script, "mode")
 
 	if HasArchaeology() then
@@ -1056,7 +1056,7 @@ function Archy:LDBTooltipShow()
 				if total_count > 0 then -- skip races that are not yet implemented
 					line = Archy_LDB_Tooltip:AddLine(" ")
 					Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
-					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name, "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name .. "*", "LEFT", 1)
 					Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:"..race_id)
 					Archy_LDB_Tooltip:SetCell(line, 3, rare_done .. "/" .. rare_count, "LEFT", 1) -- Drii: beautify the rare count using the cell_provider
 					Archy_LDB_Tooltip:SetCell(line, 5, common_done .. "/" .. common_count, "LEFT", 1)
@@ -1080,7 +1080,7 @@ function Archy:LDBTooltipShow()
 						if info.rarity > 0 then
 							line = Archy_LDB_Tooltip:AddLine(" ")
 							Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
-							Archy_LDB_Tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex,artifact), "LEFT", 1)
+							Archy_LDB_Tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex,artifact) .. "*", "LEFT", 1)
 							Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "spellid:"..info.spellid)
 							if not startline then startline = line end
 							endline = line
@@ -1109,6 +1109,7 @@ function Archy:LDBTooltipShow()
 		Archy_LDB_Tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", num_columns)
 	end
 	line = Archy_LDB_Tooltip:AddLine(" ")
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. "* Active tooltip region(s)" .. "|r", "LEFT", num_columns) -- Drii: L["* Active tooltip region(s)"] needs to be added to locale
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Ctrl Left-Click to open Archy's options"] .. "|r", "LEFT", num_columns)
