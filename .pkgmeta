@@ -59,6 +59,8 @@ externals:
         tag: latest
     Libs/LibBabble-DigSites-3.0:
         url: svn://svn.wowace.com/wow/libbabble-digsites-3-0/mainline/trunk
+    Libs/LibBabble-Artifacts-3.0:
+        url: svn://svn.wowace.com/wow/libbabble-artifacts-3-0/mainline/trunk
     Libs/LibDialog-1.0:
         url: http://hg.wowace.com/wow/libdialog-1-0/mainline
         tag: latest

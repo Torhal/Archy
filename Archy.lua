@@ -56,6 +56,7 @@ end
 -- Constants
 -----------------------------------------------------------------------
 local DIG_SITES = private.dig_sites
+local ARTIFACTS = private.artifacts_db
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[#_G.PROFESSION_RANKS][1]
 local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in OnInitialize()
 local MAP_CONTINENTS = { _G.GetMapContinents() }
@@ -344,6 +345,8 @@ local survey_location = {
 	y = 0
 }
 
+local tooltipModes, tooltipMode = {"artifacts_digsites","overall_completion"}, 1
+
 local has_announced, has_pinged = {}, {}
 
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
@@ -523,6 +526,72 @@ local function GetArchaeologyRank()
 	return rank, maxRank
 end
 
+local function GetAchievementProgress()
+	local rare, common = NONE, NONE
+	local rare_ach, common_ach, completed = 4854, 5315 -- "I had it in my hand" (Title: Assistant Professor), "Digger"
+	-- local id, name, points, completed, month, day, year, description, flags, icon, rewardText = GetAchievementInfo(achID);
+	if select(4, GetAchievementInfo(rare_ach)) then -- completed
+		rare = select(11, GetAchievementInfo(rare_ach)) -- rewardText
+		rare_ach, completed = GetNextAchievement(rare_ach)
+		while rare_ach and completed do
+			rare = select(11, GetAchievementInfo(rare_ach))
+			rare_ach, completed = GetNextAchievement(rare_ach)
+		end
+	end
+	if select(4, GetAchievementInfo(common_ach)) then -- completed
+		common = select(2, GetAchievementInfo(common_ach)) -- name
+		common_ach, completed = GetNextAchievement(common_ach)
+		while common_ach and completed do
+			common = select(2, GetAchievementInfo(common_ach))
+			common_ach, completed = GetNextAchievement(common_ach)
+		end
+	end
+	return rare:gsub("^.+:",""):trim(), common
+end
+
+local function GetArtifactsDelta(race_id, missing_data)
+	wipe(missing_data)
+	local rare_count, common_count, total_count = 0,0,0
+	local rare_missing, common_missing, total_missing = 0,0,0
+	
+	for artifact,info in pairs(ARTIFACTS) do 
+		if info.raceid == race_id then 
+			if info.rarity==0 then 
+				common_count = common_count + 1
+			else
+				rare_count = rare_count + 1
+			end
+			total_count = total_count + 1
+			missing_data[artifact] = info -- flag all race artifacts as missing
+		end
+	end
+	
+	-- then remove the one's we've already solved at least once so we have the actual missing.
+	local artifact_index, artifact, _, completionCount = 1
+	artifact, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
+	if artifact and completionCount > 0 and missing_data[artifact] then -- TODO: Maybe display "in progress" but not yet obtained artifacts different?
+		missing_data[artifact] = nil
+		artifact_index = artifact_index + 1
+	end
+	while artifact do
+		artifact, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
+		if artifact and completionCount > 0 and missing_data[artifact] then
+			missing_data[artifact] = nil
+		end
+		artifact_index = artifact_index + 1
+	end
+	for artifact,info in pairs(missing_data) do
+		if info.rarity==0 then
+			common_missing = common_missing + 1
+		else
+			rare_missing = rare_missing + 1
+		end
+		total_missing = total_missing + 1
+	end
+	
+	return rare_count - rare_missing, rare_count, common_count - common_missing, common_count, total_count - total_missing, total_count
+end
+
 local function GetArtifactStats(race_id, name)
 	local num_artifacts = _G.GetNumArtifactsByRace(race_id)
 
@@ -536,6 +605,7 @@ local function GetArtifactStats(race_id, name)
 			return artifact_index, firstCompletionTime, completionCount
 		end
 	end
+
 end
 
 -- Returns true if the player has the archaeology secondary skill
@@ -743,6 +813,28 @@ Dialog:Register("ArchyConfirmSolve", {
 -- LDB_object methods
 -----------------------------------------------------------------------
 local Archy_cell_provider, Archy_cell_prototype = QTip:CreateCellProvider()
+local Archy_LDB_Tooltip
+
+local function Archy_cell_script(_, what, button)
+	if what == "mode" then -- header was clicked, cycle display mode
+		local nextmode = tooltipMode+1
+		tooltipMode = tooltipModes[nextmode] and nextmode or 1
+	end
+	local key,value = (":"):split(what)
+	if key == "raceid" and value then -- race was clicked show/hide uncomplete artifacts lists
+		for race_id,_ in pairs(race_data) do
+			if tonumber(value) ~= race_id then
+				race_data[race_id].expand = nil
+			else
+				race_data[race_id].expand = not race_data[race_id].expand
+			end
+		end
+	end
+	if key == "spellid" and value then -- project link was clicked
+		Archy:Print((GetSpellLink(tonumber(value))))
+	end
+	Archy:LDBTooltipShow()
+end
 
 function Archy_cell_prototype:InitializeCell()
 	local bar = self:CreateTexture(nil, "OVERLAY", self)
@@ -822,139 +914,222 @@ function Archy_cell_prototype:getContentHeight()
 	return self.bar:GetHeight() + 2
 end
 
-local progress_data = {}
+local progress_data, missing_data = {}, {}
+function Archy:LDBTooltipShow()
+	local num_columns, column_index, line
+	if tooltipMode == 1 then -- artifacts_digsites
+		num_columns, column_index, line = 10, 0, 0
+		Archy_LDB_Tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
+	elseif tooltipMode == 2 then -- overall_completion
+		num_columns, column_index, line = 6, 0, 0
+		Archy_LDB_Tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT")
+	end
+	Archy_LDB_Tooltip:Hide()
+	Archy_LDB_Tooltip:Clear()
+
+	local line = Archy_LDB_Tooltip:AddHeader(".")
+	Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r"), "CENTER", num_columns)
+	Archy_LDB_Tooltip:SetCellScript(line, 1, "OnMouseDown", Archy_cell_script, "mode")
+
+	if HasArchaeology() then
+		if tooltipMode == 1 then
+			line = Archy_LDB_Tooltip:AddLine(".")
+			local rank, maxRank = GetArchaeologyRank()
+			local skill = ("%d/%d"):format(rank, maxRank)
+	
+			if maxRank < MAX_ARCHAEOLOGY_RANK and (maxRank - rank) <= 25 then
+				skill = ("%s - |cFFFF0000%s|r"):format(skill, L["Visit a trainer!"])
+			elseif maxRank == MAX_ARCHAEOLOGY_RANK and rank == maxRank then
+				skill = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, "MAX")
+			end
+			Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.SKILL .. ": ", skill), "CENTER", num_columns)
+	
+			line = Archy_LDB_Tooltip:AddLine(".")
+			Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", num_columns)
+			Archy_LDB_Tooltip:AddSeparator()
+	
+			line = Archy_LDB_Tooltip:AddLine(".")
+			Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 3, " ", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 4, _G.NORMAL_FONT_COLOR_CODE .. L["Artifact"] .. "|r", "LEFT", 2)
+			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Progress"] .. "|r", "CENTER", 1)
+			Archy_LDB_Tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
+			Archy_LDB_Tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
+			Archy_LDB_Tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
+	
+			for race_id, artifact in pairs(artifacts) do
+				if artifact.fragments_required > 0 then
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name, "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(artifact.icon), "LEFT", 1)
+	
+					local artifactName = artifact.name
+	
+					if artifact.rare then
+						artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
+					end
+	
+					Archy_LDB_Tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
+	
+					progress_data.fragments = artifact.fragments
+					progress_data.keystone_adjustment = artifact.keystone_adjustment
+					progress_data.fragments_required = artifact.fragments_required
+					progress_data.race_keystone_inventory = race_data[race_id].keystone.inventory
+					progress_data.sockets = artifact.sockets
+					progress_data.keystones_added = artifact.keystones_added
+					progress_data.canSolve = artifact.canSolve
+					progress_data.canSolveStone = artifact.canSolveStone
+					progress_data.rare = artifact.rare
+	
+					Archy_LDB_Tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
+					Archy_LDB_Tooltip:SetCell(line, 7, (race_data[race_id].keystone.inventory > 0) and race_data[race_id].keystone.inventory or "", "CENTER", 1)
+					Archy_LDB_Tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
+	
+					local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
+					Archy_LDB_Tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
+				end
+			end
+			local site_stats = Archy.db.char.digsites.stats
+	
+			line = Archy_LDB_Tooltip:AddLine(" ")
+			line = Archy_LDB_Tooltip:AddLine(" ")
+			Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", num_columns)
+			Archy_LDB_Tooltip:AddSeparator()
+	
+			for continent_id, continent_sites in pairs(continent_digsites) do
+				if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == MAP_ID_TO_CONTINENT_ID[current_continent]) then
+					local continent_name
+					for _, zone in pairs(ZONE_DATA) do
+						if zone.continent == continent_id and zone.id == 0 then
+							continent_name = zone.name
+							break
+						end
+					end
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					Archy_LDB_Tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns)
+	
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
+					Archy_LDB_Tooltip:SetCell(line, 4, _G.NORMAL_FONT_COLOR_CODE .. L["Dig Site"] .. "|r", "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ZONE .. "|r", "LEFT", 2)
+					Archy_LDB_Tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1)
+					Archy_LDB_Tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1)
+					Archy_LDB_Tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. _G.ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
+					Archy_LDB_Tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
+	
+					for _, site in pairs(continent_sites) do
+						line = Archy_LDB_Tooltip:AddLine(" ")
+						Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[site.raceId].texture), "LEFT", 1)
+						Archy_LDB_Tooltip:SetCell(line, 2, race_data[site.raceId].name, "LEFT", 2)
+						Archy_LDB_Tooltip:SetCell(line, 4, site.name, "LEFT", 1)
+						Archy_LDB_Tooltip:SetCell(line, 5, site.zoneName, "LEFT", 2)
+						Archy_LDB_Tooltip:SetCell(line, 7, site_stats[site.id].surveys, "CENTER", 1)
+						Archy_LDB_Tooltip:SetCell(line, 8, site_stats[site.id].looted, "CENTER", 1)
+						Archy_LDB_Tooltip:SetCell(line, 9, site_stats[site.id].fragments, "CENTER", 1)
+						Archy_LDB_Tooltip:SetCell(line, 10, site_stats[site.id].keystones, "CENTER", 1)
+					end
+					line = Archy_LDB_Tooltip:AddLine(" ")
+				end
+			end
+		elseif tooltipMode == 2 then
+			line = Archy_LDB_Tooltip:AddLine(".")
+			local rare_achiev, common_achiev = GetAchievementProgress()
+			local achiev = ("%s%s|r - %s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, rare_achiev, _G.ITEM_QUALITY_COLORS[1].hex, common_achiev)
+			Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.ACHIEVEMENTS .. ": ", achiev), "CENTER", num_columns)
+	
+			line = Archy_LDB_Tooltip:AddLine(".")
+			Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", _G.ACHIEVEMENT_CATEGORY_PROGRESS), "LEFT", num_columns)
+			Archy_LDB_Tooltip:AddSeparator()
+			
+			line = Archy_LDB_Tooltip:AddLine(".")
+			Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY3_DESC .. "|r", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY1_DESC .. "|r", "LEFT", 1)
+			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] or "Total" .. "|r", "RIGHT", 1) -- Drii: needs to be added to locales
+			
+			for race_id,_ in pairs(artifacts) do
+				local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race_id, missing_data)
+				if total_count > 0 then -- skip races that are not yet implemented
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name, "LEFT", 1)
+					Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:"..race_id)
+					Archy_LDB_Tooltip:SetCell(line, 3, rare_done .. "/" .. rare_count, "LEFT", 1) -- Drii: beautify the rare count using the cell_provider
+					Archy_LDB_Tooltip:SetCell(line, 5, common_done .. "/" .. common_count, "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
+				end
+			end
+			
+			for race_id,_ in pairs(artifacts) do
+				if race_data[race_id].expand then
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00",race_data[race_id].name), "LEFT", num_columns)
+					Archy_LDB_Tooltip:AddSeparator()
+					line = Archy_LDB_Tooltip:AddLine(" ")
+					Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .._G.ITEM_MISSING:format(_G.ITEM_QUALITY3_DESC) .. "|r", "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .._G.ITEM_MISSING:format(_G.ITEM_QUALITY1_DESC) .. "|r", "LEFT", 2)
+					GetArtifactsDelta(race_id, missing_data)
+					local startline, endline
+					for artifact,info in pairs(missing_data) do -- rares first
+						if info.rarity > 0 then
+							line = Archy_LDB_Tooltip:AddLine(" ")
+							Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
+							Archy_LDB_Tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex,artifact), "LEFT", 1)
+							Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "spellid:"..info.spellid)
+							if not startline then startline = line end
+							endline = line
+						end						
+					end	
+					if endline and endline >= startline then -- commons next (not exhaustive)
+						local line, cell = startline, 3
+						for artifact,info in pairs(missing_data) do 
+							if info.rarity == 0 then
+								if line <= endline and cell <= 5 then
+									Archy_LDB_Tooltip:SetCell(line, cell, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[1].hex,artifact), "LEFT", 2)
+									cell = cell + 2
+									if cell > 5 then line = line + 1; cell = 3 end
+								else
+									break
+								end
+							end
+						end
+					end
+					break
+				end
+			end
+		end
+	else
+		line = Archy_LDB_Tooltip:AddLine(" ")
+		Archy_LDB_Tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", num_columns)
+	end
+	line = Archy_LDB_Tooltip:AddLine(" ")
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", num_columns)
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", num_columns)
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Ctrl Left-Click to open Archy's options"] .. "|r", "LEFT", num_columns)
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Right-Click to lock/unlock Archy"] .. "|r", "LEFT", num_columns)
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", num_columns)
+
+	Archy_LDB_Tooltip:UpdateScrolling()
+	Archy_LDB_Tooltip:Show()
+end
 
 function LDB_object:OnEnter()
 	if IsTaintable() then
 		return
 	end
-	local num_columns, column_index, line = 10, 0, 0
-	local tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
-	tooltip:SetScale(private.db.tooltip.scale)
-	tooltip:SetAutoHideDelay(0.25, self)
-	tooltip:EnableMouse()
-	tooltip:SmartAnchorTo(self)
-	tooltip:Hide()
-	tooltip:Clear()
-
-	local line = tooltip:AddHeader(".")
-	tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r"), "CENTER", num_columns)
-
-	if HasArchaeology() then
-		line = tooltip:AddLine(".")
-		local rank, maxRank = GetArchaeologyRank()
-		local skill = ("%d/%d"):format(rank, maxRank)
-
-		if maxRank < MAX_ARCHAEOLOGY_RANK and (maxRank - rank) <= 25 then
-			skill = ("%s - |cFFFF0000%s|r"):format(skill, L["Visit a trainer!"])
-		elseif maxRank == MAX_ARCHAEOLOGY_RANK and rank == maxRank then
-			skill = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, "MAX")
-		end
-		tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.SKILL .. ": ", skill), "CENTER", num_columns)
-
-		line = tooltip:AddLine(".")
-		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", num_columns)
-		tooltip:AddSeparator()
-
-		line = tooltip:AddLine(".")
-		tooltip:SetCell(line, 1, " ", "LEFT", 1)
-		tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
-		tooltip:SetCell(line, 3, " ", "LEFT", 1)
-		tooltip:SetCell(line, 4, _G.NORMAL_FONT_COLOR_CODE .. L["Artifact"] .. "|r", "LEFT", 2)
-		tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Progress"] .. "|r", "CENTER", 1)
-		tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
-		tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
-		tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
-
-		for race_id, artifact in pairs(artifacts) do
-			if artifact.fragments_required > 0 then
-				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
-				tooltip:SetCell(line, 2, race_data[race_id].name, "LEFT", 1)
-				tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(artifact.icon), "LEFT", 1)
-
-				local artifactName = artifact.name
-
-				if artifact.rare then
-					artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
-				end
-
-				tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
-
-				progress_data.fragments = artifact.fragments
-				progress_data.keystone_adjustment = artifact.keystone_adjustment
-				progress_data.fragments_required = artifact.fragments_required
-				progress_data.race_keystone_inventory = race_data[race_id].keystone.inventory
-				progress_data.sockets = artifact.sockets
-				progress_data.keystones_added = artifact.keystones_added
-				progress_data.canSolve = artifact.canSolve
-				progress_data.canSolveStone = artifact.canSolveStone
-				progress_data.rare = artifact.rare
-
-				tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
-				tooltip:SetCell(line, 7, (race_data[race_id].keystone.inventory > 0) and race_data[race_id].keystone.inventory or "", "CENTER", 1)
-				tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
-
-				local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
-				tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
-			end
-		end
-		local site_stats = Archy.db.char.digsites.stats
-
-		line = tooltip:AddLine(" ")
-		line = tooltip:AddLine(" ")
-		tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", num_columns)
-		tooltip:AddSeparator()
-
-		for continent_id, continent_sites in pairs(continent_digsites) do
-			if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == MAP_ID_TO_CONTINENT_ID[current_continent]) then
-				local continent_name
-				for _, zone in pairs(ZONE_DATA) do
-					if zone.continent == continent_id and zone.id == 0 then
-						continent_name = zone.name
-						break
-					end
-				end
-				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns)
-
-				line = tooltip:AddLine(" ")
-				tooltip:SetCell(line, 1, " ", "LEFT", 1)
-				tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
-				tooltip:SetCell(line, 4, _G.NORMAL_FONT_COLOR_CODE .. L["Dig Site"] .. "|r", "LEFT", 1)
-				tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ZONE .. "|r", "LEFT", 2)
-				tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Surveys"] .. "|r", "CENTER", 1)
-				tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1)
-				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. _G.ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
-				tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
-
-				for _, site in pairs(continent_sites) do
-					line = tooltip:AddLine(" ")
-					tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[site.raceId].texture), "LEFT", 1)
-					tooltip:SetCell(line, 2, race_data[site.raceId].name, "LEFT", 2)
-					tooltip:SetCell(line, 4, site.name, "LEFT", 1)
-					tooltip:SetCell(line, 5, site.zoneName, "LEFT", 2)
-					tooltip:SetCell(line, 7, site_stats[site.id].surveys, "CENTER", 1)
-					tooltip:SetCell(line, 8, site_stats[site.id].looted, "CENTER", 1)
-					tooltip:SetCell(line, 9, site_stats[site.id].fragments, "CENTER", 1)
-					tooltip:SetCell(line, 10, site_stats[site.id].keystones, "CENTER", 1)
-				end
-				line = tooltip:AddLine(" ")
-			end
-		end
-	else
-		line = tooltip:AddLine(" ")
-		tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", num_columns)
-	end
-	line = tooltip:AddLine(" ")
-	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", num_columns)
-	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", num_columns)
-	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Ctrl Left-Click to open Archy's options"] .. "|r", "LEFT", num_columns)
-	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Right-Click to lock/unlock Archy"] .. "|r", "LEFT", num_columns)
-	line = tooltip:AddLine(" ") tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", num_columns)
-
-	tooltip:UpdateScrolling()
-	tooltip:Show()
+	Archy_LDB_Tooltip = QTip:Acquire("ArchyTooltip")
+	Archy_LDB_Tooltip:SetScale(private.db.tooltip.scale)
+	Archy_LDB_Tooltip:SetAutoHideDelay(0.25, self)
+	Archy_LDB_Tooltip:EnableMouse()
+	Archy_LDB_Tooltip:SmartAnchorTo(self)
+	
+	Archy:LDBTooltipShow()
 end
 
 function LDB_object:OnLeave()
@@ -2143,7 +2318,7 @@ end
 
 function Archy:ARTIFACT_HISTORY_READY()
 	for race_id, artifact in pairs(artifacts) do
-		local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
+		local _, _, completionCount = GetArtifactStats(race_id, artifact.name) -- drii:
 		if completionCount then
 			artifact.completionCount = completionCount
 		end
