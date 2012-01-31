@@ -1049,7 +1049,7 @@ function Archy:LDBTooltipShow()
 			Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
 			Archy_LDB_Tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY3_DESC .. "|r", "LEFT", 1)
 			Archy_LDB_Tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY1_DESC .. "|r", "LEFT", 1)
-			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] or "Total" .. "|r", "RIGHT", 1) -- Drii: needs to be added to locales
+			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. "Total" .. "|r", "RIGHT", 1) -- Drii: L["Total"] needs to be added to locales
 			
 			for race_id,_ in pairs(artifacts) do
 				local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race_id, missing_data)
