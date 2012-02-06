@@ -1058,7 +1058,7 @@ function Archy:LDBTooltipShow()
 					Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name .. "*", "LEFT", 1)
 					Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:"..race_id)
-					Archy_LDB_Tooltip:SetCell(line, 3, rare_done .. "/" .. rare_count, "LEFT", 1) -- Drii: beautify the rare count using the cell_provider
+					Archy_LDB_Tooltip:SetCell(line, 3, rare_done .. "/" .. rare_count, "LEFT", 1) -- Drii: beautify the rare count using the cell_provider?
 					Archy_LDB_Tooltip:SetCell(line, 5, common_done .. "/" .. common_count, "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
 				end
@@ -1109,7 +1109,7 @@ function Archy:LDBTooltipShow()
 		Archy_LDB_Tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", num_columns)
 	end
 	line = Archy_LDB_Tooltip:AddLine(" ")
-	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. "* Active tooltip region(s)" .. "|r", "LEFT", num_columns) -- Drii: L["* Active tooltip region(s)"] needs to be added to locale
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. "*Active tooltip region(s)" .. "|r", "LEFT", num_columns) -- Drii: L["*Active tooltip region(s)"] needs to be added to locale
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Ctrl Left-Click to open Archy's options"] .. "|r", "LEFT", num_columns)
@@ -2089,7 +2089,8 @@ function Archy:OnInitialize()
 			blacklist = {}
 		}
 	end
-
+	
+	if not self.db.char.digsites.stats then self.db.char.digsites.stats = {} end -- Drii: ticket 362,363 old Archy SV that had self.db.char.digsites but no stats, blacklist tables?
 	setmetatable(self.db.char.digsites.stats, {
 		__index = function(t, k)
 			if k then
@@ -2105,6 +2106,7 @@ function Archy:OnInitialize()
 		end
 	})
 
+	if not self.db.char.digsites.blacklist then self.db.char.digsites.blacklist = {} end -- Drii: ticket 362,363
 	setmetatable(self.db.char.digsites.blacklist, {
 		__index = function(t, k)
 			if k then
