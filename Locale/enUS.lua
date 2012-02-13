@@ -1,10 +1,11 @@
 local debug = false
---@debug@
+--[===[@debug@
 debug = true
---@end-debug@
+--@end-debug@]===]
 local L = LibStub("AceLocale-3.0"):NewLocale("Archy", "enUS", true, debug)
 
 L["\"Arrival Distance\""] = true
+L["*Active tooltip region(s)"] = true
 L["%d %ss in your inventory"] = true
 L["%d Key stone sockets available"] = true
 L["%d yards"] = true
@@ -288,6 +289,7 @@ L["Tooltip Options"] = true
 L["Tooltip Scale"] = true
 L["Top Left"] = true
 L["Top Right"] = true
+L["Total"] = true
 L["Undock"] = true
 L["Undock the survey distance indicator from the Dig Sites list"] = true
 L["Version: %s"] = true

@@ -1049,7 +1049,7 @@ function Archy:LDBTooltipShow()
 			Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
 			Archy_LDB_Tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY3_DESC .. "|r", "LEFT", 1)
 			Archy_LDB_Tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY1_DESC .. "|r", "LEFT", 1)
-			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. "Total" .. "|r", "RIGHT", 1) -- Drii: L["Total"] needs to be added to locales
+			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. "Total" .. "|r", "RIGHT", 1) -- Drii: L["Total"] needs adding to localization app
 			
 			for race_id,_ in pairs(artifacts) do
 				local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race_id, missing_data)
@@ -1109,7 +1109,7 @@ function Archy:LDBTooltipShow()
 		Archy_LDB_Tooltip:SetCell(line, 1, L["Learn Archaeology in your nearest major city!"], "CENTER", num_columns)
 	end
 	line = Archy_LDB_Tooltip:AddLine(" ")
-	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. "*Active tooltip region(s)" .. "|r", "LEFT", num_columns) -- Drii: L["*Active tooltip region(s)"] needs to be added to locale
+	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. "*Active tooltip region(s)" .. "|r", "LEFT", num_columns) -- Drii: L["*Active tooltip region(s)"] needs adding to localization app
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Left-Click to toggle Archy"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Shift Left-Click to toggle Archy's on-screen lists"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Ctrl Left-Click to open Archy's options"] .. "|r", "LEFT", num_columns)
@@ -2268,6 +2268,7 @@ function Archy:OnEnable()
 
 	InitializeFrames()
 	ToggleDistanceIndicator()
+	self:UpdateTracking()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 
@@ -2291,7 +2292,7 @@ function Archy:OnEnable()
 			end
 		end		
 	end
-
+	
  	self:RegisterEvent("PLAYER_ALIVE") -- Drii: delay loading Blizzard_ArchaeologyUI until PLAYER_ALIVE so races main page doesn't bug.
 end
 
@@ -2518,6 +2519,11 @@ function Archy:PLAYER_REGEN_ENABLED()
 		overrideOn = false
 	end
 	
+	if private.regen_update_tracking then
+		private.regen_update_tracking = nil
+		self:UpdateTracking()
+	end
+	
 end
 
 function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
@@ -2665,20 +2671,65 @@ local function FontString_SetShadow(fs, hasShadow)
 	end
 end
 
+local function BattleFieldMinimap_Digsites(show)
+	if not ( _G.BattlefieldMinimap and _G.BattlefieldMinimap:IsShown() ) then return end
+	if show then
+		if not private.battlefield_digsites then
+			private.battlefield_digsites = CreateFrame("ArchaeologyDigSiteFrame","ArchyBattleFieldDigsites",_G.BattlefieldMinimap)
+			private.battlefield_digsites:SetSize(225,150)
+			private.battlefield_digsites:SetPoint("TOPLEFT", _G.BattlefieldMinimap)
+			private.battlefield_digsites:SetPoint("BOTTOMRIGHT", _G.BattlefieldMinimap)
+			local tex = private.battlefield_digsites:CreateTexture("ArchyBattleFieldDigsitesTexture", "OVERLAY")
+			tex:SetAllPoints()
+			private.battlefield_digsites:SetFillAlpha(128)
+			private.battlefield_digsites:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
+			private.battlefield_digsites:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
+			private.battlefield_digsites:EnableSmoothing(true)
+			private.battlefield_digsites:SetBorderScalar(0.1)			
+			private.battlefield_digsites.lastUpdate = 0
+			local function BattlefieldDigsites_OnUpdate(self, elapsed)
+				if private.battlefield_digsites.lastUpdate > TOOLTIP_UPDATE_TIME then
+					private.battlefield_digsites:DrawNone();
+					local numEntries = _G.ArchaeologyMapUpdateAll();
+					for i = 1, numEntries do
+						local blobID = _G.ArcheologyGetVisibleBlobID(i);
+						private.battlefield_digsites:DrawBlob(blobID, true);
+					end
+					private.battlefield_digsites.lastUpdate = 0
+				else
+					private.battlefield_digsites.lastUpdate = private.battlefield_digsites.lastUpdate + elapsed
+				end
+			end
+			private.battlefield_digsites:SetScript("OnUpdate",BattlefieldDigsites_OnUpdate)
+		end
+		private.battlefield_digsites:Show()
+	else
+		if private.battlefield_digsites then
+			private.battlefield_digsites:Hide()
+		end
+	end
+end
+
 function Archy:UpdateTracking()
-	-- maybe add some options to control this behaviour? for now tracking just mirrors Archy show/hide.
+	if IsTaintable() then -- Drii: need the check for battlefield blobs, if we don't provide those it can be removed
+		private.regen_update_tracking = true
+		return
+	end
+	-- options to control this behaviour? for now tracking just mirrors Archy show/hide.
 	-- manage minimap tracking
 	if not HasArchaeology() then return end
 	if digsitesTrackingID then
 		_G.SetTracking(digsitesTrackingID, private.db.general.show)
 	end
-	-- manage worldmap digsites display
+	-- manage worldmap and battlefield map digsites display
 	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
 	local showDig = _G.GetCVarBool("digSites")
 	if showDig then 
 		_G.WorldMapArchaeologyDigSites:Show()
+		BattleFieldMinimap_Digsites(true)
 	else
 		_G.WorldMapArchaeologyDigSites:Hide()
+		BattleFieldMinimap_Digsites(false)
 	end
 	_G.WorldMapShowDigSites:SetChecked(showDig)
 	_G.RefreshWorldMap()
