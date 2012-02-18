@@ -5,7 +5,7 @@ debug = true
 local L = LibStub("AceLocale-3.0"):NewLocale("Archy", "enUS", true, debug)
 
 L["\"Arrival Distance\""] = true
-L["*Active tooltip region(s)"] = true
+L["*Interactive tooltip region(s)"] = true
 L["%d %ss in your inventory"] = true
 L["%d Key stone sockets available"] = true
 L["%d yards"] = true
