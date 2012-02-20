@@ -6,7 +6,7 @@
 ## Notes: Archaeology assistant
 ## Notes-zhCN: 考古学助手
 ## Notes-zhTW: 考古學助手
-## Author: Torhal, Myrroddin, daihenka
+## Author: Torhal, Myrroddin, daihenka, Dridzt
 ## X-Credits: Cidrei on wowinterface for fan fixes
 ## X-Category: Archaeology
 ## SavedVariables: ArchyDB

@@ -116,6 +116,7 @@ local PROFILE_DEFAULTS = {
 			easyCast = false,
 			autoLoot = true,
 			theme = "Graphical",
+			manualTrack = false,
 		},
 		artifact = {
 			show = true,
@@ -505,6 +506,22 @@ local pois = setmetatable({}, {
 -----------------------------------------------------------------------
 -- Local helper functions
 -----------------------------------------------------------------------
+local clickToMove
+local function SuspendClickToMove()
+	if not private.db.general.easyCast or IsUsableSpell(FISHING_SPELL_NAME) then return end -- we're not using easy cast, no need to mess with click to move
+	if private.db.general.show then -- Archy enabled
+		if _G.GetCVarBool("autointeract") then -- and click to move 'on'
+			_G.SetCVar("autointeract","0") -- suspend it
+			clickToMove = "1" -- and store previous state
+		end
+	else                           -- archy disabled
+		if clickToMove and clickToMove == "1" then -- did we suspend click to move previously?
+			_G.SetCVar("autointeract","1") -- restore it
+			clickToMove = nil
+		end
+	end
+end
+
 local function AnnounceNearestSite()
 	if not nearestSite or not nearestSite.distance or nearestSite.distance == 999999 then
 		return
@@ -1284,6 +1301,7 @@ function Archy:ConfigUpdated(namespace, option)
 		self:UpdateTracking()
 		UpdateMinimapPOIs(true)
 		RefreshTomTom()
+		SuspendClickToMove()
 	end
 end
 
@@ -2309,6 +2327,15 @@ end
 -----------------------------------------------------------------------
 -- Event handlers.
 -----------------------------------------------------------------------
+function Archy:ADDON_LOADED(event, addon)
+	if addon == "Blizzard_BattlefieldMinimap" then
+		if not private.battlefield_hooked then
+			_G.BattlefieldMinimap:HookScript("OnShow",Archy.UpdateTracking)
+			private.battlefield_hooked = true
+		end
+		Archy:UnregisterEvent("ADDON_LOADED")
+	end
+end
 
 function Archy:ARTIFACT_COMPLETE(event, name)
 	for race_id, artifact in pairs(artifacts) do
@@ -2672,7 +2699,17 @@ local function FontString_SetShadow(fs, hasShadow)
 end
 
 local function BattleFieldMinimap_Digsites(show)
-	if not ( _G.BattlefieldMinimap and _G.BattlefieldMinimap:IsShown() ) then return end
+	if not _G.BattlefieldMinimap then
+		Archy:RegisterEvent("ADDON_LOADED")
+		return
+	end
+	if not _G.BattlefieldMinimap:IsShown() then
+		if not private.battlefield_hooked then
+			_G.BattlefieldMinimap:HookScript("OnShow",Archy.UpdateTracking)
+			private.battlefield_hooked = true
+		end
+		return
+	end
 	if show then
 		if not private.battlefield_digsites then
 			private.battlefield_digsites = CreateFrame("ArchaeologyDigSiteFrame","ArchyBattleFieldDigsites",_G.BattlefieldMinimap)
@@ -2711,13 +2748,12 @@ local function BattleFieldMinimap_Digsites(show)
 end
 
 function Archy:UpdateTracking()
+	if not HasArchaeology() or private.db.general.manualTrack then return end -- do nothing if user has selected to manually configure tracking and blobs.
 	if IsTaintable() then -- Drii: need the check for battlefield blobs, if we don't provide those it can be removed
 		private.regen_update_tracking = true
 		return
 	end
-	-- options to control this behaviour? for now tracking just mirrors Archy show/hide.
 	-- manage minimap tracking
-	if not HasArchaeology() then return end
 	if digsitesTrackingID then
 		_G.SetTracking(digsitesTrackingID, private.db.general.show)
 	end

@@ -146,6 +146,17 @@ local function GetGeneralOptions()
 					end,
 					width = "full",
 				},
+				manualTracking = {
+					order = 8,
+					name = L["Manual tracking"],
+					desc = L["Archy will not automate dig site tracking on the minimap, world map and battlefield map."],
+					type = "toggle",
+					get = function() return db.general.manualTrack end,
+					set = function(_, value)
+						db.general.manualTrack = value
+					end,
+					width = "full",
+				},
 			},
 		}
 		general_options.args.output = Archy:GetSinkAce3OptionsDataTable()
