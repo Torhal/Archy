@@ -1068,6 +1068,7 @@ function Archy:LDBTooltipShow()
 			Archy_LDB_Tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY1_DESC .. "|r", "LEFT", 1)
 			Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] .. "|r", "RIGHT", 1)
 			
+			local all_rare_done, all_rare_count, all_common_done, all_common_count, all_total_done, all_total_count = 0,0,0,0,0,0
 			for race_id,_ in pairs(artifacts) do
 				local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race_id, missing_data)
 				if total_count > 0 then -- skip races that are not yet implemented
@@ -1078,7 +1079,22 @@ function Archy:LDBTooltipShow()
 					Archy_LDB_Tooltip:SetCell(line, 3, rare_done .. "/" .. rare_count, "LEFT", 1) -- Drii: beautify the rare count using the cell_provider?
 					Archy_LDB_Tooltip:SetCell(line, 5, common_done .. "/" .. common_count, "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
+					all_rare_done = all_rare_done + rare_done
+					all_rare_count = all_rare_count + rare_count
+					all_common_done = all_common_done + common_done
+					all_common_count = all_common_count + common_count
+					all_total_done = all_total_done + total_done
+					all_total_count = all_total_count + total_count
 				end
+			end
+			if all_rare_done > 0 or all_rare_count > 0 or all_common_done > 0 or all_common_count > 0 or all_total_done > 0 or all_total_count > 0 then
+				Archy_LDB_Tooltip:AddSeparator()
+				line = Archy_LDB_Tooltip:AddLine(" ")
+				Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
+				Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] .. "|r", "LEFT", 1)
+				Archy_LDB_Tooltip:SetCell(line, 3, all_rare_done .. "/" .. all_rare_count, "LEFT", 1)
+				Archy_LDB_Tooltip:SetCell(line, 5, all_common_done .. "/" .. all_common_count, "LEFT", 1)
+				Archy_LDB_Tooltip:SetCell(line, 6, all_total_done .. "/" .. all_total_count, "RIGHT", 1)
 			end
 			
 			for race_id,_ in pairs(artifacts) do
