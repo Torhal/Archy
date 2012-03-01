@@ -2515,7 +2515,7 @@ function Archy:PLAYER_ENTERING_WORLD()
 
 	SECURE_ACTION_BUTTON = button
 
-	SetMapToCurrentZone()
+-- 	_G.SetMapToCurrentZone() -- Drii: ticket #371 BigWigs load on zone after a reload/login in raid.
 	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
 	self:ScheduleTimer(function()
 		self:UpdateDigSiteFrame()
