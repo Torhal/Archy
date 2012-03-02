@@ -358,6 +358,7 @@ local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 local Blizzard_SolveArtifact
 local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local UpdateMinimapPOIs
+local CacheMapData
 
 -----------------------------------------------------------------------
 -- Metatables.
@@ -1437,6 +1438,45 @@ local function GetContinentSites(continent_id)
 	return new_sites
 end
 
+CacheMapData = function()
+	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
+		_G.SetMapZoom(continent_id)
+		local map_id = _G.GetCurrentMapAreaID()
+		local map_file_name = _G.GetMapInfo()
+
+		MAP_ID_TO_CONTINENT_ID[map_id] = continent_id
+		ZONE_DATA[map_id] = {
+			continent = continent_id,
+			map = map_id,
+			level = 0,
+			mapFile = map_file_name,
+			id = 0,
+			name = continent_name
+		}
+		MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
+		MAP_ID_TO_ZONE_NAME[map_id] = continent_name
+
+		for zone_id, zone_name in pairs{ _G.GetMapZones(continent_id) } do
+			_G.SetMapZoom(continent_id, zone_id)
+			local map_id = _G.GetCurrentMapAreaID()
+			local level = _G.GetCurrentMapDungeonLevel()
+			MAP_FILENAME_TO_MAP_ID[_G.GetMapInfo()] = map_id
+			MAP_ID_TO_ZONE_ID[map_id] = zone_id
+			MAP_ID_TO_ZONE_NAME[map_id] = zone_name
+			ZONE_ID_TO_NAME[zone_id] = zone_name
+			ZONE_DATA[map_id] = {
+				continent = zone_id,
+				map = map_id,
+				level = level,
+				mapFile = _G.GetMapInfo(),
+				id = zone_id,
+				name = zone_name
+			}
+		end
+	end
+	CacheMapData = nil
+end
+
 local function UpdateSite(continent_id)
 	_G.SetMapZoom(continent_id)
 
@@ -1454,7 +1494,7 @@ end
 local function UpdateAllSites()
 	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
 	local original_map_id = _G.GetCurrentMapAreaID()
-
+	if CacheMapData then CacheMapData() end -- Drii: runs only once
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		if private.db.tooltip.filter_continent then
 			if continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
@@ -2190,46 +2230,7 @@ function Archy:OnInitialize()
 		end)
 	end
 	self:ImportOldStatsDB()
-
-	-- Cache the zone/map data so it can be restored after populating the constant tables.
-	local orig = _G.GetCurrentMapAreaID()
-
-	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
-		_G.SetMapZoom(continent_id)
-		local map_id = _G.GetCurrentMapAreaID()
-		local map_file_name = _G.GetMapInfo()
-
-		MAP_ID_TO_CONTINENT_ID[map_id] = continent_id
-		ZONE_DATA[map_id] = {
-			continent = continent_id,
-			map = map_id,
-			level = 0,
-			mapFile = map_file_name,
-			id = 0,
-			name = continent_name
-		}
-		MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
-		MAP_ID_TO_ZONE_NAME[map_id] = continent_name
-
-		for zone_id, zone_name in pairs{ _G.GetMapZones(continent_id) } do
-			_G.SetMapZoom(continent_id, zone_id)
-			local map_id = _G.GetCurrentMapAreaID()
-			local level = _G.GetCurrentMapDungeonLevel()
-			MAP_FILENAME_TO_MAP_ID[_G.GetMapInfo()] = map_id
-			MAP_ID_TO_ZONE_ID[map_id] = zone_id
-			MAP_ID_TO_ZONE_NAME[map_id] = zone_name
-			ZONE_ID_TO_NAME[zone_id] = zone_name
-			ZONE_DATA[map_id] = {
-				continent = zone_id,
-				map = map_id,
-				level = level,
-				mapFile = _G.GetMapInfo(),
-				id = zone_id,
-				name = zone_name
-			}
-		end
-	end
-	_G.SetMapByID(orig)
+	
 end
 
 function Archy:UpdateFramePositions()
@@ -2326,8 +2327,7 @@ function Archy:OnEnable()
 			end
 		end		
 	end
-	
- 	self:RegisterEvent("PLAYER_ALIVE") -- Drii: delay loading Blizzard_ArchaeologyUI until PLAYER_ALIVE so races main page doesn't bug.
+ 	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE -PLAYER_ALIVE- so races main page doesn't bug.
 end
 
 function Archy:OnDisable()
@@ -2462,7 +2462,7 @@ function Archy:LootReceived(event, msg)
 	end
 end
 
-function Archy:PLAYER_ALIVE()
+function Archy:QUEST_LOG_UPDATE()
 	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
 	if not Blizzard_SolveArtifact then
 		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then 
@@ -2487,7 +2487,7 @@ function Archy:PLAYER_ALIVE()
 		end
 	end
 	Archy:ConfigUpdated()
-	self:UnregisterEvent("PLAYER_ALIVE")
+	self:UnregisterEvent("QUEST_LOG_UPDATE")
 	self.PLAYER_ALIVE = nil
 end
 
@@ -2515,15 +2515,9 @@ function Archy:PLAYER_ENTERING_WORLD()
 
 	SECURE_ACTION_BUTTON = button
 
--- 	_G.SetMapToCurrentZone() -- Drii: ticket #371 BigWigs load on zone after a reload/login in raid.
+ 	_G.SetMapToCurrentZone()
 	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
-	self:ScheduleTimer(function()
-		self:UpdateDigSiteFrame()
-		self:UpdateRacesFrame()
-		timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
-	end, 1)
-
-	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
+	self:ScheduleTimer("UpdatePlayerPosition", 2, true) -- Drii: 2nd timer is started when this runs
 
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self.PLAYER_ENTERING_WORLD = nil
@@ -2635,6 +2629,13 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
+	if force and not timer_handle then
+		self:ScheduleTimer(function()
+		self:UpdateDigSiteFrame()
+		self:UpdateRacesFrame()
+		timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
+		end, 1)
+	end
 	if not private.db.general.show and not force then
 		return
 	end
