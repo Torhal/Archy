@@ -691,7 +691,8 @@ local function UpdateRaceArtifact(race_id)
 	artifact.tooltip = spellDescription
 	artifact.rare = (rarity ~= 0)
 	artifact.name = name
-	artifact.canSolveStone = nil
+	artifact.canSolveStone = nil -- Drii: stores whether we can actually solve with current user selection
+	artifact.canSolveInventory = nil -- Drii: stores whether we would be able to solve if using all inventory stones
 	artifact.keystone_adjustment = 0
 	artifact.completionCount = 0
 
@@ -715,6 +716,7 @@ local function UpdateRaceArtifact(race_id)
 				artifact.canSolveStone = _G.CanSolveArtifact()
 			end
 		end
+		artifact.canSolveInventory = _G.CanSolveArtifact()
 
 		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then -- Drii: keep our user value if there's one
 			_, adjust = _G.GetArtifactProgress() -- Drii: or get the current fill if not
@@ -730,12 +732,12 @@ local function UpdateRaceArtifact(race_id)
 		return
 	end
 
-	if not has_announced[artifact.name] and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveStone)) then
+	if not has_announced[artifact.name] and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
 		has_announced[artifact.name] = true
 		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race_data[race_id].name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
 	end
 
-	if not has_pinged[artifact.name] and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveStone)) then
+	if not has_pinged[artifact.name] and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
 		has_pinged[artifact.name] = true
 		_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
 	end
@@ -890,7 +892,8 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
     6 artifact.keystones_added,
     7 artifact.canSolve,
     8 artifact.canSolveStone,
-    9 artifact.rare }
+    9 artifact.canSolveInventory,
+   10 artifact.rare }
 ]]
 
 	local perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
@@ -898,7 +901,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 
 	if data.canSolve then
 		self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
-	elseif data.canSolveStone then
+	elseif data.canSolveInventory then
 		self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
 	elseif data.rare then
 		self.r, self.g, self.b = bar_colors["Rare"].r, bar_colors["Rare"].g, bar_colors["Rare"].b
@@ -999,6 +1002,7 @@ function Archy:LDBTooltipShow()
 					progress_data.keystones_added = artifact.keystones_added
 					progress_data.canSolve = artifact.canSolve
 					progress_data.canSolveStone = artifact.canSolveStone
+					progress_data.canSolveInventory = artifact.canSolveInventory
 					progress_data.rare = artifact.rare
 	
 					Archy_LDB_Tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
@@ -1326,7 +1330,7 @@ end
 function Archy:SolveAnyArtifact(use_stones)
 	local found = false
 	for race_id, artifact in pairs(artifacts) do
-		if not private.db.artifact.blacklist[race_id] and (artifact.canSolve or (use_stones and artifact.canSolveStone)) then
+		if not private.db.artifact.blacklist[race_id] and (artifact.canSolve or (use_stones and artifact.canSolveInventory)) then
 			SolveRaceArtifact(race_id, use_stones)
 			found = true
 			break
@@ -2138,7 +2142,7 @@ local function SpawnToast(source, text, r, g, b, ...)
 	Toast:Spawn("Archy_Toast", text)
 end
 
-function Archy:OnInitialize()
+function Archy:OnInitialize() -- @ADDON_LOADED (1)
 	self.db = LibStub("AceDB-3.0"):New("ArchyDB", PROFILE_DEFAULTS, 'Default')
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileUpdate")
@@ -2271,7 +2275,9 @@ local function InitializeFrames()
 	private.distance_indicator_frame.surveyButton:SetText(_G.GetSpellInfo(SURVEY_SPELL_ID))
 	private.distance_indicator_frame.surveyButton:SetWidth(private.distance_indicator_frame.surveyButton:GetTextWidth() + 20)
 	private.distance_indicator_frame.circle:SetScale(0.65)
-
+	
+	private.frames_init_done = true
+	
 	Archy:UpdateFramePositions()
 	Archy:UpdateDigSiteFrame()
 	Archy:UpdateRacesFrame()
@@ -2279,7 +2285,7 @@ end
 
 local timer_handle
 
-function Archy:OnEnable()
+function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	_G["SLASH_ARCHY1"] = "/archy"
 	_G.SlashCmdList["ARCHY"] = SlashHandler
 
@@ -2295,6 +2301,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("SKILL_LINES_CHANGED", "UpdateSkillBar")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 	self:RegisterBucketEvent("BAG_UPDATE", 0.2)
@@ -2327,7 +2334,7 @@ function Archy:OnEnable()
 			end
 		end		
 	end
- 	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE -PLAYER_ALIVE- so races main page doesn't bug.
+
 end
 
 function Archy:OnDisable()
@@ -2365,7 +2372,7 @@ end
 
 function Archy:ARTIFACT_HISTORY_READY()
 	for race_id, artifact in pairs(artifacts) do
-		local _, _, completionCount = GetArtifactStats(race_id, artifact.name) -- drii:
+		local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
 		if completionCount then
 			artifact.completionCount = completionCount
 		end
@@ -2462,7 +2469,7 @@ function Archy:LootReceived(event, msg)
 	end
 end
 
-function Archy:QUEST_LOG_UPDATE()
+function Archy:QUEST_LOG_UPDATE() -- (4)
 	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
 	if not Blizzard_SolveArtifact then
 		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then 
@@ -2486,12 +2493,12 @@ function Archy:QUEST_LOG_UPDATE()
 			end
 		end
 	end
-	Archy:ConfigUpdated()
+	if private.frames_init_done then Archy:ConfigUpdated() end
 	self:UnregisterEvent("QUEST_LOG_UPDATE")
-	self.PLAYER_ALIVE = nil
+	self.QUEST_LOG_UPDATE = nil
 end
 
-function Archy:PLAYER_ENTERING_WORLD()
+function Archy:PLAYER_ENTERING_WORLD() -- (3)
 	local button_name = "Archy_SurveyButton"
 	local button = _G.CreateFrame("Button", button_name, _G.UIParent, "SecureActionButtonTemplate")
 	button:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
@@ -2517,7 +2524,14 @@ function Archy:PLAYER_ENTERING_WORLD()
 
  	_G.SetMapToCurrentZone()
 	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
-	self:ScheduleTimer("UpdatePlayerPosition", 2, true) -- Drii: 2nd timer is started when this runs
+	self:ScheduleTimer(function()
+		if private.frames_init_done then
+			self:UpdateDigSiteFrame()
+			self:UpdateRacesFrame()
+		end
+		timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
+	end, 1)
+	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self.PLAYER_ENTERING_WORLD = nil
@@ -2539,26 +2553,26 @@ function Archy:PLAYER_REGEN_ENABLED()
 		private.regen_toggle_distance = nil
 		ToggleDistanceIndicator()
 	end
-
-	if private.regen_update_races then
-		private.regen_update_races = nil
-		self:UpdateRacesFrame()
-	end
-
-	if private.regen_update_digsites then
-		private.regen_update_digsites = nil
-		self:UpdateDigSiteFrame()
+	
+	if private.regen_update_tracking then
+		private.regen_update_tracking = nil
+		self:UpdateTracking()
 	end
 	
 	if private.regen_clear_override then
 		private.regen_clear_override = nil
 		_G.ClearOverrideBindings(SECURE_ACTION_BUTTON.name)
 		overrideOn = false
+	end	
+
+	if private.regen_update_digsites then
+		private.regen_update_digsites = nil
+		self:UpdateDigSiteFrame()
 	end
 	
-	if private.regen_update_tracking then
-		private.regen_update_tracking = nil
-		self:UpdateTracking()
+	if private.regen_update_races then
+		private.regen_update_races = nil
+		self:UpdateRacesFrame()
 	end
 	
 end
@@ -2629,19 +2643,13 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if force and not timer_handle then
-		self:ScheduleTimer(function()
-		self:UpdateDigSiteFrame()
-		self:UpdateRacesFrame()
-		timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
-		end, 1)
-	end
 	if not private.db.general.show and not force then
 		return
 	end
 	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
 		return
 	end
+	if not private.frames_init_done then return end
 
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
@@ -3076,11 +3084,11 @@ function Archy:RefreshRacesDisplay()
 				end
 			end
 
-			if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then
+			if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then -- Drii: actual user-filled sockets enough to solve so enable the manual solve button
 				child.solveButton:Enable()
 				barColor = private.db.artifact.fragmentBarColors["Solvable"]
 			else
-				if artifact.canSolveStone then
+				if artifact.canSolveInventory then -- Drii: solve available with stones from inventory but not enough socketed
 					barColor = private.db.artifact.fragmentBarColors["AttachToSolve"]
 				end
 				child.solveButton:Disable()
