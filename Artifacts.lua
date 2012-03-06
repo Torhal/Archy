@@ -868,8 +868,8 @@ local ARTIFACTS = {
 		rarity = 0,
 		keystones = 2,
 		fragments = 45,
-	},
-	[AF["Crawling Claw"]] = {
+	}, -- Mummified Monkey Paw is the project name, Crawling Claw the item/spell name produced.
+	[AF["Mummified Monkey Paw"]] = {
 		itemid = 60847,
 		spellid = 92137,
 		raceid = RACE_TOLVIR,
