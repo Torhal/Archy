@@ -2362,7 +2362,9 @@ end
 
 function Archy:ARTIFACT_COMPLETE(event, name)
 	for race_id, artifact in pairs(artifacts) do
-		if artifact.name == name then 
+		if artifact.name == name then
+			if has_pinged[name] then has_pinged[name] = nil end       -- Drii: see if this helps with ticket 377 
+			if has_announced[name] then has_announced[name] = nil end -- (alerts not working if the same common artifact pops up after solving it)
 			UpdateRaceArtifact(race_id) -- this is still the artifact that was just solved when the event fires
 			self:ScheduleTimer(function() UpdateRaceArtifact(race_id) Archy:RefreshRacesDisplay() end, 2)
 			break
