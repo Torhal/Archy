@@ -358,7 +358,7 @@ local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 local Blizzard_SolveArtifact
 local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local UpdateMinimapPOIs
-local CacheMapData
+local CacheMapData, UpdateAllSites
 
 -----------------------------------------------------------------------
 -- Metatables.
@@ -1284,9 +1284,12 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		end
 	end,
 	digsite = function(option)
+		if option == "tooltip" then
+			UpdateAllSites()
+		end
 		Archy:UpdateDigSiteFrame()
 
-		if option == "font" then
+		if option == "font" then 
 			Archy:ResizeDigSiteDisplay()
 		else
 			Archy:RefreshDigSiteDisplay()
@@ -1495,7 +1498,7 @@ local function UpdateSite(continent_id)
 	end
 end
 
-local function UpdateAllSites()
+UpdateAllSites = function()
 	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
 	local original_map_id = _G.GetCurrentMapAreaID()
 	if CacheMapData then CacheMapData() end -- Drii: runs only once

@@ -1425,7 +1425,7 @@ local function GetTooltipOptions()
 					end,
 					set = function(_, value)
 						db.tooltip.filter_continent = value
-						Archy:ConfigUpdated('digsite')
+						Archy:ConfigUpdated('digsite', 'tooltip')
 					end,
 				},
 				scale = {
