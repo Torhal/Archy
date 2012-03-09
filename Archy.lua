@@ -1191,7 +1191,6 @@ function LDB_object:OnClick(button, down)
 		else
 			private.db.general.show = not private.db.general.show
 			Archy:ConfigUpdated()
-			ToggleDistanceIndicator()
 		end
 	elseif button == "RightButton" then
 		private.db.general.locked = not private.db.general.locked
@@ -1329,6 +1328,7 @@ function Archy:ConfigUpdated(namespace, option)
 		self:UpdateDigSiteFrame()
 		self:RefreshDigSiteDisplay()
 		self:UpdateTracking()
+		ToggleDistanceIndicator()
 		UpdateMinimapPOIs(true)
 		RefreshTomTom()
 		SuspendClickToMove()
@@ -2318,7 +2318,7 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	private.db.general.locked = false
 
 	InitializeFrames()
-	ToggleDistanceIndicator()
+-- 	ToggleDistanceIndicator() -- Drii: will run after init finished anyway
 	self:UpdateTracking()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
@@ -2550,6 +2550,7 @@ end
 
 function Archy:PLAYER_REGEN_DISABLED()
 	private.in_combat = true
+	if Archy_LDB_Tooltip and Archy_LDB_Tooltip:IsShown() then Archy_LDB_Tooltip:Hide() end
 end
 
 function Archy:PLAYER_REGEN_ENABLED()
@@ -3594,3 +3595,10 @@ function Archy:OnPlayerLooting(event, ...)
 		end
 	end
 end
+
+--@do-not-package@
+--[[
+toggle macro
+/run Archy.db.profile.general.show = not Archy.db.profile.general.show Archy:ConfigUpdated()
+]]
+--@end-do-not-package@
