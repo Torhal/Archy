@@ -779,7 +779,7 @@ local function SolveRaceArtifact(race_id, use_stones)
 	Blizzard_SolveArtifact()
 end
 
-local function ToggleDistanceIndicator()
+local function ToggleDistanceIndicator() 
 	if IsTaintable() then
 		private.regen_toggle_distance = true
 		return
@@ -792,7 +792,13 @@ local function ToggleDistanceIndicator()
 	private.distance_indicator_frame:Show()
 
 	if distanceIndicatorActive then
-		private.distance_indicator_frame.circle:SetAlpha(1) else private.distance_indicator_frame.circle:SetAlpha(0)
+		private.distance_indicator_frame.circle:SetAlpha(1) 
+	else 
+		if private.db.digsite.distanceIndicator.undocked and private.db.digsite.distanceIndicator.showSurveyButton then
+			private.distance_indicator_frame.circle:SetAlpha(0.25) -- Drii: allow the distance indicator to show at reduced alpha for dragging when undocked
+		else
+			private.distance_indicator_frame.circle:SetAlpha(0)
+		end
 	end
 
 	if private.db.digsite.distanceIndicator.showSurveyButton then
@@ -3456,7 +3462,7 @@ function Archy:RefreshDigSiteDisplay()
 end
 
 function Archy:SetFramePosition(frame)
-	if frame.isMoving then
+	if frame.isMoving or ( frame:IsProtected() and IsTaintable() ) then
 		return
 	end
 	local bPoint, bRelativePoint, bXofs, bYofs

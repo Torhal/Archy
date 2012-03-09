@@ -266,10 +266,11 @@
 				if (Archy.db.profile.general.locked == false and Archy.db.profile.digsite.distanceIndicator.undocked == true) then
 					self:StopMovingOrSizing()
 					self.isMoving = false
-					self:SetUserPlaced(false)
-					self:SetFrameLevel(2)
-					
-					Archy:SaveFramePosition(self)
+					if not InCombatLockdown() then
+						self:SetUserPlaced(false)
+						self:SetFrameLevel(2)
+						Archy:SaveFramePosition(self)
+					end
 				end
 			</OnDragStop>
 		</Scripts>
