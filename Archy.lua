@@ -1595,17 +1595,29 @@ function Archy:ImportOldStatsDB()
 	local site_stats = self.db.char.digsites.stats
 
 	for key, st in pairs(self.db.char.digsites) do
-		if key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" then
-			if DIG_SITES[key] then
+		if type(key)=="string" and key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" then
+			if DIG_SITES[key] then -- Drii: DIG_SITES has a custom metatable so this would add ANY key passed and set it to the EMPTY_DIGSITE table; was this corrupting the SV? ticket 380
 				local site = DIG_SITES[key]
-				site_stats[site.blob_id].surveys = (site_stats[site.blob_id].surveys or 0) + (st.surveys or 0)
-				site_stats[site.blob_id].fragments = (site_stats[site.blob_id].fragments or 0) + (st.fragments or 0)
-				site_stats[site.blob_id].looted = (site_stats[site.blob_id].looted or 0) + (st.looted or 0)
-				site_stats[site.blob_id].keystones = (site_stats[site.blob_id].keystones or 0) + (st.keystones or 0)
-				self.db.char.digsites[key] = nil
+				if type(site.blob_id) == "number" and site.blob_id > 0 then -- Drii: make sure we're not puting whatever trash was passed into the stats SV.
+					site_stats[site.blob_id].surveys = (site_stats[site.blob_id].surveys or 0) + (st.surveys or 0)
+					site_stats[site.blob_id].fragments = (site_stats[site.blob_id].fragments or 0) + (st.fragments or 0)
+					site_stats[site.blob_id].looted = (site_stats[site.blob_id].looted or 0) + (st.looted or 0)
+					site_stats[site.blob_id].keystones = (site_stats[site.blob_id].keystones or 0) + (st.keystones or 0)
+					self.db.char.digsites[key] = nil
+				end
 			end
 		end
 	end
+	-- Drii: let's also try to fix whatever crap was put in the SV by the old version of this function so users don't have to delete their variables.
+	if next(site_stats) then
+		for blobid, _ in pairs(site_stats) do
+			if type(blobid)=="number" and blobid > 0 then
+			else
+				site_stats[blobid] = nil
+			end
+		end
+	end
+	
 end
 
 --[[ Survey Functions ]] --
@@ -2446,12 +2458,14 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 
 			distanceIndicatorActive = false
 			ToggleDistanceIndicator()
-
-			IncrementDigCounter(lastSite.id)
-			site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
-			site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
-
-			AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
+			
+			if type(lastSite.id) == "number" and lastSite.id > 0 then -- Drii: for now let's just avoid the error
+				IncrementDigCounter(lastSite.id) -- Drii: ticket 380 lastSite.id passed is nil or not a number; why?
+				site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
+				site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
+	
+				AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
+			end
 
 			survey_location.map = 0
 			survey_location.level = 0
