@@ -352,6 +352,8 @@ local has_announced, has_pinged = {}, {}
 
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 
+local prevTheme
+
 -----------------------------------------------------------------------
 -- Function upvalues
 -----------------------------------------------------------------------
@@ -779,7 +781,7 @@ local function SolveRaceArtifact(race_id, use_stones)
 	Blizzard_SolveArtifact()
 end
 
-local function ToggleDistanceIndicator() 
+local function ToggleDistanceIndicator()
 	if IsTaintable() then
 		private.regen_toggle_distance = true
 		return
@@ -1292,6 +1294,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		if option == "tooltip" then
 			UpdateAllSites()
 		end
+		Archy:UpdateSiteDistances()
 		Archy:UpdateDigSiteFrame()
 
 		if option == "font" then 
@@ -1509,14 +1512,7 @@ UpdateAllSites = function()
 	local original_map_id = _G.GetCurrentMapAreaID()
 	if CacheMapData then CacheMapData() end -- Drii: runs only once
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
-		if private.db.tooltip.filter_continent then
-			if continent_id == MAP_ID_TO_CONTINENT_ID[current_continent] then
-				UpdateSite(continent_id)
-				break
-			end
-		else
-			UpdateSite(continent_id)
-		end
+		UpdateSite(continent_id)
 	end
 	_G.SetMapByID(original_map_id)
 end
@@ -1642,39 +1638,6 @@ local function AddSurveyNode(siteId, map, level, x, y)
 		local distance = Astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
 
 		if not distance or _G.IsInInstance() then
-			distance = 0
-		end
-
-		if distance <= 10 then
-			exists = true
-			break
-		end
-	end
-	if not exists then
-		table.insert(Archy.db.global.surveyNodes[siteId], newNode)
-	end
-end
-
-function Archy:InjectSurveyNode(siteId, map, level, x, y)
-	local newNode = {
-		m = map,
-		f = level,
-		x = x,
-		y = y
-	}
-	local exists = false
-
-	if not Archy.db.global.surveyNodes then
-		Archy.db.global.surveyNodes = {}
-	end
-
-	if not Archy.db.global.surveyNodes[siteId] then
-		Archy.db.global.surveyNodes[siteId] = {}
-	end
-
-	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do
-		local distance = Astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
-		if not distance then
 			distance = 0
 		end
 
@@ -2215,6 +2178,7 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		end
 	})
 	private.db = self.db.profile
+	prevTheme = private.db and private.db.general and private.db.general.theme or PROFILE_DEFAULTS.profile.general.theme
 
 	if not private.db.data then
 		private.db.data = {}
@@ -2330,7 +2294,6 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	private.db.general.locked = false
 
 	InitializeFrames()
--- 	ToggleDistanceIndicator() -- Drii: will run after init finished anyway
 	self:UpdateTracking()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
@@ -2362,8 +2325,19 @@ function Archy:OnDisable()
 	self:CancelTimer(timer_handle)
 end
 
-function Archy:OnProfileUpdate()
-	private.db = self.db.profile
+function Archy:OnProfileUpdate(event, database, ProfileKey)
+	local newTheme
+	if database then
+		if event == "OnProfileChanged" or event == "OnProfileCopied" then
+			newTheme = database.profile and database.profile.general and database.profile.general.theme or PROFILE_DEFAULTS.profile.general.theme
+		elseif event == "OnProfileReset" then
+			newTheme = database.defaults and database.defaults.profile and database.defaults.profile.general and database.defaults.profile.general.theme
+		end
+	end
+	private.db = database and database.profile or self.db.profile
+	if newTheme ~= prevTheme then
+		_G.ReloadUI() 
+	end
 	self:ConfigUpdated()
 	self:UpdateFramePositions()
 end
@@ -2688,18 +2662,26 @@ function Archy:UpdatePlayerPosition(force)
 	if not map or not level or (x == 0 and y == 0) then
 		return
 	end
-
+	
 	if player_position.x ~= x or player_position.y ~= y or player_position.map ~= map or player_position.level ~= level or force then
 		player_position.x, player_position.y, player_position.map, player_position.level = x, y, map, level
 
 		self:RefreshAll()
 	end
-	local continent = Astrolabe:GetMapInfo(map, level)
-
+	local continent = Astrolabe:GetMapInfo(map, level) -- Drii: can return nil
+	
 	if current_continent == continent then
+		if force and current_continent then 
+			UpdateAllSites()
+			ToggleDistanceIndicator()
+		elseif force and not continent then
+			self:ScheduleTimer("UpdatePlayerPosition", 1, true) -- Drii: get the edge case where continent and current_continent are both nil (nil==nil is true)
+		end
 		return
 	end
 	current_continent = continent
+	
+	if force then ToggleDistanceIndicator() end
 
 	if #race_data == 0 then
 		for race_id = 1, _G.GetNumArchaeologyRaces() do
@@ -2723,6 +2705,7 @@ function Archy:UpdatePlayerPosition(force)
 		self:UpdateRacesFrame()
 		self:RefreshRacesDisplay()
 	end
+	if force then self:UpdateSiteDistances() end
 	self:UpdateDigSiteFrame()
 	self:RefreshDigSiteDisplay()
 	self:UpdateFramePositions()
@@ -3578,7 +3561,6 @@ function Archy:SaveFramePosition(frame)
 		end
 	end
 
-	self:OnProfileUpdate()
 end
 
 function Archy:OnPlayerLooting(event, ...)
