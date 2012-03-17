@@ -59,7 +59,6 @@ local DIG_SITES = private.dig_sites
 local ARTIFACTS = private.artifacts_db
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[#_G.PROFESSION_RANKS][1]
 local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in OnInitialize()
-local MAP_CONTINENTS = { _G.GetMapContinents() }
 local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_ZONE_NAME = {} -- Popupated in OnInitialize()
@@ -304,6 +303,7 @@ local SURVEY_SPELL_ID = 80451
 local FISHING_SPELL_NAME = (GetSpellInfo(7620)) or ""
 local ZONE_DATA = {}
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
+local MAP_CONTINENTS = {} -- Popupated in CacheMapData
 
 _G.BINDING_HEADER_ARCHY = "Archy"
 _G.BINDING_NAME_OPTIONS = L["BINDING_NAME_OPTIONS"]
@@ -608,8 +608,14 @@ local function GetArtifactsDelta(race_id, missing_data)
 		end
 		total_missing = total_missing + 1
 	end
-	
-	return rare_count - rare_missing, rare_count, common_count - common_missing, common_count, total_count - total_missing, total_count
+	missing_data["rare_done"] = rare_count - rare_missing
+	missing_data["rare_count"] = rare_count
+	missing_data["common_done"] = common_count - common_missing
+	missing_data["common_count"] = common_count
+	missing_data["total_done"] = total_count - total_missing
+	missing_data["total_count"] = total_count
+		
+	return missing_data["rare_done"], missing_data["rare_count"], missing_data["common_done"], missing_data["common_count"], missing_data["total_done"], missing_data["total_count"]
 end
 
 local function GetArtifactStats(race_id, name)
@@ -837,6 +843,29 @@ Dialog:Register("ArchyConfirmSolve", {
 	hide_on_escape = true,
 })
 
+-- Drii: temporary workaround for ticket 384
+Dialog:Register("ArchyTomTomError",{
+	text = "",
+	on_show = function(self, data)
+		self.text:SetFormattedText("%s%s|r\nIncompatible TomTom setting detected. \"%s%s|r\".\nDo you want to reset it? (will reloadui)", "|cFFFFCC00", ADDON_NAME, "|cFFFF0000", TomTomLocals and TomTomLocals["Enable automatic quest objective waypoints"] or "")
+	end,
+	buttons = {
+		{
+			text = _G.YES,
+			on_click = function(self, data)
+				TomTom.profile.poi.setClosest = false
+				TomTom:EnableDisablePOIIntegration()
+				_G.ReloadUI()
+			end,
+		},
+		{
+			text = _G.NO,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+})
+
 -----------------------------------------------------------------------
 -- LDB_object methods
 -----------------------------------------------------------------------
@@ -891,7 +920,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	local barTexture = [[Interface\TargetingFrame\UI-StatusBar]]
 	local bar = self.bar
 	local fs = self.fs
-	--[[    {
+	--[[    { -- artifacts
     1 artifact.fragments,
     2 artifact.keystone_adjustment,
     3 artifact.fragments_required,
@@ -902,36 +931,60 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
     8 artifact.canSolveStone,
     9 artifact.canSolveInventory,
    10 artifact.rare }
+   				{ -- rares overall progress
+   	1 progress.rare_done,
+   	2 progress.rare_count,
+   	3 progress.common_done,
+   	4 progress.common_count,
+   	5 progress.total_done,
+   	6 progress.total_count, }
 ]]
-
-	local perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
-	local bar_colors = private.db.artifact.fragmentBarColors
-
-	if data.canSolve then
-		self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
-	elseif data.canSolveInventory then
-		self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
-	elseif data.rare then
-		self.r, self.g, self.b = bar_colors["Rare"].r, bar_colors["Rare"].g, bar_colors["Rare"].b
-	else
-		self.r, self.g, self.b = bar_colors["Normal"].r, bar_colors["Normal"].g, bar_colors["Normal"].b
+	if tooltipMode == 1 then -- artifacts_digsites
+		local perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
+		local bar_colors = private.db.artifact.fragmentBarColors
+	
+		if data.canSolve then
+			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
+		elseif data.canSolveInventory then
+			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
+		elseif data.rare then
+			self.r, self.g, self.b = bar_colors["Rare"].r, bar_colors["Rare"].g, bar_colors["Rare"].b
+		else
+			self.r, self.g, self.b = bar_colors["Normal"].r, bar_colors["Normal"].g, bar_colors["Normal"].b
+		end
+		bar:SetVertexColor(self.r, self.g, self.b)
+		bar:SetWidth(perc)
+	
+		local adjust = ""
+		if data.keystone_adjustment > 0 then
+			adjust = "(+" .. tostring(data.keystone_adjustment) .. ")"
+		end
+	
+		fs:SetFormattedText("%d%s / %d", data.fragments, adjust, data.fragments_required)
+	elseif tooltipMode == 2 then -- overall_completion
+		local perc = math.min((data.rare_done / data.rare_count) * 100, 100)
+		local bar_colors = private.db.artifact.fragmentBarColors
+	
+		if data.rare_done > 0 and data.rare_done == data.rare_count then -- all done
+			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
+		elseif data.rare_done > 0 and data.rare_done < data.rare_count then
+			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
+		else
+			self.r, self.g, self.b = 0.0, 0.0, 0.0
+		end
+		bar:SetVertexColor(self.r, self.g, self.b)
+		bar:SetWidth(perc)
+	
+		fs:SetFormattedText("%d / %d", data.rare_done, data.rare_count)
 	end
-	bar:SetVertexColor(self.r, self.g, self.b)
-	bar:SetWidth(perc)
+	
 	bar:SetTexture(barTexture)
 	bar:Show()
 	fs:SetFontObject(font or tooltip:GetFont())
 	fs:SetJustifyH("CENTER")
-	fs:SetTextColor(1, 1, 1)
-
-	local adjust = ""
-	if data.keystone_adjustment > 0 then
-		adjust = "(+" .. tostring(data.keystone_adjustment) .. ")"
-	end
-
-	fs:SetFormattedText("%d%s / %d", data.fragments, adjust, data.fragments_required)
+	fs:SetTextColor(1, 1, 1)	
 	fs:Show()
-
+	
 	return bar:GetWidth() + 2, bar:GetHeight() + 2
 end
 
@@ -1037,8 +1090,9 @@ function Archy:LDBTooltipShow()
 							break
 						end
 					end
+
 					line = Archy_LDB_Tooltip:AddLine(" ")
-					Archy_LDB_Tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns)
+					Archy_LDB_Tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns) -- Drii: ticket 384
 	
 					line = Archy_LDB_Tooltip:AddLine(" ")
 					Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
@@ -1089,7 +1143,7 @@ function Archy:LDBTooltipShow()
 					Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name .. "*", "LEFT", 1)
 					Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:"..race_id)
-					Archy_LDB_Tooltip:SetCell(line, 3, rare_done .. "/" .. rare_count, "LEFT", 1) -- Drii: beautify the rare count using the cell_provider?
+					Archy_LDB_Tooltip:SetCell(line, 3, missing_data, Archy_cell_provider, 1, 0, 0)
 					Archy_LDB_Tooltip:SetCell(line, 5, common_done .. "/" .. common_count, "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
 					all_rare_done = all_rare_done + rare_done
@@ -1123,19 +1177,19 @@ function Archy:LDBTooltipShow()
 					GetArtifactsDelta(race_id, missing_data)
 					local startline, endline
 					for artifact,info in pairs(missing_data) do -- rares first
-						if info.rarity > 0 then
+						if type(info)=="table" and info.rarity > 0 then
 							line = Archy_LDB_Tooltip:AddLine(" ")
 							Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 							Archy_LDB_Tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex,artifact) .. "*", "LEFT", 1)
 							Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "spellid:"..info.spellid)
 							if not startline then startline = line end
 							endline = line
-						end						
+						end
 					end	
 					if endline and endline >= startline then -- commons next (not exhaustive)
 						local line, cell = startline, 3
 						for artifact,info in pairs(missing_data) do 
-							if info.rarity == 0 then
+							if type(info)=="table" and info.rarity == 0 then
 								if line <= endline and cell <= 5 then
 									Archy_LDB_Tooltip:SetCell(line, cell, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[1].hex,artifact), "LEFT", 2)
 									cell = cell + 2
@@ -1455,6 +1509,7 @@ local function GetContinentSites(continent_id)
 end
 
 CacheMapData = function()
+	if not next(MAP_CONTINENTS) then MAP_CONTINENTS = { _G.GetMapContinents() } end
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		_G.SetMapZoom(continent_id)
 		local map_id = _G.GetCurrentMapAreaID()
@@ -1476,7 +1531,8 @@ CacheMapData = function()
 			_G.SetMapZoom(continent_id, zone_id)
 			local map_id = _G.GetCurrentMapAreaID()
 			local level = _G.GetCurrentMapDungeonLevel()
-			MAP_FILENAME_TO_MAP_ID[_G.GetMapInfo()] = map_id
+			local map_file_name = _G.GetMapInfo()
+			MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
 			MAP_ID_TO_ZONE_ID[map_id] = zone_id
 			MAP_ID_TO_ZONE_NAME[map_id] = zone_name
 			ZONE_ID_TO_NAME[zone_id] = zone_name
@@ -1484,13 +1540,15 @@ CacheMapData = function()
 				continent = zone_id,
 				map = map_id,
 				level = level,
-				mapFile = _G.GetMapInfo(),
+				mapFile = map_file_name,
 				id = zone_id,
 				name = zone_name
 			}
 		end
 	end
-	CacheMapData = nil
+	if next(ZONE_DATA) then
+		CacheMapData = nil
+	end
 end
 
 local function UpdateSite(continent_id)
@@ -1510,9 +1568,11 @@ end
 UpdateAllSites = function()
 	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
 	local original_map_id = _G.GetCurrentMapAreaID()
-	if CacheMapData then CacheMapData() end -- Drii: runs only once
-	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
-		UpdateSite(continent_id)
+	if CacheMapData then CacheMapData() end -- Drii: runs only until ZONE_DATA is populated
+	if next(MAP_CONTINENTS) then
+		for continent_id, continent_name in pairs(MAP_CONTINENTS) do
+			UpdateSite(continent_id)
+		end
 	end
 	_G.SetMapByID(original_map_id)
 end
@@ -2297,6 +2357,8 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	self:UpdateTracking()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
+	-- Drii: workaround for TomTom bug ticket 384
+ 	private.tomtomPoiIntegration = private.tomtomExists and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
 	-- Check for minimap AddOns.
 	local mbf = LibStub("AceAddon-3.0"):GetAddon("Minimap Button Frame", true)
@@ -2533,6 +2595,7 @@ function Archy:PLAYER_ENTERING_WORLD() -- (3)
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	if private.tomtomPoiIntegration and TomTom.profile.poi.setClosest then Dialog:Spawn("ArchyTomTomError") end -- Drii: temporary workaround for ticket 384
 	self.PLAYER_ENTERING_WORLD = nil
 end
 
@@ -2650,7 +2713,7 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 	if not private.frames_init_done then return end
-
+	
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
 		self:UpdateDigSiteFrame()
@@ -3596,5 +3659,7 @@ end
 --[[
 toggle macro
 /run Archy.db.profile.general.show = not Archy.db.profile.general.show Archy:ConfigUpdated()
+TomTom.profile.poi.setClosest = false
+TomTom:EnableDisablePOIIntegration()
 ]]
 --@end-do-not-package@
