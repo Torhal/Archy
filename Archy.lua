@@ -569,6 +569,7 @@ local function GetAchievementProgress()
 	return rare:gsub("^.+:",""):trim(), common
 end
 
+local count_descriptors = {["rare_counts"]=true,["common_counts"]=true,["total_counts"]=true}
 local function GetArtifactsDelta(race_id, missing_data)
 	wipe(missing_data)
 	local rare_count, common_count, total_count = 0,0,0
@@ -608,14 +609,11 @@ local function GetArtifactsDelta(race_id, missing_data)
 		end
 		total_missing = total_missing + 1
 	end
-	missing_data["rare_done"] = rare_count - rare_missing
-	missing_data["rare_count"] = rare_count
-	missing_data["common_done"] = common_count - common_missing
-	missing_data["common_count"] = common_count
-	missing_data["total_done"] = total_count - total_missing
-	missing_data["total_count"] = total_count
-		
-	return missing_data["rare_done"], missing_data["rare_count"], missing_data["common_done"], missing_data["common_count"], missing_data["total_done"], missing_data["total_count"]
+	missing_data["rare_counts"] = {rare_count - rare_missing, rare_count}
+	missing_data["common_counts"] = {common_count - common_missing, common_count}
+	missing_data["total_counts"] = {total_count - total_missing, total_count}
+
+	return rare_count - rare_missing, rare_count, common_count - common_missing, common_count, total_count - total_missing, total_count
 end
 
 local function GetArtifactStats(race_id, name)
@@ -932,12 +930,8 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
     9 artifact.canSolveInventory,
    10 artifact.rare }
    				{ -- rares overall progress
-   	1 progress.rare_done,
-   	2 progress.rare_count,
-   	3 progress.common_done,
-   	4 progress.common_count,
-   	5 progress.total_done,
-   	6 progress.total_count, }
+   	1 progress[1], -- done
+   	2 progress[2], -- total }
 ]]
 	if tooltipMode == 1 then -- artifacts_digsites
 		local perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
@@ -962,12 +956,12 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	
 		fs:SetFormattedText("%d%s / %d", data.fragments, adjust, data.fragments_required)
 	elseif tooltipMode == 2 then -- overall_completion
-		local perc = math.min((data.rare_done / data.rare_count) * 100, 100)
+		local perc = math.min((data[1] / data[2]) * 100, 100)
 		local bar_colors = private.db.artifact.fragmentBarColors
 	
-		if data.rare_done > 0 and data.rare_done == data.rare_count then -- all done
+		if data[1] > 0 and data[1] == data[2] then -- all done
 			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
-		elseif data.rare_done > 0 and data.rare_done < data.rare_count then
+		elseif data[1] > 0 and data[1] < data[2] then
 			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
 		else
 			self.r, self.g, self.b = 0.0, 0.0, 0.0
@@ -975,7 +969,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 		bar:SetVertexColor(self.r, self.g, self.b)
 		bar:SetWidth(perc)
 	
-		fs:SetFormattedText("%d / %d", data.rare_done, data.rare_count)
+		fs:SetFormattedText("%d / %d", data[1], data[2])
 	end
 	
 	bar:SetTexture(barTexture)
@@ -1143,8 +1137,8 @@ function Archy:LDBTooltipShow()
 					Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name .. "*", "LEFT", 1)
 					Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:"..race_id)
-					Archy_LDB_Tooltip:SetCell(line, 3, missing_data, Archy_cell_provider, 1, 0, 0)
-					Archy_LDB_Tooltip:SetCell(line, 5, common_done .. "/" .. common_count, "LEFT", 1)
+					Archy_LDB_Tooltip:SetCell(line, 3, missing_data.rare_counts, Archy_cell_provider, 1, 0, 0)
+					Archy_LDB_Tooltip:SetCell(line, 5, missing_data.common_counts, Archy_cell_provider, 1, 0, 0)
 					Archy_LDB_Tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
 					all_rare_done = all_rare_done + rare_done
 					all_rare_count = all_rare_count + rare_count
@@ -1177,7 +1171,7 @@ function Archy:LDBTooltipShow()
 					GetArtifactsDelta(race_id, missing_data)
 					local startline, endline
 					for artifact,info in pairs(missing_data) do -- rares first
-						if type(info)=="table" and info.rarity > 0 then
+						if not count_descriptors[artifact] and info.rarity > 0 then
 							line = Archy_LDB_Tooltip:AddLine(" ")
 							Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 							Archy_LDB_Tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex,artifact) .. "*", "LEFT", 1)
@@ -1189,7 +1183,7 @@ function Archy:LDBTooltipShow()
 					if endline and endline >= startline then -- commons next (not exhaustive)
 						local line, cell = startline, 3
 						for artifact,info in pairs(missing_data) do 
-							if type(info)=="table" and info.rarity == 0 then
+							if not count_descriptors[artifact] and info.rarity == 0 then
 								if line <= endline and cell <= 5 then
 									Archy_LDB_Tooltip:SetCell(line, cell, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[1].hex,artifact), "LEFT", 2)
 									cell = cell + 2
@@ -3655,11 +3649,4 @@ function Archy:OnPlayerLooting(event, ...)
 	end
 end
 
---@do-not-package@
---[[
-toggle macro
-/run Archy.db.profile.general.show = not Archy.db.profile.general.show Archy:ConfigUpdated()
-TomTom.profile.poi.setClosest = false
-TomTom:EnableDisablePOIIntegration()
-]]
---@end-do-not-package@
+
