@@ -297,13 +297,13 @@ local PROFILE_DEFAULTS = {
 		},
 	},
 }
-local SECURE_ACTION_BUTTON -- Populated in PLAYER_ENTERING_WORLD
+local SECURE_ACTION_BUTTON -- Populated in OnInitialize()
 local SITES_PER_CONTINENT = 4
 local SURVEY_SPELL_ID = 80451
 local FISHING_SPELL_NAME = (GetSpellInfo(7620)) or ""
 local ZONE_DATA = {}
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
-local MAP_CONTINENTS = {} -- Popupated in CacheMapData
+local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
 
 _G.BINDING_HEADER_ARCHY = "Archy"
 _G.BINDING_NAME_OPTIONS = L["BINDING_NAME_OPTIONS"]
@@ -587,7 +587,7 @@ local function GetArtifactsDelta(race_id, missing_data)
 		end
 	end
 	
-	-- then remove the one's we've already solved at least once so we have the actual missing.
+	-- then remove the ones we've already solved at least once so we have the actual missing.
 	local artifact_index, artifact, _, completionCount = 1
 	artifact, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
 	if artifact and completionCount > 0 and missing_data[artifact] then -- TODO: Maybe display "in progress" but not yet obtained artifacts different?
@@ -2182,6 +2182,7 @@ end
 
 function Archy:OnInitialize() -- @ADDON_LOADED (1)
 	self.db = LibStub("AceDB-3.0"):New("ArchyDB", PROFILE_DEFAULTS, 'Default')
+	self.db.RegisterCallback(self, "OnNewProfile", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileUpdate")
@@ -2240,7 +2241,32 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 	private.db.data.imported = false
 
 	LDBI:Register("Archy", LDB_object, private.db.general.icon)
-
+	
+	if not SECURE_ACTION_BUTTON then
+		local button_name = "Archy_SurveyButton"
+		local button = _G.CreateFrame("Button", button_name, _G.UIParent, "SecureActionButtonTemplate")
+		button:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
+		button:Hide()
+		button:SetFrameStrata("LOW")
+		button:EnableMouse(true)
+		button:RegisterForClicks("RightButtonUp")
+		button.name = button_name
+		button:SetAttribute("type", "spell")
+		button:SetAttribute("spell", SURVEY_SPELL_ID)
+		button:SetAttribute("action", nil)
+	
+		button:SetScript("PostClick", function()
+			if not IsTaintable() then
+				_G.ClearOverrideBindings(_G[button_name])
+				overrideOn = false
+			else
+				private.regen_clear_override = true
+			end
+		end)
+	
+		SECURE_ACTION_BUTTON = button
+	end
+	
 	do
 		local clicked_time
 		local ACTION_DOUBLE_WAIT = 0.4
@@ -2386,7 +2412,7 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 	if database then
 		if event == "OnProfileChanged" or event == "OnProfileCopied" then
 			newTheme = database.profile and database.profile.general and database.profile.general.theme or PROFILE_DEFAULTS.profile.general.theme
-		elseif event == "OnProfileReset" then
+		elseif event == "OnProfileReset" or event == "OnNewProfile" then
 			newTheme = database.defaults and database.defaults.profile and database.defaults.profile.general and database.defaults.profile.general.theme
 		end
 	end
@@ -2554,43 +2580,22 @@ function Archy:QUEST_LOG_UPDATE() -- (4)
 end
 
 function Archy:PLAYER_ENTERING_WORLD() -- (3)
-	local button_name = "Archy_SurveyButton"
-	local button = _G.CreateFrame("Button", button_name, _G.UIParent, "SecureActionButtonTemplate")
-	button:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
-	button:Hide()
-	button:SetFrameStrata("LOW")
-	button:EnableMouse(true)
-	button:RegisterForClicks("RightButtonUp")
-	button.name = button_name
-	button:SetAttribute("type", "spell")
-	button:SetAttribute("spell", SURVEY_SPELL_ID)
-	button:SetAttribute("action", nil)
-
-	button:SetScript("PostClick", function()
-		if not IsTaintable() then
-			_G.ClearOverrideBindings(_G[button_name])
-			overrideOn = false
-		else
-			private.regen_clear_override = true
-		end
-	end)
-
-	SECURE_ACTION_BUTTON = button
-
  	_G.SetMapToCurrentZone()
 	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
-	self:ScheduleTimer(function()
-		if private.frames_init_done then
-			self:UpdateDigSiteFrame()
-			self:UpdateRacesFrame()
-		end
-		timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
-	end, 1)
+	if not timer_handle then
+		self:ScheduleTimer(function()
+			if private.frames_init_done then
+				self:UpdateDigSiteFrame()
+				self:UpdateRacesFrame()
+			end
+			timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
+		end, 1)
+	end
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	if private.tomtomPoiIntegration and TomTom.profile.poi.setClosest then Dialog:Spawn("ArchyTomTomError") end -- Drii: temporary workaround for ticket 384
-	self.PLAYER_ENTERING_WORLD = nil
+-- 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+-- 	self.PLAYER_ENTERING_WORLD = nil
 end
 
 function Archy:PLAYER_REGEN_DISABLED()
@@ -2706,6 +2711,8 @@ function Archy:UpdatePlayerPosition(force)
 	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
 		return
 	end
+	if force then _G.RequestArtifactCompletionHistory() end
+	
 	if not private.frames_init_done then return end
 	
 	if _G.GetCurrentMapAreaID() == -1 then
@@ -2748,7 +2755,7 @@ function Archy:UpdatePlayerPosition(force)
 				raceNameToID[race.name] = race_id
 				keystoneIDToRaceID[race.keystone.id] = race_id
 			end
-		end
+		end 
 		_G.RequestArtifactCompletionHistory()
 	end
 	ClearTomTomPoint()
