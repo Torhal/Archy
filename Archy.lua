@@ -2593,7 +2593,10 @@ function Archy:PLAYER_ENTERING_WORLD() -- (3)
 	end
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
-	if private.tomtomPoiIntegration and TomTom.profile.poi.setClosest then Dialog:Spawn("ArchyTomTomError") end -- Drii: temporary workaround for ticket 384
+	if private.tomtomPoiIntegration and TomTom.profile.poi.setClosest and not private.tomtomWarning then 
+		private.tomtomWarning = true 
+		Dialog:Spawn("ArchyTomTomError") 
+	end -- Drii: temporary workaround for ticket 384
 -- 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 -- 	self.PLAYER_ENTERING_WORLD = nil
 end
