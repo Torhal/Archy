@@ -306,12 +306,12 @@ local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
 local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
 
 _G.BINDING_HEADER_ARCHY = "Archy"
-_G.BINDING_NAME_OPTIONS = L["BINDING_NAME_OPTIONS"]
-_G.BINDING_NAME_TOGGLE = L["BINDING_NAME_TOGGLE"]
-_G.BINDING_NAME_SOLVE = L["BINDING_NAME_SOLVE"]
-_G.BINDING_NAME_SOLVE_WITH_KEYSTONES = L["BINDING_NAME_SOLVESTONE"]
-_G.BINDING_NAME_ARTIFACTS = L["BINDING_NAME_ARTIFACTS"]
-_G.BINDING_NAME_DIGSITES = L["BINDING_NAME_DIGSITES"]
+_G.BINDING_NAME_OPTIONSARCHY = L["BINDING_NAME_OPTIONS"]
+_G.BINDING_NAME_TOGGLEARCHY = L["BINDING_NAME_TOGGLE"]
+_G.BINDING_NAME_SOLVEARCHY = L["BINDING_NAME_SOLVE"]
+_G.BINDING_NAME_SOLVE_WITH_KEYSTONESARCHY = L["BINDING_NAME_SOLVESTONE"]
+_G.BINDING_NAME_ARTIFACTSARCHY = L["BINDING_NAME_ARTIFACTS"]
+_G.BINDING_NAME_DIGSITESARCHY = L["BINDING_NAME_DIGSITES"]
 
 -----------------------------------------------------------------------
 -- Variables
@@ -2646,7 +2646,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 	if unit ~= "player" or spell_id ~= SURVEY_SPELL_ID then
 		return
 	end
-
+	
 	if not player_position or not nearestSite then
 		survey_location.map = 0
 		survey_location.level = 0
@@ -2666,6 +2666,18 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 	ToggleDistanceIndicator()
 	UpdateDistanceIndicator()
 
+	if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
+		local now = GetTime()
+		local start, duration, enable = GetSpellCooldown(SURVEY_SPELL_ID)
+		if start > 0 and duration > 0 and now < (start + duration) then
+			if duration <= 1.5 then -- gcd
+				self:ScheduleTimer(function() CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, GetSpellCooldown(SURVEY_SPELL_ID)) end, (start+duration)-now)
+			elseif duration > 1.5 then -- in case they ever take it off the gcd
+				CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, start, duration, enable)
+			end
+		end
+	end
+	
 	if private.db.minimap.fragmentColorBySurveyDistance then
 		local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
 		local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
