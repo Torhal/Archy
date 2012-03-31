@@ -845,11 +845,11 @@ Dialog:Register("ArchyConfirmSolve", {
 Dialog:Register("ArchyTomTomError",{
 	text = "",
 	on_show = function(self, data)
-		self.text:SetFormattedText("%s%s|r\nIncompatible TomTom setting detected. \"%s%s|r\".\nDo you want to reset it? (will reloadui)", "|cFFFFCC00", ADDON_NAME, "|cFFFF0000", TomTomLocals and TomTomLocals["Enable automatic quest objective waypoints"] or "")
+		self.text:SetFormattedText("%s%s|r\nIncompatible TomTom setting detected. \"%s%s|r\".\nDo you want to reset it?", "|cFFFFCC00", ADDON_NAME, "|cFFFFCC00", TomTomLocals and TomTomLocals["Enable automatic quest objective waypoints"] or "")
 	end,
 	buttons = {
 		{
-			text = _G.YES,
+			text = _G.YES .. " (reloads UI)",
 			on_click = function(self, data)
 				TomTom.profile.poi.setClosest = false
 				TomTom:EnableDisablePOIIntegration()
@@ -858,6 +858,12 @@ Dialog:Register("ArchyTomTomError",{
 		},
 		{
 			text = _G.NO,
+		},
+		{
+			text = _G.IGNORE,
+			on_click = function(self, data)
+				private.db.tomtom.noerrorwarn = Archy.version -- Drii: don't warn again for this version
+			end,
 		},
 	},
 	show_while_dead = true,
@@ -2593,7 +2599,9 @@ function Archy:PLAYER_ENTERING_WORLD() -- (3)
 	end
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
-	if private.tomtomPoiIntegration and TomTom.profile.poi.setClosest and not private.tomtomWarning then 
+	if private.db.tomtom.noerrorwarn and ( private.db.tomtom.noerrorwarn == Archy.version ) then
+	  -- 
+	elseif private.tomtomPoiIntegration and TomTom.profile.poi.setClosest and not private.tomtomWarning then 
 		private.tomtomWarning = true 
 		Dialog:Spawn("ArchyTomTomError") 
 	end -- Drii: temporary workaround for ticket 384
