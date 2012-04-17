@@ -365,7 +365,7 @@ local CacheMapData, UpdateAllSites
 -----------------------------------------------------------------------
 -- Metatables.
 -----------------------------------------------------------------------
-local race_data = {}
+local race_data, race_data_uncached = {}, {}
 setmetatable(race_data, {
 	__index = function(t, k)
 		if _G.GetNumArchaeologyRaces() == 0 then
@@ -373,7 +373,7 @@ setmetatable(race_data, {
 		end
 		local raceName, raceTexture, itemID, currencyAmount = _G.GetArchaeologyRaceInfo(k)
 		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(itemID)
-
+		
 		t[k] = {
 			name = raceName,
 			currency = currencyAmount,
@@ -385,6 +385,10 @@ setmetatable(race_data, {
 				inventory = 0
 			}
 		}
+		if itemID and itemID > 0 and (not itemName or itemName == "") then 
+			race_data_uncached[k] = itemID
+			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED") -- Drii: ticket 391, fill in missing data when the keystone gets cached
+		end
 		return t[k]
 	end
 })
@@ -2426,8 +2430,10 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 	if newTheme ~= prevTheme then
 		_G.ReloadUI() 
 	end
-	self:ConfigUpdated()
-	self:UpdateFramePositions()
+	if private.frames_init_done then -- Drii: ticket 394 'OnNewProfile' fires for fresh installations too it seems.
+		self:ConfigUpdated()
+		self:UpdateFramePositions()
+	end
 end
 
 -----------------------------------------------------------------------
@@ -2440,6 +2446,20 @@ function Archy:ADDON_LOADED(event, addon)
 			private.battlefield_hooked = true
 		end
 		Archy:UnregisterEvent("ADDON_LOADED")
+	end
+end
+
+function Archy:GET_ITEM_INFO_RECEIVED(event)
+	for k, itemID in next, race_data_uncached, nil do
+		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(itemID)
+		if itemName and itemTexture then
+			race_data_uncached[k] = nil
+			race_data[k].keystone.name = itemName
+			race_data[k].keystone.texture = itemTexture
+		end
+	end
+	if not next(race_data_uncached) then
+		Archy:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
 
@@ -3571,7 +3591,7 @@ function Archy:SetFramePosition(frame)
 	frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
 	frame:SetFrameLevel(2)
 
-	if frame:GetParent() == _G.UIParent and not IsTaintable() and not private.db.general.locked then
+	if frame:GetParent() == _G.UIParent and not IsTaintable() and not private.db.general.locked then -- Drii: ticket 390
 		frame:SetUserPlaced(false)
 	end
 end
