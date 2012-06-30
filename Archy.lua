@@ -2202,7 +2202,7 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 	if about_panel then
 		self.optionsFrame = about_panel.new(nil, "Archy")
 	end
-	self:RegisterSink(L["Toast"], L["Toast"], L["Shows messages in a toast window."], SpawnToast)
+	self:RegisterSink("Archy_Toast", L["Toast"], L["Shows messages in a toast window."], SpawnToast)
 	self:SetSinkStorage(Archy.db.profile.general.sinkOptions)
 	self:SetupOptions()
 
