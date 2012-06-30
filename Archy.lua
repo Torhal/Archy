@@ -110,7 +110,7 @@ local PROFILE_DEFAULTS = {
 			confirmSolve = true,
 			showSkillBar = true,
 			sinkOptions = {
-				sink20OutputSink = L["Toast"],
+				sink20OutputSink = "Archy_Toast",
 			},
 			easyCast = false,
 			autoLoot = true,
