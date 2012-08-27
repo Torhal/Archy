@@ -1480,7 +1480,7 @@ local function GetContinentSites(continent_id)
 			mz = site.map
 			zoneID = MAP_ID_TO_ZONE_ID[mz]
 
-			if site then
+			if site and site.race then -- Drii: fail silently for missing data while we complete MoP info
 				local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
 
 				local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
@@ -2377,11 +2377,12 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	self:RegisterEvent("SKILL_LINES_CHANGED", "UpdateSkillBar")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
+	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Drii: new MoP event
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
-	self:RegisterBucketEvent("BAG_UPDATE", 0.2)
+-- 	self:RegisterBucketEvent("BAG_UPDATE", 0.2)
 
-	private.db.general.locked = false
+-- 	private.db.general.locked = false
 
 	InitializeFrames()
 	self:UpdateTracking()
@@ -2427,7 +2428,7 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 		end
 	end
 	private.db = database and database.profile or self.db.profile
-	if newTheme ~= prevTheme then
+	if newTheme and prevTheme and (newTheme ~= prevTheme) then -- Drii: fix for ticket 406?
 		_G.ReloadUI() 
 	end
 	if private.frames_init_done then -- Drii: ticket 394 'OnNewProfile' fires for fresh installations too it seems.
@@ -2497,6 +2498,15 @@ function Archy:ARTIFACT_DIG_SITE_UPDATED()
 	UpdateAllSites()
 	self:UpdateSiteDistances()
 	self:RefreshDigSiteDisplay()
+end
+
+function Archy:BAG_UPDATE_DELAYED()
+	if not current_continent or not keystoneLootRaceID then
+		return
+	end
+	UpdateRaceArtifact(keystoneLootRaceID)
+	self:RefreshRacesDisplay()
+	keystoneLootRaceID = nil
 end
 
 function Archy:BAG_UPDATE()
@@ -2775,7 +2785,7 @@ function Archy:UpdatePlayerPosition(force)
 
 		self:RefreshAll()
 	end
-	local continent = Astrolabe:GetMapInfo(map, level) -- Drii: can return nil
+ 	local continent = Astrolabe:GetMapInfo(map, level) -- Drii: can return nil; MoP Note: Astrolabe r146 returns wrong continent? (eg. GetMapInfo(301,0) "Stormwind" should return 2, returns 0) 
 	
 	if current_continent == continent then
 		if force and current_continent then 
@@ -3659,13 +3669,14 @@ function Archy:SaveFramePosition(frame)
 			bXofs,
 			bYofs
 		}
-		if frame == private.digsite_frame then
-			private.db.digsite.position = position
-		elseif frame == private.races_frame then
-			private.db.artifact.position = position
-		elseif frame == private.distance_indicator_frame then
-			private.db.digsite.distanceIndicator.position = position
-		end
+	end
+	
+	if frame == private.digsite_frame then
+		private.db.digsite.position = position
+	elseif frame == private.races_frame then
+		private.db.artifact.position = position
+	elseif frame == private.distance_indicator_frame then
+		private.db.digsite.distanceIndicator.position = position
 	end
 
 end
@@ -3683,9 +3694,12 @@ function Archy:OnPlayerLooting(event, ...)
 	end
 
 	for slotNum = 1, _G.GetNumLootItems() do
-		if _G.LootSlotIsCurrency(slotNum) then
+		local slotType = GetLootSlotType(slotNum)
+		if slotType == LOOT_SLOT_CURRENCY then
+--  		if _G.LootSlotIsCurrency(slotNum) then
 			_G.LootSlot(slotNum)
-		elseif _G.LootSlotIsItem(slotNum) then
+		elseif slotType == LOOT_SLOT_ITEM then
+-- 		elseif _G.LootSlotIsItem(slotNum) then
 			local link = _G.GetLootSlotLink(slotNum)
 
 			if link then
@@ -3699,4 +3713,7 @@ function Archy:OnPlayerLooting(event, ...)
 	end
 end
 
-
+--[[
+local RaceName, RaceTexture, RaceitemID, currencyAmount, projectAmount = GetArchaeologyRaceInfo(raceid)
+local numProjects = GetNumArtifactsByRace(raceid)
+]]

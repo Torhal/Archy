@@ -413,8 +413,19 @@
 					</OnLoad>
 					<OnClick>
 						if (button == "LeftButton") then
-							ShowUIPanel(WorldMapFrame)
-							SetMapZoom(GetCurrentMapContinent(), self.zoneId)
+							if WorldMapFrame:IsShown() then 
+								if self.oldzoneId and (self.oldzoneId == self.zoneId) then
+									HideUIPanel(WorldMapFrame)
+									self.oldzoneId = nil
+								else
+									SetMapZoom(GetCurrentMapContinent(), self.zoneId)
+									self.oldzoneId = self.zoneId
+								end
+							else
+								ShowUIPanel(WorldMapFrame)
+								SetMapZoom(GetCurrentMapContinent(), self.zoneId)
+								self.oldzoneId = self.zoneId
+							end
 						elseif (button == "RightButton") then
 							Archy:ToggleSiteBlacklist(self.siteName)
 							if Archy:IsSiteBlacklisted(self.siteName) then

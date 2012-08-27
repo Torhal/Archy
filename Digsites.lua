@@ -1,3 +1,7 @@
+--[[
+	Digsite Database current as of WoW 4.3 build 15050
+	27-Aug-2012: Digsite Database updated to WoW 5.04 build 16016 (Pandaria raceid and mapid data PENDING)
+]]
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
@@ -23,6 +27,9 @@ local RACE_ORC = 6
 local RACE_TOLVIR = 7
 local RACE_TROLL = 8
 local RACE_VRYKUL = 9
+local RACE_PANDAREN = 11
+local RACE_MOGU = 12
+local RACE_UNKNOWN = 0
 
 local DIG_SITES = {
 	-----------------------------------------------------------------------
@@ -1126,6 +1133,400 @@ local DIG_SITES = {
 		blob_id = 56537,
 		race = RACE_TROLL
 	},
+	-- MoP RC (build 16016) data, mapids, races, incomplete
+	-----------------------------------------------------------------------
+	-- Pandaria
+	-----------------------------------------------------------------------
+	[DS["Tiger's Wood Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66767,
+		race = RACE_PANDAREN
+	},
+	[DS["Tian Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66784,
+		race = RACE_UNKNOWN
+	},
+	[DS["Shrine of the Dawn Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66789,
+		race = RACE_UNKNOWN
+	},
+	[DS["Ruins of Gan Shi Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66795,
+		race = RACE_UNKNOWN
+	},
+	[DS["Emperor's Omen Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66817,
+		race = RACE_PANDAREN
+	},
+	[DS["The Arboretum Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66854,
+		race = RACE_PANDAREN
+	},
+	[DS["Thunderwood Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66890,
+		race = RACE_MOGU
+	},
+	[DS["Singing Marshes Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66917,
+		race = RACE_MOGU
+	},
+	[DS["North Great Wall Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66919,
+		race = RACE_UNKNOWN
+	},
+	[DS["South Great Wall Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66923,
+		race = RACE_MOGU
+	},
+	[DS["Torjari Pit Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66925,
+		race = RACE_MOGU
+	},
+	[DS["The Spring Road Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66929,
+		race = RACE_UNKNOWN
+	},
+	[DS["Paoquan Hollow Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66933,
+		race = RACE_PANDAREN
+	},
+	[DS["North Fruited Fields Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66935,
+		race = RACE_UNKNOWN
+	},
+	[DS["South Fruited Fields Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66939,
+		race = RACE_UNKNOWN
+	},
+	[DS["Pools of Purity Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66941,
+		race = RACE_PANDAREN
+	},
+	[DS["Fallsong Village Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66943,
+		race = RACE_MOGU
+	},
+	[DS["Ruins of Korja Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66945,
+		race = RACE_MOGU
+	},
+	[DS["Krasarang Wilds Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66949,
+		race = RACE_UNKNOWN
+	},
+	[DS["Lost Dynasty Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66951,
+		race = RACE_UNKNOWN
+	},
+	[DS["North Temple of the Red Crane Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66957,
+		race = RACE_UNKNOWN
+	},
+	[DS["Zhu Province Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66961,
+		race = RACE_PANDAREN
+	},
+	[DS["Valley of Kings Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66965,
+		race = RACE_MOGU
+	},
+	[DS["Gate to Golden Valley Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66967,
+		race = RACE_MOGU
+	},
+	[DS["Snow Covered Hills Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66969,
+		race = RACE_MOGU
+	},
+	[DS["East Snow Covered Hills Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66971,
+		race = RACE_UNKNOWN
+	},
+	[DS["Remote Village Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66973,
+		race = RACE_PANDAREN
+	},
+	[DS["Destroyed Village Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66979,
+		race = RACE_UNKNOWN
+	},
+	[DS["Old Village Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66983,
+		race = RACE_UNKNOWN
+	},
+	[DS["Grumblepaw Ranch Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66985,
+		race = RACE_PANDAREN
+	},
+	[DS["Chow Farmstead Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66987,
+		race = RACE_UNKNOWN
+	},
+	[DS["West Old Village Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66989,
+		race = RACE_UNKNOWN
+	},
+	[DS["Small Gate Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 66991,
+		race = RACE_UNKNOWN
+	},
+	[DS["Kun-Lai Peak Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67005,
+		race = RACE_PANDAREN
+	},
+	[DS["Forest Heart Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67021,
+		race = RACE_UNKNOWN
+	},
+	[DS["Gong of Hope Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67023,
+		race = RACE_PANDAREN
+	},
+	[DS["Great Bridge Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67025,
+		race = RACE_PANDAREN
+	},
+	[DS["Orchard Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67027,
+		race = RACE_UNKNOWN
+	},
+	[DS["Jade Temple Grounds Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67031,
+		race = RACE_UNKNOWN
+	},
+	[DS["South Orchard Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67033,
+		race = RACE_PANDAREN
+	},
+	[DS["Den of Sorrow Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67035,
+		race = RACE_UNKNOWN
+	},
+	[DS["Shrine Meadow Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67037,
+		race = RACE_PANDAREN
+	},
+	[DS["Veridian Grove Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 67039,
+		race = RACE_UNKNOWN
+	},
+	[DS["Setting Sun Garrison Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92020,
+		race = RACE_PANDAREN
+	},
+	[DS["Mistfall Village Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92022,
+		race = RACE_UNKNOWN
+	},
+	[DS["Five Sisters Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92026,
+		race = RACE_UNKNOWN
+	},
+	[DS["North Ruins of Guo-Lai Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92030,
+		race = RACE_UNKNOWN
+	},
+	[DS["South Ruins of Guo-Lai Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92032,
+		race = RACE_UNKNOWN
+	},
+	[DS["Tu Shen Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92038,
+		race = RACE_UNKNOWN
+	},
+	[DS["West Ruins of Guo-Lai Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92046,
+		race = RACE_UNKNOWN
+	},
+	[DS["Winterbough Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92150,
+		race = RACE_MOGU
+	},
+	[DS["Emperor's Approach Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92156,
+		race = RACE_UNKNOWN
+	},
+	[DS["West Summer Fields Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92160,
+		race = RACE_UNKNOWN
+	},
+	[DS["North Summer Fields Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92162,
+		race = RACE_UNKNOWN
+	},
+	[DS["East Summer Fields Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92166,
+		race = RACE_UNKNOWN
+	},
+	[DS["Sra'thik Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92172,
+		race = RACE_UNKNOWN
+	},
+	[DS["Niuzao Temple Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92174,
+		race = RACE_PANDAREN
+	},
+	[DS["Fire Camp Osul Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92178,
+		race = RACE_UNKNOWN
+	},
+	[DS["Hatred's Vice Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92180,
+		race = RACE_UNKNOWN
+	},
+	[DS["Shanze'Dao Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92196,
+		race = RACE_UNKNOWN
+	},
+	[DS["Lake of Stars Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92200,
+		race = RACE_UNKNOWN
+	},
+	[DS["Terrace of Gurthan Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92202,
+		race = RACE_UNKNOWN
+	},
+	[DS["Writhingwood Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92206,
+		race = RACE_UNKNOWN
+	},
+	[DS["South Ruins of Dojan Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92210,
+		race = RACE_UNKNOWN
+	},
+	[DS["North Ruins of Dojan Digsite"]] = {
+		continent = 6,
+		map = 0,
+		blob_id = 92212,
+		race = RACE_UNKNOWN
+	},
 }
 
 -- Workaround for Blizzard bug with GetMapLandmarkInfo()
@@ -1135,7 +1536,7 @@ local EMPTY_DIGSITE = {
 	continent = 0,
 	map = 0,
 	blob_id = 0,
-	race = 0
+	race = RACE_UNKNOWN
 }
 
 _G.setmetatable(DIG_SITES, {

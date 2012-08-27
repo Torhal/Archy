@@ -1,5 +1,6 @@
 ﻿--[[
 	Artifact Database current as of WoW 4.3 build 15050
+	27-Aug-2012: Artifact Database updated to WoW 5.04 build 16016
 ]]
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
@@ -25,6 +26,8 @@ local RACE_ORC = 6
 local RACE_TOLVIR = 7
 local RACE_TROLL = 8
 local RACE_VRYKUL = 9
+local RACE_PANDAREN = 11
+local RACE_MOGU = 12
 
 -- Extracted from ResearchBranch.dbc
 local raceIDtoCurrencyID = {
@@ -37,6 +40,8 @@ local raceIDtoCurrencyID = {
 	[RACE_TOLVIR] = 401,
 	[RACE_TROLL] = 385,
 	[RACE_VRYKUL] = 399,
+	[RACE_PANDAREN] = 676,
+	[RACE_MOGU] = 677,
 }
 local raceIDtoKeystoneID = {
 	[RACE_DWARF] = 52843,
@@ -48,6 +53,8 @@ local raceIDtoKeystoneID = {
 	[RACE_TOLVIR] = 64397,
 	[RACE_TROLL] = 63128,
 	[RACE_VRYKUL] = 64395,
+	[RACE_PANDAREN] = 79868,
+	[RACE_MOGU] = 79869,
 }
 
 -- Extracted from ResearchProject.dbc 
@@ -1164,6 +1171,198 @@ local ARTIFACTS = {
 		rarity = 0,
 		keystones = 2,
 		fragments = 45,
+	},
+	[AF["Pandaren Tea Set"]] = {
+		itemid = 79896,
+		spellid = 113968,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Pandaren Game Board"]] = {
+		itemid = 79897,
+		spellid = 113971,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 0,
+		fragments = 40,
+	},
+	[AF["Twin Stein Set of Brewfather Quan Tou Kuo"]] = {
+		itemid = 79898,
+		spellid = 113972,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Walking Cane of Brewfather Ren Yun"]] = {
+		itemid = 79899,
+		spellid = 113973,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Empty Keg of Brewfather Xin Wo Yin"]] = {
+		itemid = 79900,
+		spellid = 113974,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Carved Bronze Mirror"]] = {
+		itemid = 79901,
+		spellid = 113975,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Gold-Inlaid Porcelain Funerary Figurine"]] = {
+		itemid = 79902,
+		spellid = 113976,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Apothecary Tins"]] = {
+		itemid = 79903,
+		spellid = 113977,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Pearl of Yu'lon"]] = {
+		itemid = 79904,
+		spellid = 113978,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 2,
+		fragments = 60,
+	},
+	[AF["Standard of Niuzao"]] = {
+		itemid = 79905,
+		spellid = 113979,
+		raceid = RACE_PANDAREN,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Umbrella of Chi-Ji"]] = {
+		itemid = 79906,
+		spellid = 113980,
+		raceid = RACE_PANDAREN,
+		rarity = 1,
+		keystones = 3,
+		fragments = 180,
+	},
+	[AF["Spear of Xuen"]] = {
+		itemid = 79907,
+		spellid = 113981,
+		raceid = RACE_PANDAREN,
+		rarity = 1,
+		keystones = 3,
+		fragments = 180,
+	},
+	[AF["Manacles of Rebellion"]] = {
+		itemid = 79908,
+		spellid = 113982,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Cracked Mogu Runestone"]] = {
+		itemid = 79909,
+		spellid = 113983,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Terracotta Arm"]] = {
+		itemid = 79910,
+		spellid = 113984,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Petrified Bone Whip"]] = {
+		itemid = 79911,
+		spellid = 113985,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Thunder King Insignia"]] = {
+		itemid = 79912,
+		spellid = 113986,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Edicts of the Thunder King"]] = {
+		itemid = 79913,
+		spellid = 113987,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 2,
+		fragments = 60,
+	},
+	[AF["Iron Amulet"]] = {
+		itemid = 79914,
+		spellid = 113988,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Warlord's Branding Iron"]] = {
+		itemid = 79915,
+		spellid = 113989,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Mogu Coin"]] = {
+		itemid = 79916,
+		spellid = 113990,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 0,
+		fragments = 30,
+	},
+	[AF["Worn Monument Ledger"]] = {
+		itemid = 79917,
+		spellid = 113991,
+		raceid = RACE_MOGU,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Quilen Statuette"]] = {
+		itemid = 79918,
+		spellid = 113992,
+		raceid = RACE_MOGU,
+		rarity = 1,
+		keystones = 3,
+		fragments = 180,
+	},
+	[AF["Anatomical Dummy"]] = {
+		itemid = 79919,
+		spellid = 113993,
+		raceid = RACE_MOGU,
+		rarity = 1,
+		keystones = 3,
+		fragments = 180,
 	},
 }
 for artifact, data in pairs(ARTIFACTS) do
