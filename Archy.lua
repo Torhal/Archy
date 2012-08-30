@@ -509,13 +509,22 @@ local pois = setmetatable({}, {
 	end
 })
 
-
 -----------------------------------------------------------------------
 -- Local helper functions
 -----------------------------------------------------------------------
+local function IsFishingPoleEquipped()
+	-- 1 = "Weapon" class which contains the "Fishing Poles" subclasscheck with GetAuctionItemClasses() for index of "Weapons" if this stops working
+	-- We were using the much simpler IsUsableSpell(FISHING_SPELL_NAME) until WoW 5.0.4 but this function changed behavior and reports true for fishing even without pole
+	local poletypeNum = select("#",GetAuctionItemSubClasses(1))
+	local poletypeName = (select(poletypeNum,GetAuctionItemSubClasses(1))) -- "Fishing Poles" is the last return
+	if poletypeName then
+		return IsEquippedItemType(poletypeName)
+	end
+end
+
 local clickToMove
 local function SuspendClickToMove()
-	if not private.db.general.easyCast or IsUsableSpell(FISHING_SPELL_NAME) then return end -- we're not using easy cast, no need to mess with click to move
+	if not private.db.general.easyCast or IsFishingPoleEquipped() then return end -- we're not using easy cast, no need to mess with click to move
 	if private.db.general.show then -- Archy enabled
 		if _G.GetCVarBool("autointeract") then -- and click to move 'on'
 			_G.SetCVar("autointeract","0") -- suspend it
@@ -1086,7 +1095,7 @@ function Archy:LDBTooltipShow()
 			Archy_LDB_Tooltip:AddSeparator()
 	
 			for continent_id, continent_sites in pairs(continent_digsites) do
-				if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == MAP_ID_TO_CONTINENT_ID[current_continent]) then
+				if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == current_continent) then -- current_continent) then
 					local continent_name
 					for _, zone in pairs(ZONE_DATA) do
 						if zone.continent == continent_id and zone.id == 0 then
@@ -1541,7 +1550,7 @@ CacheMapData = function()
 			MAP_ID_TO_ZONE_NAME[map_id] = zone_name
 			ZONE_ID_TO_NAME[zone_id] = zone_name
 			ZONE_DATA[map_id] = {
-				continent = zone_id,
+				continent = continent_id,
 				map = map_id,
 				level = level,
 				mapFile = map_file_name,
@@ -1608,14 +1617,14 @@ local function SortSitesByName(a, b)
 end
 
 function Archy:UpdateSiteDistances()
-	if not continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] or (#continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] == 0) then
+	if not continent_digsites[current_continent] or (#continent_digsites[current_continent] == 0) then
 		nearestSite = nil
 		return
 	end
 	local distance, nearest
 
 	for index = 1, SITES_PER_CONTINENT do
-		local site = continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]][index]
+		local site = continent_digsites[current_continent][index]
 
 		if site.poi then
 			site.distance = Astrolabe:GetDistanceToIcon(site.poi)
@@ -1643,7 +1652,7 @@ function Archy:UpdateSiteDistances()
 	end
 
 	-- Sort sites
-	local sites = continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
+	local sites = continent_digsites[current_continent]
 	if private.db.digsite.sortByDistance then
 		table.sort(sites, SortSitesByDistance)
 	else -- sort by zone then name
@@ -1961,8 +1970,8 @@ local function GetContinentSiteIDs()
 		return validSiteIDs
 	end
 
-	if continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]] then
-		for _, site in pairs(continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]) do
+	if continent_digsites[current_continent] then
+		for _, site in pairs(continent_digsites[current_continent]) do
 			table.insert(validSiteIDs, site.id)
 		end
 	end
@@ -2004,7 +2013,7 @@ function UpdateMinimapPOIs(force)
 	end
 	lastNearestSite = nearestSite
 
-	local sites = continent_digsites[MAP_ID_TO_CONTINENT_ID[current_continent]]
+	local sites = continent_digsites[current_continent]
 
 	if not sites or #sites == 0 or _G.IsInInstance() then
 		ClearAllPOIs()
@@ -2283,7 +2292,7 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		local MIN_ACTION_DOUBLECLICK = 0.05
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() and not IsUsableSpell(FISHING_SPELL_NAME) then
+			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() and not IsFishingPoleEquipped() then
 				local perform_survey = false
 
 				if not is_looting and clicked_time then
@@ -2785,7 +2794,7 @@ function Archy:UpdatePlayerPosition(force)
 
 		self:RefreshAll()
 	end
- 	local continent = Astrolabe:GetMapInfo(map, level) -- Drii: can return nil; MoP Note: Astrolabe r146 returns wrong continent? (eg. GetMapInfo(301,0) "Stormwind" should return 2, returns 0) 
+	local continent = _G.GetCurrentMapContinent()
 	
 	if current_continent == continent then
 		if force and current_continent then 
@@ -3022,7 +3031,7 @@ end
 local function ContinentRaces(continent_id)
 	local races = {}
 	for _, site in pairs(DIG_SITES) do
-		if site.continent == MAP_ID_TO_CONTINENT_ID[continent_id] and not _G.tContains(races, site.race) then
+		if site.continent == continent_id and not _G.tContains(races, site.race) then
 			table.insert(races, site.race)
 		end
 	end
@@ -3351,7 +3360,7 @@ function Archy:UpdateDigSiteFrame()
 		end
 	end
 
-	local continent_id = MAP_ID_TO_CONTINENT_ID[current_continent]
+	local continent_id = current_continent
 
 	if private.digsite_frame:IsVisible() then
 		if private.db.general.stealthMode or not private.db.digsite.show or ShouldBeHidden() or not continent_digsites[continent_id] or #continent_digsites[continent_id] == 0 then
@@ -3510,7 +3519,7 @@ function Archy:RefreshDigSiteDisplay()
 	if ShouldBeHidden() then
 		return
 	end
-	local continent_id = MAP_ID_TO_CONTINENT_ID[current_continent]
+	local continent_id = current_continent
 
 	if not continent_id or not continent_digsites[continent_id] or #continent_digsites[continent_id] == 0 then
 		return
@@ -3696,10 +3705,8 @@ function Archy:OnPlayerLooting(event, ...)
 	for slotNum = 1, _G.GetNumLootItems() do
 		local slotType = GetLootSlotType(slotNum)
 		if slotType == LOOT_SLOT_CURRENCY then
---  		if _G.LootSlotIsCurrency(slotNum) then
 			_G.LootSlot(slotNum)
 		elseif slotType == LOOT_SLOT_ITEM then
--- 		elseif _G.LootSlotIsItem(slotNum) then
 			local link = _G.GetLootSlotLink(slotNum)
 
 			if link then
@@ -3712,8 +3719,3 @@ function Archy:OnPlayerLooting(event, ...)
 		end
 	end
 end
-
---[[
-local RaceName, RaceTexture, RaceitemID, currencyAmount, projectAmount = GetArchaeologyRaceInfo(raceid)
-local numProjects = GetNumArtifactsByRace(raceid)
-]]
