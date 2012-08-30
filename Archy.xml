@@ -243,7 +243,7 @@
 					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="0" y="0" />
 				</Anchors>
 			</Frame>
-			<Button name="$parentSurveyButton" parentKey="surveyButton" inherits="UIPanelButtonTemplate2, SecureActionButtonTemplate" text="SURVEY">
+			<Button name="$parentSurveyButton" parentKey="surveyButton" inherits="UIPanelButtonTemplate, SecureActionButtonTemplate" text="SURVEY">
 				<Attributes>
 					<Attribute name="type" value="spell" />
 					<Attribute name="spell" value="80451" />
@@ -667,7 +667,7 @@
 					</OnLeave>
 				</Scripts>
 			</StatusBar>
-			<Button name="$parentSolveButton" inherits="UIPanelButtonTemplate2" text="SOLVE" parentKey="solveButton">
+			<Button name="$parentSolveButton" inherits="UIPanelButtonTemplate" text="SOLVE" parentKey="solveButton">
 				<Size x="50" y="24"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="$parentFragmentBar" relativePoint="BOTTOMRIGHT" x="0" y="-3"/>
