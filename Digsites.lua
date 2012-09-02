@@ -1158,7 +1158,7 @@ local DIG_SITES = {
 	},
 	[DS["Ruins of Gan Shi Digsite"]] = {
 		continent = 6,
-		map = 809,
+		map = 806,
 		blob_id = 66795,
 		race = RACE_MOGU
 	},
@@ -1206,7 +1206,7 @@ local DIG_SITES = {
 	},
 	[DS["The Spring Road Digsite"]] = {
 		continent = 6,
-		map = 807,
+		map = 873,
 		blob_id = 66929,
 		race = RACE_MOGU
 	},
