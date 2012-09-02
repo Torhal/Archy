@@ -299,6 +299,7 @@ local PROFILE_DEFAULTS = {
 }
 local SECURE_ACTION_BUTTON -- Populated in OnInitialize()
 local SITES_PER_CONTINENT = 4
+local SURVEYS_PER_DIGSITE = 6
 local SURVEY_SPELL_ID = 80451
 local FISHING_SPELL_NAME = (GetSpellInfo(7620)) or ""
 local ZONE_DATA = {}
@@ -3561,7 +3562,7 @@ function Archy:RefreshDigSiteDisplay()
 			end
 			site_frame.digCounter.value:SetText(count or "")
 		else
-			site_frame.digCounter.value:SetFormattedText("%d/3", count or 0)
+			site_frame.digCounter.value:SetFormattedText("%d/%d", count or 0, SURVEYS_PER_DIGSITE)
 		end
 
 		site_frame.distance.value:SetFormattedText(L["%d yards"], site.distance)
