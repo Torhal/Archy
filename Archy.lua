@@ -57,7 +57,8 @@ end
 -----------------------------------------------------------------------
 local DIG_SITES = private.dig_sites
 local ARTIFACTS = private.artifacts_db
-local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[#_G.PROFESSION_RANKS][1]
+local MAX_PROFESSION_RANK = GetExpansionLevel()+4 -- Skip the 4 ranks of vanilla
+local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in OnInitialize()
