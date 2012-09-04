@@ -14,6 +14,8 @@ local ADDON_NAME, private = ...
 LibStub = _G.LibStub
 local AF = LibStub("LibBabble-Artifacts-3.0"):GetLookupTable()
 
+local sessionErrors = {}
+
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
@@ -1383,8 +1385,9 @@ local NULL_ARTIFACT = {
 
 _G.setmetatable(ARTIFACTS, {
 	__index = function(t, k)
-		if k then
+		if k and not sessionErrors[k] then
 			_G.DEFAULT_CHAT_FRAME:AddMessage("Archy is missing data for artifact " .. k)
+			sessionErrors[k] = true
 		end
 		return NULL_ARTIFACT
 	end

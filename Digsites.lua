@@ -16,6 +16,8 @@ local ADDON_NAME, private = ...
 local LibStub = _G.LibStub
 local DS = LibStub("LibBabble-DigSites-3.0"):GetLookupTable()
 
+local sessionErrors = {}
+
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
@@ -1542,8 +1544,9 @@ local EMPTY_DIGSITE = {
 
 _G.setmetatable(DIG_SITES, {
 	__index = function(t, k)
-		if k then
+		if k and not sessionErrors[k] then
 			_G.DEFAULT_CHAT_FRAME:AddMessage("Archy is missing data for dig site " .. k)
+			sessionErrors[k] = true
 		end
 		return EMPTY_DIGSITE
 	end
