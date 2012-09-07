@@ -2990,8 +2990,8 @@ function Archy:UpdateRacesFrame()
 		end
 	end
 
-	local borderTexture = LSM:Fetch('border', private.db.artifact.borderTexture) or [[Interface\None]]
-	local backgroundTexture = LSM:Fetch('background', private.db.artifact.backgroundTexture) or [[Interface\None]]
+	local borderTexture = LSM:Fetch('border', private.db.artifact.borderTexture)
+	local backgroundTexture = LSM:Fetch('background', private.db.artifact.backgroundTexture)
 	races_frame:SetBackdrop({
 		bgFile = backgroundTexture,
 		edgeFile = borderTexture,
@@ -3325,8 +3325,8 @@ function Archy:UpdateDigSiteFrame()
 	private.digsite_frame:SetScale(private.db.digsite.scale)
 	private.digsite_frame:SetAlpha(private.db.digsite.alpha)
 
-	local borderTexture = LSM:Fetch('border', private.db.digsite.borderTexture) or [[Interface\None]]
-	local backgroundTexture = LSM:Fetch('background', private.db.digsite.backgroundTexture) or [[Interface\None]]
+	local borderTexture = LSM:Fetch('border', private.db.digsite.borderTexture)
+	local backgroundTexture = LSM:Fetch('background', private.db.digsite.backgroundTexture)
 	private.digsite_frame:SetBackdrop({ bgFile = backgroundTexture, edgeFile = borderTexture, tile = false, edgeSize = 8, tileSize = 8, insets = { left = 2, top = 2, right = 2, bottom = 2 } })
 	private.digsite_frame:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
 	private.digsite_frame:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
