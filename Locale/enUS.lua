@@ -4,6 +4,10 @@ debug = true
 --@end-debug@]===]
 local L = LibStub("AceLocale-3.0"):NewLocale("Archy", "enUS", true, debug)
 
+if not L then
+	return
+end
+
 L["\"Arrival Distance\""] = true
 L["*Interactive tooltip region(s)"] = true
 L["%d %ss in your inventory"] = true
@@ -223,7 +227,6 @@ L["Show the locations where you have collected fragments"] = true
 L["Show your Archaeology skill on the Artifacts list header"] = true
 L["Show your dig sites on the minimap"] = true
 L["Shows a Survey button with the Distance Indicator."] = true
-L["Shows messages in a toast window."] = true
 L["Shows the Options"] = true
 L["Shows the configuration window"] = true
 L["Size"] = true
@@ -267,7 +270,6 @@ L["The style of display for Archy.  This will reload your UI after selecting"] =
 L["Thick Outline"] = true
 L[ [=[This setting will control the distance at which the waypoint arrow switches to a downwards arrow, indicating you have arrived at your destination.
 NOTE: This may not work with emulation addons if they do not support this.]=] ] = true
-L["Toast"] = true
 L["Toggle if Archy will send the nearest dig site waypoint information to TomTom"] = true
 L["Toggle if Artifacts will be shown"] = true
 L["Toggle if Dig Sites will be shown"] = true
