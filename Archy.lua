@@ -1609,7 +1609,12 @@ end
 UpdateAllSites = function()
 -- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
 	local original_map_id = _G.GetCurrentMapAreaID()
-	if CacheMapData then CacheMapData() end -- Drii: runs only until ZONE_DATA is populated
+
+	-- Drii: runs only until ZONE_DATA is populated
+	if CacheMapData then
+		CacheMapData()
+	end
+
 	if next(MAP_CONTINENTS) then
 		for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 			UpdateSite(continent_id)
