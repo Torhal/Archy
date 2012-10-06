@@ -265,6 +265,15 @@
 					</Cooldown>
 				</Frames>				
 			</Button>
+			<Button name="$parentCrateButton" parentKey="crateButton" inherits="ActionButtonTemplate, SecureActionButtonTemplate">
+				<Size><AbsDimension x="24" y="24" /></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSurveyButton" relativePoint="RIGHT" x="5" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>if not InCombatLockdown() then self:Disable() end; self.icon:SetTexture("Interface\\Icons\\inv_crate_04"); self.icon:SetDesaturated(1)</OnLoad>
+				</Scripts>
+			</Button>
 		</Frames>
 		<Scripts>
 			<OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>

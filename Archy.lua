@@ -308,6 +308,9 @@ local SECURE_ACTION_BUTTON -- Populated in OnInitialize()
 local SITES_PER_CONTINENT = 4
 local SURVEYS_PER_DIGSITE = 6
 local SURVEY_SPELL_ID = 80451
+local CRATE_SPELL_ID = 126935
+local CRATE_SPELL_NAME = (GetSpellInfo(CRATE_SPELL_ID))
+local CRATE_USE_STRING -- Populate in HasArchaeology()
 local ZONE_DATA = {}
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
 local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
@@ -670,10 +673,27 @@ local function GetArtifactStats(race_id, name)
 	end
 end
 
+local function GetCrateUseString(spellID)
+	private.scantip:ClearLines()
+	private.scantip:SetSpellByID(spellID)
+	local i = 1
+	while (_G["ArchyScanTipTextLeft"..i]:GetText()) do
+		-- overwrite until we get the contents of bottom fontstring on the left
+		spelltext = (_G["ArchyScanTipTextLeft"..i]:GetText()) 
+		i = i + 1
+	end
+	if spelltext then 
+		return _G.ITEM_SPELL_TRIGGER_ONUSE.." "..spelltext
+	end
+end
+
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
 	local _, _, arch = _G.GetProfessions()
 	if arch then
+		private.scantip = private.scantip or CreateFrame("GameTooltip","ArchyScanTip",nil,"GameTooltipTemplate")
+		private.scantip:SetOwner(UIParent, "ANCHOR_NONE")
+		CRATE_USE_STRING = CRATE_USE_STRING or GetCrateUseString(CRATE_SPELL_ID)
 		for i = 1, _G.GetNumTrackingTypes() do
 			if (_G.GetTrackingInfo(i)) == _G.MINIMAP_TRACKING_DIGSITES then
 				digsitesTrackingID = i
@@ -2297,7 +2317,7 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		button:SetAttribute("action", nil)
 
 		button:SetScript("PostClick", function()
-			if not IsTaintable() then
+			if overrideOn and not IsTaintable() then
 				_G.ClearOverrideBindings(_G[button_name])
 				overrideOn = false
 			else
@@ -2328,9 +2348,9 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 				end
 				clicked_time = _G.GetTime()
 
-				if perform_survey then
+				if perform_survey and not IsTaintable() then
 					-- We're stealing the mouse-up event, make sure we exit MouseLook
-					if _G.IsMouselooking() and not IsTaintable() then
+					if _G.IsMouselooking() then
 						_G.MouselookStop()
 					end
 					_G.SetOverrideBindingClick(SECURE_ACTION_BUTTON, true, "BUTTON2", SECURE_ACTION_BUTTON.name)
@@ -2406,11 +2426,14 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("SKILL_LINES_CHANGED", "UpdateSkillBar")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Drii: new MoP event
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
-	-- 	self:RegisterBucketEvent("BAG_UPDATE", 0.2)
 
 	-- 	private.db.general.locked = false
 
@@ -2544,6 +2567,46 @@ function Archy:ARTIFACT_DIG_SITE_UPDATED()
 	self:RefreshDigSiteDisplay()
 end
 
+local function FindCrateable(bag, slot)
+	if IsTaintable() then private.regen_find_crate = true return end
+	private.scantip:SetBagItem(bag,slot)
+	for i=1, private.scantip:NumLines() do
+		local linetext = (_G["ArchyScanTipTextLeft"..i]:GetText())
+		if linetext == CRATE_USE_STRING then
+			return true
+		end
+	end
+	return false
+end
+
+function Archy:FindForCrate()
+	if IsTaintable() then private.regen_find_crate = true return end
+	private.bag_id, private.bag_slot_id = nil, nil
+	for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS, 1 do
+		for slot = 1, GetContainerNumSlots(bag), 1 do
+			if not private.bag_id then
+				if FindCrateable(bag, slot) then
+					private.bag_id = bag
+					private.bag_slot_id = slot
+					break
+				end
+			end
+		end
+		if private.bag_id then
+			break
+		end
+	end
+	if private.bag_id then
+		private.distance_indicator_frame.crateButton:SetAttribute("type1", "macro")
+		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/use "..private.bag_id.." "..private.bag_slot_id)
+		private.distance_indicator_frame.crateButton:Enable()
+		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
+	else
+		private.distance_indicator_frame.crateButton:Disable()
+		private.distance_indicator_frame.crateButton.icon:SetDesaturated(1)
+	end
+end
+
 function Archy:BAG_UPDATE_DELAYED()
 	if not current_continent or not keystoneLootRaceID then
 		return
@@ -2551,15 +2614,7 @@ function Archy:BAG_UPDATE_DELAYED()
 	UpdateRaceArtifact(keystoneLootRaceID)
 	self:RefreshRacesDisplay()
 	keystoneLootRaceID = nil
-end
-
-function Archy:BAG_UPDATE()
-	if not current_continent or not keystoneLootRaceID then
-		return
-	end
-	UpdateRaceArtifact(keystoneLootRaceID)
-	self:RefreshRacesDisplay()
-	keystoneLootRaceID = nil
+	Archy:FindForCrate()
 end
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
@@ -2721,71 +2776,91 @@ function Archy:PLAYER_REGEN_ENABLED()
 		private.regen_update_races = nil
 		self:UpdateRacesFrame()
 	end
+	
+	if private.regen_find_crate then
+		private.regen_find_crate = nil
+		self:FindForCrate()
+	end
+	
 end
 
 local function SetSurveyCooldown(time)
 	_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
 end
 
+function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
+	if unit == "player" and spell == CRATE_SPELL_NAME then
+		private.busy_crating = true
+	end
+end
+
 function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
-	if unit ~= "player" or spell_id ~= SURVEY_SPELL_ID then
-		return
-	end
-
-	if not player_position or not nearestSite then
-		survey_location.map = 0
-		survey_location.level = 0
-		survey_location.x = 0
-		survey_location.y = 0
-		return
-	end
-	survey_location.x = player_position.x
-	survey_location.y = player_position.y
-	survey_location.map = player_position.map
-	survey_location.level = player_position.level
-
-	distanceIndicatorActive = true
-	lastSite = nearestSite
-	self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
-
-	ToggleDistanceIndicator()
-	UpdateDistanceIndicator()
-
-	if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
-		local now = _G.GetTime()
-		local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
-
-		if start > 0 and duration > 0 and now < (start + duration) then
-			if duration <= GLOBAL_COOLDOWN_TIME then
-				self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
-			elseif duration > GLOBAL_COOLDOWN_TIME then -- in case they ever take it off the gcd
-				_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, start, duration, enable)
-			end
+	if unit ~= "player" then return end
+	
+	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
+		if not player_position or not nearestSite then
+			survey_location.map = 0
+			survey_location.level = 0
+			survey_location.x = 0
+			survey_location.y = 0
+			return
 		end
-	end
-
-	if private.db.minimap.fragmentColorBySurveyDistance then
-		local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
-		local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
-		local min_red, max_red = max_yellow, 500
-
-		for id, poi in pairs(allPois) do
-			if poi.active and poi.type == "survey" then
-				local distance = Astrolabe:GetDistanceToIcon(poi)
-
-				if distance >= min_green and distance <= max_green then
-					poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
-				elseif distance >= min_yellow and distance <= max_yellow then
-					poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
-				elseif distance >= min_red and distance <= max_red then
-					poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+		survey_location.x = player_position.x
+		survey_location.y = player_position.y
+		survey_location.map = player_position.map
+		survey_location.level = player_position.level
+	
+		distanceIndicatorActive = true
+		lastSite = nearestSite
+		self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
+	
+		ToggleDistanceIndicator()
+		UpdateDistanceIndicator()
+	
+		if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
+			local now = _G.GetTime()
+			local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
+	
+			if start > 0 and duration > 0 and now < (start + duration) then
+				if duration <= GLOBAL_COOLDOWN_TIME then
+					self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
+				elseif duration > GLOBAL_COOLDOWN_TIME then -- in case they ever take it off the gcd
+					_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, start, duration, enable)
 				end
 			end
 		end
+	
+		if private.db.minimap.fragmentColorBySurveyDistance then
+			local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
+			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
+			local min_red, max_red = max_yellow, 500
+	
+			for id, poi in pairs(allPois) do
+				if poi.active and poi.type == "survey" then
+					local distance = Astrolabe:GetDistanceToIcon(poi)
+	
+					if distance >= min_green and distance <= max_green then
+						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
+					elseif distance >= min_yellow and distance <= max_yellow then
+						poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
+					elseif distance >= min_red and distance <= max_red then
+						poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+					end
+				end
+			end
+		end
+		tomtomActive = false
+		RefreshTomTom()
+		self:RefreshDigSiteDisplay()	
 	end
-	tomtomActive = false
-	RefreshTomTom()
-	self:RefreshDigSiteDisplay()
+	
+	if spell_id == CRATE_SPELL_NAME then
+		if private.busy_crating then
+			private.busy_crating = nil
+			self:ScheduleTimer("FindForCrate", 1)
+		end
+	end
+	
 end
 
 function Archy:UpdateSkillBar()
