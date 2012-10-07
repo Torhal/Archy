@@ -2608,13 +2608,13 @@ function Archy:FindForCrate()
 end
 
 function Archy:BAG_UPDATE_DELAYED()
+	Archy:FindForCrate()
 	if not current_continent or not keystoneLootRaceID then
 		return
 	end
 	UpdateRaceArtifact(keystoneLootRaceID)
 	self:RefreshRacesDisplay()
 	keystoneLootRaceID = nil
-	Archy:FindForCrate()
 end
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
