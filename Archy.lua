@@ -2568,6 +2568,7 @@ function Archy:ARTIFACT_DIG_SITE_UPDATED()
 end
 
 local function FindCrateable(bag, slot)
+	if not HasArchaeology() then return end
 	if IsTaintable() then private.regen_find_crate = true return end
 	private.scantip:SetBagItem(bag,slot)
 	for i=1, private.scantip:NumLines() do
