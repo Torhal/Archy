@@ -102,6 +102,18 @@ local MINIMAP_SIZES = {
 	},
 }
 
+local CRATE_OF_FRAGMENTS = { -- all pre-MoP races at Mists of Pandaria expansion
+	[87533] = true, -- Dwarven
+	[87534] = true, -- Draenei
+	[87535] = true, -- Fossil
+	[87536] = true, -- Night Elf
+	[87537] = true, -- Nerubian
+	[87538] = true, -- Orc
+	[87539] = true, -- Tol'vir
+	[87540] = true, -- Troll
+	[87541] = true, -- Vrykul
+}
+
 local PROFILE_DEFAULTS = {
 	profile = {
 		general = {
@@ -2570,11 +2582,19 @@ end
 local function FindCrateable(bag, slot)
 	if not HasArchaeology() then return end
 	if IsTaintable() then private.regen_find_crate = true return end
-	private.scantip:SetBagItem(bag,slot)
-	for i=1, private.scantip:NumLines() do
-		local linetext = (_G["ArchyScanTipTextLeft"..i]:GetText())
-		if linetext == CRATE_USE_STRING then
-			return true
+	local itemID = GetContainerItemID(bag, slot)
+	if itemID then
+		if CRATE_OF_FRAGMENTS[itemID] then 
+			private.item_id = itemID 
+			return true 
+		end
+		private.scantip:SetBagItem(bag,slot)
+		for i=1, private.scantip:NumLines() do
+			local linetext = (_G["ArchyScanTipTextLeft"..i]:GetText())
+			if linetext == CRATE_USE_STRING then
+				private.item_id = itemID
+				return true
+			end
 		end
 	end
 	return false
@@ -2582,7 +2602,7 @@ end
 
 function Archy:FindForCrate()
 	if IsTaintable() then private.regen_find_crate = true return end
-	private.bag_id, private.bag_slot_id = nil, nil
+	private.bag_id, private.bag_slot_id, private.item_id = nil, nil, nil
 	for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS, 1 do
 		for slot = 1, GetContainerNumSlots(bag), 1 do
 			if not private.bag_id then
@@ -2602,9 +2622,11 @@ function Archy:FindForCrate()
 		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/use "..private.bag_id.." "..private.bag_slot_id)
 		private.distance_indicator_frame.crateButton:Enable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
+		private.distance_indicator_frame.crateButton.tooltip = private.item_id
 	else
 		private.distance_indicator_frame.crateButton:Disable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(1)
+		private.distance_indicator_frame.crateButton.tooltip = _G.BROWSE_NO_RESULTS
 	end
 end
 

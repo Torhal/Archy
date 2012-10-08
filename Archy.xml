@@ -271,7 +271,30 @@
 					<Anchor point="LEFT" relativeTo="$parentSurveyButton" relativePoint="RIGHT" x="5" y="0" />
 				</Anchors>
 				<Scripts>
-					<OnLoad>if not InCombatLockdown() then self:Disable() end; self.icon:SetTexture("Interface\\Icons\\inv_crate_04"); self.icon:SetDesaturated(1)</OnLoad>
+					<OnLoad>
+						if not InCombatLockdown() then self:Disable() end 
+						self.icon:SetTexture("Interface\\Icons\\inv_crate_04") 
+						self.icon:SetDesaturated(1)
+						self:SetMotionScriptsWhileDisabled(true)
+						self.tooltip = BROWSE_NO_RESULTS
+					</OnLoad>
+					<OnEnter>
+						if self.tooltip then
+							GameTooltip:SetOwner(self,"ANCHOR_TOP")
+							if type(self.tooltip) == "string" then
+								GameTooltip:SetText(self.tooltip)
+							elseif type(self.tooltip) == "number" then
+								GameTooltip:SetItemByID(self.tooltip)
+							end
+							GameTooltip:Show()
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide()
+					</OnLeave>
+					<OnHide>
+						GameTooltip_Hide()
+					</OnHide>
 				</Scripts>
 			</Button>
 		</Frames>
