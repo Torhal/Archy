@@ -1319,6 +1319,9 @@ function LDB_object:OnClick(button, down)
 			_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
 		else
 			private.db.general.show = not private.db.general.show
+			if private.db.general.show and private.db.general.stealthMode then
+				Archy:Print(L["You are trying to show Archy's Lists while in stealth mode. Shift-Click the button or type /archy stealth if you wish to toggle it."])
+			end
 			Archy:ConfigUpdated()
 		end
 	elseif button == "RightButton" then
