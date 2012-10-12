@@ -248,6 +248,7 @@ local PROFILE_DEFAULTS = {
 				anchor = "TOPLEFT",
 				undocked = false,
 				showSurveyButton = true,
+				showCrateButton = true,
 				font = {
 					name = "Friz Quadrata TT",
 					size = 16,
@@ -884,6 +885,15 @@ local function ToggleDistanceIndicator()
 		private.distance_indicator_frame.surveyButton:Hide()
 		private.distance_indicator_frame:SetWidth(42)
 	end
+	
+	if private.db.digsite.distanceIndicator.showCrateButton then
+		private.distance_indicator_frame.crateButton:Show()
+		local w = private.distance_indicator_frame:GetWidth()
+		private.distance_indicator_frame:SetWidth(w+private.distance_indicator_frame.crateButton:GetWidth())
+	else
+		private.distance_indicator_frame.crateButton:Hide()
+	end
+	
 end
 
 Dialog:Register("ArchyConfirmSolve", {
@@ -2626,10 +2636,15 @@ function Archy:FindForCrate()
 		private.distance_indicator_frame.crateButton:Enable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
 		private.distance_indicator_frame.crateButton.tooltip = private.item_id
+		-- Driizt: still on the fence about whether to situationally show/hide the Crate button instead of enable/disable. 
+		-- Since it's a new feature I'm inclined to have it shown instead of a strange button popping up out of nowhere (no user reads changelogs anyway)
+		-- Simple enough to switch the logic down the road if we change our mind / based on user feedback.
+-- 		private.distance_indicator_frame.crateButton:Show() 
 	else
 		private.distance_indicator_frame.crateButton:Disable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(1)
 		private.distance_indicator_frame.crateButton.tooltip = _G.BROWSE_NO_RESULTS
+-- 		private.distance_indicator_frame.crateButton:Hide()
 	end
 end
 

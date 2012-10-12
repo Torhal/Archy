@@ -913,6 +913,17 @@ local function GetDigSiteOptions()
 								Archy:ConfigUpdated('digsite')
 							end,
 						},
+						showCrateButton = {
+							order = 1.6,
+							type = "toggle",
+							name = L["Show Crate Button"],
+							desc = L["Shows a Crate button with the Distance Indicator."],
+							get = function() return db.digsite.distanceIndicator.showCrateButton end,
+							set = function(_, value)
+								db.digsite.distanceIndicator.showCrateButton = value
+								Archy:ConfigUpdated('digsite')
+							end,
+						},
 						docked = {
 							order = 2,
 							type = "toggle",

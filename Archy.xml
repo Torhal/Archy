@@ -243,12 +243,12 @@
 					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="0" y="0" />
 				</Anchors>
 			</Frame>
-			<Button name="$parentSurveyButton" parentKey="surveyButton" inherits="UIPanelButtonTemplate, SecureActionButtonTemplate" text="SURVEY">
+			<Button name="$parentSurveyButton" parentKey="surveyButton" inherits="ActionButtonTemplate, SecureActionButtonTemplate">
 				<Attributes>
 					<Attribute name="type" value="spell" />
 					<Attribute name="spell" value="80451" />
 				</Attributes>
-				<Size><AbsDimension x="100" y="24" /></Size>
+				<Size><AbsDimension x="24" y="24" /></Size>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentCircle" relativePoint="RIGHT" x="5" y="0" />
 				</Anchors>
@@ -263,16 +263,28 @@
 							</Anchor>
 						</Anchors> 
 					</Cooldown>
-				</Frames>				
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						self.icon:SetTexture("Interface\\Icons\\inv_misc_shovel_01")
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(self,"ANCHOR_TOP")
+						GameTooltip:SetSpellByID(80451)
+						GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>GameTooltip_Hide()</OnLeave>
+					<OnHide>GameTooltip_Hide()</OnHide>
+				</Scripts>
 			</Button>
 			<Button name="$parentCrateButton" parentKey="crateButton" inherits="ActionButtonTemplate, SecureActionButtonTemplate">
 				<Size><AbsDimension x="24" y="24" /></Size>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentSurveyButton" relativePoint="RIGHT" x="5" y="0" />
+					<Anchor point="LEFT" relativeTo="$parentSurveyButton" relativePoint="RIGHT" x="10" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						if not InCombatLockdown() then self:Disable() end 
+						if not InCombatLockdown() then self:Disable() --[[ self:Hide()]] end 
 						self.icon:SetTexture("Interface\\Icons\\inv_crate_04") 
 						self.icon:SetDesaturated(1)
 						self:SetMotionScriptsWhileDisabled(true)
