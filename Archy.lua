@@ -2597,7 +2597,7 @@ local function FindCrateable(bag, slot)
 	if IsTaintable() then private.regen_find_crate = true return end
 	local itemID = GetContainerItemID(bag, slot)
 	if itemID then
-		if CRATE_OF_FRAGMENTS[itemID] then 
+		if CRATE_OF_FRAGMENTS[itemID] then -- 86068,73410 for debug or any book-type item
 			private.item_id = itemID 
 			return true 
 		end
@@ -2632,14 +2632,14 @@ function Archy:FindForCrate()
 	end
 	if private.bag_id then
 		private.distance_indicator_frame.crateButton:SetAttribute("type1", "macro")
-		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/use "..private.bag_id.." "..private.bag_slot_id)
+		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use "..private.bag_id.." "..private.bag_slot_id)
 		private.distance_indicator_frame.crateButton:Enable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
 		private.distance_indicator_frame.crateButton.tooltip = private.item_id
-		-- Driizt: still on the fence about whether to situationally show/hide the Crate button instead of enable/disable. 
+		-- Driizt: still on the fence about whether to show/hide the Crate button instead of enable/disable. 
 		-- Since it's a new feature I'm inclined to have it shown instead of a strange button popping up out of nowhere (no user reads changelogs anyway)
-		-- Simple enough to switch the logic down the road if we change our mind / based on user feedback.
--- 		private.distance_indicator_frame.crateButton:Show() 
+		-- Simple enough to switch the logic down the road if we change our mind or based on user feedback.
+-- 		private.distance_indicator_frame.crateButton:Show()
 	else
 		private.distance_indicator_frame.crateButton:Disable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(1)
