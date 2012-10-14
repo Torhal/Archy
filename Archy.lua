@@ -689,6 +689,7 @@ end
 local function GetCrateUseString(spellID)
 	private.scantip:ClearLines()
 	private.scantip:SetSpellByID(spellID)
+	local spelltext
 	local i = 1
 	while (_G["ArchyScanTipTextLeft"..i]:GetText()) do
 		-- overwrite until we get the contents of bottom fontstring on the left
