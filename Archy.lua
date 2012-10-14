@@ -347,7 +347,6 @@ local artifactSolved = {
 local current_continent
 local continent_digsites = {}
 local distanceIndicatorActive = false
-local is_looting = false
 local overrideOn = false
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
@@ -871,7 +870,8 @@ local function ToggleDistanceIndicator()
 	if distanceIndicatorActive then
 		private.distance_indicator_frame.circle:SetAlpha(1)
 	else
-		if private.db.digsite.distanceIndicator.undocked and private.db.digsite.distanceIndicator.showSurveyButton then
+		private.distance_indicator_frame.circle.distance:SetText("0")
+		if private.db.digsite.distanceIndicator.undocked and not private.db.general.locked and (private.db.digsite.distanceIndicator.showSurveyButton or private.db.digsite.distanceIndicator.showCrateButton) then
 			private.distance_indicator_frame.circle:SetAlpha(0.25) -- Drii: allow the distance indicator to show at reduced alpha for dragging when undocked
 		else
 			private.distance_indicator_frame.circle:SetAlpha(0)
@@ -1330,7 +1330,10 @@ function LDB_object:OnClick(button, down)
 		else
 			private.db.general.show = not private.db.general.show
 			if private.db.general.show and private.db.general.stealthMode then
-				Archy:Print(L["You are trying to show Archy's Lists while in stealth mode. Shift-Click the button or type /archy stealth if you wish to toggle it."])
+				if not private.stealthWarned then
+					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session 
+					private.stealthWarned = true
+				end
 			end
 			Archy:ConfigUpdated()
 		end
@@ -2361,18 +2364,15 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
 			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() and not IsFishingPoleEquipped() then
 				local perform_survey = false
-
-				if not is_looting and clicked_time then
+				if (_G.GetNumLootItems()==0 or not _G.GetNumLootItems()) and clicked_time then
 					local pressTime = _G.GetTime()
 					local doubleTime = pressTime - clicked_time
-
 					if doubleTime < ACTION_DOUBLE_WAIT and doubleTime > MIN_ACTION_DOUBLECLICK then
 						clicked_time = nil
 						perform_survey = true
 					end
 				end
 				clicked_time = _G.GetTime()
-
 				if perform_survey and not IsTaintable() then
 					-- We're stealing the mouse-up event, make sure we exit MouseLook
 					if _G.IsMouselooking() then
@@ -2445,7 +2445,6 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	self:RegisterEvent("CHAT_MSG_LOOT", "LootReceived")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 	self:RegisterEvent("LOOT_OPENED", "OnPlayerLooting")
-	self:RegisterEvent("LOOT_CLOSED", "OnPlayerLooting")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -2771,8 +2770,8 @@ function Archy:PLAYER_ENTERING_WORLD() -- (3)
 
 	if private.db.tomtom.noerrorwarn and (private.db.tomtom.noerrorwarn == Archy.version) then
 		--
-	elseif private.tomtomPoiIntegration and _G.TomTom.profile.poi.setClosest and not private.tomtomWarning then
-		private.tomtomWarning = true
+	elseif private.tomtomPoiIntegration and _G.TomTom.profile.poi.setClosest and not private.tomtomWarned then
+		private.tomtomWarned = true
 		Dialog:Spawn("ArchyTomTomError")
 	end -- Drii: temporary workaround for ticket 384
 	-- 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -3848,14 +3847,13 @@ function Archy:SaveFramePosition(frame)
 end
 
 function Archy:OnPlayerLooting(event, ...)
-	is_looting = (event == "LOOT_OPENED")
 	local autoLootEnabled = ...
 
 	if autoLootEnabled == 1 then
 		return
 	end
 
-	if not is_looting or not private.db.general.autoLoot then
+	if not private.db.general.autoLoot then
 		return
 	end
 
