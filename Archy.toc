@@ -50,6 +50,7 @@ Locale\esES.lua
 Locale\esMX.lua
 Locale\deDE.lua
 Locale\frFR.lua
+Locale\itIT.lua
 Locale\koKR.lua
 Locale\ruRU.lua
 Locale\ptBR.lua
