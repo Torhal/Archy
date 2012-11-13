@@ -349,6 +349,7 @@ local continent_digsites = {}
 local distanceIndicatorActive = false
 local overrideOn = false
 local keystoneIDToRaceID = {}
+local archyQuestItemID = {[79049]=true} -- Serpentrider Relic
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in HasArchaeology()
 local lastSite = {}
@@ -889,7 +890,7 @@ local function ToggleDistanceIndicator()
 	if private.db.digsite.distanceIndicator.showCrateButton then
 		private.distance_indicator_frame.crateButton:Show()
 		local w = private.distance_indicator_frame:GetWidth()
-		private.distance_indicator_frame:SetWidth(w+private.distance_indicator_frame.crateButton:GetWidth())
+		private.distance_indicator_frame:SetWidth(w+10+private.distance_indicator_frame.crateButton:GetWidth())
 	else
 		private.distance_indicator_frame.crateButton:Hide()
 	end
@@ -2429,8 +2430,6 @@ local function InitializeFrames()
 	})
 
 	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
-	private.distance_indicator_frame.surveyButton:SetText(_G.GetSpellInfo(SURVEY_SPELL_ID))
-	private.distance_indicator_frame.surveyButton:SetWidth(private.distance_indicator_frame.surveyButton:GetTextWidth() + 20)
 	private.distance_indicator_frame.circle:SetScale(0.65)
 
 	private.frames_init_done = true
@@ -2674,6 +2673,9 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		local diff = currencyAmount - (race_data[race_id].currency or 0)
 
 		race_data[race_id].currency = currencyAmount
+		
+		-- update the artifact info
+		UpdateRaceArtifact(race_id)
 
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
@@ -2690,9 +2692,6 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		elseif diff > 0 then
 			local site_stats = self.db.char.digsites.stats
 			-- we've gained fragments, aka. Successfully dug at a dig site
-
-			-- update the artifact info
-			UpdateRaceArtifact(race_id)
 
 			distanceIndicatorActive = false
 			ToggleDistanceIndicator()
@@ -3875,7 +3874,7 @@ function Archy:OnPlayerLooting(event, ...)
 			if link then
 				local itemID = GetIDFromLink(link)
 
-				if itemID and keystoneIDToRaceID[itemID] then
+				if itemID and (keystoneIDToRaceID[itemID] or archyQuestItemID[itemID]) then
 					_G.LootSlot(slotNum)
 				end
 			end

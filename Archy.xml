@@ -248,13 +248,13 @@
 					<Attribute name="type" value="spell" />
 					<Attribute name="spell" value="80451" />
 				</Attributes>
-				<Size><AbsDimension x="24" y="24" /></Size>
+				<Size><AbsDimension x="28" y="24" /></Size>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentCircle" relativePoint="RIGHT" x="5" y="0" />
 				</Anchors>
 				<Frames>
 					<Cooldown name="$parentCooldown" inherits="CooldownFrameTemplate" parentKey="cooldown">
-						<Size x="100" y="24"/>
+						<Size x="28" y="24"/>
 						<Anchors>
 							<Anchor point="CENTER">
 								<Offset>
@@ -278,13 +278,13 @@
 				</Scripts>
 			</Button>
 			<Button name="$parentCrateButton" parentKey="crateButton" inherits="ActionButtonTemplate, SecureActionButtonTemplate">
-				<Size><AbsDimension x="24" y="24" /></Size>
+				<Size><AbsDimension x="28" y="24" /></Size>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentSurveyButton" relativePoint="RIGHT" x="10" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						if not InCombatLockdown() then self:Disable() --[[ self:Hide()]] end 
+						if not InCombatLockdown() then self:Disable() end 
 						self.icon:SetTexture("Interface\\Icons\\inv_crate_04") 
 						self.icon:SetDesaturated(1)
 						self:SetMotionScriptsWhileDisabled(true)
