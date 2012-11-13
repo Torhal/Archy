@@ -1306,8 +1306,11 @@ function Archy:LDBTooltipShow()
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Right-Click to lock/unlock Archy"] .. "|r", "LEFT", num_columns)
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", num_columns)
 
-	Archy_LDB_Tooltip:UpdateScrolling()
 	Archy_LDB_Tooltip:Show()
+	if (Archy_LDB_Tooltip:GetPoint()) then
+	 	Archy_LDB_Tooltip:UpdateScrolling()
+	end
+
 end
 
 function LDB_object:OnEnter()
