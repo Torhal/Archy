@@ -2729,7 +2729,9 @@ function Archy:LootReceived(event, msg)
 	local race_id = keystoneIDToRaceID[itemID]
 
 	if race_id then
-		self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
+		if lastSite.id then -- Drii: we can get solves without digging now from crates
+			self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
+		end
 		keystoneLootRaceID = race_id
 	end
 end
