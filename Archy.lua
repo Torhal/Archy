@@ -692,16 +692,20 @@ local function GetArtifactStats(race_id, name)
 end
 
 local function GetCrateUseString(spellID)
+	local spell_text
+	local line_num = 1
+
 	private.scantip:ClearLines()
 	private.scantip:SetSpellByID(spellID)
-	local i, spelltext = 1
-	while (_G["ArchyScanTipTextLeft"..i]:GetText()) do
+
+	while (_G["ArchyScanTipTextLeft".. line_num]:GetText()) do
 		-- overwrite until we get the contents of bottom fontstring on the left
-		spelltext = (_G["ArchyScanTipTextLeft"..i]:GetText())
-		i = i + 1
+		spell_text = (_G["ArchyScanTipTextLeft".. line_num]:GetText())
+		line_num = line_num + 1
 	end
-	if spelltext then
-		return _G.ITEM_SPELL_TRIGGER_ONUSE.." "..spelltext
+
+	if spell_text then
+		return _G.ITEM_SPELL_TRIGGER_ONUSE.." ".. spell_text
 	end
 end
 
@@ -709,9 +713,10 @@ end
 local function HasArchaeology()
 	local _, _, arch = _G.GetProfessions()
 	if arch then
-		private.scantip = private.scantip or CreateFrame("GameTooltip","ArchyScanTip",nil,"GameTooltipTemplate")
-		private.scantip:SetOwner(UIParent, "ANCHOR_NONE")
+		private.scantip = private.scantip or _G.CreateFrame("GameTooltip","ArchyScanTip",nil,"GameTooltipTemplate")
+		private.scantip:SetOwner(_G.UIParent, "ANCHOR_NONE")
 		CRATE_USE_STRING = CRATE_USE_STRING or GetCrateUseString(CRATE_SPELL_ID)
+
 		for i = 1, _G.GetNumTrackingTypes() do
 			if (_G.GetTrackingInfo(i)) == _G.MINIMAP_TRACKING_DIGSITES then
 				digsitesTrackingID = i
