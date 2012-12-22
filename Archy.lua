@@ -692,10 +692,10 @@ local function GetCrateUseString(spellID)
 	local i, spelltext = 1
 	while (_G["ArchyScanTipTextLeft"..i]:GetText()) do
 		-- overwrite until we get the contents of bottom fontstring on the left
-		spelltext = (_G["ArchyScanTipTextLeft"..i]:GetText()) 
+		spelltext = (_G["ArchyScanTipTextLeft"..i]:GetText())
 		i = i + 1
 	end
-	if spelltext then 
+	if spelltext then
 		return _G.ITEM_SPELL_TRIGGER_ONUSE.." "..spelltext
 	end
 end
@@ -886,7 +886,7 @@ local function ToggleDistanceIndicator()
 		private.distance_indicator_frame.surveyButton:Hide()
 		private.distance_indicator_frame:SetWidth(42)
 	end
-	
+
 	if private.db.digsite.distanceIndicator.showCrateButton then
 		private.distance_indicator_frame.crateButton:Show()
 		local w = private.distance_indicator_frame:GetWidth()
@@ -894,7 +894,7 @@ local function ToggleDistanceIndicator()
 	else
 		private.distance_indicator_frame.crateButton:Hide()
 	end
-	
+
 end
 
 Dialog:Register("ArchyConfirmSolve", {
@@ -1098,7 +1098,7 @@ function Archy:LDBTooltipShow()
 	local line = Archy_LDB_Tooltip:AddHeader(".")
 	Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r") .. "*", "CENTER", num_columns)
 	Archy_LDB_Tooltip:SetCellScript(line, 1, "OnMouseDown", Archy_cell_script, "mode")
-	
+
 	if HasArchaeology() then
 		if tooltipMode == 1 then
 			line = Archy_LDB_Tooltip:AddLine(".")
@@ -1115,7 +1115,7 @@ function Archy:LDBTooltipShow()
 				line = Archy_LDB_Tooltip:AddLine(".")
 				Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", num_columns)
 				Archy_LDB_Tooltip:AddSeparator()
-	
+
 				line = Archy_LDB_Tooltip:AddLine(".")
 				Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 				Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
@@ -1125,22 +1125,22 @@ function Archy:LDBTooltipShow()
 				Archy_LDB_Tooltip:SetCell(line, 7, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 				Archy_LDB_Tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
 				Archy_LDB_Tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
-	
+
 				for race_id, artifact in pairs(artifacts) do
 					if artifact.fragments_required > 0 then
 						line = Archy_LDB_Tooltip:AddLine(" ")
 						Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
 						Archy_LDB_Tooltip:SetCell(line, 2, race_data[race_id].name, "LEFT", 1)
 						Archy_LDB_Tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(artifact.icon), "LEFT", 1)
-	
+
 						local artifactName = artifact.name
-	
+
 						if artifact.rare then
 							artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
 						end
-	
+
 						Archy_LDB_Tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
-	
+
 						progress_data.fragments = artifact.fragments
 						progress_data.keystone_adjustment = artifact.keystone_adjustment
 						progress_data.fragments_required = artifact.fragments_required
@@ -1151,22 +1151,22 @@ function Archy:LDBTooltipShow()
 						progress_data.canSolveStone = artifact.canSolveStone
 						progress_data.canSolveInventory = artifact.canSolveInventory
 						progress_data.rare = artifact.rare
-	
+
 						Archy_LDB_Tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
 						Archy_LDB_Tooltip:SetCell(line, 7, (race_data[race_id].keystone.inventory > 0) and race_data[race_id].keystone.inventory or "", "CENTER", 1)
 						Archy_LDB_Tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
-	
+
 						local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
 						Archy_LDB_Tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 					end
 				end
 				local site_stats = Archy.db.char.digsites.stats
-	
+
 				line = Archy_LDB_Tooltip:AddLine(" ")
 				line = Archy_LDB_Tooltip:AddLine(" ")
 				Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", num_columns)
 				Archy_LDB_Tooltip:AddSeparator()
-	
+
 				for continent_id, continent_sites in pairs(continent_digsites) do
 					if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == current_continent) then -- current_continent) then
 						local continent_name
@@ -1176,10 +1176,10 @@ function Archy:LDBTooltipShow()
 								break
 							end
 						end
-	
+
 						line = Archy_LDB_Tooltip:AddLine(" ")
 						Archy_LDB_Tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns) -- Drii: ticket 384
-	
+
 						line = Archy_LDB_Tooltip:AddLine(" ")
 						Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 						Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
@@ -1189,7 +1189,7 @@ function Archy:LDBTooltipShow()
 						Archy_LDB_Tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Digs"] .. "|r", "CENTER", 1)
 						Archy_LDB_Tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. _G.ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
 						Archy_LDB_Tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
-	
+
 						for _, site in pairs(continent_sites) do
 							line = Archy_LDB_Tooltip:AddLine(" ")
 							Archy_LDB_Tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[site.raceId].texture), "LEFT", 1)
@@ -1210,19 +1210,19 @@ function Archy:LDBTooltipShow()
 			local rare_achiev, common_achiev = GetAchievementProgress()
 			local achiev = ("%s%s|r - %s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, rare_achiev, _G.ITEM_QUALITY_COLORS[1].hex, common_achiev)
 			Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.ACHIEVEMENTS .. ": ", achiev), "CENTER", num_columns)
-			
+
 			if private.db.general.show then
 				line = Archy_LDB_Tooltip:AddLine(".")
 				Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", _G.ACHIEVEMENT_CATEGORY_PROGRESS), "LEFT", num_columns)
 				Archy_LDB_Tooltip:AddSeparator()
-	
+
 				line = Archy_LDB_Tooltip:AddLine(".")
 				Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 				Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. "|r", "LEFT", 1)
 				Archy_LDB_Tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY3_DESC .. "|r", "LEFT", 1)
 				Archy_LDB_Tooltip:SetCell(line, 5, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_QUALITY1_DESC .. "|r", "LEFT", 1)
 				Archy_LDB_Tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] .. "|r", "RIGHT", 1)
-	
+
 				local all_rare_done, all_rare_count, all_common_done, all_common_count, all_total_done, all_total_count = 0, 0, 0, 0, 0, 0
 				for race_id, _ in pairs(artifacts) do
 					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race_id, missing_data)
@@ -1251,7 +1251,7 @@ function Archy:LDBTooltipShow()
 					Archy_LDB_Tooltip:SetCell(line, 5, all_common_done .. "/" .. all_common_count, "LEFT", 1)
 					Archy_LDB_Tooltip:SetCell(line, 6, all_total_done .. "/" .. all_total_count, "RIGHT", 1)
 				end
-	
+
 				for race_id, _ in pairs(artifacts) do
 					if race_data[race_id].expand then
 						line = Archy_LDB_Tooltip:AddLine(" ")
@@ -1342,7 +1342,7 @@ function LDB_object:OnClick(button, down)
 			Archy:LDBTooltipShow()
 			if private.db.general.show and private.db.general.stealthMode then
 				if not private.stealthWarned then
-					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session 
+					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session
 					private.stealthWarned = true
 				end
 			end
@@ -2610,8 +2610,8 @@ local function FindCrateable(bag, slot)
 	local itemID = GetContainerItemID(bag, slot)
 	if itemID then
 		if CRATE_OF_FRAGMENTS[itemID] then -- 86068,73410 for debug or any book-type item
-			private.item_id = itemID 
-			return true 
+			private.item_id = itemID
+			return true
 		end
 		private.scantip:SetBagItem(bag,slot)
 		for i=1, private.scantip:NumLines() do
@@ -2648,7 +2648,7 @@ function Archy:FindForCrate()
 		private.distance_indicator_frame.crateButton:Enable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
 		private.distance_indicator_frame.crateButton.tooltip = private.item_id
-		-- Driizt: still on the fence about whether to show/hide the Crate button instead of enable/disable. 
+		-- Driizt: still on the fence about whether to show/hide the Crate button instead of enable/disable.
 		-- Since it's a new feature I'm inclined to have it shown instead of a strange button popping up out of nowhere (no user reads changelogs anyway)
 		-- Simple enough to switch the logic down the road if we change our mind or based on user feedback.
 -- 		private.distance_indicator_frame.crateButton:Show()
@@ -2680,7 +2680,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		local diff = currencyAmount - (race_data[race_id].currency or 0)
 
 		race_data[race_id].currency = currencyAmount
-		
+
 		-- update the artifact info
 		UpdateRaceArtifact(race_id)
 
@@ -2831,12 +2831,12 @@ function Archy:PLAYER_REGEN_ENABLED()
 		private.regen_update_races = nil
 		self:UpdateRacesFrame()
 	end
-	
+
 	if private.regen_find_crate then
 		private.regen_find_crate = nil
 		self:FindForCrate()
 	end
-	
+
 end
 
 local function SetSurveyCooldown(time)
@@ -2851,7 +2851,7 @@ end
 
 function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
 	if unit ~= "player" then return end
-	
+
 	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
 		if not player_position or not nearestSite then
 			survey_location.map = 0
@@ -2864,18 +2864,18 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 		survey_location.y = player_position.y
 		survey_location.map = player_position.map
 		survey_location.level = player_position.level
-	
+
 		distanceIndicatorActive = true
 		lastSite = nearestSite
 		self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
-	
+
 		ToggleDistanceIndicator()
 		UpdateDistanceIndicator()
-	
+
 		if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
 			local now = _G.GetTime()
 			local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
-	
+
 			if start > 0 and duration > 0 and now < (start + duration) then
 				if duration <= GLOBAL_COOLDOWN_TIME then
 					self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
@@ -2884,16 +2884,16 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 				end
 			end
 		end
-	
+
 		if private.db.minimap.fragmentColorBySurveyDistance then
 			local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
 			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
 			local min_red, max_red = max_yellow, 500
-	
+
 			for id, poi in pairs(allPois) do
 				if poi.active and poi.type == "survey" then
 					local distance = Astrolabe:GetDistanceToIcon(poi)
-	
+
 					if distance >= min_green and distance <= max_green then
 						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
 					elseif distance >= min_yellow and distance <= max_yellow then
@@ -2906,16 +2906,15 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 		end
 		tomtomActive = false
 		RefreshTomTom()
-		self:RefreshDigSiteDisplay()	
+		self:RefreshDigSiteDisplay()
 	end
-	
+
 	if spell_id == CRATE_SPELL_NAME then
 		if private.busy_crating then
 			private.busy_crating = nil
 			self:ScheduleTimer("FindForCrate", 1)
 		end
 	end
-	
 end
 
 function Archy:UpdateSkillBar()
