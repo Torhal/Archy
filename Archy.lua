@@ -60,8 +60,9 @@ end
 -----------------------------------------------------------------------
 local DIG_SITES = private.dig_sites
 local ARTIFACTS = private.artifacts_db
-local MAX_PROFESSION_RANK = GetExpansionLevel() + 4 -- Skip the 4 ranks of vanilla
+local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of vanilla
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
+
 local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in OnInitialize()
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in OnInitialize()
@@ -226,7 +227,9 @@ local PROFILE_DEFAULTS = {
 		},
 		digsite = {
 			show = true,
-			position = { "TOPRIGHT", "TOPRIGHT", -200, -200 },
+			position = {
+				"TOPRIGHT", "TOPRIGHT", -200, -200
+			},
 			anchor = "TOPRIGHT",
 			positionX = 400,
 			positionY = -300,
@@ -322,7 +325,7 @@ local SITES_PER_CONTINENT = 4
 local SURVEYS_PER_DIGSITE = 6
 local SURVEY_SPELL_ID = 80451
 local CRATE_SPELL_ID = 126935
-local CRATE_SPELL_NAME = (GetSpellInfo(CRATE_SPELL_ID))
+local CRATE_SPELL_NAME = (_G.GetSpellInfo(CRATE_SPELL_ID))
 local CRATE_USE_STRING -- Populate in HasArchaeology()
 local ZONE_DATA = {}
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
@@ -1244,6 +1247,7 @@ function Archy:LDBTooltipShow()
 						all_total_count = all_total_count + total_count
 					end
 				end
+
 				if all_rare_done > 0 or all_rare_count > 0 or all_common_done > 0 or all_common_count > 0 or all_total_done > 0 or all_total_count > 0 then
 					Archy_LDB_Tooltip:AddSeparator()
 					line = Archy_LDB_Tooltip:AddLine(" ")
@@ -1259,31 +1263,42 @@ function Archy:LDBTooltipShow()
 						line = Archy_LDB_Tooltip:AddLine(" ")
 						line = Archy_LDB_Tooltip:AddLine(" ")
 						Archy_LDB_Tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", race_data[race_id].name), "LEFT", num_columns)
+
 						Archy_LDB_Tooltip:AddSeparator()
+
 						line = Archy_LDB_Tooltip:AddLine(" ")
 						Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 						Archy_LDB_Tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_MISSING:format(_G.ITEM_QUALITY3_DESC) .. "|r", "LEFT", 1)
 						Archy_LDB_Tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_MISSING:format(_G.ITEM_QUALITY1_DESC) .. "|r", "LEFT", 2)
+
 						GetArtifactsDelta(race_id, missing_data)
-						local startline, endline
+
+						local start_line, end_line
+
 						for artifact, info in pairs(missing_data) do -- rares first
 							if not count_descriptors[artifact] and info.rarity > 0 then
 								line = Archy_LDB_Tooltip:AddLine(" ")
 								Archy_LDB_Tooltip:SetCell(line, 1, " ", "LEFT", 1)
 								Archy_LDB_Tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, artifact) .. "*", "LEFT", 1)
 								Archy_LDB_Tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "spellid:" .. info.spellid)
-								if not startline then startline = line end
-								endline = line
+								if not start_line then start_line = line end
+								end_line = line
 							end
 						end
-						if endline and endline >= startline then -- commons next (not exhaustive)
-							local line, cell = startline, 3
+
+						if end_line and end_line >= start_line then -- commons next (not exhaustive)
+							local line, cell = start_line, 3
+
 							for artifact, info in pairs(missing_data) do
 								if not count_descriptors[artifact] and info.rarity == 0 then
-									if line <= endline and cell <= 5 then
+									if line <= end_line and cell <= 5 then
 										Archy_LDB_Tooltip:SetCell(line, cell, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[1].hex, artifact), "LEFT", 2)
 										cell = cell + 2
-										if cell > 5 then line = line + 1; cell = 3 end
+
+										if cell > 5 then
+											line = line + 1
+											cell = 3
+										end
 									else
 										break
 									end
@@ -1309,10 +1324,10 @@ function Archy:LDBTooltipShow()
 	line = Archy_LDB_Tooltip:AddLine(" ") Archy_LDB_Tooltip:SetCell(line, 1, "|cFF00FF00" .. L["Middle-Click to display the Archaeology window"] .. "|r", "LEFT", num_columns)
 
 	Archy_LDB_Tooltip:Show()
+
 	if (Archy_LDB_Tooltip:GetPoint()) then
 	 	Archy_LDB_Tooltip:UpdateScrolling()
 	end
-
 end
 
 function LDB_object:OnEnter()
@@ -1560,6 +1575,7 @@ local function GetContinentSites(continent_id)
 	-- function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
 	-- So make sure we enable and show blobs and restore the setting at the end.
 	local showDig = _G.GetCVarBool("digSites")
+
 	if not showDig then
 		_G.SetCVar("digSites", "1")
 		_G.WorldMapArchaeologyDigSites:Show()
@@ -1567,6 +1583,7 @@ local function GetContinentSites(continent_id)
 		_G.RefreshWorldMap()
 		showDig = "0"
 	end
+
 	for index = 1, _G.GetNumMapLandmarks() do
 		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
 
@@ -1580,10 +1597,9 @@ local function GetContinentSites(continent_id)
 
 			if site and site.race then -- Drii: fail silently for missing data while we complete MoP info
 				local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
-
 				local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
 
-				local digsite = {
+				table.insert(new_sites, {
 					continent = mc,
 					zoneId = zoneID,
 					zoneName = MAP_ID_TO_ZONE_NAME[mz] or _G.UNKNOWN,
@@ -1596,11 +1612,11 @@ local function GetContinentSites(continent_id)
 					raceId = site.race,
 					id = site.blob_id,
 					distance = 999999,
-				}
-				table.insert(new_sites, digsite)
+				})
 			end
 		end
 	end
+
 	if showDig == "0" then -- restore initial setting
 		_G.SetCVar("digSites", showDig)
 		_G.WorldMapArchaeologyDigSites:Hide()
@@ -1611,7 +1627,10 @@ local function GetContinentSites(continent_id)
 end
 
 CacheMapData = function()
-	if not next(MAP_CONTINENTS) then MAP_CONTINENTS = { _G.GetMapContinents() } end
+	if not next(MAP_CONTINENTS) then
+		MAP_CONTINENTS = { _G.GetMapContinents() }
+	end
+
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		_G.SetMapZoom(continent_id)
 		local map_id = _G.GetCurrentMapAreaID()
@@ -1648,6 +1667,7 @@ CacheMapData = function()
 			}
 		end
 	end
+
 	if next(ZONE_DATA) then
 		CacheMapData = nil
 	end
@@ -1725,6 +1745,7 @@ function Archy:UpdateSiteDistances()
 		else
 			site.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, site.map, site.level, site.x, site.y)
 		end
+
 		if not Archy:IsSiteBlacklisted(site.name) then
 			if not distance or site.distance < distance then
 				distance = site.distance
@@ -1747,6 +1768,7 @@ function Archy:UpdateSiteDistances()
 
 	-- Sort sites
 	local sites = continent_digsites[current_continent]
+
 	if private.db.digsite.sortByDistance then
 		table.sort(sites, SortSitesByDistance)
 	else -- sort by zone then name
@@ -1771,6 +1793,7 @@ function Archy:ImportOldStatsDB()
 			end
 		end
 	end
+
 	-- Drii: let's also try to fix whatever crap was put in the SV by the old version of this function so users don't have to delete their variables.
 	if next(site_stats) then
 		for blobid, _ in pairs(site_stats) do
@@ -2101,6 +2124,7 @@ function UpdateMinimapPOIs(force)
 	if _G.WorldMapButton:IsVisible() then
 		return
 	end
+
 	if lastNearestSite == nearestSite and not force then
 		return
 	end
@@ -2519,9 +2543,11 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 		end
 	end
 	private.db = database and database.profile or self.db.profile
+
 	if newTheme and prevTheme and (newTheme ~= prevTheme) then -- Drii: fix for ticket 406?
 		_G.ReloadUI()
 	end
+
 	if private.frames_init_done then -- Drii: ticket 394 'OnNewProfile' fires for fresh installations too it seems.
 		self:ConfigUpdated()
 		self:UpdateFramePositions()
@@ -2550,6 +2576,7 @@ function Archy:GET_ITEM_INFO_RECEIVED(event)
 			race_data[k].keystone.texture = itemTexture
 		end
 	end
+
 	if not next(race_data_uncached) then
 		Archy:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
@@ -2607,19 +2634,28 @@ function Archy:ARTIFACT_DIG_SITE_UPDATED()
 end
 
 local function FindCrateable(bag, slot)
-	if not HasArchaeology() then return end
-	if IsTaintable() then private.regen_find_crate = true return end
-	local itemID = GetContainerItemID(bag, slot)
-	if itemID then
-		if CRATE_OF_FRAGMENTS[itemID] then -- 86068,73410 for debug or any book-type item
-			private.item_id = itemID
+	if not HasArchaeology() then
+		return
+	end
+
+	if IsTaintable() then
+		private.regen_find_crate = true
+		return
+	end
+	local item_id = _G.GetContainerItemID(bag, slot)
+
+	if item_id then
+		if CRATE_OF_FRAGMENTS[item_id] then -- 86068,73410 for debug or any book-type item
+			private.item_id = item_id
 			return true
 		end
 		private.scantip:SetBagItem(bag,slot)
-		for i=1, private.scantip:NumLines() do
-			local linetext = (_G["ArchyScanTipTextLeft"..i]:GetText())
+
+		for line_num = 1, private.scantip:NumLines() do
+			local linetext = (_G["ArchyScanTipTextLeft" .. line_num]:GetText())
+
 			if linetext == CRATE_USE_STRING then
-				private.item_id = itemID
+				private.item_id = item_id
 				return true
 			end
 		end
@@ -2628,22 +2664,26 @@ local function FindCrateable(bag, slot)
 end
 
 function Archy:FindForCrate()
-	if IsTaintable() then private.regen_find_crate = true return end
+	if IsTaintable() then
+		private.regen_find_crate = true
+		return
+	end
 	private.bag_id, private.bag_slot_id, private.item_id = nil, nil, nil
-	for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS, 1 do
-		for slot = 1, GetContainerNumSlots(bag), 1 do
-			if not private.bag_id then
-				if FindCrateable(bag, slot) then
-					private.bag_id = bag
-					private.bag_slot_id = slot
-					break
-				end
+
+	for bag = _G.BACKPACK_CONTAINER, _G.NUM_BAG_SLOTS, 1 do
+		for slot = 1, _G.GetContainerNumSlots(bag), 1 do
+			if not private.bag_id and FindCrateable(bag, slot) then
+				private.bag_id = bag
+				private.bag_slot_id = slot
+				break
 			end
 		end
+
 		if private.bag_id then
 			break
 		end
 	end
+
 	if private.bag_id then
 		private.distance_indicator_frame.crateButton:SetAttribute("type1", "macro")
 		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use "..private.bag_id.." "..private.bag_slot_id)
@@ -2664,6 +2704,7 @@ end
 
 function Archy:BAG_UPDATE_DELAYED()
 	Archy:FindForCrate()
+
 	if not current_continent or not keystoneLootRaceID then
 		return
 	end
@@ -2673,15 +2714,17 @@ function Archy:BAG_UPDATE_DELAYED()
 end
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
-	if not current_continent or _G.GetNumArchaeologyRaces() == 0 then
+	local num_races = _G.GetNumArchaeologyRaces()
+
+	if not current_continent or num_races == 0 then
 		return
 	end
 
-	for race_id = 1, _G.GetNumArchaeologyRaces() do
-		local _, _, _, currencyAmount = _G.GetArchaeologyRaceInfo(race_id)
-		local diff = currencyAmount - (race_data[race_id].currency or 0)
+	for race_id = 1, num_races do
+		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(race_id)
+		local diff = currency_amount - (race_data[race_id].currency or 0)
 
-		race_data[race_id].currency = currencyAmount
+		race_data[race_id].currency = currency_amount
 
 		-- update the artifact info
 		UpdateRaceArtifact(race_id)
@@ -2712,7 +2755,6 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 
 				AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
 			end
-
 			survey_location.map = 0
 			survey_location.level = 0
 			survey_location.x = 0
@@ -2766,7 +2808,10 @@ function Archy:QUEST_LOG_UPDATE() -- (4)
 			end
 		end
 	end
-	if private.frames_init_done then Archy:ConfigUpdated() end
+
+	if private.frames_init_done then
+		Archy:ConfigUpdated()
+	end
 	self:UnregisterEvent("QUEST_LOG_UPDATE")
 	self.QUEST_LOG_UPDATE = nil
 end
@@ -2797,7 +2842,10 @@ end
 
 function Archy:PLAYER_REGEN_DISABLED()
 	private.in_combat = true
-	if Archy_LDB_Tooltip and Archy_LDB_Tooltip:IsShown() then Archy_LDB_Tooltip:Hide() end
+
+	if Archy_LDB_Tooltip and Archy_LDB_Tooltip:IsShown() then
+		Archy_LDB_Tooltip:Hide()
+	end
 end
 
 function Archy:PLAYER_REGEN_ENABLED()
@@ -2852,7 +2900,9 @@ function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
 end
 
 function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
-	if unit ~= "player" then return end
+	if unit ~= "player" then
+		return
+	end
 
 	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
 		if not player_position or not nearestSite then
@@ -2940,12 +2990,18 @@ function Archy:UpdatePlayerPosition(force)
 	if not private.db.general.show and not force then
 		return
 	end
+
 	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
 		return
 	end
-	if force then _G.RequestArtifactCompletionHistory() end
 
-	if not private.frames_init_done then return end
+	if force then
+		_G.RequestArtifactCompletionHistory()
+	end
+
+	if not private.frames_init_done then
+		return
+	end
 
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
@@ -2977,7 +3033,9 @@ function Archy:UpdatePlayerPosition(force)
 	end
 	current_continent = continent
 
-	if force then ToggleDistanceIndicator() end
+	if force then
+		ToggleDistanceIndicator()
+	end
 
 	if #race_data == 0 then
 		for race_id = 1, _G.GetNumArchaeologyRaces() do
@@ -3000,7 +3058,10 @@ function Archy:UpdatePlayerPosition(force)
 		self:UpdateRacesFrame()
 		self:RefreshRacesDisplay()
 	end
-	if force then self:UpdateSiteDistances() end
+
+	if force then
+		self:UpdateSiteDistances()
+	end
 	self:UpdateDigSiteFrame()
 	self:RefreshDigSiteDisplay()
 	self:UpdateFramePositions()
@@ -3062,6 +3123,7 @@ local function BattleFieldMinimap_Digsites(show)
 			private.battlefield_digsites:SetSize(225, 150)
 			private.battlefield_digsites:SetPoint("TOPLEFT", _G.BattlefieldMinimap)
 			private.battlefield_digsites:SetPoint("BOTTOMRIGHT", _G.BattlefieldMinimap)
+
 			local tex = private.battlefield_digsites:CreateTexture("ArchyBattleFieldDigsitesTexture", "OVERLAY")
 			tex:SetAllPoints()
 			private.battlefield_digsites:SetFillAlpha(128)
@@ -3082,11 +3144,16 @@ local function BattleFieldMinimap_Digsites(show)
 end
 
 function Archy:UpdateTracking()
-	if not HasArchaeology() or private.db.general.manualTrack then return end -- do nothing if user has selected to manually configure tracking and blobs.
+	-- do nothing if user has selected to manually configure tracking and blobs.
+	if not HasArchaeology() or private.db.general.manualTrack then
+		return
+	end
+
 	if IsTaintable() then -- Drii: need the check for battlefield blobs, if we don't provide those it can be removed
 		private.regen_update_tracking = true
 		return
 	end
+
 	-- manage minimap tracking
 	if digsitesTrackingID then
 		_G.SetTracking(digsitesTrackingID, private.db.general.show)
@@ -3094,6 +3161,7 @@ function Archy:UpdateTracking()
 	-- manage worldmap and battlefield map digsites display
 	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
 	local showDig = _G.GetCVarBool("digSites")
+
 	if showDig then
 		_G.WorldMapArchaeologyDigSites:Show()
 		BattleFieldMinimap_Digsites(true)
@@ -3161,9 +3229,9 @@ function Archy:UpdateRacesFrame()
 			FontString_SetShadow(child.artifact.text, artifact_font_data.shadow)
 		end
 	end
-
 	local borderTexture = LSM:Fetch('border', private.db.artifact.borderTexture)
 	local backgroundTexture = LSM:Fetch('background', private.db.artifact.backgroundTexture)
+
 	races_frame:SetBackdrop({
 		bgFile = backgroundTexture,
 		edgeFile = borderTexture,
@@ -3864,23 +3932,19 @@ function Archy:SaveFramePosition(frame)
 end
 
 function Archy:OnPlayerLooting(event, ...)
-	local autoLootEnabled = ...
+	local auto_loot_enabled = ...
 
-	if autoLootEnabled == 1 then
+	if not private.db.general.autoLoot or auto_loot_enabled == 1 then
 		return
 	end
 
-	if not private.db.general.autoLoot then
-		return
-	end
+	for slot_id = 1, _G.GetNumLootItems() do
+		local slot_type = _G.GetLootSlotType(slot_id)
 
-	for slotNum = 1, _G.GetNumLootItems() do
-		local slotType = _G.GetLootSlotType(slotNum)
-
-		if slotType == _G.LOOT_SLOT_CURRENCY then
-			_G.LootSlot(slotNum)
-		elseif slotType == _G.LOOT_SLOT_ITEM then
-			local link = _G.GetLootSlotLink(slotNum)
+		if slot_type == _G.LOOT_SLOT_CURRENCY then
+			_G.LootSlot(slot_id)
+		elseif slot_type == _G.LOOT_SLOT_ITEM then
+			local link = _G.GetLootSlotLink(slot_id)
 
 			if link then
 				local item_id = GetIDFromLink(link)
