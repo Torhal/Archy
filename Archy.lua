@@ -364,7 +364,6 @@ local player_position = {
 	y = 0
 }
 
-local raceNameToID = {} -- TODO: Currently unused; see if it should be removed
 local survey_location = {
 	map = 0,
 	level = 0,
@@ -2985,7 +2984,6 @@ function Archy:UpdatePlayerPosition(force)
 			local race = race_data[race_id] -- metatable should load the data
 
 			if race then
-				raceNameToID[race.name] = race_id
 				keystoneIDToRaceID[race.keystone.id] = race_id
 			end
 		end
