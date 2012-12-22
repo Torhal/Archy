@@ -3029,6 +3029,21 @@ local function FontString_SetShadow(fs, hasShadow)
 	end
 end
 
+local function BattlefieldDigsites_OnUpdate(self, elapsed)
+	if private.battlefield_digsites.lastUpdate > _G.TOOLTIP_UPDATE_TIME then
+		private.battlefield_digsites:DrawNone();
+
+		local num_entries = _G.ArchaeologyMapUpdateAll()
+
+		for index = 1, num_entries do
+			private.battlefield_digsites:DrawBlob(_G.ArcheologyGetVisibleBlobID(index), true)
+		end
+		private.battlefield_digsites.lastUpdate = 0
+	else
+		private.battlefield_digsites.lastUpdate = private.battlefield_digsites.lastUpdate + elapsed
+	end
+end
+
 local function BattleFieldMinimap_Digsites(show)
 	if not _G.BattlefieldMinimap then
 		Archy:RegisterEvent("ADDON_LOADED")
@@ -3057,19 +3072,6 @@ local function BattleFieldMinimap_Digsites(show)
 			private.battlefield_digsites:EnableSmoothing(true)
 			private.battlefield_digsites:SetBorderScalar(0.1)
 			private.battlefield_digsites.lastUpdate = 0
-			local function BattlefieldDigsites_OnUpdate(self, elapsed)
-				if private.battlefield_digsites.lastUpdate > _G.TOOLTIP_UPDATE_TIME then
-					private.battlefield_digsites:DrawNone();
-					local numEntries = _G.ArchaeologyMapUpdateAll();
-					for i = 1, numEntries do
-						local blobID = _G.ArcheologyGetVisibleBlobID(i);
-						private.battlefield_digsites:DrawBlob(blobID, true);
-					end
-					private.battlefield_digsites.lastUpdate = 0
-				else
-					private.battlefield_digsites.lastUpdate = private.battlefield_digsites.lastUpdate + elapsed
-				end
-			end
 
 			private.battlefield_digsites:SetScript("OnUpdate", BattlefieldDigsites_OnUpdate)
 		end
