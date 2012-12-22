@@ -2375,15 +2375,19 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
 			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() and not IsFishingPoleEquipped() then
 				local perform_survey = false
-				if (_G.GetNumLootItems()==0 or not _G.GetNumLootItems()) and clicked_time then
+				local num_loot_items = _G.GetNumLootItems()
+
+				if (num_loot_items == 0 or not num_loot_items) and clicked_time then
 					local pressTime = _G.GetTime()
 					local doubleTime = pressTime - clicked_time
+
 					if doubleTime < ACTION_DOUBLE_WAIT and doubleTime > MIN_ACTION_DOUBLECLICK then
 						clicked_time = nil
 						perform_survey = true
 					end
 				end
 				clicked_time = _G.GetTime()
+
 				if perform_survey and not IsTaintable() then
 					-- We're stealing the mouse-up event, make sure we exit MouseLook
 					if _G.IsMouselooking() then
