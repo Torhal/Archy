@@ -328,6 +328,10 @@ local ZONE_DATA = {}
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
 local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
 
+local QUEST_ITEM_IDS = {
+	[79049] = true
+}
+
 _G.BINDING_HEADER_ARCHY = "Archy"
 _G.BINDING_NAME_OPTIONSARCHY = L["BINDING_NAME_OPTIONS"]
 _G.BINDING_NAME_TOGGLEARCHY = L["BINDING_NAME_TOGGLE"]
@@ -349,7 +353,6 @@ local continent_digsites = {}
 local distanceIndicatorActive = false
 local overrideOn = false
 local keystoneIDToRaceID = {}
-local archyQuestItemID = {[79049]=true} -- Serpentrider Relic
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in HasArchaeology()
 local lastSite = {}
@@ -3880,10 +3883,10 @@ function Archy:OnPlayerLooting(event, ...)
 			local link = _G.GetLootSlotLink(slotNum)
 
 			if link then
-				local itemID = GetIDFromLink(link)
+				local item_id = GetIDFromLink(link)
 
-				if itemID and (keystoneIDToRaceID[itemID] or archyQuestItemID[itemID]) then
-					_G.LootSlot(slotNum)
+				if item_id and (keystoneIDToRaceID[item_id] or QUEST_ITEM_IDS[item_id]) then
+					_G.LootSlot(slot_id)
 				end
 			end
 		end
