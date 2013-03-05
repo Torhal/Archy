@@ -351,7 +351,6 @@ local continent_digsites = {}
 private.continent_digsites = continent_digsites
 
 local distanceIndicatorActive = false
-local override_binding_on = false
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in HasArchaeology()
@@ -1888,10 +1887,10 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		button:SetAttribute("spell", SURVEY_SPELL_ID)
 		button:SetAttribute("action", nil)
 
-		button:SetScript("PostClick", function()
-			if override_binding_on and not IsTaintable() then
-				_G.ClearOverrideBindings(_G[button_name])
-				override_binding_on = false
+		button:SetScript("PostClick", function(self, mouse_button, is_down)
+			if private.override_binding_on and not IsTaintable() then
+				_G.ClearOverrideBindings(self)
+				private.override_binding_on = nil
 			else
 				private.regen_clear_override = true
 			end
@@ -1927,7 +1926,7 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 						_G.MouselookStop()
 					end
 					_G.SetOverrideBindingClick(SECURE_ACTION_BUTTON, true, "BUTTON2", SECURE_ACTION_BUTTON.name)
-					override_binding_on = true
+					private.override_binding_on = true
 				end
 			end
 		end)
@@ -2353,9 +2352,9 @@ function Archy:PLAYER_REGEN_ENABLED()
 	end
 
 	if private.regen_clear_override then
+		_G.ClearOverrideBindings(SECURE_ACTION_BUTTON)
+		private.override_binding_on = nil
 		private.regen_clear_override = nil
-		_G.ClearOverrideBindings(SECURE_ACTION_BUTTON.name)
-		override_binding_on = false
 	end
 
 	if private.regen_update_digsites then
