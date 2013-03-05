@@ -2013,27 +2013,6 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	-- Drii: workaround for TomTom bug ticket 384
 	private.tomtomPoiIntegration = private.tomtomExists and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
-
-	-- Check for minimap AddOns.
-	local mbf = LibStub("AceAddon-3.0"):GetAddon("Minimap Button Frame", true)
-	if mbf then
-		local foundMBF = false
-		if _G.MBF.db.profile.MinimapIcons then
-			for i, button in pairs(_G.MBF.db.profile.MinimapIcons) do
-				local lower_button = button:lower()
-
-				if lower_button == "archyminimap" or lower_button == "archyminimap_" then
-					foundMBF = true
-					break
-				end
-			end
-
-			if not foundMBF then
-				table.insert(_G.MBF.db.profile.MinimapIcons, "ArchyMinimap")
-				self:Print("Adding Archy to the MinimapButtonFrame protected items list")
-			end
-		end
-	end
 end
 
 function Archy:OnDisable()
