@@ -362,9 +362,10 @@ function Archy:LDBTooltipShow()
 							end
 						end
 
-						line = tooltip:AddLine(" ")
-						tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns) -- Drii: ticket 384
-
+						if continent_name then
+							line = tooltip:AddLine(" ")
+							tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns) -- Drii: ticket 384
+						end
 						line = tooltip:AddLine(" ")
 						tooltip:SetCell(line, 1, " ", "LEFT", 1)
 						tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. L["Fragment"] .. "|r", "LEFT", 2)
