@@ -663,7 +663,7 @@ function private:ResetPositions()
 end
 
 local function ShouldBeHidden()
-	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or not HasArchaeology())
+	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not HasArchaeology())
 end
 
 local function UpdateRaceArtifact(race_id)
@@ -2001,6 +2001,8 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Drii: new MoP event
+	self:RegisterEvent("PET_BATTLE_OPENING_START")
+	self:RegisterEvent("PET_BATTLE_CLOSE")
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
@@ -2450,6 +2452,28 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 		if private.busy_crating then
 			private.busy_crating = nil
 			self:ScheduleTimer("FindForCrate", 1)
+		end
+	end
+end
+
+function Archy:PET_BATTLE_OPENING_START()
+	if not private.db.general.show or private.db.general.stealthMode then -- already hidden do nothing
+		return
+	else
+		private.pet_battle_shown = true -- store our visible state to restore after pet battle
+		private.db.general.show = false
+		self:ConfigUpdated()
+	end
+end
+
+function Archy:PET_BATTLE_CLOSE()
+	if private.pet_battle_shown then
+		private.pet_battle_shown = nil
+		private.db.general.show = true
+		if _G.C_PetBattles.IsInBattle() then -- API doesn't return correct values in this event
+			self:ScheduleTimer("ConfigUpdated",1.5) -- so let's schedule our re-show in a sec
+		else
+			self:ConfigUpdated()
 		end
 	end
 end
