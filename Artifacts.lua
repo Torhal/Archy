@@ -28,6 +28,7 @@ local RACE_ORC = 6
 local RACE_TOLVIR = 7
 local RACE_TROLL = 8
 local RACE_VRYKUL = 9
+local RACE_MANTID = 10
 local RACE_PANDAREN = 11
 local RACE_MOGU = 12
 
@@ -42,6 +43,7 @@ local raceIDtoCurrencyID = {
 	[RACE_TOLVIR] = 401,
 	[RACE_TROLL] = 385,
 	[RACE_VRYKUL] = 399,
+	[RACE_MANTID] = 754,
 	[RACE_PANDAREN] = 676,
 	[RACE_MOGU] = 677,
 }
@@ -55,6 +57,7 @@ local raceIDtoKeystoneID = {
 	[RACE_TOLVIR] = 64397,
 	[RACE_TROLL] = 63128,
 	[RACE_VRYKUL] = 64395,
+	[RACE_MANTID] = 95373,
 	[RACE_PANDAREN] = 79868,
 	[RACE_MOGU] = 79869,
 }
@@ -1362,6 +1365,86 @@ local ARTIFACTS = {
 		itemid = 79919,
 		spellid = 113993,
 		raceid = RACE_MOGU,
+		rarity = 1,
+		keystones = 3,
+		fragments = 180,
+	},
+	[AF["Banner of the Mantid Empire"]] = {
+		itemid = 95375,
+		spellid = 139776,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Ancient Sap Feeder"]] = {
+		itemid = 95376,
+		spellid = 139779,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["The Praying Mantid"]] = {
+		itemid = 95377,
+		spellid = 139780,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Inert Sound Beacon"]] = {
+		itemid = 95378,
+		spellid = 139781,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Remains of a Paragon"]] = {
+		itemid = 95379,
+		spellid = 139782,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Mantid Lamp"]] = {
+		itemid = 95380,
+		spellid = 139783,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Pollen Collector"]] = {
+		itemid = 95381,
+		spellid = 139784,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Kypari Sap Container"]] = {
+		itemid = 95382,
+		spellid = 139785,
+		raceid = RACE_MANTID,
+		rarity = 0,
+		keystones = 1,
+		fragments = 50,
+	},
+	[AF["Mantid Sky Reaver"]] = {
+		itemid = 95391,
+		spellid = 139786,
+		raceid = RACE_MANTID,
+		rarity = 1,
+		keystones = 3,
+		fragments = 180,
+	},
+	[AF["Sonic Pulse Generator"]] = {
+		itemid = 95392,
+		spellid = 139787,
+		raceid = RACE_MANTID,
 		rarity = 1,
 		keystones = 3,
 		fragments = 180,
