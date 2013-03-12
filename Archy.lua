@@ -51,7 +51,6 @@ end
 -- Constants
 -----------------------------------------------------------------------
 local DIG_SITES = private.dig_sites
-local ARTIFACTS = private.artifacts_db
 local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of vanilla
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK

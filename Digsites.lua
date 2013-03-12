@@ -30,6 +30,7 @@ local RACE_ORC = 6
 local RACE_TOLVIR = 7
 local RACE_TROLL = 8
 local RACE_VRYKUL = 9
+local RACE_MANTID = 10
 local RACE_PANDAREN = 11
 local RACE_MOGU = 12
 local RACE_UNKNOWN = 0
@@ -1529,6 +1530,126 @@ local DIG_SITES = {
 		map = 857,
 		blob_id = 92212,
 		race = RACE_MOGU
+	}, -- patch 5.2.0 Mantid Digsites \/
+	[DS["Kor'vess Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177485,
+		race = RACE_MANTID
+	},
+	[DS["Sra'thik Swarmdock Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177487,
+		race = RACE_MANTID
+	},
+	[DS["West Sra'vess Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177489,
+		race = RACE_MANTID
+	},
+	[DS["The Feeding Pits Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177491,
+		race = RACE_MANTID
+	},
+	[DS["Kzzok Warcamp Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177493,
+		race = RACE_MANTID
+	},
+	[DS["East Sra'vess Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177495,
+		race = RACE_MANTID
+	},
+	[DS["The Underbough Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177497,
+		race = RACE_MANTID
+	},	
+	[DS["Ikz'ka Ridge Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177501,
+		race = RACE_MANTID
+	},
+	[DS["Sik'vess Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177503,
+		race = RACE_MANTID
+	},
+	[DS["West Sik'vess Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177505,
+		race = RACE_MANTID
+	},
+	[DS["North Sik'vess Digsite"]] = {
+		continent = 6,
+		map = 810,
+		blob_id = 177507,
+		race = RACE_MANTID
+	},
+	[DS["The Clutches of Shek'zeer Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177509,
+		race = RACE_MANTID
+	},
+	[DS["Kypari'ik Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177511,
+		race = RACE_MANTID
+	},
+	[DS["Zan'vess Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177513,
+		race = RACE_MANTID
+	},
+	[DS["Venomous Ledge Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177515,
+		race = RACE_MANTID
+	},
+	[DS["Amber Quarry Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177517,
+		race = RACE_MANTID
+	},
+	[DS["The Briny Muck Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177519,
+		race = RACE_MANTID
+	},
+	[DS["Kypari'zar Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177523,
+		race = RACE_MANTID
+	},
+	[DS["Lake of Stars Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177525,
+		race = RACE_MANTID
+	},
+	[DS["Kypari Vor Digsite"]] = {
+		continent = 6,
+		map = 858,
+		blob_id = 177529,
+		race = RACE_MANTID
 	},
 }
 
