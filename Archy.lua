@@ -2456,7 +2456,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 end
 
 function Archy:PET_BATTLE_OPENING_START()
-	if not private.db.general.show or private.db.general.stealthMode then -- already hidden do nothing
+	if not private.db.general.show or private.db.general.stealthMode then -- already hidden
 		return
 	else
 		private.pet_battle_shown = true -- store our visible state to restore after pet battle
