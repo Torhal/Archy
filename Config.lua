@@ -87,10 +87,41 @@ local function GetGeneralOptions()
 						db.general.locked = value
 						Archy:ConfigUpdated()
 					end,
-					width = "double"
+					width = "double",
 				},
-				icon = {
+				archyTheme = {
 					order = 4,
+					type = "select",
+					name = L["Style"],
+					desc = L["The style of display for Archy.  This will reload your UI after selecting"],
+					get = function() return db.general.theme end,
+					set = function(_, value)
+						db.general.theme = value
+						_G.ReloadUI()
+					end,
+					values = {
+						["Graphical"] = L["Graphical"],
+						["Minimal"] = L["Minimal"],
+					},
+				},				
+				combathide = {
+					order = 5,
+					name = L["Auto Hide in Combat"],
+					desc = L["Auto Hide Archy Frames in Combat"],
+					type = "toggle",
+					get = function() return db.general.combathide end,
+					set = function(k, v)
+						db.general.combathide = v
+						if db.general.combathide then
+							private.regen_update_visibility = true
+						else
+							private.regen_update_visibility = nil
+						end
+					end,
+					width = "double"
+				},				
+				icon = {
+					order = 6,
 					name = L["Hide Minimap Button"],
 					desc = L["Toggles the display of the Minimap Icon"],
 					type = "toggle",
@@ -107,23 +138,8 @@ local function GetGeneralOptions()
 					end,
 					width = "double"
 				},
-				archyTheme = {
-					order = 5,
-					type = "select",
-					name = L["Style"],
-					desc = L["The style of display for Archy.  This will reload your UI after selecting"],
-					get = function() return db.general.theme end,
-					set = function(_, value)
-						db.general.theme = value
-						_G.ReloadUI()
-					end,
-					values = {
-						["Graphical"] = L["Graphical"],
-						["Minimal"] = L["Minimal"],
-					},
-				},
 				easyCast = {
-					order = 6,
+					order = 7,
 					name = L["Enable EasyCast"],
 					desc = L["Double right-click on the screen to cast Survey.  This is experimental and may interfere with other addons with similar functionality when enabled."],
 					type = "toggle",
@@ -135,7 +151,7 @@ local function GetGeneralOptions()
 					width = "full",
 				},
 				autoLoot = {
-					order = 7,
+					order = 8,
 					name = L["AutoLoot Fragments and Key Stones"],
 					desc = L["Enable the addon to auto-loot fragments and key stones for you."],
 					type = "toggle",
@@ -147,7 +163,7 @@ local function GetGeneralOptions()
 					width = "full",
 				},
 				manualTracking = {
-					order = 8,
+					order = 9,
 					name = L["Manual tracking"],
 					desc = L["Archy will not automate dig site tracking on the minimap, world map and battlefield map."],
 					type = "toggle",

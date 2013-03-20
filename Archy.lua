@@ -113,6 +113,7 @@ local PROFILE_DEFAULTS = {
 			enabled = true,
 			show = true,
 			stealthMode = false,
+			combathide = false,
 			icon = {
 				hide = false
 			},
@@ -1969,6 +1970,8 @@ local function InitializeFrames()
 
 	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
 	private.distance_indicator_frame.circle:SetScale(0.65)
+	
+	if private.db.general.combathide then private.regen_update_visibility = true end
 
 	private.frames_init_done = true
 
@@ -2332,6 +2335,14 @@ function Archy:PLAYER_REGEN_DISABLED()
 	if self.LDB_Tooltip and self.LDB_Tooltip:IsShown() then
 		self.LDB_Tooltip:Hide()
 	end
+	
+	if private.db.general.combathide and private.digsite_frame:IsVisible() then
+		RegisterStateDriver(private.digsite_frame,"visibility","[combat]hide;show")
+	end
+	if private.db.general.combathide and private.races_frame:IsVisible() then
+		private.races_frame:Hide()
+	end
+		
 end
 
 function Archy:PLAYER_REGEN_ENABLED()
@@ -2372,7 +2383,12 @@ function Archy:PLAYER_REGEN_ENABLED()
 		private.regen_find_crate = nil
 		self:FindForCrate()
 	end
-
+	
+	if private.regen_update_visibility then
+		UnregisterStateDriver(private.digsite_frame,"visibility")
+		self:ConfigUpdated()
+	end
+	
 end
 
 local function SetSurveyCooldown(time)
