@@ -2238,7 +2238,10 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			ToggleDistanceIndicator()
 
 			if type(lastSite.id) == "number" and lastSite.id > 0 then -- Drii: for now let's just avoid the error
-				IncrementDigCounter(lastSite.id) -- Drii: ticket 380 lastSite.id passed is nil or not a number; why?
+ 				if private.has_dug then -- only increment once for each dig else fragments looted from 'ancient haunt' throw counter off (bonus fix: ticket 469)
+ 					IncrementDigCounter(lastSite.id)
+ 					private.has_dug = nil 
+ 				end
 				site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
 				site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
 
@@ -2407,6 +2410,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 	end
 
 	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
+		private.has_dug = true
 		if not player_position or not nearestSite then
 			survey_location.map = 0
 			survey_location.level = 0
