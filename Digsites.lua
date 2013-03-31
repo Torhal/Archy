@@ -1501,12 +1501,6 @@ local DIG_SITES = {
 		blob_id = 92196,
 		race = RACE_MOGU
 	},
-	[DS["Lake of Stars Digsite"]] = {
-		continent = 6,
-		map = 858,
-		blob_id = 92200,
-		race = RACE_MOGU
-	},
 	[DS["Terrace of Gurthan Digsite"]] = {
 		continent = 6,
 		map = 858,
