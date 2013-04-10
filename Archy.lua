@@ -95,18 +95,6 @@ local MINIMAP_SIZES = {
 	},
 }
 
-local CRATE_OF_FRAGMENTS = { -- all pre-MoP races at Mists of Pandaria expansion
-	[87533] = true, -- Dwarven
-	[87534] = true, -- Draenei
-	[87535] = true, -- Fossil
-	[87536] = true, -- Night Elf
-	[87537] = true, -- Nerubian
-	[87538] = true, -- Orc
-	[87539] = true, -- Tol'vir
-	[87540] = true, -- Troll
-	[87541] = true, -- Vrykul
-}
-
 local PROFILE_DEFAULTS = {
 	profile = {
 		general = {
@@ -245,6 +233,7 @@ local PROFILE_DEFAULTS = {
 				undocked = false,
 				showSurveyButton = true,
 				showCrateButton = true,
+				showLorItemButton = true,
 				font = {
 					name = "Friz Quadrata TT",
 					size = 16,
@@ -327,8 +316,23 @@ private.ZONE_DATA = ZONE_DATA
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
 local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
 
+local LOREWALKER_ITEMS = {
+ 	MAP = {id=87549,spell=126957}, 
+ 	LODESTONE = {id=87548,spell=126956},
+}
 local QUEST_ITEM_IDS = {
 	[79049] = true
+}
+local CRATE_OF_FRAGMENTS = { -- all pre-MoP races at Mists of Pandaria expansion
+	[87533] = true, -- Dwarven
+	[87534] = true, -- Draenei
+	[87535] = true, -- Fossil
+	[87536] = true, -- Night Elf
+	[87537] = true, -- Nerubian
+	[87538] = true, -- Orc
+	[87539] = true, -- Tol'vir
+	[87540] = true, -- Troll
+	[87541] = true, -- Vrykul
 }
 
 _G.BINDING_HEADER_ARCHY = "Archy"
@@ -801,7 +805,7 @@ local function ToggleDistanceIndicator()
 		private.distance_indicator_frame.circle:SetAlpha(1)
 	else
 		private.distance_indicator_frame.circle.distance:SetText("0")
-		if private.db.digsite.distanceIndicator.undocked and not private.db.general.locked and (private.db.digsite.distanceIndicator.showSurveyButton or private.db.digsite.distanceIndicator.showCrateButton) then
+		if private.db.digsite.distanceIndicator.undocked and not private.db.general.locked and (private.db.digsite.distanceIndicator.showSurveyButton or private.db.digsite.distanceIndicator.showCrateButton or private.db.digsite.distanceIndicator.showLorItemButton) then
 			private.distance_indicator_frame.circle:SetAlpha(0.25) -- Drii: allow the distance indicator to show at reduced alpha for dragging when undocked
 		else
 			private.distance_indicator_frame.circle:SetAlpha(0)
@@ -822,6 +826,14 @@ local function ToggleDistanceIndicator()
 		private.distance_indicator_frame:SetWidth(w+10+private.distance_indicator_frame.crateButton:GetWidth())
 	else
 		private.distance_indicator_frame.crateButton:Hide()
+	end
+	
+	if private.db.digsite.distanceIndicator.showLorItemButton then
+		private.distance_indicator_frame.loritemButton:Show()
+		local w = private.distance_indicator_frame:GetWidth()
+		private.distance_indicator_frame:SetWidth(w+10+private.distance_indicator_frame.loritemButton:GetWidth())
+	else
+		private.distance_indicator_frame.loritemButton:Hide()
 	end
 
 end
@@ -2128,14 +2140,14 @@ local function FindCrateable(bag, slot)
 	end
 
 	if IsTaintable() then
-		private.regen_find_crate = true
+		private.regen_scan_bags = true
 		return
 	end
 	local item_id = _G.GetContainerItemID(bag, slot)
 
 	if item_id then
 		if CRATE_OF_FRAGMENTS[item_id] then -- 86068,73410 for debug or any book-type item
-			private.item_id = item_id
+			private.crate_item_id = item_id
 			return true
 		end
 		private.scantip:SetBagItem(bag,slot)
@@ -2144,7 +2156,7 @@ local function FindCrateable(bag, slot)
 			local linetext = (_G["ArchyScanTipTextLeft" .. line_num]:GetText())
 
 			if linetext == CRATE_USE_STRING then
-				private.item_id = item_id
+				private.crate_item_id = item_id
 				return true
 			end
 		end
@@ -2152,47 +2164,83 @@ local function FindCrateable(bag, slot)
 	return false
 end
 
-function Archy:FindForCrate()
+function Archy:ScanBags()
 	if IsTaintable() then
-		private.regen_find_crate = true
+		private.regen_scan_bags = true
 		return
 	end
-	private.bag_id, private.bag_slot_id, private.item_id = nil, nil, nil
+	private.crate_bag_id, private.crate_bag_slot_id, private.crate_item_id = nil, nil, nil
 
 	for bag = _G.BACKPACK_CONTAINER, _G.NUM_BAG_SLOTS, 1 do
 		for slot = 1, _G.GetContainerNumSlots(bag), 1 do
-			if not private.bag_id and FindCrateable(bag, slot) then
-				private.bag_id = bag
-				private.bag_slot_id = slot
+			if not private.crate_bag_id and FindCrateable(bag, slot) then
+				private.crate_bag_id = bag
+				private.crate_bag_slot_id = slot
 				break
 			end
 		end
 
-		if private.bag_id then
+		if private.crate_bag_id then
 			break
 		end
 	end
 
-	if private.bag_id then
+	if private.crate_bag_id then
 		private.distance_indicator_frame.crateButton:SetAttribute("type1", "macro")
-		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use "..private.bag_id.." "..private.bag_slot_id)
+		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use "..private.crate_bag_id.." "..private.crate_bag_slot_id)
 		private.distance_indicator_frame.crateButton:Enable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
-		private.distance_indicator_frame.crateButton.tooltip = private.item_id
-		-- Driizt: still on the fence about whether to show/hide the Crate button instead of enable/disable.
-		-- Since it's a new feature I'm inclined to have it shown instead of a strange button popping up out of nowhere (no user reads changelogs anyway)
-		-- Simple enough to switch the logic down the road if we change our mind or based on user feedback.
--- 		private.distance_indicator_frame.crateButton:Show()
+		private.distance_indicator_frame.crateButton.tooltip = private.crate_item_id
+		private.distance_indicator_frame.crateButton.shine:Show()
+		_G.AutoCastShine_AutoCastStart(private.distance_indicator_frame.crateButton.shine)
+		private.distance_indicator_frame.crateButton.shining = true
 	else
 		private.distance_indicator_frame.crateButton:Disable()
 		private.distance_indicator_frame.crateButton.icon:SetDesaturated(1)
 		private.distance_indicator_frame.crateButton.tooltip = _G.BROWSE_NO_RESULTS
--- 		private.distance_indicator_frame.crateButton:Hide()
+		private.distance_indicator_frame.crateButton.shine:Hide()
+		if private.distance_indicator_frame.crateButton.shining then
+			_G.AutoCastShine_AutoCastStop(private.distance_indicator_frame.crateButton.shine)
+			private.distance_indicator_frame.crateButton.shining = nil
+		end
 	end
+	
+	local lorewalker_map_count = _G.GetItemCount(LOREWALKER_ITEMS.MAP.id,false,false)
+	local lorewalker_lode_count = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.id,false,false)
+	if lorewalker_map_count > 0 then -- prioritize map since it affects Archy's lists. (randomize digsites)
+		local item_name = (_G.GetItemInfo(LOREWALKER_ITEMS.MAP.id))
+		private.distance_indicator_frame.loritemButton:SetAttribute("type1", "item")
+		private.distance_indicator_frame.loritemButton:SetAttribute("item1", item_name)
+		private.distance_indicator_frame.loritemButton:Enable()
+		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(0)
+		private.distance_indicator_frame.loritemButton.tooltip = LOREWALKER_ITEMS.MAP.id
+		local start, duration, enable = _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id)
+		if start > 0 and duration > 0 then
+			_G.CooldownFrame_SetTimer(private.distance_indicator_frame.loritemButton.cooldown, start, duration, enable)
+		end
+	end
+	if lorewalker_lode_count > 0 then
+		local item_name = (_G.GetItemInfo(LOREWALKER_ITEMS.LODESTONE.id))
+		private.distance_indicator_frame.loritemButton:SetAttribute("type2", "item")
+		private.distance_indicator_frame.loritemButton:SetAttribute("item2", item_name)
+		private.distance_indicator_frame.loritemButton:Enable()
+		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(0)
+		if lorewalker_map_count > 0 then
+			private.distance_indicator_frame.loritemButton.tooltip = {LOREWALKER_ITEMS.MAP.id,item_name}	
+		else
+			private.distance_indicator_frame.loritemButton.tooltip = {LOREWALKER_ITEMS.LODESTONE.id,_G.USE}
+		end
+	end
+	if lorewalker_map_count == 0 and lorewalker_lode_count == 0 then
+		private.distance_indicator_frame.loritemButton:Disable()
+		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(1)
+		private.distance_indicator_frame.loritemButton.tooltip = _G.BROWSE_NO_RESULTS
+	end
+	
 end
 
 function Archy:BAG_UPDATE_DELAYED()
-	Archy:FindForCrate()
+	Archy:ScanBags()
 
 	if not private.current_continent or not keystoneLootRaceID then
 		return
@@ -2382,9 +2430,9 @@ function Archy:PLAYER_REGEN_ENABLED()
 		self:UpdateRacesFrame()
 	end
 
-	if private.regen_find_crate then
-		private.regen_find_crate = nil
-		self:FindForCrate()
+	if private.regen_scan_bags then
+		private.regen_scan_bags = nil
+		self:ScanBags()
 	end
 	
 	if private.regen_update_visibility then
@@ -2398,6 +2446,10 @@ local function SetSurveyCooldown(time)
 	_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
 end
 
+local function SetLoreItemCooldown(time)
+	_G.CooldownFrame_SetTimer(private.distance_indicator_frame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id))
+end
+
 function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
 	if unit == "player" and spell == CRATE_SPELL_NAME then
 		private.busy_crating = true
@@ -2408,7 +2460,20 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 	if unit ~= "player" then
 		return
 	end
-
+	
+	if spell_id == LOREWALKER_ITEMS.MAP.spell and event == "UNIT_SPELLCAST_SUCCEEDED" then
+		if private.distance_indicator_frame.loritemButton and private.distance_indicator_frame.loritemButton:IsShown() then
+			self:ScheduleTimer(SetLoreItemCooldown, 0.2)
+		end
+	end
+	
+	if spell_id == CRATE_SPELL_ID then
+		if private.busy_crating then
+			private.busy_crating = nil
+			self:ScheduleTimer("ScanBags", 1)
+		end
+	end
+	
 	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
 		private.has_dug = true
 		if not player_position or not nearestSite then
@@ -2466,13 +2531,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 		RefreshTomTom()
 		self:RefreshDigSiteDisplay()
 	end
-
-	if spell_id == CRATE_SPELL_NAME then
-		if private.busy_crating then
-			private.busy_crating = nil
-			self:ScheduleTimer("FindForCrate", 1)
-		end
-	end
+	
 end
 
 function Archy:PET_BATTLE_OPENING_START()
