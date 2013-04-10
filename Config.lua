@@ -918,30 +918,8 @@ local function GetDigSiteOptions()
 								Archy:ConfigUpdated('digsite')
 							end,
 						},
-						showSurveyButton = {
-							order = 1.5,
-							type = "toggle",
-							name = L["Show Survey Button"],
-							desc = L["Shows a Survey button with the Distance Indicator."],
-							get = function() return db.digsite.distanceIndicator.showSurveyButton end,
-							set = function(_, value)
-								db.digsite.distanceIndicator.showSurveyButton = value
-								Archy:ConfigUpdated('digsite')
-							end,
-						},
-						showCrateButton = {
-							order = 1.6,
-							type = "toggle",
-							name = L["Show Crate Button"],
-							desc = L["Shows a Crate button with the Distance Indicator."],
-							get = function() return db.digsite.distanceIndicator.showCrateButton end,
-							set = function(_, value)
-								db.digsite.distanceIndicator.showCrateButton = value
-								Archy:ConfigUpdated('digsite')
-							end,
-						},
 						docked = {
-							order = 2,
+							order = 1.5,
 							type = "toggle",
 							name = L["Undock"],
 							desc = L["Undock the survey distance indicator from the Dig Sites list"],
@@ -952,7 +930,7 @@ local function GetDigSiteOptions()
 							end,
 						},
 						anchor = {
-							order = 2.5,
+							order = 1.6,
 							type = "select",
 							name = L["Anchor"],
 							desc = L["The corner of the survey distance indicator that the frame will anchor from."],
@@ -963,6 +941,39 @@ local function GetDigSiteOptions()
 							end,
 							values = FRAME_ANCHOR_OPTIONS,
 							disabled = function() return not db.digsite.distanceIndicator.undocked end,
+						},
+						showSurveyButton = {
+							order = 2.1,
+							type = "toggle",
+							name = L["Show Survey Button"],
+							desc = L["Shows a Survey button with the Distance Indicator."],
+							get = function() return db.digsite.distanceIndicator.showSurveyButton end,
+							set = function(_, value)
+								db.digsite.distanceIndicator.showSurveyButton = value
+								Archy:ConfigUpdated('digsite')
+							end,
+						},
+						showCrateButton = {
+							order = 2.2,
+							type = "toggle",
+							name = L["Show Crate Button"],
+							desc = L["Shows a Crate button with the Distance Indicator."],
+							get = function() return db.digsite.distanceIndicator.showCrateButton end,
+							set = function(_, value)
+								db.digsite.distanceIndicator.showCrateButton = value
+								Archy:ConfigUpdated('digsite')
+							end,
+						},
+						showLorItemButton = {
+							order = 2.3,
+							type = "toggle",
+							name = L["Show Lorewalker Items Button"],
+							desc = L["Shows Lorewalker Items with the Distance Indicator."],
+							get = function() return db.digsite.distanceIndicator.showLorItemButton end,
+							set = function(_, value)
+								db.digsite.distanceIndicator.showLorItemButton = value
+								Archy:ConfigUpdated('digsite')
+							end,
 						},
 						space = {
 							order = 3,
