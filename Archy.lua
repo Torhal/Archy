@@ -1097,7 +1097,7 @@ local function GetContinentSites(continent_id)
 	if not showDig then
 		_G.SetCVar("digSites", "1")
 		_G.WorldMapArchaeologyDigSites:Show()
-		_G.WorldMapShowDigSites:SetChecked(1)
+-- 		_G.WorldMapShowDigSites:SetChecked(1)
 		_G.RefreshWorldMap()
 		showDig = "0"
 	end
@@ -1138,7 +1138,7 @@ local function GetContinentSites(continent_id)
 	if showDig == "0" then -- restore initial setting
 		_G.SetCVar("digSites", showDig)
 		_G.WorldMapArchaeologyDigSites:Hide()
-		_G.WorldMapShowDigSites:SetChecked(nil)
+-- 		_G.WorldMapShowDigSites:SetChecked(nil)
 		_G.RefreshWorldMap()
 	end
 	return new_sites
@@ -2756,7 +2756,7 @@ function Archy:UpdateTracking()
 		_G.WorldMapArchaeologyDigSites:Hide()
 		BattleFieldMinimap_Digsites(false)
 	end
-	_G.WorldMapShowDigSites:SetChecked(showDig)
+-- 	_G.WorldMapShowDigSites:SetChecked(showDig)
 	_G.RefreshWorldMap()
 end
 
