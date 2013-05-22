@@ -1255,7 +1255,7 @@ function Archy:UpdateSiteDistances()
 	end
 	local distance, nearest
 
-	for index = 1, SITES_PER_CONTINENT do
+	for index = 1, #continent_digsites[private.current_continent] do
 		local site = continent_digsites[private.current_continent][index]
 
 		if site.poi then
