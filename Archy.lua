@@ -314,6 +314,7 @@ local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
 
 local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
+local MAP_CONTINENT_ZONES = {} -- Popupated in CacheMapData()
 local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
 
 local LOREWALKER_ITEMS = {
@@ -1148,15 +1149,42 @@ end
 
 CacheMapData = function()
 	if not next(MAP_CONTINENTS) then
-		MAP_CONTINENTS = { _G.GetMapContinents() }
+		local continent_data = { _G.GetMapContinents() }
+
+		-- Odd indices are IDs, even are names.
+		for continent_data_index = 1, #continent_data do
+			if continent_data_index % 2 == 0 then
+				local continent_id = continent_data_index / 2
+				local continent_name = continent_data[continent_data_index]
+
+				MAP_CONTINENTS[continent_id] = continent_name
+				MAP_CONTINENT_ZONES[continent_id] = {}
+
+				local zone_data = { _G.GetMapZones(continent_id) }
+
+				-- Odd indices are IDs, even are names.
+				for zone_data_index = 1, #zone_data do
+					if zone_data_index % 2 == 0 then
+						local zone_id = zone_data_index / 2
+						local zone_name = zone_data[zone_data_index]
+
+						MAP_CONTINENT_ZONES[continent_id][zone_id] = zone_name
+					end
+				end
+			end
+		end
 	end
 
 	for continent_id, continent_name in pairs(MAP_CONTINENTS) do
 		_G.SetMapZoom(continent_id)
+
 		local map_id = _G.GetCurrentMapAreaID()
 		local map_file_name = _G.GetMapInfo()
 
+		MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
 		MAP_ID_TO_CONTINENT_ID[map_id] = continent_id
+		MAP_ID_TO_ZONE_NAME[map_id] = continent_name
+
 		ZONE_DATA[map_id] = {
 			continent = continent_id,
 			map = map_id,
@@ -1165,14 +1193,14 @@ CacheMapData = function()
 			id = 0,
 			name = continent_name
 		}
-		MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
-		MAP_ID_TO_ZONE_NAME[map_id] = continent_name
 
-		for zone_id, zone_name in pairs{ _G.GetMapZones(continent_id) } do
+		for zone_id, zone_name in pairs(MAP_CONTINENT_ZONES[continent_id]) do
 			_G.SetMapZoom(continent_id, zone_id)
+
 			local map_id = _G.GetCurrentMapAreaID()
 			local level = _G.GetCurrentMapDungeonLevel()
 			local map_file_name = _G.GetMapInfo()
+
 			MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
 			MAP_ID_TO_ZONE_ID[map_id] = zone_id
 			MAP_ID_TO_ZONE_NAME[map_id] = zone_name
