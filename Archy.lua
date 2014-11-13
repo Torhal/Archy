@@ -388,7 +388,7 @@ local prevTheme
 local Blizzard_SolveArtifact
 local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local UpdateMinimapPOIs
-local CacheMapData, UpdateAllSites
+local UpdateAllSites
 
 -----------------------------------------------------------------------
 -- Metatables.
@@ -1147,7 +1147,7 @@ local function GetContinentSites(continent_id)
 	return new_sites
 end
 
-CacheMapData = function()
+function CacheMapData()
 	if not next(MAP_CONTINENTS) then
 		local continent_data = { _G.GetMapContinents() }
 
