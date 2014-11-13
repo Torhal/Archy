@@ -1394,7 +1394,7 @@ local DIG_SITES = {
 		continent = 6,
 		map = 806,
 		blob_id = 67039,
-		race = DIG_SITE_RACES.UNKNOWN
+		race = DIG_SITE_RACES.PANDAREN
 	},
 	[DS["Setting Sun Garrison Digsite"]] = {
 		continent = 6,
