@@ -1460,10 +1460,10 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 	poi.type = "site"
 	poi.tooltip = tooltip
 	poi.location = {
-		map,
-		level,
-		x,
-		y
+		map = map,
+		level = level,
+		x = x,
+		y = y,
 	}
 	poi.active = true
 	poi.siteId = siteId
@@ -1522,10 +1522,10 @@ local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 	poi.type = "survey"
 	poi.tooltip = tooltip
 	poi.location = {
-		map,
-		level,
-		x,
-		y
+		map = map,
+		level = level,
+		x = x,
+		y = y,
 	}
 	poi.active = true
 	poi.siteId = siteId
@@ -1684,9 +1684,7 @@ function UpdateMinimapPOIs(force)
 		site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
 		site.poi.active = true
 
-		if site.map > 0 then
-			Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
-		end
+		Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
 
 		if (not private.db.minimap.nearest or (nearestSite and nearestSite.id == site.id)) and private.db.general.show and private.db.minimap.show then
 			site.poi:Show()
