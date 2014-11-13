@@ -1147,7 +1147,7 @@ local function GetContinentSites(continent_id)
 	return new_sites
 end
 
-function CacheMapData()
+local function CacheMapData()
 	if not next(MAP_CONTINENTS) then
 		local continent_data = { _G.GetMapContinents() }
 
