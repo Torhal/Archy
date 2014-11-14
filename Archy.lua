@@ -1684,7 +1684,9 @@ function UpdateMinimapPOIs(force)
 		site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
 		site.poi.active = true
 
-		Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
+		if site.map > 0 then
+			Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
+		end
 
 		if (not private.db.minimap.nearest or (nearestSite and nearestSite.id == site.id)) and private.db.general.show and private.db.minimap.show then
 			site.poi:Show()
