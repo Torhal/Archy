@@ -1279,7 +1279,7 @@ function Archy:UpdateSiteDistances()
 
 		if site.poi then
 			site.distance = Astrolabe:GetDistanceToIcon(site.poi)
-		else
+		elseif site.map > 0 then
 			site.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, site.map, site.level, site.x, site.y)
 		end
 
