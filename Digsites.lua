@@ -1678,6 +1678,12 @@ local DIG_SITES = {
 		blob_id = 264223,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Zangarra Digsite"] = {
+		continent = 7,
+		map = 946,
+		blob_id = 307966,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 }
 
 -- Workaround for Blizzard bug with GetMapLandmarkInfo()
