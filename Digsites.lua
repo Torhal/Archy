@@ -1678,6 +1678,12 @@ local DIG_SITES = {
 		blob_id = 264223,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Grom'gar Digsite"] = {
+		continent = 7,
+		map = 941,
+		blob_id = 264233,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 	["Zangarra Digsite"] = {
 		continent = 7,
 		map = 946,
