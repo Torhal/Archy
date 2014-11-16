@@ -1645,6 +1645,15 @@ local DIG_SITES = {
 		blob_id = 177529,
 		race = DIG_SITE_RACES.MANTID
 	},
+	-----------------------------------------------------------------------
+	-- Draenor
+	-----------------------------------------------------------------------
+	["Overlook Ruins Digsite"] = {
+		continent = 7,
+		map = 949,
+		blob_id = 308011,
+		race = DIG_SITE_RACES.DRAENORCLANS,
+	},
 }
 
 -- Workaround for Blizzard bug with GetMapLandmarkInfo()
