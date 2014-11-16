@@ -29,6 +29,9 @@ local DIG_SITE_RACES = {
 	MANTID = 10,
 	PANDAREN = 11,
 	MOGU = 12,
+	ARAKKOA = 13,
+	DRAENORCLANS = 14,
+	OGRE = 15,
 	UNKNOWN = 0,
 }
 
