@@ -1652,7 +1652,13 @@ local DIG_SITES = {
 		continent = 7,
 		map = 949,
 		blob_id = 308011,
-		race = DIG_SITE_RACES.DRAENORCLANS,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
+	["East Coldsnap Bluffs Digsite"] = {
+		continent = 7,
+		map = 941,
+		blob_id = 264237,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 }
 
