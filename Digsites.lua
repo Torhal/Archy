@@ -1666,6 +1666,12 @@ local DIG_SITES = {
 		blob_id = 264237,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Icewind Drifts Digsite"] = {
+		continent = 7,
+		map = 941,
+		blob_id = 307918,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 	["Frostwind Crag Digsite"] = {
 		continent = 7,
 		map = 941,
