@@ -1648,16 +1648,16 @@ local DIG_SITES = {
 	-----------------------------------------------------------------------
 	-- Draenor
 	-----------------------------------------------------------------------
-	["Overlook Ruins Digsite"] = {
+	["Frozen Lake Digsite"] = {
 		continent = 7,
-		map = 949,
-		blob_id = 308011,
+		map = 941,
+		blob_id = 264223,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
-	["Deadgrin Ruins Digsite"] = {
+	["Grom'gar Digsite"] = {
 		continent = 7,
-		map = 949,
-		blob_id = 308005,
+		map = 941,
+		blob_id = 264233,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 	["East Coldsnap Bluffs Digsite"] = {
@@ -1678,24 +1678,25 @@ local DIG_SITES = {
 		blob_id = 307922,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
-	["Frozen Lake Digsite"] = {
-		continent = 7,
-		map = 941,
-		blob_id = 264223,
-		race = DIG_SITE_RACES.DRAENOR_CLANS,
-	},
-	["Grom'gar Digsite"] = {
-		continent = 7,
-		map = 941,
-		blob_id = 264233,
-		race = DIG_SITE_RACES.DRAENOR_CLANS,
-	},
 	["Zangarra Digsite"] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307966,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Deadgrin Ruins Digsite"] = {
+		continent = 7,
+		map = 949,
+		blob_id = 308005,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
+	["Overlook Ruins Digsite"] = {
+		continent = 7,
+		map = 949,
+		blob_id = 308011,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
+
 }
 
 -- Workaround for Blizzard bug with GetMapLandmarkInfo()
