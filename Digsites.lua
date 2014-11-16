@@ -1654,6 +1654,12 @@ local DIG_SITES = {
 		blob_id = 308011,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Deadgrin Ruins Digsite"] = {
+		continent = 7,
+		map = 949,
+		blob_id = 308005,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 	["East Coldsnap Bluffs Digsite"] = {
 		continent = 7,
 		map = 941,
