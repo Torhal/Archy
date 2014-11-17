@@ -1684,6 +1684,12 @@ local DIG_SITES = {
 		blob_id = 307922,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Shaz'gul Digsite"] = {
+		continent = 7,
+		map = 947,
+		blob_id = 307924,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 	["Umbrafen Digsite"] = {
 		continent = 7,
 		map = 947,
