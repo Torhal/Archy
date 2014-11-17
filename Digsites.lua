@@ -1732,6 +1732,12 @@ local DIG_SITES = {
 		blob_id = 308011,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Southwind Cliffs Digsite"] = {
+		continent = 7,
+		map = 949,
+		blob_id = 308018,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 }
 
 -- Workaround for Blizzard bug with GetMapLandmarkInfo()
