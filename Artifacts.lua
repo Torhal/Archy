@@ -31,6 +31,9 @@ local RACE_VRYKUL = 9
 local RACE_MANTID = 10
 local RACE_PANDAREN = 11
 local RACE_MOGU = 12
+local RACE_ARAKKOA = 13
+local RACE_DRAENOR_CLANS = 14
+local RACE_OGRE = 15
 
 -- Extracted from ResearchBranch.dbc
 local raceIDtoCurrencyID = {
@@ -46,6 +49,9 @@ local raceIDtoCurrencyID = {
 	[RACE_MANTID] = 754,
 	[RACE_PANDAREN] = 676,
 	[RACE_MOGU] = 677,
+	[RACE_ARAKKOA] = 829,
+	[RACE_DRAENOR_CLANS] = 821,
+	[RACE_OGRE] = 828,
 }
 local raceIDtoKeystoneID = {
 	[RACE_DWARF] = 52843,
@@ -60,6 +66,9 @@ local raceIDtoKeystoneID = {
 	[RACE_MANTID] = 95373,
 	[RACE_PANDAREN] = 79868,
 	[RACE_MOGU] = 79869,
+	[RACE_ARAKKOA] = 109585,
+	[RACE_DRAENOR_CLANS] = 108439,
+	[RACE_OGRE] = 109584,
 }
 
 -- Extracted from ResearchProject.dbc 
