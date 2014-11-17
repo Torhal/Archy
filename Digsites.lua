@@ -1637,7 +1637,7 @@ local DIG_SITES = {
 		continent = 6,
 		map = 858,
 		blob_id = 177525,
-		race = DIG_SITE_RACES.MOGU
+		race = DIG_SITE_RACES.MANTID
 	},
 	[DS["Kypari Vor Digsite"]] = {
 		continent = 6,
