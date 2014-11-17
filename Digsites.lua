@@ -1690,6 +1690,12 @@ local DIG_SITES = {
 		blob_id = 307928,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Shimmering Moor Digsite"] = {
+		continent = 7,
+		map = 947,
+		blob_id = 307934,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 	["Zangarra Digsite"] = {
 		continent = 7,
 		map = 946,
