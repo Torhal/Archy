@@ -1732,6 +1732,12 @@ local DIG_SITES = {
 		blob_id = 308011,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
+	["Ruins of the First Bastion Digsite"] = {
+		continent = 7,
+		map = 949,
+		blob_id = 308015,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
 	["Southwind Cliffs Digsite"] = {
 		continent = 7,
 		map = 941,
