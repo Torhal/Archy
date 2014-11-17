@@ -1734,7 +1734,7 @@ local DIG_SITES = {
 	},
 	["Southwind Cliffs Digsite"] = {
 		continent = 7,
-		map = 949,
+		map = 941,
 		blob_id = 308018,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
