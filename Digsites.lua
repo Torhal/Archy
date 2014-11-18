@@ -791,7 +791,7 @@ local DIG_SITES = {
 		continent = 3,
 		map = 477,
 		blob_id = 56412,
-		race = DigsiteRaces.Orc
+		race = DigsiteRaces.DraenorClans
 	},
 	[DS["Arklon Ruins Digsite"]] = {
 		continent = 3,
@@ -1139,7 +1139,7 @@ local DIG_SITES = {
 		blob_id = 56537,
 		race = DigsiteRaces.Troll
 	},
-	-- MoP RC (build 16016) data, mapids, races, incomplete
+
 	-----------------------------------------------------------------------
 	-- Pandaria
 	-----------------------------------------------------------------------
@@ -1647,6 +1647,7 @@ local DIG_SITES = {
 		blob_id = 177529,
 		race = DigsiteRaces.Mantid
 	},
+
 	-----------------------------------------------------------------------
 	-- Draenor
 	-----------------------------------------------------------------------
@@ -1840,7 +1841,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 946,
 		blob_id = 307966,
-		race = DigsiteRaces.DraenorClans,
+		race = DigsiteRaces.Ogre,
 	},
 	["Ango'rosh Digsite"] = {
 		continent = 7,
@@ -1954,7 +1955,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 949,
 		blob_id = 308011,
-		race = DigsiteRaces.DraenorClans,
+		race = DigsiteRaces.Ogre,
 	},
 	["Wildwood Wash Dam Digsite"] = {
 		continent = 7,
