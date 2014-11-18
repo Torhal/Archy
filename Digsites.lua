@@ -1670,7 +1670,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 941,
 		blob_id = 264229,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 	["The Crackling Plains Digsite"] = {
 		continent = 7,
@@ -1724,7 +1724,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 947,
 		blob_id = 307926,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 	["Anguish Fortress Digsite"] = {
 		continent = 7,
@@ -1796,7 +1796,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 947,
 		blob_id = 307952,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.ARAKKOA,
 	},
 	["Bloodmane Valley Digsite"] = {
 		continent = 7,
@@ -1832,19 +1832,13 @@ local DIG_SITES = {
 		continent = 7,
 		map = 947,
 		blob_id = 307964,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.OGRE,
 	},
 	["Zangarra Digsite"] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307966,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
-	},
-	["PH West Talador Dig Site (disabled)"] = {
-		continent = 7,
-		map = 946,
-		blob_id = 307968,
-		race = DIG_SITE_RACES.UNKNOWN,
 	},
 	["Ango'rosh Digsite"] = {
 		continent = 7,
@@ -1874,7 +1868,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 946,
 		blob_id = 307979,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 	["Stonecrag Excavation Digsite"] = {
 		continent = 7,
@@ -1916,7 +1910,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 946,
 		blob_id = 307993,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 	["Drowning Plateau Digsite"] = {
 		continent = 7,
