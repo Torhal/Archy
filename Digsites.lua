@@ -1805,7 +1805,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 947,
 		blob_id = 307954,
-		race = DigsiteRaces.Arakkoe,
+		race = DigsiteRaces.Arakkoa,
 	},
 	["Veil Zekk Digsite"] = {
 		continent = 7,
