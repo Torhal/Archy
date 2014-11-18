@@ -1736,7 +1736,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 947,
 		blob_id = 307930,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.DRAENOR_CLANS,
 	},
 	["Dataminer's Delite Digsite"] = {
 		continent = 7,
@@ -1790,7 +1790,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 947,
 		blob_id = 307950,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.ARAKKOA,
 	},
 	["Pinchwhistle Point Digsite"] = {
 		continent = 7,
@@ -1839,6 +1839,12 @@ local DIG_SITES = {
 		map = 946,
 		blob_id = 307966,
 		race = DIG_SITE_RACES.DRAENOR_CLANS,
+	},
+	["PH West Talador Dig Site (disabled)"] = {
+		continent = 7,
+		map = 946,
+		blob_id = 307968,
+		race = DIG_SITE_RACES.UNKNOWN,
 	},
 	["Ango'rosh Digsite"] = {
 		continent = 7,
@@ -1958,7 +1964,7 @@ local DIG_SITES = {
 		continent = 7,
 		map = 949,
 		blob_id = 308013,
-		race = DIG_SITE_RACES.UNKNOWN,
+		race = DIG_SITE_RACES.OGRE,
 	},
 	["Ruins of the First Bastion Digsite"] = {
 		continent = 7,
