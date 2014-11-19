@@ -791,7 +791,7 @@ local DIG_SITES = {
 		continent = 3,
 		map = 477,
 		blob_id = 56412,
-		race = DigsiteRaces.DraenorClans
+		race = DigsiteRaces.Orc
 	},
 	[DS["Arklon Ruins Digsite"]] = {
 		continent = 3,
