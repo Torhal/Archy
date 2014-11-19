@@ -1741,12 +1741,6 @@ local DIG_SITES = {
 		blob_id = 307930,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Dataminer's Delite Digsite"] = {
-		continent = 7,
-		map = 947,
-		blob_id = 307932,
-		race = DigsiteRaces.Unknown,
-	},
 	["Umbrafen Digsite"] = {
 		continent = 7,
 		map = 947,
