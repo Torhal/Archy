@@ -1821,7 +1821,7 @@ local DIG_SITES = {
 	},
 	["Veil Shadar Digsite"] = {
 		continent = 7,
-		map = 948,
+		map = 946,
 		blob_id = 307962,
 		race = DigsiteRaces.Arakkoa,
 	},
@@ -1851,7 +1851,7 @@ local DIG_SITES = {
 	},
 	["Ruins of Na'gwa Digsite"] = {
 		continent = 7,
-		map = 946,
+		map = 950,
 		blob_id = 307975,
 		race = DigsiteRaces.Ogre,
 	},
@@ -1875,7 +1875,7 @@ local DIG_SITES = {
 	},
 	["North Spirit Woods Digsite"] = {
 		continent = 7,
-		map = 946,
+		map = 950,
 		blob_id = 307983,
 		race = DigsiteRaces.DraenorClans,
 	},
