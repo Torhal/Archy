@@ -1447,7 +1447,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Draenor
 	-----------------------------------------------------------------------
-	["Fang-Scarred Frostwolf Axe"] = {
+	[AF["Fang-Scarred Frostwolf Axe"]] = {
 		itemid = 114141,
 		spellid = 168290,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1455,7 +1455,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Frostwolf Ancestry Scrimshaw"] = {
+	[AF["Frostwolf Ancestry Scrimshaw"]] = {
 		itemid = 114143,
 		spellid = 168291,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1463,7 +1463,7 @@ local ARTIFACTS = {
 		keystones = 2,
 		fragments = 60,
 	},
-	["Wolfskin Snowshoes"] = {
+	[AF["Wolfskin Snowshoes"]] = {
 		itemid = 114145,
 		spellid = 168292,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1471,7 +1471,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Headdress of the First Shaman"] = {
+	[AF["Headdress of the First Shaman"]] = {
 		itemid = 114179,
 		spellid = 139787,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1479,7 +1479,7 @@ local ARTIFACTS = {
 		keystones = 3,
 		fragments = 180,
 	},
-	["Warsinger's Drums"] = {
+	[AF["Warsinger's Drums"]] = {
 		itemid = 114147,
 		spellid = 168293,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1487,7 +1487,7 @@ local ARTIFACTS = {
 		keystones = 2,
 		fragments = 45,
 	},
-	["Screaming Bullroarer"] = {
+	[AF["Screaming Bullroarer"]] = {
 		itemid = 114149,
 		spellid = 168294,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1495,7 +1495,7 @@ local ARTIFACTS = {
 		keystones = 2,
 		fragments = 55,
 	},
-	["Warsong Ceremonial Pike"] = {
+	[AF["Warsong Ceremonial Pike"]] = {
 		itemid = 114151,
 		spellid = 168295,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1503,7 +1503,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 60,
 	},
-	["Metalworker's Hammer"] = {
+	[AF["Metalworker's Hammer"]] = {
 		itemid = 114153,
 		spellid = 168296,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1511,7 +1511,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Elemental Bellows"] = {
+	[AF["Elemental Bellows"]] = {
 		itemid = 114155,
 		spellid = 168297,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1519,7 +1519,7 @@ local ARTIFACTS = {
 		keystones = 2,
 		fragments = 65,
 	},
-	["Blackrock Razor"] = {
+	[AF["Blackrock Razor"]] = {
 		itemid = 114157,
 		spellid = 168298,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1527,7 +1527,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Weighted Chopping Axe"] = {
+	[AF["Weighted Chopping Axe"]] = {
 		itemid = 114159,
 		spellid = 168299,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1535,7 +1535,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Hooked Dagger"] = {
+	[AF["Hooked Dagger"]] = {
 		itemid = 114161,
 		spellid = 168300,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1543,7 +1543,7 @@ local ARTIFACTS = {
 		keystones = 2,
 		fragments = 60,
 	},
-	["Barbed Fishing Hook"] = {
+	[AF["Barbed Fishing Hook"]] = {
 		itemid = 114163,
 		spellid = 168301,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1551,7 +1551,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Ceremonial Tattoo Needles"] = {
+	[AF["Ceremonial Tattoo Needles"]] = {
 		itemid = 114167,
 		spellid = 168303,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1559,7 +1559,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 40,
 	},
-	["Cracked Ivory Idol"] = {
+	[AF["Cracked Ivory Idol"]] = {
 		itemid = 114169,
 		spellid = 168304,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1567,7 +1567,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Ancestral Talisman"] = {
+	[AF["Ancestral Talisman"]] = {
 		itemid = 114171,
 		spellid = 168305,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1575,7 +1575,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 55,
 	},
-	["Flask of Blazegrease"] = {
+	[AF["Flask of Blazegrease"]] = {
 		itemid = 114173,
 		spellid = 168306,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1583,7 +1583,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Gronn-Tooth Necklace"] = {
+	[AF["Gronn-Tooth Necklace"]] = {
 		itemid = 114175,
 		spellid = 168307,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1591,7 +1591,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 55,
 	},
-	["Doomsday Prophecy"] = {
+	[AF["Doomsday Prophecy"]] = {
 		itemid = 114177,
 		spellid = 168308,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1599,7 +1599,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 40,
 	},
-	["Stonemaul Succession Stone"] = {
+	[AF["Stonemaul Succession Stone"]] = {
 		itemid = 114181,
 		spellid = 168309,
 		raceid = DigsiteRaces.Ogre,
@@ -1607,7 +1607,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 40,
 	},
-	["Stone Manacles"] = {
+	[AF["Stone Manacles"]] = {
 		itemid = 114183,
 		spellid = 168310,
 		raceid = DigsiteRaces.Ogre,
@@ -1615,7 +1615,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 55,
 	},
-	["Ogre Figurine"] = {
+	[AF["Ogre Figurine"]] = {
 		itemid = 114185,
 		spellid = 168311,
 		raceid = DigsiteRaces.Ogre,
@@ -1623,7 +1623,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Pictogram Carving"] = {
+	[AF["Pictogram Carving"]] = {
 		itemid = 114187,
 		spellid = 168312,
 		raceid = DigsiteRaces.Ogre,
@@ -1631,7 +1631,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 55,
 	},
-	["Gladiator's Shield"] = {
+	[AF["Gladiator's Shield"]] = {
 		itemid = 114189,
 		spellid = 168313,
 		raceid = DigsiteRaces.Ogre,
@@ -1639,7 +1639,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Mortar and Pestle"] = {
+	[AF["Mortar and Pestle"]] = {
 		itemid = 114190,
 		spellid = 168314,
 		raceid = DigsiteRaces.Ogre,
@@ -1647,7 +1647,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 55,
 	},
-	["Eye of Har'gunn the Blind"] = {
+	[AF["Eye of Har'gunn the Blind"]] = {
 		itemid = 114191,
 		spellid = 168315,
 		raceid = DigsiteRaces.Ogre,
@@ -1655,7 +1655,7 @@ local ARTIFACTS = {
 		keystones = 2,
 		fragments = 70,
 	},
-	["Stone Dentures"] = {
+	[AF["Stone Dentures"]] = {
 		itemid = 114192,
 		spellid = 168316,
 		raceid = DigsiteRaces.Ogre,
@@ -1663,7 +1663,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Rylak Riding Harness"] = {
+	[AF["Rylak Riding Harness"]] = {
 		itemid = 114193,
 		spellid = 168317,
 		raceid = DigsiteRaces.Ogre,
@@ -1671,7 +1671,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 55,
 	},
-	["Imperial Decree Stele"] = {
+	[AF["Imperial Decree Stele"]] = {
 		itemid = 114194,
 		spellid = 168318,
 		raceid = DigsiteRaces.Ogre,
@@ -1679,7 +1679,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Sorcerer-King Toe Ring"] = {
+	[AF["Sorcerer-King Toe Ring"]] = {
 		itemid = 114195,
 		spellid = 168319,
 		raceid = DigsiteRaces.Ogre,
@@ -1687,7 +1687,7 @@ local ARTIFACTS = {
 		keystones = 3,
 		fragments = 150,
 	},
-	["Warmaul of the Warmaul Chieftain"] = {
+	[AF["Warmaul of the Warmaul Chieftain"]] = {
 		itemid = 114196,
 		spellid = 168320,
 		raceid = DigsiteRaces.Ogre,
@@ -1695,7 +1695,7 @@ local ARTIFACTS = {
 		keystones = 3,
 		fragments = 200,
 	},
-	["Dreamcatcher"] = {
+	[AF["Dreamcatcher"]] = {
 		itemid = 114197,
 		spellid = 168321,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1703,7 +1703,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Burial Urn"] = {
+	[AF["Burial Urn"]] = {
 		itemid = 114198,
 		spellid = 168322,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1711,7 +1711,7 @@ local ARTIFACTS = {
 		keystones = 3,
 		fragments = 180,
 	},
-	["Decree Scrolls"] = {
+	[AF["Decree Scrolls"]] = {
 		itemid = 114199,
 		spellid = 168323,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1719,7 +1719,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Solar Orb"] = {
+	[AF["Solar Orb"]] = {
 		itemid = 114200,
 		spellid = 168324,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1727,7 +1727,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Sundial"] = {
+	[AF["Sundial"]] = {
 		itemid = 114201,
 		spellid = 168325,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1735,7 +1735,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 60,
 	},
-	["Talonpriest Mask"] = {
+	[AF["Talonpriest Mask"]] = {
 		itemid = 114202,
 		spellid = 168326,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1743,7 +1743,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Outcast Dreamcatcher"] = {
+	[AF["Outcast Dreamcatcher"]] = {
 		itemid = 114203,
 		spellid = 168327,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1751,7 +1751,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 45,
 	},
-	["Apexis Crystal"] = {
+	[AF["Apexis Crystal"]] = {
 		itemid = 114204,
 		spellid = 168328,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1759,7 +1759,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 70,
 	},
-	["Apexis Hieroglyph"] = {
+	[AF["Apexis Hieroglyph"]] = {
 		itemid = 114205,
 		spellid = 168329,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1767,7 +1767,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 65,
 	},
-	["Apexis Scroll"] = {
+	[AF["Apexis Scroll"]] = {
 		itemid = 114206,
 		spellid = 168330,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1775,7 +1775,7 @@ local ARTIFACTS = {
 		keystones = 1,
 		fragments = 50,
 	},
-	["Beakbreaker of Terokk"] = {
+	[AF["Beakbreaker of Terokk"]] = {
 		itemid = 114207,
 		spellid = 168331,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1783,7 +1783,7 @@ local ARTIFACTS = {
 		keystones = 3,
 		fragments = 190,
 	},
-	["Ancient Nest Guardian"] = {
+	[AF["Ancient Nest Guardian"]] = {
 		itemid = 117354,
 		spellid = 172460,
 		raceid = DigsiteRaces.Arakkoa,
@@ -1791,7 +1791,7 @@ local ARTIFACTS = {
 		keystones = 4,
 		fragments = 250,
 	},
-	["Ancient Frostwolf Fang"] = {
+	[AF["Ancient Frostwolf Fang"]] = {
 		itemid = 117380,
 		spellid = 172466,
 		raceid = DigsiteRaces.DraenorClans,
@@ -1799,7 +1799,7 @@ local ARTIFACTS = {
 		keystones = 3,
 		fragments = 175,
 	},
-	["Calcified Eye in a Jar"] = {
+	[AF["Calcified Eye in a Jar"]] = {
 		itemid = 114165,
 		spellid = 168302,
 		raceid = DigsiteRaces.DraenorClans,

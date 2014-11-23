@@ -1651,319 +1651,319 @@ local DIG_SITES = {
 	-----------------------------------------------------------------------
 	-- Draenor
 	-----------------------------------------------------------------------
-	["Frozen Lake Digsite"] = {
+	[DS["Frozen Lake Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264223,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Wor'gol Ridge Digsite"] = {
+	[DS["Wor'gol Ridge Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264225,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Daggermaw Flows Digsite"] = {
+	[DS["Daggermaw Flows Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264227,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Lashwind Cleft Digsite"] = {
+	[DS["Lashwind Cleft Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264229,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["The Crackling Plains Digsite"] = {
+	[DS["The Crackling Plains Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264231,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Grom'gar Digsite"] = {
+	[DS["Grom'gar Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264233,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Frostwind Crag Digsite"] = {
+	[DS["Frostwind Crag Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 264237,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Frostboar Drifts Digsite"] = {
+	[DS["Frostboar Drifts Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 307916,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Icewind Drifts Digsite"] = {
+	[DS["Icewind Drifts Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 307918,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["East Coldsnap Bluffs Digsite"] = {
+	[DS["East Coldsnap Bluffs Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 307920,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Coldsnap Bluffs Digsite"] = {
+	[DS["Coldsnap Bluffs Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 307922,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Shaz'gul Digsite"] = {
+	[DS["Shaz'gul Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307924,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Burial Fields Digsite"] = {
+	[DS["Burial Fields Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307926,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Anguish Fortress Digsite"] = {
+	[DS["Anguish Fortress Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307928,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Cursed Woods Digsite"] = {
+	[DS["Cursed Woods Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307930,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Umbrafen Digsite"] = {
+	[DS["Umbrafen Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307934,
 		race = DigsiteRaces.Ogre,
 	},
-	["Shimmering Moor Digsite"] = {
+	[DS["Shimmering Moor Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307936,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Gloomshade Digsite"] = {
+	[DS["Gloomshade Digsite"]] = {
 		continent = 7,
 		map = 947,
 		blob_id = 307940,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Sethekk Hollow South Digsite"] = {
+	[DS["Sethekk Hollow South Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307942,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Sethekk Hollow North Digsite"] = {
+	[DS["Sethekk Hollow North Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307944,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Veil Akraz Digsite"] = {
+	[DS["Veil Akraz Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307946,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Writhing Mire Digsite"] = {
+	[DS["Writhing Mire Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307948,
 		race = DigsiteRaces.Ogre,
 	},
-	["Bloodmane Pridelands Digsite"] = {
+	[DS["Bloodmane Pridelands Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307950,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Pinchwhistle Point Digsite"] = {
+	[DS["Pinchwhistle Point Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307952,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Bloodmane Valley Digsite"] = {
+	[DS["Bloodmane Valley Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307954,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Veil Zekk Digsite"] = {
+	[DS["Veil Zekk Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307956,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Apexis Excavation Digsite"] = {
+	[DS["Apexis Excavation Digsite"]] = {
 		continent = 7,
 		map = 948,
 		blob_id = 307958,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Gordal Fortress Digsite"] = {
+	[DS["Gordal Fortress Digsite"]] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307960,
 		race = DigsiteRaces.Ogre,
 	},
-	["Veil Shadar Digsite"] = {
+	[DS["Veil Shadar Digsite"]] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307962,
 		race = DigsiteRaces.Arakkoa,
 	},
-	["Duskfall Island Digsite"] = {
+	[DS["Duskfall Island Digsite"]] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307964,
 		race = DigsiteRaces.Ogre,
 	},
-	["Zangarra Digsite"] = {
+	[DS["Zangarra Digsite"]] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307966,
 		race = DigsiteRaces.Ogre,
 	},
-	["Ango'rosh Digsite"] = {
+	[DS["Ango'rosh Digsite"]] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307971,
 		race = DigsiteRaces.Ogre,
 	},
-	["Forgotten Ogre Ruin Digsite"] = {
+	[DS["Forgotten Ogre Ruin Digsite"]] = {
 		continent = 7,
 		map = 946,
 		blob_id = 307973,
 		race = DigsiteRaces.Ogre,
 	},
-	["Ruins of Na'gwa Digsite"] = {
+	[DS["Ruins of Na'gwa Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307975,
 		race = DigsiteRaces.Ogre,
 	},
-	["Overgrown Highmaul Road Digsite"] = {
+	[DS["Overgrown Highmaul Road Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307977,
 		race = DigsiteRaces.Ogre,
 	},
-	["Razed Warsong Outpost Digsite"] = {
+	[DS["Razed Warsong Outpost Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307979,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Stonecrag Excavation Digsite"] = {
+	[DS["Stonecrag Excavation Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307981,
 		race = DigsiteRaces.Ogre,
 	},
-	["North Spirit Woods Digsite"] = {
+	[DS["North Spirit Woods Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307983,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Kag'ah Digsite"] = {
+	[DS["Kag'ah Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307985,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Ancestral Grounds Digsite"] = {
+	[DS["Ancestral Grounds Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307987,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Ring of Trials Sludge Digsite"] = {
+	[DS["Ring of Trials Sludge Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307989,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Howling Plateau Digsite"] = {
+	[DS["Howling Plateau Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307991,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Rumbling Plateau Digsite"] = {
+	[DS["Rumbling Plateau Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307993,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Drowning Plateau Digsite"] = {
+	[DS["Drowning Plateau Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307995,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Burning Plateau Digsite"] = {
+	[DS["Burning Plateau Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 307997,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["Highmaul Watchtower Digsite"] = {
+	[DS["Highmaul Watchtower Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 308001,
 		race = DigsiteRaces.Ogre,
 	},
-	["Mar'gok's Overwatch Digsite"] = {
+	[DS["Mar'gok's Overwatch Digsite"]] = {
 		continent = 7,
 		map = 950,
 		blob_id = 308003,
 		race = DigsiteRaces.Ogre,
 	},
-	["Deadgrin Ruins Digsite"] = {
+	[DS["Deadgrin Ruins Digsite"]] = {
 		continent = 7,
 		map = 949,
 		blob_id = 308005,
 		race = DigsiteRaces.DraenorClans,
 	},
-	["The Broken Spine Digsite"] = {
+	[DS["The Broken Spine Digsite"]] = {
 		continent = 7,
 		map = 949,
 		blob_id = 308007,
 		race = DigsiteRaces.Ogre,
 	},
-	["Overlook Ruins Digsite"] = {
+	[DS["Overlook Ruins Digsite"]] = {
 		continent = 7,
 		map = 949,
 		blob_id = 308011,
 		race = DigsiteRaces.Ogre,
 	},
-	["Wildwood Wash Dam Digsite"] = {
+	[DS["Wildwood Wash Dam Digsite"]] = {
 		continent = 7,
 		map = 949,
 		blob_id = 308013,
 		race = DigsiteRaces.Ogre,
 	},
-	["Ruins of the First Bastion Digsite"] = {
+	[DS["Ruins of the First Bastion Digsite"]] = {
 		continent = 7,
 		map = 949,
 		blob_id = 308015,
 		race = DigsiteRaces.Ogre,
 	},
-	["Southwind Cliffs Digsite"] = {
+	[DS["Southwind Cliffs Digsite"]] = {
 		continent = 7,
 		map = 941,
 		blob_id = 308018,
