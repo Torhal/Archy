@@ -1116,25 +1116,23 @@ local function GetContinentSites(continent_id)
 			mz = site.map
 			zoneID = MAP_ID_TO_ZONE_ID[mz]
 
-			if site and site.race then -- Drii: fail silently for missing data while we complete MoP info
-				local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
-				local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
+			local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
+			local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
 
-				table.insert(new_sites, {
-					continent = mc,
-					zoneId = zoneID,
-					zoneName = MAP_ID_TO_ZONE_NAME[mz] or _G.UNKNOWN,
-					mapFile = map_file,
-					map = mz,
-					level = fz,
-					x = x,
-					y = y,
-					name = name,
-					raceId = site.race,
-					id = site.blob_id,
-					distance = 999999,
-				})
-			end
+			table.insert(new_sites, {
+				continent = mc,
+				zoneId = zoneID,
+				zoneName = MAP_ID_TO_ZONE_NAME[mz] or _G.UNKNOWN,
+				mapFile = map_file,
+				map = mz,
+				level = fz,
+				x = x,
+				y = y,
+				name = name,
+				raceId = site.race,
+				id = site.blob_id,
+				distance = 999999,
+			})
 		end
 	end
 
