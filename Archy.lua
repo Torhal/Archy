@@ -3164,7 +3164,16 @@ function Archy:UpdateDigSiteFrame()
 
 	local borderTexture = LSM:Fetch('border', private.db.digsite.borderTexture)
 	local backgroundTexture = LSM:Fetch('background', private.db.digsite.backgroundTexture)
-	private.digsite_frame:SetBackdrop({ bgFile = backgroundTexture, edgeFile = borderTexture, tile = false, edgeSize = 8, tileSize = 8, insets = { left = 2, top = 2, right = 2, bottom = 2 } })
+
+	private.digsite_frame:SetBackdrop({
+		bgFile = backgroundTexture,
+		edgeFile = borderTexture,
+		tile = false,
+		edgeSize = 8,
+		tileSize = 8,
+		insets = { left = 2, top = 2, right = 2, bottom = 2 }
+	})
+
 	private.digsite_frame:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
 	private.digsite_frame:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
 
@@ -3254,19 +3263,30 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
 		siteFrame.site:SetWidth(siteFrame.site.name:GetStringWidth())
+
 		local width
 		local nameWidth = siteFrame.site:GetWidth()
 		local zoneWidth = siteFrame.zone:GetWidth()
-		if maxNameWidth < nameWidth then maxNameWidth = nameWidth
-		end
-		if maxZoneWidth < zoneWidth then maxZoneWidth = zoneWidth
-		end
-		if maxDistWidth < siteFrame.distance:GetWidth() then maxDistWidth = siteFrame.distance:GetWidth()
-		end
-		maxHeight = maxHeight + siteFrame:GetHeight() + 5
 
+		if maxNameWidth < nameWidth then
+			maxNameWidth = nameWidth
+		end
+
+		if maxZoneWidth < zoneWidth then
+			maxZoneWidth = zoneWidth
+		end
+
+		if maxDistWidth < siteFrame.distance:GetWidth() then
+			maxDistWidth = siteFrame.distance:GetWidth()
+		end
+
+		maxHeight = maxHeight + siteFrame:GetHeight() + 5
 		siteFrame:ClearAllPoints()
-		if siteIndex == 1 then siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0) else siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
+
+		if siteIndex == 1 then
+			siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
+		else
+			siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
 		end
 		topFrame = siteFrame
 	end
@@ -3297,8 +3317,6 @@ function Archy:ResizeMinimalDigSiteDisplay()
 
 	if not IsTaintable() then
 		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
-
-		-- private.digsite_frame:SetHeight(private.digsite_frame.container:GetHeight() + cyOfs + 40)
 		private.digsite_frame:SetHeight(maxHeight + cyOfs + 40)
 		private.digsite_frame:SetWidth(maxWidth + cxOfs + 30)
 	end
@@ -3348,7 +3366,6 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 
 	if not IsTaintable() then
 		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
-		-- private.digsite_frame:SetHeight(private.digsite_frame.container:GetHeight() + cyOfs + 40) -- masahikatao on wowinterface
 		private.digsite_frame:SetHeight(maxHeight + cyOfs + 40)
 		private.digsite_frame:SetWidth(maxWidth + cxOfs + 30)
 	end
