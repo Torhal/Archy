@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	
+
 	<Font name="DistanceIndicatorFont" font="Fonts\FRIZQT__.TTF" outline="NORMAL" virtual="true">
 		<Color r="1" g="1" b="1" />
 		<FontHeight>
@@ -126,7 +126,7 @@
 			</Layer>
 		</Layers>
 		<NormalTexture file="Interface\Archeology\ArchaeologyParts">
-			<Size x="25" y="28"/>	
+			<Size x="25" y="28"/>
 			<TexCoords left="0.11132813" right="0.21093750" top="0.56250000" bottom="0.78125000"/>
 		</NormalTexture>
 		<HighlightTexture file="Interface\Archeology\ArchaeologyParts" alphaMode="ADD">
@@ -216,7 +216,7 @@
 			<TexCoords left="0" right="0.810546875" top="0.40625" bottom="0.5625"/>
 		</BarTexture>
 	</StatusBar>
-	
+
 	<Frame name="ArchyDistanceIndicator" movable="true" enableMouse="true" clampedToScreen="true" id="" virtual="true">
 		<Size x="84" y="42" />
 		<Frames>
@@ -261,7 +261,7 @@
 									<AbsDimension x="0" y="-1"/>
 								</Offset>
 							</Anchor>
-						</Anchors> 
+						</Anchors>
 					</Cooldown>
 				</Frames>
 				<Scripts>
@@ -292,9 +292,9 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						if not InCombatLockdown() then self:Disable() end 
-						self.icon:SetTexture("Interface\\Icons\\inv_crate_04") 
-						self.icon:SetDesaturated(1)
+						if not InCombatLockdown() then self:Disable() end
+						self.icon:SetTexture("Interface\\Icons\\inv_crate_04")
+						self.icon:SetDesaturated(true)
 						self:SetMotionScriptsWhileDisabled(true)
 						self.tooltip = BROWSE_NO_RESULTS
 					</OnLoad>
@@ -331,14 +331,14 @@
 									<AbsDimension x="0" y="-1"/>
 								</Offset>
 							</Anchor>
-						</Anchors> 
+						</Anchors>
 					</Cooldown>
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						if not InCombatLockdown() then self:Disable() end 
+						if not InCombatLockdown() then self:Disable() end
 						self.icon:SetTexture("Interface\\Icons\\inv_misc_map08")
-						self.icon:SetDesaturated(1)
+						self.icon:SetDesaturated(true)
 						self:SetMotionScriptsWhileDisabled(true)
 						self.tooltip = BROWSE_NO_RESULTS
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -361,7 +361,7 @@
 					<OnLeave>GameTooltip_Hide()</OnLeave>
 					<OnHide>GameTooltip_Hide()</OnHide>
 				</Scripts>
-			</Button>			
+			</Button>
 		</Frames>
 		<Scripts>
 			<OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
@@ -384,7 +384,7 @@
 			</OnDragStop>
 		</Scripts>
 	</Frame>
-	
+
 	<Frame name="ArchyDigSiteContainer" virtual="true" movable="true" enableMouse="true" clampedToScreen="true">
 		<Size>
 			<AbsDimension x="340" y="200" />
@@ -455,7 +455,7 @@
 					self.isMoving = false
 					self:SetUserPlaced(false)
 					self:SetFrameLevel(2)
-					
+
 					Archy:SaveFramePosition(self)
 				end
 			</OnDragStop>
@@ -510,7 +510,7 @@
 					</OnLoad>
 					<OnClick>
 						if (button == "LeftButton") then
-							if WorldMapFrame:IsShown() then 
+							if WorldMapFrame:IsShown() then
 								if self.oldzoneId and (self.oldzoneId == self.zoneId) then
 									HideUIPanel(WorldMapFrame)
 									self.oldzoneId = nil
@@ -621,8 +621,8 @@
 			</Frame>
 		</Frames>
 	</Frame>
-	
-	
+
+
 	<Frame name="ArchyArtifactContainer" virtual="true" movable="true" enableMouse="true" clampedToScreen="true">
 		<Size>
 			<AbsDimension x="330" y="900" />
@@ -707,7 +707,7 @@
 					self.isMoving = false
 					self:SetUserPlaced(false)
 					self:SetFrameLevel(2)
-					
+
 					Archy:SaveFramePosition(self)
 				end
 			</OnDragStop>
@@ -878,7 +878,7 @@
 					self.isMoving = false
 					self:SetUserPlaced(false)
 					self:SetFrameLevel(2)
-					
+
 					Archy:SaveFramePosition(self)
 				end
 			</OnDragStop>
@@ -1004,7 +1004,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			
+
 		</Frames>
 	</Frame>
 
@@ -1044,7 +1044,7 @@
 					self.isMoving = false
 					self:SetUserPlaced(false)
 					self:SetFrameLevel(2)
-					
+
 					Archy:SaveFramePosition(self)
 				end
 			</OnDragStop>
@@ -1114,7 +1114,7 @@
 					</OnLoad>
 					<OnClick>
 						if (button == "LeftButton") then
-							if WorldMapFrame:IsShown() then 
+							if WorldMapFrame:IsShown() then
 								if self.oldzoneId and (self.oldzoneId == self.zoneId) then
 									HideUIPanel(WorldMapFrame)
 									self.oldzoneId = nil

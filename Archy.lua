@@ -2203,14 +2203,14 @@ function Archy:ScanBags()
 		private.distance_indicator_frame.crateButton:SetAttribute("type1", "macro")
 		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use " .. private.crate_bag_id .. " " .. private.crate_bag_slot_id)
 		private.distance_indicator_frame.crateButton:Enable()
-		private.distance_indicator_frame.crateButton.icon:SetDesaturated(0)
+		private.distance_indicator_frame.crateButton.icon:SetDesaturated(false)
 		private.distance_indicator_frame.crateButton.tooltip = private.crate_item_id
 		private.distance_indicator_frame.crateButton.shine:Show()
 		_G.AutoCastShine_AutoCastStart(private.distance_indicator_frame.crateButton.shine)
 		private.distance_indicator_frame.crateButton.shining = true
 	else
 		private.distance_indicator_frame.crateButton:Disable()
-		private.distance_indicator_frame.crateButton.icon:SetDesaturated(1)
+		private.distance_indicator_frame.crateButton.icon:SetDesaturated(true)
 		private.distance_indicator_frame.crateButton.tooltip = _G.BROWSE_NO_RESULTS
 		private.distance_indicator_frame.crateButton.shine:Hide()
 		if private.distance_indicator_frame.crateButton.shining then
@@ -2226,7 +2226,7 @@ function Archy:ScanBags()
 		private.distance_indicator_frame.loritemButton:SetAttribute("type1", "item")
 		private.distance_indicator_frame.loritemButton:SetAttribute("item1", item_name)
 		private.distance_indicator_frame.loritemButton:Enable()
-		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(0)
+		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(false)
 		private.distance_indicator_frame.loritemButton.tooltip = LOREWALKER_ITEMS.MAP.id
 		local start, duration, enable = _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id)
 		if start > 0 and duration > 0 then
@@ -2238,7 +2238,7 @@ function Archy:ScanBags()
 		private.distance_indicator_frame.loritemButton:SetAttribute("type2", "item")
 		private.distance_indicator_frame.loritemButton:SetAttribute("item2", item_name)
 		private.distance_indicator_frame.loritemButton:Enable()
-		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(0)
+		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(false)
 		if lorewalker_map_count > 0 then
 			private.distance_indicator_frame.loritemButton.tooltip = { LOREWALKER_ITEMS.MAP.id, item_name }
 		else
@@ -2247,7 +2247,7 @@ function Archy:ScanBags()
 	end
 	if lorewalker_map_count == 0 and lorewalker_lode_count == 0 then
 		private.distance_indicator_frame.loritemButton:Disable()
-		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(1)
+		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(true)
 		private.distance_indicator_frame.loritemButton.tooltip = _G.BROWSE_NO_RESULTS
 	end
 end
