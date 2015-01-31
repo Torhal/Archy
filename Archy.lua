@@ -415,7 +415,7 @@ setmetatable(race_data, {
 		}
 		if itemID and itemID > 0 and (not itemName or itemName == "") then
 			race_data_uncached[k] = itemID
-			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED") -- Drii: ticket 391, fill in missing data when the keystone gets cached
+			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 		end
 		return t[k]
 	end
@@ -683,7 +683,7 @@ local function UpdateRaceArtifact(race_id)
 		artifact_data[race_id] = nil
 		return
 	end
-	race_data[race_id].keystone.inventory = _G.GetItemCount(race_data[race_id].keystone.id) or 0
+	race.keystone.inventory = _G.GetItemCount(race.keystone.id) or 0
 
 	if _G.GetNumArtifactsByRace(race_id) == 0 then
 		return
@@ -696,8 +696,8 @@ local function UpdateRaceArtifact(race_id)
 
 	local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local base, adjust, total = _G.GetArtifactProgress()
-	local artifact = artifact_data[race_id]
 
+	local artifact = artifact_data[race_id]
 	artifact.canSolve = _G.CanSolveArtifact()
 	artifact.fragments = base
 	artifact.fragments_required = total
@@ -706,40 +706,42 @@ local function UpdateRaceArtifact(race_id)
 	artifact.tooltip = spellDescription
 	artifact.rare = (rarity ~= 0)
 	artifact.name = name
-	artifact.canSolveStone = nil -- Drii: stores whether we can actually solve with current user selection
-	artifact.canSolveInventory = nil -- Drii: stores whether we would be able to solve if using all inventory stones
+	artifact.canSolveStone = nil
+	artifact.canSolveInventory = nil
 	artifact.keystone_adjustment = 0
 	artifact.completionCount = 0
 
-	local prevAdded = math.min(artifact.keystones_added, race_data[race_id].keystone.inventory, numSockets)
+	local prevAdded = math.min(artifact.keystones_added, race.keystone.inventory, numSockets)
 
 	if private.db.artifact.autofill[race_id] then
-		prevAdded = math.min(race_data[race_id].keystone.inventory, numSockets)
+		prevAdded = math.min(race.keystone.inventory, numSockets)
 	end
-	artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, numSockets) -- Drii: sets it to keystones in inventory
+	artifact.keystones_added = math.min(race.keystone.inventory, numSockets)
 	-- Drii: this whole section looks like a needlessly convoluted way of doing things but hey 'if it's not broken don't fix it'
 	-- cosmetic changes only; don't fancy wading through 10 tail calls if I break something :P
 	if artifact.keystones_added > 0 and numSockets > 0 then
-		for i = 1, math.min(artifact.keystones_added, numSockets) do -- Drii: adds any available keystones regardless of autofill settings
+		for i = 1, math.min(artifact.keystones_added, numSockets) do
 			_G.SocketItemToArtifact()
+
 			if not _G.ItemAddedToArtifact(i) then
 				break
 			end
+
 			if i == prevAdded then
 				_, adjust = _G.GetArtifactProgress()
-				artifact.keystone_adjustment = adjust -- Drii: set adjustment to actual user selection and move along
+				artifact.keystone_adjustment = adjust
 				artifact.canSolveStone = _G.CanSolveArtifact()
 			end
 		end
 		artifact.canSolveInventory = _G.CanSolveArtifact()
 
-		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then -- Drii: keep our user value if there's one
-			_, adjust = _G.GetArtifactProgress() -- Drii: or get the current fill if not
+		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then
+			_, adjust = _G.GetArtifactProgress()
 			artifact.keystone_adjustment = adjust
 			artifact.canSolveStone = _G.CanSolveArtifact()
 		end
 	end
-	artifact.keystones_added = prevAdded -- Drii: and here it sets it back to what the user chose by clicking Archy socket and relies on the overridden SolveArtifact to remove the extra keystones back out when solving.
+	artifact.keystones_added = prevAdded
 
 	_G.RequestArtifactCompletionHistory()
 
@@ -749,7 +751,7 @@ local function UpdateRaceArtifact(race_id)
 
 	if not has_announced[artifact.name] and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
 		has_announced[artifact.name] = true
-		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race_data[race_id].name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
+		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
 	end
 
 	if not has_pinged[artifact.name] and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
@@ -811,7 +813,7 @@ local function ToggleDistanceIndicator()
 	else
 		private.distance_indicator_frame.circle.distance:SetText("0")
 		if private.db.digsite.distanceIndicator.undocked and not private.db.general.locked and (private.db.digsite.distanceIndicator.showSurveyButton or private.db.digsite.distanceIndicator.showCrateButton or private.db.digsite.distanceIndicator.showLorItemButton) then
-			private.distance_indicator_frame.circle:SetAlpha(0.25) -- Drii: allow the distance indicator to show at reduced alpha for dragging when undocked
+			private.distance_indicator_frame.circle:SetAlpha(0.25)
 		else
 			private.distance_indicator_frame.circle:SetAlpha(0)
 		end
@@ -888,7 +890,7 @@ Dialog:Register("ArchyTomTomError", {
 		{
 			text = _G.IGNORE,
 			on_click = function(self, data)
-				private.db.tomtom.noerrorwarn = Archy.version -- Drii: don't warn again for this version
+				private.db.tomtom.noerrorwarn = Archy.version
 			end,
 		},
 	},
@@ -1084,7 +1086,6 @@ local function CompareAndResetDigCounters(a, b)
 		end
 
 		if not exists then
-			--			print(("CompareAndResetDigCounters: Resetting counter for %s"):format(siteA.id))
 			Archy.db.char.digsites.stats[siteA.id].counter = 0
 		end
 	end
@@ -1093,11 +1094,10 @@ end
 local DIG_LOCATION_TEXTURE = 177
 local function GetContinentSites(continent_id)
 	local new_sites = {}
-	-- Drii: and this solves the mystery of "location of the digsite is gone missing" ticket 351;
-	-- function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
+
+	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
 	-- So make sure we enable and show blobs and restore the setting at the end.
 	local showDig = _G.GetCVarBool("digSites")
-
 	if not showDig then
 		_G.SetCVar("digSites", "1")
 		_G.WorldMapArchaeologyDigSites:Show()
@@ -1223,10 +1223,9 @@ local function UpdateSite(continent_id)
 end
 
 UpdateAllSites = function()
--- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
+	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
 	local original_map_id = _G.GetCurrentMapAreaID()
 
-	-- Drii: runs only until ZONE_DATA is populated
 	if CacheMapData then
 		CacheMapData()
 	end
@@ -1314,29 +1313,28 @@ function Archy:UpdateSiteDistances()
 end
 
 function Archy:ImportOldStatsDB()
-	local site_stats = self.db.char.digsites.stats
+	local siteStats = self.db.char.digsites.stats
 
 	for key, st in pairs(self.db.char.digsites) do
-		if type(key) == "string" and key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" then
-			if DIG_SITES[key] then -- Drii: DIG_SITES has a custom metatable so this would add ANY key passed and set it to the EMPTY_DIGSITE table; was this corrupting the SV? ticket 380
-				local site = DIG_SITES[key]
-				if type(site.blob_id) == "number" and site.blob_id > 0 then -- Drii: make sure we're not puting whatever trash was passed into the stats SV.
-					site_stats[site.blob_id].surveys = (site_stats[site.blob_id].surveys or 0) + (st.surveys or 0)
-					site_stats[site.blob_id].fragments = (site_stats[site.blob_id].fragments or 0) + (st.fragments or 0)
-					site_stats[site.blob_id].looted = (site_stats[site.blob_id].looted or 0) + (st.looted or 0)
-					site_stats[site.blob_id].keystones = (site_stats[site.blob_id].keystones or 0) + (st.keystones or 0)
-					self.db.char.digsites[key] = nil
-				end
+		if type(key) == "string" and key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" and DIG_SITES[key] then
+			local site = DIG_SITES[key]
+			if type(site.blob_id) == "number" and site.blob_id > 0 then
+				local blobStats = siteStats[site.blob_id]
+				blobStats.surveys = (blobStats.surveys or 0) + (st.surveys or 0)
+				blobStats.fragments = (blobStats.fragments or 0) + (st.fragments or 0)
+				blobStats.looted = (blobStats.looted or 0) + (st.looted or 0)
+				blobStats.keystones = (blobStats.keystones or 0) + (st.keystones or 0)
+
+				self.db.char.digsites[key] = nil
 			end
 		end
 	end
 
 	-- Drii: let's also try to fix whatever crap was put in the SV by the old version of this function so users don't have to delete their variables.
-	if next(site_stats) then
-		for blobid, _ in pairs(site_stats) do
-			if type(blobid) == "number" and blobid > 0 then
-			else
-				site_stats[blobid] = nil
+	if next(siteStats) then
+		for blobID, _ in pairs(siteStats) do
+			if type(blobID) ~= "number" or blobID <= 0 then
+				siteStats[blobID] = nil
 			end
 		end
 	end
@@ -1772,7 +1770,6 @@ function UpdateTomTomPoint()
 	if not waypointExists then -- waypoint doesn't exist or we have a TomTom emulator
 		ClearTomTomPoint()
 		tomtomPoint = _G.TomTom:AddMFWaypoint(tomtomSite.map, nil, tomtomSite.x, tomtomSite.y, { title = tomtomSite.name .. "\n" .. tomtomSite.zoneName })
---		tomtomPoint = _G.TomTom:AddZWaypoint(MAP_ID_TO_CONTINENT_ID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName, false, false, false, false, false, true)
 	end
 end
 
@@ -1846,7 +1843,7 @@ local function SlashHandler(msg, editbox)
 	end
 end
 
-function Archy:OnInitialize() -- @ADDON_LOADED (1)
+function Archy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("ArchyDB", PROFILE_DEFAULTS, 'Default')
 	self.db.RegisterCallback(self, "OnNewProfile", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileUpdate")
@@ -1862,18 +1859,14 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 	self:SetSinkStorage(Archy.db.profile.general.sinkOptions)
 	self:SetupOptions()
 
-	if not self.db.global.surveyNodes then
-		self.db.global.surveyNodes = {}
-	end
+	self.db.global.surveyNodes = self.db.global.surveyNodes or {}
 
-	if not self.db.char.digsites then
-		self.db.char.digsites = {
-			stats = {},
-			blacklist = {}
-		}
-	end
+	self.db.char.digsites = self.db.char.digsites or {
+		stats = {},
+		blacklist = {}
+	}
 
-	if not self.db.char.digsites.stats then self.db.char.digsites.stats = {} end -- Drii: ticket 362,363 old Archy SV that had self.db.char.digsites but no stats, blacklist tables?
+	self.db.char.digsites.stats = self.db.char.digsites.stats or {}
 	setmetatable(self.db.char.digsites.stats, {
 		__index = function(t, k)
 			if k then
@@ -1889,7 +1882,7 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 		end
 	})
 
-	if not self.db.char.digsites.blacklist then self.db.char.digsites.blacklist = {} end -- Drii: ticket 362,363
+	self.db.char.digsites.blacklist = self.db.char.digsites.blacklist or {}
 	setmetatable(self.db.char.digsites.blacklist, {
 		__index = function(t, k)
 			if k then
@@ -1898,12 +1891,11 @@ function Archy:OnInitialize() -- @ADDON_LOADED (1)
 			end
 		end
 	})
+
 	private.db = self.db.profile
 	prevTheme = private.db and private.db.general and private.db.general.theme or PROFILE_DEFAULTS.profile.general.theme
 
-	if not private.db.data then
-		private.db.data = {}
-	end
+	private.db.data = private.db.data or {}
 	private.db.data.imported = false
 
 	LDBI:Register("Archy", private.LDB_object, private.db.general.icon)
@@ -2035,8 +2027,8 @@ function Archy:OnEnable() -- @PLAYER_LOGIN (2)
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
-	self:RegisterEvent("QUEST_LOG_UPDATE") -- Drii: delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
-	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Drii: new MoP event
+	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("PET_BATTLE_OPENING_START")
 	self:RegisterEvent("PET_BATTLE_CLOSE")
 
@@ -2338,14 +2330,15 @@ function Archy:LootReceived(event, msg)
 	local race_id = keystoneIDToRaceID[itemID]
 
 	if race_id then
-		if lastSite.id then -- Drii: we can get solves without digging now from crates
+		if lastSite.id then
 			self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
 		end
 		keystoneLootRaceID = race_id
 	end
 end
 
-function Archy:QUEST_LOG_UPDATE() -- (4)
+-- Delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
+function Archy:QUEST_LOG_UPDATE()
 	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
 	if not Blizzard_SolveArtifact then
 		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
@@ -2377,8 +2370,9 @@ function Archy:QUEST_LOG_UPDATE() -- (4)
 	self.QUEST_LOG_UPDATE = nil
 end
 
-function Archy:PLAYER_ENTERING_WORLD() -- (3)
+function Archy:PLAYER_ENTERING_WORLD()
 	_G.SetMapToCurrentZone()
+
 	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
 	if not timer_handle then
 		self:ScheduleTimer(function()
@@ -2392,13 +2386,11 @@ function Archy:PLAYER_ENTERING_WORLD() -- (3)
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
 	if private.db.tomtom.noerrorwarn and (private.db.tomtom.noerrorwarn == Archy.version) then
-		--
+		-- TODO: Figure out what the hell is supposed to happen (if anything) here.
 	elseif private.tomtomPoiIntegration and _G.TomTom.profile.poi.setClosest and not private.tomtomWarned then
 		private.tomtomWarned = true
 		Dialog:Spawn("ArchyTomTomError")
-	end -- Drii: temporary workaround for ticket 384
-	-- 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	-- 	self.PLAYER_ENTERING_WORLD = nil
+	end
 end
 
 function Archy:PLAYER_REGEN_DISABLED()
@@ -2409,8 +2401,9 @@ function Archy:PLAYER_REGEN_DISABLED()
 	end
 
 	if private.db.general.combathide and private.digsite_frame:IsVisible() then
-		RegisterStateDriver(private.digsite_frame, "visibility", "[combat]hide;show")
+		_G.RegisterStateDriver(private.digsite_frame, "visibility", "[combat]hide;show")
 	end
+
 	if private.db.general.combathide and private.races_frame:IsVisible() then
 		private.races_frame:Hide()
 	end
@@ -2456,7 +2449,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 	end
 
 	if private.regen_update_visibility then
-		UnregisterStateDriver(private.digsite_frame, "visibility")
+		_G.UnregisterStateDriver(private.digsite_frame, "visibility")
 		self:ConfigUpdated()
 	end
 end
