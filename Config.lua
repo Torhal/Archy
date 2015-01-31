@@ -39,7 +39,6 @@ local general_options
 
 local function GetGeneralOptions()
 	if not general_options then
-		local LDBI = LibStub("LibDBIcon-1.0")
 		local db = private.db
 
 		general_options = {
@@ -103,7 +102,7 @@ local function GetGeneralOptions()
 						["Graphical"] = L["Graphical"],
 						["Minimal"] = L["Minimal"],
 					},
-				},				
+				},
 				combathide = {
 					order = 5,
 					name = L["Auto Hide in Combat"],
@@ -116,24 +115,6 @@ local function GetGeneralOptions()
 							private.regen_update_visibility = true
 						else
 							private.regen_update_visibility = nil
-						end
-					end,
-					width = "double"
-				},				
-				icon = {
-					order = 6,
-					name = L["Hide Minimap Button"],
-					desc = L["Toggles the display of the Minimap Icon"],
-					type = "toggle",
-					get = function()
-						return db.general.icon.hide
-					end,
-					set = function(k, v)
-						db.general.icon.hide = v
-						if db.general.icon.hide then
-							LDBI:Hide("Archy")
-						else
-							LDBI:Show("Archy")
 						end
 					end,
 					width = "double"
@@ -1357,6 +1338,7 @@ local minimap_options
 
 local function GetMinimapOptions()
 	if not minimap_options then
+		local LDBI = LibStub("LibDBIcon-1.0")
 		local db = private.db
 
 		minimap_options = {
@@ -1433,6 +1415,24 @@ local function GetMinimapOptions()
 						db.minimap.fragmentIcon = value
 						Archy:ConfigUpdated('minimap')
 					end,
+				},
+				icon = {
+					order = 5,
+					name = L["Hide Minimap Button"],
+					desc = L["Toggles the display of the Minimap Icon"],
+					type = "toggle",
+					get = function()
+						return db.general.icon.hide
+					end,
+					set = function(k, v)
+						db.general.icon.hide = v
+						if db.general.icon.hide then
+							LDBI:Hide("Archy")
+						else
+							LDBI:Show("Archy")
+						end
+					end,
+					width = "double"
 				},
 			},
 		}
