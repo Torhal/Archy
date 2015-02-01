@@ -47,6 +47,8 @@ if LSM then
 	end
 end
 
+local debugger -- Only defined if needed.
+
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
@@ -378,6 +380,24 @@ local survey_location = {
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 
 local prevTheme
+
+-------------------------------------------------------------------------------
+-- Debugger.
+-------------------------------------------------------------------------------
+local function CreateDebugFrame()
+	if debugger then
+		return
+	end
+	debugger = LibStub("LibTextDump-1.0"):New(("%s Debug Output"):format(ADDON_NAME), 640, 480)
+end
+
+local function Debug(...)
+	if not debugger then
+		CreateDebugFrame()
+	end
+	debugger:AddLine(string.format(...))
+end
+private.Debug = Debug
 
 -----------------------------------------------------------------------
 -- Function upvalues
@@ -1602,6 +1622,19 @@ local SUBCOMMAND_FUNCS = {
 	end,
 	test = function()
 		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
+	end,
+	debug = function()
+		if not debugger then
+			CreateDebugFrame()
+		end
+
+		if debugger:Lines() == 0 then
+			debugger:AddLine("Nothing to report.")
+			debugger:Display()
+			debugger:Clear()
+			return
+		end
+		debugger:Display()
 	end,
 }
 
