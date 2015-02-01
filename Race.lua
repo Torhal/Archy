@@ -49,7 +49,7 @@ function Archy:AddRace(raceID)
 	local raceName, raceTexture, keystoneItemID, currencyAmount = _G.GetArchaeologyRaceInfo(raceID)
 	local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(keystoneItemID)
 
-	Races[raceID] = _G.setmetatable({
+	local race = _G.setmetatable({
 		currency = currencyAmount,
 		id = raceID,
 		name = raceName,
@@ -72,6 +72,15 @@ function Archy:AddRace(raceID)
 			inventory = 0
 		}
 	}, raceMetatable)
+
+	Races[raceID] = race
+
+	local ArtifactNameToIDMapping = {}
+	for artifactIndex = 1, _G.GetNumArtifactsByRace(raceID) do
+		local artifactName = _G.GetArtifactInfoByRace(raceID, artifactIndex)
+		ArtifactNameToIDMapping[artifactName] = artifactIndex
+	end
+	race.ArtifactNameToIDMapping = ArtifactNameToIDMapping
 
 	if keystoneItemID and keystoneItemID > 0 and (not itemName or itemName == "") then
 		RaceKeystoneProcessingQueue[raceID] = keystoneItemID
