@@ -2056,57 +2056,66 @@ function Archy:ScanBags()
 			break
 		end
 	end
+	local crateButton = private.distance_indicator_frame.crateButton
 
 	if private.crate_bag_id then
-		private.distance_indicator_frame.crateButton:SetAttribute("type1", "macro")
-		private.distance_indicator_frame.crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use " .. private.crate_bag_id .. " " .. private.crate_bag_slot_id)
-		private.distance_indicator_frame.crateButton:Enable()
-		private.distance_indicator_frame.crateButton.icon:SetDesaturated(false)
-		private.distance_indicator_frame.crateButton.tooltip = private.crate_item_id
-		private.distance_indicator_frame.crateButton.shine:Show()
-		_G.AutoCastShine_AutoCastStart(private.distance_indicator_frame.crateButton.shine)
-		private.distance_indicator_frame.crateButton.shining = true
+		crateButton:SetAttribute("type1", "macro")
+		crateButton:SetAttribute("macrotext1", "/run _G.ClearCursor() if _G.MerchantFrame:IsShown() then HideUIPanel(_G.MerchantFrame) end\n/use " .. private.crate_bag_id .. " " .. private.crate_bag_slot_id)
+		crateButton:Enable()
+		crateButton.icon:SetDesaturated(false)
+		crateButton.tooltip = private.crate_item_id
+		crateButton.shine:Show()
+		_G.AutoCastShine_AutoCastStart(crateButton.shine)
+		crateButton.shining = true
 	else
-		private.distance_indicator_frame.crateButton:Disable()
-		private.distance_indicator_frame.crateButton.icon:SetDesaturated(true)
-		private.distance_indicator_frame.crateButton.tooltip = _G.BROWSE_NO_RESULTS
-		private.distance_indicator_frame.crateButton.shine:Hide()
-		if private.distance_indicator_frame.crateButton.shining then
-			_G.AutoCastShine_AutoCastStop(private.distance_indicator_frame.crateButton.shine)
-			private.distance_indicator_frame.crateButton.shining = nil
+		crateButton:Disable()
+		crateButton.icon:SetDesaturated(true)
+		crateButton.tooltip = _G.BROWSE_NO_RESULTS
+		crateButton.shine:Hide()
+
+		if crateButton.shining then
+			_G.AutoCastShine_AutoCastStop(crateButton.shine)
+			crateButton.shining = nil
 		end
 	end
 
-	local lorewalker_map_count = _G.GetItemCount(LOREWALKER_ITEMS.MAP.id, false, false)
-	local lorewalker_lode_count = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.id, false, false)
-	if lorewalker_map_count > 0 then -- prioritize map since it affects Archy's lists. (randomize digsites)
-		local item_name = (_G.GetItemInfo(LOREWALKER_ITEMS.MAP.id))
-		private.distance_indicator_frame.loritemButton:SetAttribute("type1", "item")
-		private.distance_indicator_frame.loritemButton:SetAttribute("item1", item_name)
-		private.distance_indicator_frame.loritemButton:Enable()
-		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(false)
-		private.distance_indicator_frame.loritemButton.tooltip = LOREWALKER_ITEMS.MAP.id
+	local lorewalkerMapCount = _G.GetItemCount(LOREWALKER_ITEMS.MAP.id, false, false)
+	local lorewalkerLodeCount = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.id, false, false)
+	local loreItemButton = private.distance_indicator_frame.loritemButton
+
+	-- Prioritize map, since it affects Archy's lists. (randomize digsites)
+	if lorewalkerMapCount > 0 then
+		local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.MAP.id))
+		loreItemButton:SetAttribute("type1", "item")
+		loreItemButton:SetAttribute("item1", itemName)
+		loreItemButton:Enable()
+		loreItemButton.icon:SetDesaturated(false)
+		loreItemButton.tooltip = LOREWALKER_ITEMS.MAP.id
+
 		local start, duration, enable = _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id)
 		if start > 0 and duration > 0 then
-			_G.CooldownFrame_SetTimer(private.distance_indicator_frame.loritemButton.cooldown, start, duration, enable)
+			_G.CooldownFrame_SetTimer(loreItemButton.cooldown, start, duration, enable)
 		end
 	end
-	if lorewalker_lode_count > 0 then
-		local item_name = (_G.GetItemInfo(LOREWALKER_ITEMS.LODESTONE.id))
-		private.distance_indicator_frame.loritemButton:SetAttribute("type2", "item")
-		private.distance_indicator_frame.loritemButton:SetAttribute("item2", item_name)
-		private.distance_indicator_frame.loritemButton:Enable()
-		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(false)
-		if lorewalker_map_count > 0 then
-			private.distance_indicator_frame.loritemButton.tooltip = { LOREWALKER_ITEMS.MAP.id, item_name }
+
+	if lorewalkerLodeCount > 0 then
+		local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.LODESTONE.id))
+		loreItemButton:SetAttribute("type2", "item")
+		loreItemButton:SetAttribute("item2", itemName)
+		loreItemButton:Enable()
+		loreItemButton.icon:SetDesaturated(false)
+
+		if lorewalkerMapCount > 0 then
+			loreItemButton.tooltip = { LOREWALKER_ITEMS.MAP.id, itemName }
 		else
-			private.distance_indicator_frame.loritemButton.tooltip = { LOREWALKER_ITEMS.LODESTONE.id, _G.USE }
+			loreItemButton.tooltip = { LOREWALKER_ITEMS.LODESTONE.id, _G.USE }
 		end
 	end
-	if lorewalker_map_count == 0 and lorewalker_lode_count == 0 then
-		private.distance_indicator_frame.loritemButton:Disable()
-		private.distance_indicator_frame.loritemButton.icon:SetDesaturated(true)
-		private.distance_indicator_frame.loritemButton.tooltip = _G.BROWSE_NO_RESULTS
+
+	if lorewalkerMapCount == 0 and lorewalkerLodeCount == 0 then
+		loreItemButton:Disable()
+		loreItemButton.icon:SetDesaturated(true)
+		loreItemButton.tooltip = _G.BROWSE_NO_RESULTS
 	end
 end
 
