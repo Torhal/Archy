@@ -1179,25 +1179,13 @@ end
 
 --[[ Survey Functions ]] --
 local function AddSurveyNode(siteId, map, level, x, y)
-	local newNode = {
-		m = map,
-		f = level,
-		x = x,
-		y = y
-	}
 	local exists = false
 
-	if not Archy.db.global.surveyNodes then
-		Archy.db.global.surveyNodes = {}
-	end
-
-	if not Archy.db.global.surveyNodes[siteId] then
-		Archy.db.global.surveyNodes[siteId] = {}
-	end
+	Archy.db.global.surveyNodes = Archy.db.global.surveyNodes or {}
+	Archy.db.global.surveyNodes[siteId] = Archy.db.global.surveyNodes[siteId] or {}
 
 	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do
-		local distance = Astrolabe:ComputeDistance(newNode.m, newNode.f, newNode.x, newNode.y, node.m, node.f, node.x, node.y)
-
+		local distance = Astrolabe:ComputeDistance(map, level, x, y, node.m, node.f, node.x, node.y)
 		if not distance or _G.IsInInstance() then
 			distance = 0
 		end
@@ -1207,8 +1195,14 @@ local function AddSurveyNode(siteId, map, level, x, y)
 			break
 		end
 	end
+
 	if not exists then
-		table.insert(Archy.db.global.surveyNodes[siteId], newNode)
+		table.insert(Archy.db.global.surveyNodes[siteId], {
+			m = map,
+			f = level,
+			x = x,
+			y = y
+		})
 	end
 end
 
