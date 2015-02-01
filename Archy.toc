@@ -57,8 +57,8 @@ Locale\ptBR.lua
 Locale\zhCN.lua
 Locale\zhTW.lua
 
-Digsites.lua
-Artifacts.lua
+Database\Digsites.lua
+Database\Artifacts.lua
 Archy.xml
 Archy.lua
 Race.lua
