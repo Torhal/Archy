@@ -94,15 +94,12 @@ end
 function Race:KeystoneSocketOnClick(mouseButtonName)
 	local artifact = self.artifact
 
-	if mouseButtonName == "LeftButton" then
-		if artifact.keystones_added < artifact.sockets and artifact.keystones_added < self.keystone.inventory then
-			artifact.keystones_added = artifact.keystones_added + 1
-		end
-	else
-		if artifact.keystones_added > 0 then
-			artifact.keystones_added = artifact.keystones_added - 1
-		end
+	if mouseButtonName == "LeftButton" and artifact.keystones_added < artifact.sockets and artifact.keystones_added < self.keystone.inventory then
+		artifact.keystones_added = artifact.keystones_added + 1
+	elseif mouseButtonName == "RightButton" and artifact.keystones_added > 0 then
+		artifact.keystones_added = artifact.keystones_added - 1
 	end
+
 	self:UpdateArtifact()
 end
 
