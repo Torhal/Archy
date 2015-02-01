@@ -299,8 +299,8 @@ local function GetArtifactOptions()
 							desc = L["Select races to blacklist"],
 							values = function()
 								local races = {}
-								for rid, race in pairs(private.race_data) do
-									races[rid] = race.name
+								for raceID, race in pairs(private.Races) do
+									races[raceID] = race.name
 								end
 								return races
 							end,
@@ -331,8 +331,8 @@ local function GetArtifactOptions()
 							desc = L["Select races to autofill"],
 							values = function()
 								local races = {}
-								for rid, race in pairs(private.race_data) do
-									races[rid] = race.name
+								for raceID, race in pairs(private.Races) do
+									races[raceID] = race.name
 								end
 								return races
 							end,

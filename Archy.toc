@@ -61,6 +61,7 @@ Digsites.lua
 Artifacts.lua
 Archy.xml
 Archy.lua
+Race.lua
 Tooltip.lua
 Config.lua
 Bindings.xml

@@ -392,37 +392,6 @@ local UpdateAllSites
 -----------------------------------------------------------------------
 -- Metatables.
 -----------------------------------------------------------------------
-local race_data = {}
-local RaceKeystoneProcessingQueue = {}
-
-setmetatable(race_data, {
-	__index = function(dataTable, raceID)
-		if _G.GetNumArchaeologyRaces() == 0 then
-			return
-		end
-		local raceName, raceTexture, keystoneItemID, currencyAmount = _G.GetArchaeologyRaceInfo(raceID)
-		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(keystoneItemID)
-
-		dataTable[raceID] = {
-			name = raceName,
-			currency = currencyAmount,
-			texture = raceTexture,
-			keystone = {
-				id = keystoneItemID,
-				name = itemName,
-				texture = itemTexture,
-				inventory = 0
-			}
-		}
-
-		if keystoneItemID and keystoneItemID > 0 and (not itemName or itemName == "") then
-			RaceKeystoneProcessingQueue[raceID] = keystoneItemID
-			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-		end
-		return dataTable[raceID]
-	end
-})
-private.race_data = race_data
 
 local artifact_data = {}
 setmetatable(artifact_data, {
@@ -678,29 +647,29 @@ local function ShouldBeHidden()
 	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not HasArchaeology())
 end
 
-local function UpdateRaceArtifact(race_id)
-	local race = race_data[race_id]
+local function UpdateRaceArtifact(raceID)
+	local race = private.Races[raceID]
 
 	if not race then
 		-- @??? Maybe use a wipe statement here
-		artifact_data[race_id] = nil
+		artifact_data[raceID] = nil
 		return
 	end
 	race.keystone.inventory = _G.GetItemCount(race.keystone.id) or 0
 
-	if _G.GetNumArtifactsByRace(race_id) == 0 then
+	if _G.GetNumArtifactsByRace(raceID) == 0 then
 		return
 	end
 
 	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
-		_G.ArchaeologyFrame_ShowArtifact(race_id)
+		_G.ArchaeologyFrame_ShowArtifact(raceID)
 	end
-	_G.SetSelectedArtifact(race_id)
+	_G.SetSelectedArtifact(raceID)
 
 	local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local base, adjust, total = _G.GetArtifactProgress()
 
-	local artifact = artifact_data[race_id]
+	local artifact = artifact_data[raceID]
 	artifact.canSolve = _G.CanSolveArtifact()
 	artifact.fragments = base
 	artifact.fragments_required = total
@@ -716,7 +685,7 @@ local function UpdateRaceArtifact(race_id)
 
 	local prevAdded = math.min(artifact.keystones_added, race.keystone.inventory, numSockets)
 
-	if private.db.artifact.autofill[race_id] then
+	if private.db.artifact.autofill[raceID] then
 		prevAdded = math.min(race.keystone.inventory, numSockets)
 	end
 	artifact.keystones_added = math.min(race.keystone.inventory, numSockets)
@@ -748,7 +717,7 @@ local function UpdateRaceArtifact(race_id)
 
 	_G.RequestArtifactCompletionHistory()
 
-	if not private.db.general.show or private.db.artifact.blacklist[race_id] then
+	if not private.db.general.show or private.db.artifact.blacklist[raceID] then
 		return
 	end
 
@@ -776,7 +745,7 @@ local function SolveRaceArtifact(race_id, use_stones)
 
 		if _G.type(use_stones) == "boolean" then
 			if use_stones then
-				artifact.keystones_added = math.min(race_data[race_id].keystone.inventory, artifact.sockets)
+				artifact.keystones_added = math.min(private.Races[race_id].keystone.inventory, artifact.sockets)
 			else
 				artifact.keystones_added = 0
 			end
@@ -1056,7 +1025,7 @@ function Archy:SocketClicked(keystone_button, mouse_button, down)
 	local race_id = keystone_button:GetParent():GetParent():GetID()
 
 	if mouse_button == "LeftButton" then
-		if artifact_data[race_id].keystones_added < artifact_data[race_id].sockets and artifact_data[race_id].keystones_added < race_data[race_id].keystone.inventory then
+		if artifact_data[race_id].keystones_added < artifact_data[race_id].sockets and artifact_data[race_id].keystones_added < private.Races[race_id].keystone.inventory then
 			artifact_data[race_id].keystones_added = artifact_data[race_id].keystones_added + 1
 		end
 	else
@@ -2045,6 +2014,16 @@ function Archy:OnEnable()
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	-- Drii: workaround for TomTom bug ticket 384
 	private.tomtomPoiIntegration = private.tomtomExists and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
+
+	if not next(private.Races) then
+		for raceID = 1, _G.GetNumArchaeologyRaces() do
+			local race = self:AddRace(raceID)
+			if race then
+				keystoneIDToRaceID[race.keystone.id] = raceID
+			end
+		end
+		_G.RequestArtifactCompletionHistory()
+	end
 end
 
 function Archy:OnDisable()
@@ -2086,16 +2065,14 @@ function Archy:ADDON_LOADED(event, addon)
 end
 
 function Archy:GET_ITEM_INFO_RECEIVED(event)
-	for raceID, keystoneItemID in next, RaceKeystoneProcessingQueue, nil do
+	for raceID, keystoneItemID in next, private.RaceKeystoneProcessingQueue, nil do
 		local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
 		if keystoneName and keystoneTexture then
-			RaceKeystoneProcessingQueue[raceID] = nil
-			race_data[raceID].keystone.name = keystoneName
-			race_data[raceID].keystone.texture = keystoneTexture
+			private.Races[raceID]:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
 		end
 	end
 
-	if not next(RaceKeystoneProcessingQueue) then
+	if not next(private.RaceKeystoneProcessingQueue) then
 		Archy:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
@@ -2267,28 +2244,29 @@ function Archy:BAG_UPDATE_DELAYED()
 end
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
-	local num_races = _G.GetNumArchaeologyRaces()
+	local raceCount = _G.GetNumArchaeologyRaces()
 
-	if not private.current_continent or num_races == 0 then
+	if not private.current_continent or raceCount == 0 then
 		return
 	end
 
-	for race_id = 1, num_races do
-		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(race_id)
-		local diff = currency_amount - (race_data[race_id].currency or 0)
+	for raceID = 1, raceCount do
+		local race = private.Races[raceID]
+		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
+		local diff = currency_amount - (race.currency or 0)
 
-		race_data[race_id].currency = currency_amount
+		race.currency = currency_amount
 
 		-- update the artifact info
-		UpdateRaceArtifact(race_id)
+		UpdateRaceArtifact(raceID)
 
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
-			artifact_data[race_id].keystones_added = 0
+			artifact_data[raceID].keystones_added = 0
 
 			if artifactSolved.raceId > 0 then
-				local _, _, completionCount = GetArtifactStats(race_id, artifactSolved.name)
-				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race_data[race_id].name, artifactSolved.name, completionCount or 0), 1, 1, 1)
+				local _, _, completionCount = GetArtifactStats(raceID, artifactSolved.name)
+				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race.name, artifactSolved.name, completionCount or 0), 1, 1, 1)
 
 				artifactSolved.raceId = 0
 				artifactSolved.name = ""
@@ -2628,7 +2606,8 @@ function Archy:UpdatePlayerPosition(force)
 			UpdateAllSites()
 			ToggleDistanceIndicator()
 		elseif force and not continent then
-			self:ScheduleTimer("UpdatePlayerPosition", 1, true) -- Drii: get the edge case where continent and private.current_continent are both nil (nil==nil is true)
+			-- Drii: get the edge case where continent and private.current_continent are both nil (nil==nil is true)
+			self:ScheduleTimer("UpdatePlayerPosition", 1, true)
 		end
 		return
 	end
@@ -2638,16 +2617,6 @@ function Archy:UpdatePlayerPosition(force)
 		ToggleDistanceIndicator()
 	end
 
-	if #race_data == 0 then
-		for race_id = 1, _G.GetNumArchaeologyRaces() do
-			local race = race_data[race_id] -- metatable should load the data
-
-			if race then
-				keystoneIDToRaceID[race.keystone.id] = race_id
-			end
-		end
-		_G.RequestArtifactCompletionHistory()
-	end
 	ClearTomTomPoint()
 	RefreshTomTom()
 	UpdateAllSites()
@@ -2691,7 +2660,7 @@ end
 
 local function BattlefieldDigsites_OnUpdate(self, elapsed)
 	if private.battlefield_digsites.lastUpdate > _G.TOOLTIP_UPDATE_TIME then
-		private.battlefield_digsites:DrawNone();
+		private.battlefield_digsites:DrawNone()
 
 		local num_entries = _G.ArchaeologyMapUpdateAll()
 
@@ -2900,11 +2869,11 @@ function Archy:RefreshRacesDisplay()
 		child:Hide()
 	end
 
-	for race_id, race in pairs(race_data) do
-		local child = races_frame.children[race_id]
-		local artifact = artifact_data[race_id]
-		local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
-		child:SetID(race_id)
+	for raceID, race in pairs(private.Races) do
+		local child = races_frame.children[raceID]
+		local artifact = artifact_data[raceID]
+		local _, _, completionCount = GetArtifactStats(raceID, artifact.name)
+		child:SetID(raceID)
 
 		if private.db.general.theme == "Graphical" then
 			child.solveButton:SetText(_G.SOLVE)
@@ -3081,16 +3050,16 @@ function Archy:RefreshRacesDisplay()
 			local nameColor = (artifact.rare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
 			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragments_required)
 
-			if race_data[race_id].keystone.inventory > 0 or artifact.sockets > 0 then
-				child.sockets.text:SetFormattedText("%d/%d", race_data[race_id].keystone.inventory, artifact.sockets)
+			if race.keystone.inventory > 0 or artifact.sockets > 0 then
+				child.sockets.text:SetFormattedText("%d/%d", race.keystone.inventory, artifact.sockets)
 				child.sockets.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
 			else
 				child.sockets.text:SetText("")
 				child.sockets.tooltip = nil
 			end
-			child.crest:SetNormalTexture(race_data[race_id].texture)
-			child.crest:SetHighlightTexture(race_data[race_id].texture)
-			child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race_data[race_id].name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
+			child.crest:SetNormalTexture(race.texture)
+			child.crest:SetHighlightTexture(race.texture)
+			child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race.name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 			child.artifact.text:SetFormattedText("%s%s", nameColor, artifact.name)
 			child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
@@ -3100,7 +3069,7 @@ function Archy:RefreshRacesDisplay()
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
 
-		if not private.db.artifact.blacklist[race_id] and artifact.fragments_required > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(private.current_continent), race_id)) then
+		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(private.current_continent), raceID)) then
 			child:ClearAllPoints()
 
 			if topFrame == races_frame.container then
@@ -3432,8 +3401,9 @@ function Archy:RefreshDigSiteDisplay()
 		end
 
 		if site_frame.site.siteName ~= site.name then
-			site_frame.crest.icon:SetTexture(race_data[site.raceId].texture)
-			site_frame.crest.tooltip = race_data[site.raceId].name
+			local race = private.Races[site.raceId]
+			site_frame.crest.icon:SetTexture(race.texture)
+			site_frame.crest.tooltip = race.name
 			site_frame.zone.name:SetText(site.zoneName)
 			site_frame.site.siteName = site.name
 			site_frame.site.zoneId = site.zoneId

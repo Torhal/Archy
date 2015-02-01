@@ -55,7 +55,6 @@ total_counts = true
 -- Variables
 -----------------------------------------------------------------------
 local current_tooltip_mode = 1
-local race_data = private.race_data
 
 -----------------------------------------------------------------------
 -- Tooltip cell provider.
@@ -70,11 +69,11 @@ local function Archy_cell_script(_, what, button)
 	local key, value = (":"):split(what)
 
 	if key == "raceid" and value then -- race was clicked show/hide uncomplete artifacts lists
-		for race_id, _ in pairs(race_data) do
-			if tonumber(value) ~= race_id then
-				race_data[race_id].expand = nil
+		for raceID, race in pairs(private.Races) do
+			if tonumber(value) ~= raceID then
+				race.expand = nil
 			else
-				race_data[race_id].expand = not race_data[race_id].expand
+				race.expand = not race.expand
 			end
 		end
 	end
@@ -311,11 +310,13 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
-				for race_id, artifact in pairs(private.artifact_data) do
+				for raceID, artifact in pairs(private.artifact_data) do
 					if artifact.fragments_required > 0 then
+						local race = private.Races[raceID]
+
 						line = tooltip:AddLine(" ")
-						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
-						tooltip:SetCell(line, 2, race_data[race_id].name, "LEFT", 1)
+						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
+						tooltip:SetCell(line, 2, race.name, "LEFT", 1)
 						tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(artifact.icon), "LEFT", 1)
 
 						local artifactName = artifact.name
@@ -329,7 +330,7 @@ function Archy:LDBTooltipShow()
 						progress_data.fragments = artifact.fragments
 						progress_data.keystone_adjustment = artifact.keystone_adjustment
 						progress_data.fragments_required = artifact.fragments_required
-						progress_data.race_keystone_inventory = race_data[race_id].keystone.inventory
+						progress_data.race_keystone_inventory = race.keystone.inventory
 						progress_data.sockets = artifact.sockets
 						progress_data.keystones_added = artifact.keystones_added
 						progress_data.canSolve = artifact.canSolve
@@ -338,10 +339,10 @@ function Archy:LDBTooltipShow()
 						progress_data.rare = artifact.rare
 
 						tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
-						tooltip:SetCell(line, 7, (race_data[race_id].keystone.inventory > 0) and race_data[race_id].keystone.inventory or "", "CENTER", 1)
+						tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
 						tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
 
-						local _, _, completionCount = private.GetArtifactStats(race_id, artifact.name)
+						local _, _, completionCount = private.GetArtifactStats(raceID, artifact.name)
 						tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 					end
 				end
@@ -377,9 +378,11 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 
 						for _, site in pairs(continent_sites) do
+							local race = private.Races[site.raceId]
+
 							line = tooltip:AddLine(" ")
-							tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[site.raceId].texture), "LEFT", 1)
-							tooltip:SetCell(line, 2, race_data[site.raceId].name, "LEFT", 2)
+							tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
+							tooltip:SetCell(line, 2, race.name, "LEFT", 2)
 							tooltip:SetCell(line, 4, site.name, "LEFT", 1)
 							tooltip:SetCell(line, 5, site.zoneName, "LEFT", 2)
 							tooltip:SetCell(line, 7, site_stats[site.id].surveys, "CENTER", 1)
@@ -410,13 +413,15 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] .. "|r", "RIGHT", 1)
 
 				local all_rare_done, all_rare_count, all_common_done, all_common_count, all_total_done, all_total_count = 0, 0, 0, 0, 0, 0
-				for race_id, _ in pairs(private.artifact_data) do
-					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race_id, missing_data)
-					if total_count > 0 then -- skip races that are not yet implemented
+				for raceID, _ in pairs(private.artifact_data) do
+					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(raceID, missing_data)
+					if total_count > 0 then
+						local race = private.Races[raceID]
+
 						line = tooltip:AddLine(" ")
-						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race_data[race_id].texture), "LEFT", 1)
-						tooltip:SetCell(line, 2, race_data[race_id].name .. "*", "LEFT", 1)
-						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:" .. race_id)
+						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
+						tooltip:SetCell(line, 2, race.name .. "*", "LEFT", 1)
+						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:" .. raceID)
 						tooltip:SetCell(line, 3, missing_data.rare_counts, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 5, missing_data.common_counts, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
@@ -439,11 +444,13 @@ function Archy:LDBTooltipShow()
 					tooltip:SetCell(line, 6, all_total_done .. "/" .. all_total_count, "RIGHT", 1)
 				end
 
-				for race_id, _ in pairs(private.artifact_data) do
-					if race_data[race_id].expand then
+				for raceID, _ in pairs(private.artifact_data) do
+					local race = private.Races[raceID]
+
+					if race.expand then
 						line = tooltip:AddLine(" ")
 						line = tooltip:AddLine(" ")
-						tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", race_data[race_id].name), "LEFT", num_columns)
+						tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", race.name), "LEFT", num_columns)
 
 						tooltip:AddSeparator()
 
@@ -452,11 +459,12 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_MISSING:format(_G.ITEM_QUALITY3_DESC) .. "|r", "LEFT", 1)
 						tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_MISSING:format(_G.ITEM_QUALITY1_DESC) .. "|r", "LEFT", 2)
 
-						GetArtifactsDelta(race_id, missing_data)
+						GetArtifactsDelta(raceID, missing_data)
 
 						local start_line, end_line
 
-						for artifact, info in pairs(missing_data) do -- rares first
+						-- Rares first
+						for artifact, info in pairs(missing_data) do
 							if not COUNT_DESCRIPTORS[artifact] and info.rarity > 0 then
 								line = tooltip:AddLine(" ")
 								tooltip:SetCell(line, 1, " ", "LEFT", 1)
@@ -467,7 +475,8 @@ function Archy:LDBTooltipShow()
 							end
 						end
 
-						if end_line and end_line >= start_line then -- commons next (not exhaustive)
+						-- Commons next (not exhaustive)
+						if end_line and end_line >= start_line then
 							local line, cell = start_line, 3
 
 							for artifact, info in pairs(missing_data) do
