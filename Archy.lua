@@ -392,41 +392,43 @@ local UpdateAllSites
 -----------------------------------------------------------------------
 -- Metatables.
 -----------------------------------------------------------------------
-local race_data, race_data_uncached = {}, {}
+local race_data = {}
+local RaceKeystoneProcessingQueue = {}
 
 setmetatable(race_data, {
-	__index = function(t, k)
+	__index = function(dataTable, raceID)
 		if _G.GetNumArchaeologyRaces() == 0 then
 			return
 		end
-		local raceName, raceTexture, itemID, currencyAmount = _G.GetArchaeologyRaceInfo(k)
-		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(itemID)
+		local raceName, raceTexture, keystoneItemID, currencyAmount = _G.GetArchaeologyRaceInfo(raceID)
+		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(keystoneItemID)
 
-		t[k] = {
+		dataTable[raceID] = {
 			name = raceName,
 			currency = currencyAmount,
 			texture = raceTexture,
 			keystone = {
-				id = itemID,
+				id = keystoneItemID,
 				name = itemName,
 				texture = itemTexture,
 				inventory = 0
 			}
 		}
-		if itemID and itemID > 0 and (not itemName or itemName == "") then
-			race_data_uncached[k] = itemID
+
+		if keystoneItemID and keystoneItemID > 0 and (not itemName or itemName == "") then
+			RaceKeystoneProcessingQueue[raceID] = keystoneItemID
 			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 		end
-		return t[k]
+		return dataTable[raceID]
 	end
 })
 private.race_data = race_data
 
 local artifact_data = {}
 setmetatable(artifact_data, {
-	__index = function(t, k)
-		if k then
-			t[k] = {
+	__index = function(dataTable, raceID)
+		if raceID then
+			dataTable[raceID] = {
 				name = "",
 				tooltip = "",
 				icon = "",
@@ -436,7 +438,8 @@ setmetatable(artifact_data, {
 				keystone_adjustment = 0,
 				fragments_required = 0,
 			}
-			return t[k]
+
+			return dataTable[raceID]
 		end
 	end
 })
@@ -2008,7 +2011,7 @@ end
 
 local timer_handle
 
-function Archy:OnEnable() -- @PLAYER_LOGIN (2)
+function Archy:OnEnable()
 	_G["SLASH_ARCHY1"] = "/archy"
 	_G.SlashCmdList["ARCHY"] = SlashHandler
 
@@ -2083,16 +2086,16 @@ function Archy:ADDON_LOADED(event, addon)
 end
 
 function Archy:GET_ITEM_INFO_RECEIVED(event)
-	for k, itemID in next, race_data_uncached, nil do
-		local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(itemID)
-		if itemName and itemTexture then
-			race_data_uncached[k] = nil
-			race_data[k].keystone.name = itemName
-			race_data[k].keystone.texture = itemTexture
+	for raceID, keystoneItemID in next, RaceKeystoneProcessingQueue, nil do
+		local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
+		if keystoneName and keystoneTexture then
+			RaceKeystoneProcessingQueue[raceID] = nil
+			race_data[raceID].keystone.name = keystoneName
+			race_data[raceID].keystone.texture = keystoneTexture
 		end
 	end
 
-	if not next(race_data_uncached) then
+	if not next(RaceKeystoneProcessingQueue) then
 		Archy:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
