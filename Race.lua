@@ -93,6 +93,16 @@ end
 -----------------------------------------------------------------------
 -- Race methods.
 -----------------------------------------------------------------------
+function Race:GetArtifactCompletionDataByName(artifactName)
+	if not artifactName or artifactName == "" then
+		return
+	end
+
+	local artifactIndex = self.ArtifactNameToIDMapping[artifactName]
+	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.id, artifactIndex)
+	return artifactIndex, firstCompletionTime, completionCount
+end
+
 function Race:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
 	RaceKeystoneProcessingQueue[self.id] = nil
 

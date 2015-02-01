@@ -330,7 +330,7 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
 						tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
 
-						local _, _, completionCount = private.GetArtifactStats(raceID, artifact.name)
+						local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 						tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 					end
 				end

@@ -547,22 +547,6 @@ end
 
 private.GetArchaeologyRank = GetArchaeologyRank
 
-local function GetArtifactStats(race_id, name)
-	local raceArtifactCount = _G.GetNumArtifactsByRace(race_id)
-	if not raceArtifactCount then
-		return
-	end
-
-	for artifactIndex = 1, raceArtifactCount do
-		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(race_id, artifactIndex)
-		if name == artifactName then
-			return artifactIndex, firstCompletionTime, completionCount
-		end
-	end
-end
-
-private.GetArtifactStats = GetArtifactStats
-
 local function GetCrateUseString(spellID)
 	local spell_text
 	local line_num = 1
@@ -1916,7 +1900,7 @@ function Archy:ARTIFACT_HISTORY_READY()
 	for raceID, race in pairs(private.Races) do
 		local artifact = race.artifact
 
-		local _, _, completionCount = GetArtifactStats(raceID, artifact.name)
+		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 		if completionCount then
 			artifact.completionCount = completionCount
 		end
@@ -2082,7 +2066,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			race.artifact.keystones_added = 0
 
 			if artifactSolved.raceId > 0 then
-				local _, _, completionCount = GetArtifactStats(raceID, artifactSolved.name)
+				local _, _, completionCount = race:GetArtifactCompletionDataByName(artifactSolved.name)
 				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race.name, artifactSolved.name, completionCount or 0), 1, 1, 1)
 
 				artifactSolved.raceId = 0
@@ -2689,7 +2673,7 @@ function Archy:RefreshRacesDisplay()
 	for raceID, race in pairs(private.Races) do
 		local child = races_frame.children[raceID]
 		local artifact = race.artifact
-		local _, _, completionCount = GetArtifactStats(raceID, artifact.name)
+		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 
 		child:SetID(raceID)
 
