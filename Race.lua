@@ -130,6 +130,8 @@ function Race:UpdateArtifact()
 	artifact.sockets = numSockets
 	artifact.tooltip = spellDescription
 
+	self.keystone.inventory = _G.GetItemCount(self.keystone.id) or 0
+
 	local keystoneInventory = self.keystone.inventory
 	local prevAdded = math.min(artifact.keystones_added, keystoneInventory, numSockets)
 
