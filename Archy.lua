@@ -2303,7 +2303,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 
 			for id, poi in pairs(allPois) do
 				if poi.active and poi.type == "survey" then
-					local distance = Astrolabe:GetDistanceToIcon(poi)
+					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
 
 					if distance >= min_green and distance <= max_green then
 						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
