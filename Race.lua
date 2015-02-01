@@ -75,12 +75,12 @@ function Archy:AddRace(raceID)
 
 	Races[raceID] = race
 
-	local ArtifactNameToIDMapping = {}
+	local artifactNameToIDMapping = {}
 	for artifactIndex = 1, _G.GetNumArtifactsByRace(raceID) do
 		local artifactName = _G.GetArtifactInfoByRace(raceID, artifactIndex)
-		ArtifactNameToIDMapping[artifactName] = artifactIndex
+		artifactNameToIDMapping[artifactName] = artifactIndex
 	end
-	race.ArtifactNameToIDMapping = ArtifactNameToIDMapping
+	race.ArtifactNameToIDMapping = artifactNameToIDMapping
 
 	if keystoneItemID and keystoneItemID > 0 and (not itemName or itemName == "") then
 		RaceKeystoneProcessingQueue[raceID] = keystoneItemID
