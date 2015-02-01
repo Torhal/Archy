@@ -474,7 +474,7 @@ local pois = setmetatable({}, {
 		arrow:SetHeight(32)
 
 		local arrowtexture = arrow:CreateTexture(nil, "OVERLAY")
-		arrowtexture:SetTexture([[Interface\Minimap\ROTATING-MINIMAPGUIDEARROW]]) -- [[Interface\Archeology\Arch-Icon-Marker]])
+		arrowtexture:SetTexture([[Interface\Minimap\ROTATING-MINIMAPGUIDEARROW]])
 		arrowtexture:SetAllPoints(arrow)
 		arrow.texture = arrowtexture
 		arrow.t = 0
@@ -624,7 +624,7 @@ local function ShouldBeHidden()
 end
 
 local function SolveRaceArtifact(raceID, useStones)
-	-- The check for race_id exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
+	-- The check for raceID exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
 	if raceID then
 		local race = private.Races[raceID]
 		local artifact = race.artifact
@@ -733,7 +733,6 @@ Dialog:Register("ArchyConfirmSolve", {
 	hide_on_escape = true,
 })
 
--- Drii: temporary workaround for ticket 384
 Dialog:Register("ArchyTomTomError", {
 	text = "",
 	on_show = function(self, data)
@@ -808,7 +807,6 @@ end
 local function MatchFormat(msg, pattern)
 	return msg:match(pattern:gsub("(%%s)", "(.+)"):gsub("(%%d)", "(.+)"))
 end
-
 
 -- return the player, itemlink and quantity of the item in the chat_msg_loot
 local function ParseLootMessage(msg)
@@ -1403,70 +1401,6 @@ local function ClearSurveyPOI(poi)
 	table.insert(surveyPool, poi)
 end
 
--- TODO: Figure out if this should be used somewhere - it currently is not, and should maybe be removed.
-local function CreateMinimapPOI(index, type, loc, title, siteId)
-	local poi = pois[index]
-	local poiButton = _G.CreateFrame("Frame", nil, poi)
-	poiButton.texture = poiButton:CreateTexture(nil, "OVERLAY")
-
-	if type == "site" then
-		poi.useArrow = true
-		poiButton.texture:SetTexture([[Interface\Archeology\Arch-Icon-Marker.blp]])
-		poiButton:SetWidth(14)
-		poiButton:SetHeight(14)
-	else
-		poi.useArrow = false
-		poiButton.texture:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
-		if private.db.minimap.fragmentIcon == "Cross" then
-			poiButton.texture:SetTexCoord(0, 0.46875, 0, 0.453125)
-		else
-			poiButton.texture:SetTexCoord(0, 0.234375, 0.5, 0.734375)
-		end
-		poiButton:SetWidth(8)
-		poiButton:SetHeight(8)
-	end
-	poiButton.texture:SetAllPoints(poiButton)
-	poiButton:SetPoint("CENTER", poi)
-	poiButton:SetScale(1)
-	poiButton:SetParent(poi)
-	poiButton:EnableMouse(false)
-	poi.poiButton = poiButton
-	poi.index = index
-	poi.type = type
-	poi.title = title
-	poi.location = loc
-	poi.active = true
-	poi.siteId = siteId
-	pois[index] = poi
-	return poi
-end
-
--- TODO: Figure out if this should be used somewhere - it currently is not, and should maybe be removed.
-local function UpdateMinimapEdges()
-	for id, poi in pairs(allPois) do
-		if poi.active then
-			local edge = Astrolabe:IsIconOnEdge(poi)
-			if poi.type == "site" then
-				if edge then
-					poi.icon:Hide()
-					poi.arrow:Show()
-				else
-					poi.icon:Show()
-					poi.arrow:Hide()
-				end
-			else
-				if edge then
-					poi.icon:Hide()
-					poi:Hide()
-				else
-					poi.icon:Show()
-					poi:Show()
-				end
-			end
-		end
-	end
-end
-
 local lastNearestSite
 
 local function GetContinentSiteIDs()
@@ -1577,7 +1511,7 @@ function UpdateMinimapPOIs(force)
 
 		Arrow_OnUpdate(site.poi, 5)
 	end
-	--UpdateMinimapEdges()
+
 	if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
 		for id, poi in pairs(allPois) do
 			if poi.active and poi.type == "survey" then
@@ -1889,13 +1823,11 @@ function Archy:OnEnable()
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
-	-- 	private.db.general.locked = false
 
 	InitializeFrames()
 	self:UpdateTracking()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
-	-- Drii: workaround for TomTom bug ticket 384
 	private.tomtomPoiIntegration = private.tomtomExists and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
@@ -2839,12 +2771,6 @@ function Archy:RefreshRacesDisplay()
 			local barTexture = (LSM and LSM:Fetch('statusbar', private.db.artifact.fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
 			child.fragmentBar.barTexture:SetTexture(barTexture)
 			child.fragmentBar.barTexture:SetHorizTile(false)
-			--            if db.artifact.fragmentBarTexture == "Archy" then
-			--                child.fragmentBar.barTexture:SetTexCoord(0, 0.810546875, 0.40625, 0.5625)            -- can solve with keystones if they were attached
-			--            else
-			--                child.fragmentBar.barTexture:SetTexCoord(0, 0, 0.77525001764297, 0.810546875)
-			--            end
-
 
 			local barColor
 			if artifact.isRare then
