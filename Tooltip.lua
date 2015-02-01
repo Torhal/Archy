@@ -111,22 +111,8 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	local barTexture = [[Interface\TargetingFrame\UI-StatusBar]]
 	local bar = self.bar
 	local fs = self.fs
-	--[[    { -- artifacts
-    1 artifact.fragments,
-    2 artifact.keystone_adjustment,
-    3 artifact.fragments_required,
-    4 raceData[race_id].keystone.inventory,
-    5 artifact.sockets,
-    6 artifact.keystones_added,
-    7 artifact.canSolve,
-    8 artifact.canSolveStone,
-    9 artifact.canSolveInventory,
-   10 artifact.rare }
-   				{ -- rares overall progress
-   	1 progress[1], -- done
-   	2 progress[2], -- total }
-]]
 	local perc
+
 	if current_tooltip_mode == 1 then -- artifacts_digsites
 		perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
 		local bar_colors = private.db.artifact.fragmentBarColors
@@ -135,7 +121,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
 		elseif data.canSolveInventory then
 			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
-		elseif data.rare then
+		elseif data.isRare then
 			self.r, self.g, self.b = bar_colors["Rare"].r, bar_colors["Rare"].g, bar_colors["Rare"].b
 		else
 			self.r, self.g, self.b = bar_colors["Normal"].r, bar_colors["Normal"].g, bar_colors["Normal"].b
@@ -310,7 +296,9 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
-				for raceID, artifact in pairs(private.artifact_data) do
+				for raceID, race in pairs(private.Races) do
+					local artifact = race.artifact
+
 					if artifact.fragments_required > 0 then
 						local race = private.Races[raceID]
 
@@ -321,7 +309,7 @@ function Archy:LDBTooltipShow()
 
 						local artifactName = artifact.name
 
-						if artifact.rare then
+						if artifact.isRare then
 							artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
 						end
 
@@ -336,7 +324,7 @@ function Archy:LDBTooltipShow()
 						progress_data.canSolve = artifact.canSolve
 						progress_data.canSolveStone = artifact.canSolveStone
 						progress_data.canSolveInventory = artifact.canSolveInventory
-						progress_data.rare = artifact.rare
+						progress_data.isRare = artifact.isRare
 
 						tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
@@ -413,11 +401,9 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 6, _G.NORMAL_FONT_COLOR_CODE .. L["Total"] .. "|r", "RIGHT", 1)
 
 				local all_rare_done, all_rare_count, all_common_done, all_common_count, all_total_done, all_total_count = 0, 0, 0, 0, 0, 0
-				for raceID, _ in pairs(private.artifact_data) do
+				for raceID, race in pairs(private.Races) do
 					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(raceID, missing_data)
 					if total_count > 0 then
-						local race = private.Races[raceID]
-
 						line = tooltip:AddLine(" ")
 						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
 						tooltip:SetCell(line, 2, race.name .. "*", "LEFT", 1)
@@ -444,9 +430,7 @@ function Archy:LDBTooltipShow()
 					tooltip:SetCell(line, 6, all_total_done .. "/" .. all_total_count, "RIGHT", 1)
 				end
 
-				for raceID, _ in pairs(private.artifact_data) do
-					local race = private.Races[raceID]
-
+				for raceID, race in pairs(private.Races) do
 					if race.expand then
 						line = tooltip:AddLine(" ")
 						line = tooltip:AddLine(" ")

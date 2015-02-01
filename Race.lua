@@ -6,6 +6,7 @@ local _G = getfenv(0)
 -- Functions
 
 -- Libraries
+local math = _G.math
 
 -----------------------------------------------------------------------
 -- AddOn namespace.
@@ -13,6 +14,7 @@ local _G = getfenv(0)
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
+local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 
 local Races = {}
@@ -52,6 +54,17 @@ function Archy:AddRace(raceID)
 		id = raceID,
 		name = raceName,
 		texture = raceTexture,
+		artifact = {
+			canSolve = false,
+			fragments = 0,
+			fragments_required = 0,
+			icon = "",
+			keystones_added = 0,
+			keystone_adjustment = 0,
+			name = "",
+			sockets = 0,
+			tooltip = "",
+		},
 		keystone = {
 			id = keystoneItemID,
 			name = itemName,
@@ -76,5 +89,96 @@ function Race:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
 
 	self.keystone.name = keystoneName
 	self.keystone.texture = keystoneTexture
+end
 
+function Race:KeystoneSocketOnClick(mouseButtonName)
+	local artifact = self.artifact
+
+	if mouseButtonName == "LeftButton" then
+		if artifact.keystones_added < artifact.sockets and artifact.keystones_added < self.keystone.inventory then
+			artifact.keystones_added = artifact.keystones_added + 1
+		end
+	else
+		if artifact.keystones_added > 0 then
+			artifact.keystones_added = artifact.keystones_added - 1
+		end
+	end
+	self:UpdateArtifact()
+end
+
+function Race:UpdateArtifact()
+	if _G.GetNumArtifactsByRace(self.id) == 0 then
+		return
+	end
+
+	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
+		_G.ArchaeologyFrame_ShowArtifact(self.id)
+	end
+	_G.SetSelectedArtifact(self.id)
+
+	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
+	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
+
+	local artifact = self.artifact
+	artifact.canSolve = _G.CanSolveArtifact()
+	artifact.canSolveInventory = nil
+	artifact.canSolveStone = nil
+	artifact.completionCount = 0
+	artifact.fragments = baseFragments
+	artifact.fragments_required = totalFragments
+	artifact.icon = icon
+	artifact.isRare = (rarity ~= 0)
+	artifact.keystone_adjustment = 0
+	artifact.name = artifactName
+	artifact.sockets = numSockets
+	artifact.tooltip = spellDescription
+
+	local keystoneInventory = self.keystone.inventory
+	local prevAdded = math.min(artifact.keystones_added, keystoneInventory, numSockets)
+
+	if private.db.artifact.autofill[self.id] then
+		prevAdded = math.min(keystoneInventory, numSockets)
+	end
+	artifact.keystones_added = math.min(keystoneInventory, numSockets)
+
+	-- TODO: This whole section looks like a needlessly convoluted way of doing things.
+	if artifact.keystones_added > 0 and numSockets > 0 then
+		for index = 1, math.min(artifact.keystones_added, numSockets) do
+			_G.SocketItemToArtifact()
+
+			if not _G.ItemAddedToArtifact(index) then
+				break
+			end
+
+			if index == prevAdded then
+				_, adjustedFragments = _G.GetArtifactProgress()
+				artifact.keystone_adjustment = adjustedFragments
+				artifact.canSolveStone = _G.CanSolveArtifact()
+			end
+		end
+		artifact.canSolveInventory = _G.CanSolveArtifact()
+
+		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then
+			_, adjustedFragments = _G.GetArtifactProgress()
+			artifact.keystone_adjustment = adjustedFragments
+			artifact.canSolveStone = _G.CanSolveArtifact()
+		end
+	end
+	artifact.keystones_added = prevAdded
+
+	_G.RequestArtifactCompletionHistory()
+
+	if not private.db.general.show or private.db.artifact.blacklist[self.id] then
+		return
+	end
+
+	if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
+		artifact.hasAnnounced = true
+		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
+	end
+
+	if not artifact.hasPinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
+		artifact.hasPinged = true
+		_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+	end
 end

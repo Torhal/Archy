@@ -375,8 +375,6 @@ local survey_location = {
 	y = 0
 }
 
-local has_announced, has_pinged = {}, {}
-
 local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
 
 local prevTheme
@@ -392,27 +390,6 @@ local UpdateAllSites
 -----------------------------------------------------------------------
 -- Metatables.
 -----------------------------------------------------------------------
-
-local artifact_data = {}
-setmetatable(artifact_data, {
-	__index = function(dataTable, raceID)
-		if raceID then
-			dataTable[raceID] = {
-				name = "",
-				tooltip = "",
-				icon = "",
-				sockets = 0,
-				keystones_added = 0,
-				fragments = 0,
-				keystone_adjustment = 0,
-				fragments_required = 0,
-			}
-
-			return dataTable[raceID]
-		end
-	end
-})
-private.artifact_data = artifact_data
 
 local function POI_OnEnter(self)
 	if not self.tooltip then
@@ -571,16 +548,15 @@ end
 private.GetArchaeologyRank = GetArchaeologyRank
 
 local function GetArtifactStats(race_id, name)
-	local num_artifacts = _G.GetNumArtifactsByRace(race_id)
-
-	if not num_artifacts then
+	local raceArtifactCount = _G.GetNumArtifactsByRace(race_id)
+	if not raceArtifactCount then
 		return
 	end
 
-	for artifact_index = 1, num_artifacts do
-		local artifact_name, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
-		if name == artifact_name then
-			return artifact_index, firstCompletionTime, completionCount
+	for artifactIndex = 1, raceArtifactCount do
+		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(race_id, artifactIndex)
+		if name == artifactName then
+			return artifactIndex, firstCompletionTime, completionCount
 		end
 	end
 end
@@ -647,105 +623,21 @@ local function ShouldBeHidden()
 	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not HasArchaeology())
 end
 
-local function UpdateRaceArtifact(raceID)
-	local race = private.Races[raceID]
-
-	if not race then
-		-- @??? Maybe use a wipe statement here
-		artifact_data[raceID] = nil
-		return
-	end
-	race.keystone.inventory = _G.GetItemCount(race.keystone.id) or 0
-
-	if _G.GetNumArtifactsByRace(raceID) == 0 then
-		return
-	end
-
-	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
-		_G.ArchaeologyFrame_ShowArtifact(raceID)
-	end
-	_G.SetSelectedArtifact(raceID)
-
-	local name, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
-	local base, adjust, total = _G.GetArtifactProgress()
-
-	local artifact = artifact_data[raceID]
-	artifact.canSolve = _G.CanSolveArtifact()
-	artifact.fragments = base
-	artifact.fragments_required = total
-	artifact.sockets = numSockets
-	artifact.icon = icon
-	artifact.tooltip = spellDescription
-	artifact.rare = (rarity ~= 0)
-	artifact.name = name
-	artifact.canSolveStone = nil
-	artifact.canSolveInventory = nil
-	artifact.keystone_adjustment = 0
-	artifact.completionCount = 0
-
-	local prevAdded = math.min(artifact.keystones_added, race.keystone.inventory, numSockets)
-
-	if private.db.artifact.autofill[raceID] then
-		prevAdded = math.min(race.keystone.inventory, numSockets)
-	end
-	artifact.keystones_added = math.min(race.keystone.inventory, numSockets)
-	-- Drii: this whole section looks like a needlessly convoluted way of doing things but hey 'if it's not broken don't fix it'
-	-- cosmetic changes only; don't fancy wading through 10 tail calls if I break something :P
-	if artifact.keystones_added > 0 and numSockets > 0 then
-		for i = 1, math.min(artifact.keystones_added, numSockets) do
-			_G.SocketItemToArtifact()
-
-			if not _G.ItemAddedToArtifact(i) then
-				break
-			end
-
-			if i == prevAdded then
-				_, adjust = _G.GetArtifactProgress()
-				artifact.keystone_adjustment = adjust
-				artifact.canSolveStone = _G.CanSolveArtifact()
-			end
-		end
-		artifact.canSolveInventory = _G.CanSolveArtifact()
-
-		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then
-			_, adjust = _G.GetArtifactProgress()
-			artifact.keystone_adjustment = adjust
-			artifact.canSolveStone = _G.CanSolveArtifact()
-		end
-	end
-	artifact.keystones_added = prevAdded
-
-	_G.RequestArtifactCompletionHistory()
-
-	if not private.db.general.show or private.db.artifact.blacklist[raceID] then
-		return
-	end
-
-	if not has_announced[artifact.name] and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
-		has_announced[artifact.name] = true
-		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. race.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
-	end
-
-	if not has_pinged[artifact.name] and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
-		has_pinged[artifact.name] = true
-		_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
-	end
-end
-
-local function SolveRaceArtifact(race_id, use_stones)
+local function SolveRaceArtifact(raceID, useStones)
 	-- The check for race_id exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
-	if race_id then
-		local artifact = artifact_data[race_id]
+	if raceID then
+		local race = private.Races[raceID]
+		local artifact = race.artifact
 
-		_G.SetSelectedArtifact(race_id)
-		artifactSolved.raceId = race_id
+		_G.SetSelectedArtifact(raceID)
+		artifactSolved.raceId = raceID
 		artifactSolved.name = _G.GetSelectedArtifactInfo()
 		artifact.name = artifactSolved.name
-		keystoneLootRaceID = race_id
+		keystoneLootRaceID = raceID
 
-		if _G.type(use_stones) == "boolean" then
-			if use_stones then
-				artifact.keystones_added = math.min(private.Races[race_id].keystone.inventory, artifact.sockets)
+		if _G.type(useStones) == "boolean" then
+			if useStones then
+				artifact.keystones_added = math.min(race.keystone.inventory, artifact.sockets)
 			else
 				artifact.keystones_added = 0
 			end
@@ -946,8 +838,8 @@ end
 local CONFIG_UPDATE_FUNCTIONS = {
 	artifact = function(option)
 		if option == "autofill" then
-			for race_id = 1, _G.GetNumArchaeologyRaces() do
-				UpdateRaceArtifact(race_id)
+			for raceID = 1, _G.GetNumArchaeologyRaces() do
+				private.Races[raceID]:UpdateArtifact()
 			end
 		elseif option == "color" then
 			Archy:RefreshRacesDisplay()
@@ -1008,9 +900,10 @@ end
 
 function Archy:SolveAnyArtifact(use_stones)
 	local found = false
-	for race_id, artifact in pairs(artifact_data) do
-		if not private.db.artifact.blacklist[race_id] and (artifact.canSolve or (use_stones and artifact.canSolveInventory)) then
-			SolveRaceArtifact(race_id, use_stones)
+	for raceID, race in pairs(private.Races) do
+		local artifact = race.artifact
+		if not private.db.artifact.blacklist[raceID] and (artifact.canSolve or (use_stones and artifact.canSolveInventory)) then
+			SolveRaceArtifact(raceID, use_stones)
 			found = true
 			break
 		end
@@ -1021,19 +914,9 @@ function Archy:SolveAnyArtifact(use_stones)
 	end
 end
 
-function Archy:SocketClicked(keystone_button, mouse_button, down)
-	local race_id = keystone_button:GetParent():GetParent():GetID()
-
-	if mouse_button == "LeftButton" then
-		if artifact_data[race_id].keystones_added < artifact_data[race_id].sockets and artifact_data[race_id].keystones_added < private.Races[race_id].keystone.inventory then
-			artifact_data[race_id].keystones_added = artifact_data[race_id].keystones_added + 1
-		end
-	else
-		if artifact_data[race_id].keystones_added > 0 then
-			artifact_data[race_id].keystones_added = artifact_data[race_id].keystones_added - 1
-		end
-	end
-	UpdateRaceArtifact(race_id)
+function Archy:SocketClicked(keystone_button, mouseButtonName, down)
+	local raceID = keystone_button:GetParent():GetParent():GetID()
+	private.Races[raceID]:KeystoneSocketOnClick(mouseButtonName)
 	Archy:RefreshRacesDisplay()
 end
 
@@ -2076,26 +1959,21 @@ function Archy:GET_ITEM_INFO_RECEIVED(event)
 end
 
 do
-	local function UpdateAndRefresh(race_id)
-		UpdateRaceArtifact(race_id)
+	local function UpdateAndRefresh(race)
+		race:UpdateArtifact()
 		Archy:RefreshRacesDisplay()
 	end
 
 	function Archy:ARTIFACT_COMPLETE(event, name)
-		for race_id, artifact in pairs(artifact_data) do
-			if artifact.name == name then
-				-- Drii: see if this helps with ticket 377
-				if has_pinged[name] then
-					has_pinged[name] = nil
-				end
+		for raceID, race in pairs(private.Races) do
+			local artifact = race.artifact
 
-				-- alerts not working if the same common artifact pops up after solving it
-				if has_announced[name] then
-					has_announced[name] = nil
-				end
-				-- this is still the artifact that was just solved when the event fires
-				UpdateRaceArtifact(race_id)
-				self:ScheduleTimer(UpdateAndRefresh, 2, race_id)
+			if artifact and artifact.name == name then
+				artifact.hasAnnounced = nil
+				artifact.hasPinged = nil
+
+				race:UpdateArtifact()
+				self:ScheduleTimer(UpdateAndRefresh, 2, race)
 				break
 			end
 		end
@@ -2103,8 +1981,10 @@ do
 end
 
 function Archy:ARTIFACT_HISTORY_READY()
-	for race_id, artifact in pairs(artifact_data) do
-		local _, _, completionCount = GetArtifactStats(race_id, artifact.name)
+	for raceID, race in pairs(private.Races) do
+		local artifact = race.artifact
+
+		local _, _, completionCount = GetArtifactStats(raceID, artifact.name)
 		if completionCount then
 			artifact.completionCount = completionCount
 		end
@@ -2236,7 +2116,7 @@ function Archy:BAG_UPDATE_DELAYED()
 	if not private.current_continent or not keystoneLootRaceID then
 		return
 	end
-	UpdateRaceArtifact(keystoneLootRaceID)
+	private.Races[keystoneLootRaceID]:UpdateArtifact()
 	self:RefreshRacesDisplay()
 	keystoneLootRaceID = nil
 end
@@ -2254,13 +2134,11 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		local diff = currency_amount - (race.currency or 0)
 
 		race.currency = currency_amount
-
-		-- update the artifact info
-		UpdateRaceArtifact(raceID)
+		race:UpdateArtifact()
 
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
-			artifact_data[raceID].keystones_added = 0
+			race.artifact.keystones_added = 0
 
 			if artifactSolved.raceId > 0 then
 				local _, _, completionCount = GetArtifactStats(raceID, artifactSolved.name)
@@ -2620,8 +2498,8 @@ function Archy:UpdatePlayerPosition(force)
 	UpdateAllSites()
 
 	if _G.GetNumArchaeologyRaces() > 0 then
-		for race_id = 1, _G.GetNumArchaeologyRaces() do
-			UpdateRaceArtifact(race_id)
+		for raceID = 1, _G.GetNumArchaeologyRaces() do
+			private.Races[raceID]:UpdateArtifact()
 		end
 		self:UpdateRacesFrame()
 		self:RefreshRacesDisplay()
@@ -2869,8 +2747,9 @@ function Archy:RefreshRacesDisplay()
 
 	for raceID, race in pairs(private.Races) do
 		local child = races_frame.children[raceID]
-		local artifact = artifact_data[raceID]
+		local artifact = race.artifact
 		local _, _, completionCount = GetArtifactStats(raceID, artifact.name)
+
 		child:SetID(raceID)
 
 		if private.db.general.theme == "Graphical" then
@@ -2959,7 +2838,7 @@ function Archy:RefreshRacesDisplay()
 
 
 			local barColor
-			if artifact.rare then
+			if artifact.isRare then
 				barColor = private.db.artifact.fragmentBarColors["Rare"]
 				child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625) -- rare
 			else
@@ -3045,7 +2924,7 @@ function Archy:RefreshRacesDisplay()
 
 		else
 			local fragmentColor = (artifact.canSolve and "|cFF00FF00" or (artifact.canSolveStone and "|cFFFFFF00" or ""))
-			local nameColor = (artifact.rare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
+			local nameColor = (artifact.isRare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
 			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragments_required)
 
 			if race.keystone.inventory > 0 or artifact.sockets > 0 then
