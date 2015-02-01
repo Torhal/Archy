@@ -1565,36 +1565,52 @@ function RefreshTomTom()
 end
 
 --[[ Slash command handler ]] --
+local SUBCOMMAND_FUNCS = {
+	[L["config"]:lower()] = function()
+		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
+	end,
+	[L["stealth"]:lower()] = function()
+		private.db.general.stealthMode = not private.db.general.stealthMode
+		Archy:ConfigUpdated()
+	end,
+	[L["dig sites"]:lower()] = function()
+		private.db.digsite.show = not private.db.digsite.show
+		Archy:ConfigUpdated('digsite')
+	end,
+	[L["artifacts"]:lower()] = function()
+		private.db.artifact.show = not private.db.artifact.show
+		Archy:ConfigUpdated('artifact')
+	end,
+	[_G.SOLVE:lower()] = function()
+		Archy:SolveAnyArtifact()
+	end,
+	[L["solve stone"]:lower()] = function()
+		Archy:SolveAnyArtifact(true)
+	end,
+	[L["nearest"]:lower()] = AnnounceNearestSite,
+	[L["closest"]:lower()] = AnnounceNearestSite,
+	[L["reset"]:lower()] = function()
+		private:ResetPositions()
+	end,
+	[_G.MINIMAP_LABEL:lower()] = function()
+		private.db.minimap.show = not private.db.minimap.show
+		Archy:ConfigUpdated('minimap')
+	end,
+	tomtom = function()
+		private.db.tomtom.enabled = not private.db.tomtom.enabled
+		RefreshTomTom()
+	end,
+	test = function()
+		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
+	end,
+}
+
 local function SlashHandler(msg, editbox)
 	local command = msg:lower()
 
-	if command == L["config"]:lower() then
-		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
-	elseif command == L["stealth"]:lower() then
-		private.db.general.stealthMode = not private.db.general.stealthMode
-		Archy:ConfigUpdated()
-	elseif command == L["dig sites"]:lower() then
-		private.db.digsite.show = not private.db.digsite.show
-		Archy:ConfigUpdated('digsite')
-	elseif command == L["artifacts"]:lower() then
-		private.db.artifact.show = not private.db.artifact.show
-		Archy:ConfigUpdated('artifact')
-	elseif command == _G.SOLVE:lower() then
-		Archy:SolveAnyArtifact()
-	elseif command == L["solve stone"]:lower() then
-		Archy:SolveAnyArtifact(true)
-	elseif command == L["nearest"]:lower() or command == L["closest"]:lower() then
-		AnnounceNearestSite()
-	elseif command == L["reset"]:lower() then
-		private:ResetPositions()
-	elseif command == ("TomTom"):lower() then
-		private.db.tomtom.enabled = not private.db.tomtom.enabled
-		RefreshTomTom()
-	elseif command == _G.MINIMAP_LABEL:lower() then
-		private.db.minimap.show = not private.db.minimap.show
-		Archy:ConfigUpdated('minimap')
-	elseif command == "test" then
-		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
+	local func = SUBCOMMAND_FUNCS[command]
+	if func then
+		func()
 	else
 		Archy:Print(L["Available commands are:"])
 		Archy:Print("|cFF00FF00" .. L["config"] .. "|r - " .. L["Shows the Options"])
@@ -1605,7 +1621,7 @@ local function SlashHandler(msg, editbox)
 		Archy:Print("|cFF00FF00" .. L["solve stone"] .. "|r - " .. L["Solves the first artifact it finds that it can solve (including key stones)"])
 		Archy:Print("|cFF00FF00" .. L["nearest"] .. "|r or |cFF00FF00" .. L["closest"] .. "|r - " .. L["Announces the nearest dig site to you"])
 		Archy:Print("|cFF00FF00" .. L["reset"] .. "|r - " .. L["Reset the window positions to defaults"])
-		Archy:Print("|cFF00FF00" .. "TomTom" .. "|r - " .. L["Toggles TomTom Integration"])
+		Archy:Print("|cFF00FF00" .. "tomtom" .. "|r - " .. L["Toggles TomTom Integration"])
 		Archy:Print("|cFF00FF00" .. _G.MINIMAP_LABEL .. "|r - " .. L["Toggles the dig site icons on the minimap"])
 	end
 end
