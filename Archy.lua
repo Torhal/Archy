@@ -2059,7 +2059,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			-- we've spent fragments, aka. Solved an artifact
 			race.artifact.keystones_added = 0
 
-			if artifactSolved.raceId > 0 then
+			if artifactSolved.raceId == race.id then
 				local _, _, completionCount = race:GetArtifactCompletionDataByName(artifactSolved.name)
 				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race.name, artifactSolved.name, completionCount or 0), 1, 1, 1)
 
