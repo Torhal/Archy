@@ -2015,15 +2015,13 @@ function Archy:OnEnable()
 	-- Drii: workaround for TomTom bug ticket 384
 	private.tomtomPoiIntegration = private.tomtomExists and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
-	if not next(private.Races) then
-		for raceID = 1, _G.GetNumArchaeologyRaces() do
-			local race = self:AddRace(raceID)
-			if race then
-				keystoneIDToRaceID[race.keystone.id] = raceID
-			end
+	for raceID = 1, _G.GetNumArchaeologyRaces() do
+		local race = self:AddRace(raceID)
+		if race then
+			keystoneIDToRaceID[race.keystone.id] = raceID
 		end
-		_G.RequestArtifactCompletionHistory()
 	end
+	_G.RequestArtifactCompletionHistory()
 end
 
 function Archy:OnDisable()
