@@ -1813,8 +1813,6 @@ local function InitializeFrames()
 	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
 	private.distance_indicator_frame.circle:SetScale(0.65)
 
-	if private.db.general.combathide then private.regen_update_visibility = true end
-
 	private.frames_init_done = true
 
 	Archy:UpdateFramePositions()
@@ -2225,11 +2223,8 @@ function Archy:PLAYER_REGEN_DISABLED()
 		self.LDB_Tooltip:Hide()
 	end
 
-	if private.db.general.combathide and private.digsite_frame:IsVisible() then
-		_G.RegisterStateDriver(private.digsite_frame, "visibility", "[combat]hide;show")
-	end
-
-	if private.db.general.combathide and private.races_frame:IsVisible() then
+	if private.db.general.combathide then
+		private.digsite_frame:Hide()
 		private.races_frame:Hide()
 	end
 end
@@ -2273,8 +2268,9 @@ function Archy:PLAYER_REGEN_ENABLED()
 		self:ScanBags()
 	end
 
-	if private.regen_update_visibility then
-		_G.UnregisterStateDriver(private.digsite_frame, "visibility")
+	if private.db.general.combathide then
+		private.digsite_frame:Show()
+		private.races_frame:Show()
 		self:ConfigUpdated()
 	end
 end
