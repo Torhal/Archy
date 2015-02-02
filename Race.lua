@@ -99,6 +99,10 @@ function Race:GetArtifactCompletionDataByName(artifactName)
 	end
 
 	local artifactIndex = self.ArtifactNameToIDMapping[artifactName]
+	if not artifactIndex then
+		return 0, 0, 0
+	end
+
 	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.id, artifactIndex)
 	return artifactIndex, firstCompletionTime, completionCount
 end
