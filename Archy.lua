@@ -423,58 +423,65 @@ local function POI_OnLeave(self)
 	_G.GameTooltip:Hide()
 end
 
-local ARROW_UPDATE_THRESHOLD = 0.1
 
-local function Arrow_OnUpdate(self, elapsed)
-	self.t = self.t + elapsed
+local Arrow_OnUpdate
+do
+	local ARROW_UPDATE_THRESHOLD = 0.1
+	local RAD_135 = math.rad(135)
+	local SQUARE_HALF = math.sqrt(0.5)
 
-	if self.t < ARROW_UPDATE_THRESHOLD then
-		return
-	end
-	local square_half = math.sqrt(0.5)
-	local rad_135 = math.rad(135)
-	self.t = 0
+	function Arrow_OnUpdate(self, elapsed)
+		self.t = self.t + elapsed
 
-	if _G.IsInInstance() then
-		self:Hide()
-		return
-	end
+		if self.t < ARROW_UPDATE_THRESHOLD then
+			return
+		end
+		self.t = 0
 
-	if not self.active then
-		return
-	end
+		if _G.IsInInstance() then
+			self:Hide()
+			return
+		end
 
-	local edge = Astrolabe:IsIconOnEdge(self)
+		if not self.active then
+			return
+		end
 
-	if self.type == "site" then
-		if edge then
+		local edge = Astrolabe:IsIconOnEdge(self)
+
+		if self.type == "site" then
+			if edge then
+				if self.icon:IsShown() then
+					self.icon:Hide()
+				end
+
+				if not self.arrow:IsShown() then
+					self.arrow:Show()
+				end
+
+				-- Rotate the icon, as required
+				local angle = Astrolabe:GetDirectionToIcon(self)
+				angle = angle + RAD_135
+
+				if _G.GetCVar("rotateMinimap") == "1" then
+					local cring = _G.GetPlayerFacing()
+					angle = angle - cring
+				end
+
+				local sin, cos = math.sin(angle) * SQUARE_HALF, math.cos(angle) * SQUARE_HALF
+				self.arrow:SetTexCoord(0.5 - sin, 0.5 + cos, 0.5 + cos, 0.5 + sin, 0.5 - cos, 0.5 - sin, 0.5 + sin, 0.5 - cos)
+			else
+				if not self.icon:IsShown() then self.icon:Show()
+				end
+				if self.arrow:IsShown() then self.arrow:Hide()
+				end
+			end
+		elseif edge then
 			if self.icon:IsShown() then self.icon:Hide()
 			end
-			if not self.arrow:IsShown() then self.arrow:Show()
-			end
-
-			-- Rotate the icon, as required
-			local angle = Astrolabe:GetDirectionToIcon(self)
-			angle = angle + rad_135
-
-			if _G.GetCVar("rotateMinimap") == "1" then
-				local cring = _G.GetPlayerFacing()
-				angle = angle - cring
-			end
-
-			local sin, cos = math.sin(angle) * square_half, math.cos(angle) * square_half
-			self.arrow:SetTexCoord(0.5 - sin, 0.5 + cos, 0.5 + cos, 0.5 + sin, 0.5 - cos, 0.5 - sin, 0.5 + sin, 0.5 - cos)
 		else
 			if not self.icon:IsShown() then self.icon:Show()
 			end
-			if self.arrow:IsShown() then self.arrow:Hide()
-			end
-		end
-	elseif edge then
-		if self.icon:IsShown() then self.icon:Hide()
-		end
-	else
-		if not self.icon:IsShown() then self.icon:Show()
 		end
 	end
 end
