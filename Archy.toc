@@ -36,6 +36,7 @@ Libs\LibBabble-DigSites-3.0\lib.xml
 Libs\LibBabble-Artifacts-3.0\lib.xml
 Libs\LibDialog-1.0\lib.xml
 Libs\LibToast-1.0\lib.xml
+Libs\LibTextDump-1.0\lib.xml
 #@end-no-lib-strip@
 
 Libs\Astrolabe-1.0\Load.xml
