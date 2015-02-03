@@ -444,10 +444,6 @@ do
 			return
 		end
 
-		if not self.active then
-			return
-		end
-
 		local isOnEdge = Astrolabe:IsIconOnEdge(self)
 
 		if self.type == "site" then
@@ -1235,8 +1231,6 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 		poi:SetWidth(10)
 		poi:SetHeight(10)
 
-		table.insert(PointsOfInterest, poi)
-
 		poi.icon = poi:CreateTexture("BACKGROUND")
 		poi.icon:SetTexture([[Interface\Archeology\Arch-Icon-Marker.blp]])
 		poi.icon:SetPoint("CENTER", 0, 0)
@@ -1263,9 +1257,10 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 		x = x,
 		y = y,
 	}
-	poi.active = true
 	poi.siteId = siteId
 	poi.t = 0
+
+	PointsOfInterest[poi] = true
 	return poi
 end
 
@@ -1278,8 +1273,6 @@ local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 		poi.index = surveyPoiCount
 		poi:SetWidth(8)
 		poi:SetHeight(8)
-
-		table.insert(PointsOfInterest, poi)
 
 		poi.icon = poi:CreateTexture("BACKGROUND")
 		poi.icon:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
@@ -1307,9 +1300,10 @@ local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 		x = x,
 		y = y,
 	}
-	poi.active = true
 	poi.siteId = siteId
 	poi.t = 0
+
+	PointsOfInterest[poi] = true
 	return poi
 end
 
@@ -1319,7 +1313,6 @@ local function ClearPOI(poi)
 	end
 	Astrolabe:RemoveIconFromMinimap(poi)
 
-	poi.active = nil
 	poi.location = nil
 	poi.siteId = nil
 	poi.tooltip = nil
@@ -1329,6 +1322,8 @@ local function ClearPOI(poi)
 	poi:SetScript("OnEnter", nil)
 	poi:SetScript("OnLeave", nil)
 	poi:SetScript("OnUpdate", nil)
+
+	PointsOfInterest[poi] = nil
 
 	if poi.type == "site" then
 		poi.arrow:Hide()
@@ -1356,7 +1351,7 @@ local function GetContinentSiteIDs()
 end
 
 local function ClearAllPOIs()
-	for idx, poi in ipairs(PointsOfInterest) do
+	for poi in pairs(PointsOfInterest) do
 		ClearPOI(poi)
 	end
 end
@@ -1364,9 +1359,7 @@ end
 local function ClearInvalidPOIs()
 	local validSiteIDs = GetContinentSiteIDs()
 
-	for index = 1, #PointsOfInterest do
-		local poi = PointsOfInterest[index]
-
+	for poi in pairs(PointsOfInterest) do
 		if not validSiteIDs[poi.siteId] then
 			ClearPOI(poi)
 		elseif poi.type == "survey" and lastNearestSite.id ~= nearestSite.id and lastNearestSite.id == poi.siteId then
@@ -1400,7 +1393,6 @@ function UpdateMinimapPOIs(force)
 
 	for _, site in pairs(sites) do
 		site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
-		site.poi.active = true
 
 		if site.map > 0 then
 			Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
@@ -1424,7 +1416,6 @@ function UpdateMinimapPOIs(force)
 					site.surveyPOIs[index] = GetSurveyPOI(site.id, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, site.name, site.zoneName))
 
 					local POI = site.surveyPOIs[index]
-					POI.active = true
 
 					Astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
 
@@ -1444,8 +1435,8 @@ function UpdateMinimapPOIs(force)
 	end
 
 	if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
-		for id, poi in pairs(PointsOfInterest) do
-			if poi.active and poi.type == "survey" then
+		for poi in pairs(PointsOfInterest) do
+			if poi.type == "survey" then
 				poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
 			end
 		end
@@ -3298,8 +3289,8 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
 			local min_red, max_red = max_yellow, 500
 
-			for id, poi in pairs(PointsOfInterest) do
-				if poi.active and poi.type == "survey" then
+			for poi in pairs(PointsOfInterest) do
+				if poi.type == "survey" then
 					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
 
 					if distance >= min_green and distance <= max_green then
