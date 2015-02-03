@@ -1222,7 +1222,7 @@ end
 --[[ Minimap Functions ]] --
 local sitePool = {}
 local surveyPool = {}
-local allPois = {}
+local PointsOfInterest = {}
 local sitePoiCount, surveyPoiCount = 0, 0
 
 local function GetSitePOI(siteId, map, level, x, y, tooltip)
@@ -1235,7 +1235,7 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 		poi:SetWidth(10)
 		poi:SetHeight(10)
 
-		table.insert(allPois, poi)
+		table.insert(PointsOfInterest, poi)
 
 		poi.icon = poi:CreateTexture("BACKGROUND")
 		poi.icon:SetTexture([[Interface\Archeology\Arch-Icon-Marker.blp]])
@@ -1279,7 +1279,7 @@ local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 		poi:SetWidth(8)
 		poi:SetHeight(8)
 
-		table.insert(allPois, poi)
+		table.insert(PointsOfInterest, poi)
 
 		poi.icon = poi:CreateTexture("BACKGROUND")
 		poi.icon:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
@@ -1356,7 +1356,7 @@ local function GetContinentSiteIDs()
 end
 
 local function ClearAllPOIs()
-	for idx, poi in ipairs(allPois) do
+	for idx, poi in ipairs(PointsOfInterest) do
 		ClearPOI(poi)
 	end
 end
@@ -1364,8 +1364,8 @@ end
 local function ClearInvalidPOIs()
 	local validSiteIDs = GetContinentSiteIDs()
 
-	for index = 1, #allPois do
-		local poi = allPois[index]
+	for index = 1, #PointsOfInterest do
+		local poi = PointsOfInterest[index]
 
 		if not validSiteIDs[poi.siteId] then
 			ClearPOI(poi)
@@ -1444,7 +1444,7 @@ function UpdateMinimapPOIs(force)
 	end
 
 	if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
-		for id, poi in pairs(allPois) do
+		for id, poi in pairs(PointsOfInterest) do
 			if poi.active and poi.type == "survey" then
 				poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
 			end
@@ -3298,7 +3298,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
 			local min_red, max_red = max_yellow, 500
 
-			for id, poi in pairs(allPois) do
+			for id, poi in pairs(PointsOfInterest) do
 				if poi.active and poi.type == "survey" then
 					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
 
