@@ -49,6 +49,9 @@ end
 
 local debugger -- Only defined if needed.
 
+local DatamineTooltip = _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
+DatamineTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
+
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
@@ -574,43 +577,9 @@ end
 
 private.GetArchaeologyRank = GetArchaeologyRank
 
-local function GetCrateUseString(spellID)
-	local spell_text
-	local line_num = 1
-
-	private.scantip:ClearLines()
-	private.scantip:SetSpellByID(spellID)
-
-	while (_G["ArchyScanTipTextLeft" .. line_num]:GetText()) do
-		-- overwrite until we get the contents of bottom fontstring on the left
-		spell_text = (_G["ArchyScanTipTextLeft" .. line_num]:GetText())
-		line_num = line_num + 1
-	end
-
-	if spell_text then
-		return _G.ITEM_SPELL_TRIGGER_ONUSE .. " " .. spell_text
-	end
-end
-
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
 	local _, _, arch = _G.GetProfessions()
-	if arch then
-		if not CRATE_USE_STRING then
-			private.scantip = private.scantip or _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
-			private.scantip:SetOwner(_G.UIParent, "ANCHOR_NONE")
-			CRATE_USE_STRING = CRATE_USE_STRING or GetCrateUseString(CRATE_SPELL_ID)
-		end
-
-		if not digsitesTrackingID then
-			for trackingTypeIndex = 1, _G.GetNumTrackingTypes() do
-				if (_G.GetTrackingInfo(trackingTypeIndex)) == _G.MINIMAP_TRACKING_DIGSITES then
-					digsitesTrackingID = trackingTypeIndex
-					break
-				end
-			end
-		end
-	end
 	return arch
 end
 
@@ -1860,6 +1829,18 @@ function Archy:OnEnable()
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
 	InitializeFrames()
+
+	DatamineTooltip:ClearLines()
+	DatamineTooltip:SetSpellByID(CRATE_SPELL_ID)
+	CRATE_USE_STRING = ("%s %s"):format(_G.ITEM_SPELL_TRIGGER_ONUSE, _G["ArchyScanTipTextLeft" .. DatamineTooltip:NumLines()]:GetText())
+
+	for trackingTypeIndex = 1, _G.GetNumTrackingTypes() do
+		if (_G.GetTrackingInfo(trackingTypeIndex)) == _G.MINIMAP_TRACKING_DIGSITES then
+			digsitesTrackingID = trackingTypeIndex
+			break
+		end
+	end
+
 	self:UpdateTracking()
 	tomtomActive = true
 	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
@@ -1989,9 +1970,9 @@ local function FindCrateable(bag, slot)
 			private.crate_item_id = item_id
 			return true
 		end
-		private.scantip:SetBagItem(bag, slot)
+		DatamineTooltip:SetBagItem(bag, slot)
 
-		for line_num = 1, private.scantip:NumLines() do
+		for line_num = 1, DatamineTooltip:NumLines() do
 			local linetext = (_G["ArchyScanTipTextLeft" .. line_num]:GetText())
 
 			if linetext == CRATE_USE_STRING then
