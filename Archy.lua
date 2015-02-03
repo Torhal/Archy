@@ -1806,13 +1806,15 @@ function Archy:OnEnable()
 	_G["SLASH_ARCHY1"] = "/archy"
 	_G.SlashCmdList["ARCHY"] = SlashHandler
 
-	--    self:RegisterEvent("ARTIFACT_UPDATE", "ArtifactUpdated")
+	-- Ignore this event for now as it's can break other Archaeology UIs
+	-- Would have been nice if Blizzard passed the race index or artifact name with the event
+	--    self:RegisterEvent("ARTIFACT_UPDATE")
 	self:RegisterEvent("ARTIFACT_COMPLETE")
 	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
-	self:RegisterEvent("CHAT_MSG_LOOT", "LootReceived")
+	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:RegisterEvent("LOOT_OPENED", "OnPlayerLooting")
+	self:RegisterEvent("LOOT_OPENED")
 	self:RegisterEvent("PET_BATTLE_CLOSE")
 	self:RegisterEvent("PET_BATTLE_OPENING_START")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -1878,80 +1880,6 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 		self:ConfigUpdated()
 		self:UpdateFramePositions()
 	end
-end
-
------------------------------------------------------------------------
--- Event handlers.
------------------------------------------------------------------------
-function Archy:ADDON_LOADED(event, addon)
-	if addon == "Blizzard_BattlefieldMinimap" then
-		if not private.battlefield_hooked then
-			_G.BattlefieldMinimap:HookScript("OnShow", Archy.UpdateTracking)
-			private.battlefield_hooked = true
-		end
-		Archy:UnregisterEvent("ADDON_LOADED")
-	end
-end
-
-function Archy:GET_ITEM_INFO_RECEIVED(event)
-	for raceID, keystoneItemID in next, private.RaceKeystoneProcessingQueue, nil do
-		local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
-		if keystoneName and keystoneTexture then
-			private.Races[raceID]:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
-		end
-	end
-
-	if not next(private.RaceKeystoneProcessingQueue) then
-		Archy:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
-	end
-end
-
-do
-	local function UpdateAndRefresh(race)
-		race:UpdateArtifact()
-		Archy:RefreshRacesDisplay()
-	end
-
-	function Archy:ARTIFACT_COMPLETE(event, name)
-		for raceID, race in pairs(private.Races) do
-			local artifact = race.artifact
-
-			if artifact and artifact.name == name then
-				artifact.hasAnnounced = nil
-				artifact.hasPinged = nil
-
-				race:UpdateArtifact()
-				self:ScheduleTimer(UpdateAndRefresh, 2, race)
-				break
-			end
-		end
-	end
-end
-
-function Archy:ARTIFACT_HISTORY_READY()
-	for raceID, race in pairs(private.Races) do
-		local artifact = race.artifact
-
-		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
-		if completionCount then
-			artifact.completionCount = completionCount
-		end
-	end
-	self:RefreshRacesDisplay()
-end
-
-function Archy:ArtifactUpdated()
-	-- ignore this event for now as it's can break other Archaeology UIs
-	-- Would have been nice if Blizzard passed the race index or artifact name with the event
-end
-
-function Archy:ARTIFACT_DIG_SITE_UPDATED()
-	if not private.current_continent then
-		return
-	end
-	UpdateAllSites()
-	self:UpdateSiteDistances()
-	self:RefreshDigSiteDisplay()
 end
 
 local function FindCrateable(bag, slot)
@@ -2067,316 +1995,12 @@ function Archy:ScanBags()
 	end
 end
 
-function Archy:BAG_UPDATE_DELAYED()
-	Archy:ScanBags()
-
-	if not private.current_continent or not keystoneLootRaceID then
-		return
-	end
-	private.Races[keystoneLootRaceID]:UpdateArtifact()
-	self:RefreshRacesDisplay()
-	keystoneLootRaceID = nil
-end
-
-function Archy:CURRENCY_DISPLAY_UPDATE()
-	local raceCount = _G.GetNumArchaeologyRaces()
-
-	if not private.current_continent or raceCount == 0 then
-		return
-	end
-
-	for raceID = 1, raceCount do
-		local race = private.Races[raceID]
-		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
-		local diff = currency_amount - (race.currency or 0)
-
-		race.currency = currency_amount
-		race:UpdateArtifact()
-
-		if diff < 0 then
-			-- we've spent fragments, aka. Solved an artifact
-			race.artifact.keystones_added = 0
-
-			if artifactSolved.raceId == race.id then
-				local _, _, completionCount = race:GetArtifactCompletionDataByName(artifactSolved.name)
-				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race.name, artifactSolved.name, completionCount or 0), 1, 1, 1)
-
-				artifactSolved.raceId = 0
-				artifactSolved.name = ""
-			end
-
-		elseif diff > 0 then
-			local site_stats = self.db.char.digsites.stats
-			-- we've gained fragments, aka. Successfully dug at a dig site
-
-			distanceIndicatorActive = false
-			ToggleDistanceIndicator()
-
-			if type(lastSite.id) == "number" and lastSite.id > 0 then -- Drii: for now let's just avoid the error
-				if private.has_dug then -- only increment once for each dig else fragments looted from 'ancient haunt' throw counter off (bonus fix: ticket 469)
-					IncrementDigCounter(lastSite.id)
-					private.has_dug = nil
-				end
-				site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
-				site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
-
-				AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
-			end
-			survey_location.map = 0
-			survey_location.level = 0
-			survey_location.x = 0
-			survey_location.y = 0
-
-			UpdateMinimapPOIs(true)
-			self:RefreshDigSiteDisplay()
-		end
-	end
-	self:RefreshRacesDisplay()
-end
-
-function Archy:LootReceived(event, msg)
-	local _, itemLink, amount = ParseLootMessage(msg)
-
-	if not itemLink then
-		return
-	end
-	local itemID = GetIDFromLink(itemLink)
-	local race_id = keystoneIDToRaceID[itemID]
-
-	if race_id then
-		if lastSite.id then
-			self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
-		end
-		keystoneLootRaceID = race_id
-	end
-end
-
--- Delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
-function Archy:QUEST_LOG_UPDATE()
-	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
-	if not Blizzard_SolveArtifact then
-		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
-			local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
-			if not loaded then
-				Archy:Print(L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."]:format(_G["ADDON_" .. reason]))
-			end
-		end
-		Blizzard_SolveArtifact = _G.SolveArtifact
-		function _G.SolveArtifact(race_index, use_stones)
-			local rank, max_rank = GetArchaeologyRank()
-			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
-				Dialog:Spawn("ArchyConfirmSolve", {
-					race_index = race_index,
-					use_stones = use_stones,
-					rank = rank,
-					max_rank = max_rank
-				})
-			else
-				return SolveRaceArtifact(race_index, use_stones)
-			end
-		end
-	end
-
-	if private.frames_init_done then
-		Archy:ConfigUpdated()
-	end
-	self:UnregisterEvent("QUEST_LOG_UPDATE")
-	self.QUEST_LOG_UPDATE = nil
-end
-
-function Archy:PLAYER_ENTERING_WORLD()
-	_G.SetMapToCurrentZone()
-
-	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
-	if not timer_handle then
-		self:ScheduleTimer(function()
-			if private.frames_init_done then
-				self:UpdateDigSiteFrame()
-				self:UpdateRacesFrame()
-			end
-			timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
-		end, 1)
-	end
-	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
-
-	if private.db.tomtom.noerrorwarn and (private.db.tomtom.noerrorwarn == Archy.version) then
-		-- TODO: Figure out what the hell is supposed to happen (if anything) here.
-	elseif private.tomtomPoiIntegration and _G.TomTom.profile.poi.setClosest and not private.tomtomWarned then
-		private.tomtomWarned = true
-		Dialog:Spawn("ArchyTomTomError")
-	end
-end
-
-function Archy:PLAYER_REGEN_DISABLED()
-	private.in_combat = true
-
-	if self.LDB_Tooltip and self.LDB_Tooltip:IsShown() then
-		self.LDB_Tooltip:Hide()
-	end
-
-	if private.db.general.combathide then
-		private.digsite_frame:Hide()
-		private.races_frame:Hide()
-	end
-end
-
-function Archy:PLAYER_REGEN_ENABLED()
-	private.in_combat = nil
-
-	if private.regen_create_frames then
-		private.regen_create_frames = nil
-		InitializeFrames()
-	end
-
-	if private.regen_toggle_distance then
-		private.regen_toggle_distance = nil
-		ToggleDistanceIndicator()
-	end
-
-	if private.regen_update_tracking then
-		private.regen_update_tracking = nil
-		self:UpdateTracking()
-	end
-
-	if private.regen_clear_override then
-		_G.ClearOverrideBindings(SECURE_ACTION_BUTTON)
-		private.override_binding_on = nil
-		private.regen_clear_override = nil
-	end
-
-	if private.regen_update_digsites then
-		private.regen_update_digsites = nil
-		self:UpdateDigSiteFrame()
-	end
-
-	if private.regen_update_races then
-		private.regen_update_races = nil
-		self:UpdateRacesFrame()
-	end
-
-	if private.regen_scan_bags then
-		private.regen_scan_bags = nil
-		self:ScanBags()
-	end
-
-	if private.db.general.combathide then
-		private.digsite_frame:Show()
-		private.races_frame:Show()
-		self:ConfigUpdated()
-	end
-end
-
 local function SetSurveyCooldown(time)
 	_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
 end
 
 local function SetLoreItemCooldown(time)
 	_G.CooldownFrame_SetTimer(private.distance_indicator_frame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id))
-end
-
-function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
-	if unit == "player" and spell == CRATE_SPELL_NAME then
-		private.busy_crating = true
-	end
-end
-
-function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
-	if unit ~= "player" then
-		return
-	end
-
-	if spell_id == LOREWALKER_ITEMS.MAP.spell and event == "UNIT_SPELLCAST_SUCCEEDED" then
-		if private.distance_indicator_frame.loritemButton and private.distance_indicator_frame.loritemButton:IsShown() then
-			self:ScheduleTimer(SetLoreItemCooldown, 0.2)
-		end
-	end
-
-	if spell_id == CRATE_SPELL_ID then
-		if private.busy_crating then
-			private.busy_crating = nil
-			self:ScheduleTimer("ScanBags", 1)
-		end
-	end
-
-	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
-		private.has_dug = true
-		if not player_position or not nearestSite then
-			survey_location.map = 0
-			survey_location.level = 0
-			survey_location.x = 0
-			survey_location.y = 0
-			return
-		end
-		survey_location.x = player_position.x
-		survey_location.y = player_position.y
-		survey_location.map = player_position.map
-		survey_location.level = player_position.level
-
-		distanceIndicatorActive = true
-		lastSite = nearestSite
-		self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
-
-		ToggleDistanceIndicator()
-		UpdateDistanceIndicator()
-
-		if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
-			local now = _G.GetTime()
-			local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
-
-			if start > 0 and duration > 0 and now < (start + duration) then
-				if duration <= GLOBAL_COOLDOWN_TIME then
-					self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
-				elseif duration > GLOBAL_COOLDOWN_TIME then -- in case they ever take it off the gcd
-					_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, start, duration, enable)
-				end
-			end
-		end
-
-		if private.db.minimap.fragmentColorBySurveyDistance then
-			local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
-			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
-			local min_red, max_red = max_yellow, 500
-
-			for id, poi in pairs(allPois) do
-				if poi.active and poi.type == "survey" then
-					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
-
-					if distance >= min_green and distance <= max_green then
-						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
-					elseif distance >= min_yellow and distance <= max_yellow then
-						poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
-					elseif distance >= min_red and distance <= max_red then
-						poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
-					end
-				end
-			end
-		end
-		tomtomActive = false
-		RefreshTomTom()
-		self:RefreshDigSiteDisplay()
-	end
-end
-
-function Archy:PET_BATTLE_OPENING_START()
-	if not private.db.general.show or private.db.general.stealthMode then -- already hidden
-		return
-	else
-		private.pet_battle_shown = true -- store our visible state to restore after pet battle
-		private.db.general.show = false
-		self:ConfigUpdated()
-	end
-end
-
-function Archy:PET_BATTLE_CLOSE()
-	if private.pet_battle_shown then
-		private.pet_battle_shown = nil
-		private.db.general.show = true
-		if _G.C_PetBattles.IsInBattle() then -- API doesn't return correct values in this event
-			self:ScheduleTimer("ConfigUpdated", 1.5) -- so let's schedule our re-show in a sec
-		else
-			self:ConfigUpdated()
-		end
-	end
 end
 
 function Archy:UpdateSkillBar()
@@ -3344,7 +2968,160 @@ function Archy:SaveFramePosition(frame)
 	end
 end
 
-function Archy:OnPlayerLooting(event, ...)
+-------------------------------------------------------------------------------
+-- Event handlers.
+-------------------------------------------------------------------------------
+function Archy:ADDON_LOADED(event, addon)
+	if addon == "Blizzard_BattlefieldMinimap" then
+		if not private.battlefield_hooked then
+			_G.BattlefieldMinimap:HookScript("OnShow", self.UpdateTracking)
+			private.battlefield_hooked = true
+		end
+		self:UnregisterEvent("ADDON_LOADED")
+	end
+end
+
+do
+	local function UpdateAndRefresh(race)
+		race:UpdateArtifact()
+		Archy:RefreshRacesDisplay()
+	end
+
+	function Archy:ARTIFACT_COMPLETE(event, name)
+		for raceID, race in pairs(private.Races) do
+			local artifact = race.artifact
+
+			if artifact and artifact.name == name then
+				artifact.hasAnnounced = nil
+				artifact.hasPinged = nil
+
+				race:UpdateArtifact()
+				self:ScheduleTimer(UpdateAndRefresh, 2, race)
+				break
+			end
+		end
+	end
+end
+
+function Archy:ARTIFACT_DIG_SITE_UPDATED()
+	if not private.current_continent then
+		return
+	end
+	UpdateAllSites()
+	self:UpdateSiteDistances()
+	self:RefreshDigSiteDisplay()
+end
+
+function Archy:ARTIFACT_HISTORY_READY()
+	for raceID, race in pairs(private.Races) do
+		local artifact = race.artifact
+
+		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
+		if completionCount then
+			artifact.completionCount = completionCount
+		end
+	end
+	self:RefreshRacesDisplay()
+end
+
+function Archy:BAG_UPDATE_DELAYED()
+	self:ScanBags()
+
+	if not private.current_continent or not keystoneLootRaceID then
+		return
+	end
+	private.Races[keystoneLootRaceID]:UpdateArtifact()
+	self:RefreshRacesDisplay()
+	keystoneLootRaceID = nil
+end
+
+function Archy:CHAT_MSG_LOOT(event, msg)
+	local _, itemLink, amount = ParseLootMessage(msg)
+
+	if not itemLink then
+		return
+	end
+	local itemID = GetIDFromLink(itemLink)
+	local race_id = keystoneIDToRaceID[itemID]
+
+	if race_id then
+		if lastSite.id then
+			self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
+		end
+		keystoneLootRaceID = race_id
+	end
+end
+
+function Archy:CURRENCY_DISPLAY_UPDATE()
+	local raceCount = _G.GetNumArchaeologyRaces()
+
+	if not private.current_continent or raceCount == 0 then
+		return
+	end
+
+	for raceID = 1, raceCount do
+		local race = private.Races[raceID]
+		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
+		local diff = currency_amount - (race.currency or 0)
+
+		race.currency = currency_amount
+		race:UpdateArtifact()
+
+		if diff < 0 then
+			-- we've spent fragments, aka. Solved an artifact
+			race.artifact.keystones_added = 0
+
+			if artifactSolved.raceId == race.id then
+				local _, _, completionCount = race:GetArtifactCompletionDataByName(artifactSolved.name)
+				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race.name, artifactSolved.name, completionCount or 0), 1, 1, 1)
+
+				artifactSolved.raceId = 0
+				artifactSolved.name = ""
+			end
+
+		elseif diff > 0 then
+			local site_stats = self.db.char.digsites.stats
+			-- we've gained fragments, aka. Successfully dug at a dig site
+
+			distanceIndicatorActive = false
+			ToggleDistanceIndicator()
+
+			if type(lastSite.id) == "number" and lastSite.id > 0 then -- Drii: for now let's just avoid the error
+			if private.has_dug then -- only increment once for each dig else fragments looted from 'ancient haunt' throw counter off (bonus fix: ticket 469)
+			IncrementDigCounter(lastSite.id)
+			private.has_dug = nil
+			end
+			site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
+			site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
+
+			AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
+			end
+			survey_location.map = 0
+			survey_location.level = 0
+			survey_location.x = 0
+			survey_location.y = 0
+
+			UpdateMinimapPOIs(true)
+			self:RefreshDigSiteDisplay()
+		end
+	end
+	self:RefreshRacesDisplay()
+end
+
+function Archy:GET_ITEM_INFO_RECEIVED(event)
+	for raceID, keystoneItemID in next, private.RaceKeystoneProcessingQueue, nil do
+		local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
+		if keystoneName and keystoneTexture then
+			private.Races[raceID]:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
+		end
+	end
+
+	if not next(private.RaceKeystoneProcessingQueue) then
+		self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
+	end
+end
+
+function Archy:LOOT_OPENED(event, ...)
 	local auto_loot_enabled = ...
 
 	if not private.db.general.autoLoot or auto_loot_enabled == 1 then
@@ -3369,3 +3146,228 @@ function Archy:OnPlayerLooting(event, ...)
 		end
 	end
 end
+
+function Archy:PET_BATTLE_CLOSE()
+	if private.pet_battle_shown then
+		private.pet_battle_shown = nil
+		private.db.general.show = true
+
+		-- API doesn't return correct values in this event
+		if _G.C_PetBattles.IsInBattle() then
+			-- so let's schedule our re-show in a sec
+			self:ScheduleTimer("ConfigUpdated", 1.5)
+		else
+			self:ConfigUpdated()
+		end
+	end
+end
+
+function Archy:PET_BATTLE_OPENING_START()
+	if not private.db.general.show or private.db.general.stealthMode then
+		return
+	else
+		-- store our visible state to restore after pet battle
+		private.pet_battle_shown = true
+		private.db.general.show = false
+		self:ConfigUpdated()
+	end
+end
+
+function Archy:PLAYER_ENTERING_WORLD()
+	_G.SetMapToCurrentZone()
+
+	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
+	if not timer_handle then
+		self:ScheduleTimer(function()
+			if private.frames_init_done then
+				self:UpdateDigSiteFrame()
+				self:UpdateRacesFrame()
+			end
+			timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
+		end, 1)
+	end
+	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
+
+	if private.db.tomtom.noerrorwarn and (private.db.tomtom.noerrorwarn == Archy.version) then
+		-- TODO: Figure out what the hell is supposed to happen (if anything) here.
+	elseif private.tomtomPoiIntegration and _G.TomTom.profile.poi.setClosest and not private.tomtomWarned then
+		private.tomtomWarned = true
+		Dialog:Spawn("ArchyTomTomError")
+	end
+end
+
+function Archy:PLAYER_REGEN_DISABLED()
+	private.in_combat = true
+
+	if self.LDB_Tooltip and self.LDB_Tooltip:IsShown() then
+		self.LDB_Tooltip:Hide()
+	end
+
+	if private.db.general.combathide then
+		private.digsite_frame:Hide()
+		private.races_frame:Hide()
+	end
+end
+
+function Archy:PLAYER_REGEN_ENABLED()
+	private.in_combat = nil
+
+	if private.regen_create_frames then
+		private.regen_create_frames = nil
+		InitializeFrames()
+	end
+
+	if private.regen_toggle_distance then
+		private.regen_toggle_distance = nil
+		ToggleDistanceIndicator()
+	end
+
+	if private.regen_update_tracking then
+		private.regen_update_tracking = nil
+		self:UpdateTracking()
+	end
+
+	if private.regen_clear_override then
+		_G.ClearOverrideBindings(SECURE_ACTION_BUTTON)
+		private.override_binding_on = nil
+		private.regen_clear_override = nil
+	end
+
+	if private.regen_update_digsites then
+		private.regen_update_digsites = nil
+		self:UpdateDigSiteFrame()
+	end
+
+	if private.regen_update_races then
+		private.regen_update_races = nil
+		self:UpdateRacesFrame()
+	end
+
+	if private.regen_scan_bags then
+		private.regen_scan_bags = nil
+		self:ScanBags()
+	end
+
+	if private.db.general.combathide then
+		private.digsite_frame:Show()
+		private.races_frame:Show()
+		self:ConfigUpdated()
+	end
+end
+
+-- Delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
+function Archy:QUEST_LOG_UPDATE()
+	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
+	if not Blizzard_SolveArtifact then
+		if not _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
+			local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
+			if not loaded then
+				self:Print(L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."]:format(_G["ADDON_" .. reason]))
+			end
+		end
+		Blizzard_SolveArtifact = _G.SolveArtifact
+		function _G.SolveArtifact(race_index, use_stones)
+			local rank, max_rank = GetArchaeologyRank()
+			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
+				Dialog:Spawn("ArchyConfirmSolve", {
+					race_index = race_index,
+					use_stones = use_stones,
+					rank = rank,
+					max_rank = max_rank
+				})
+			else
+				return SolveRaceArtifact(race_index, use_stones)
+			end
+		end
+	end
+
+	if private.frames_init_done then
+		self:ConfigUpdated()
+	end
+	self:UnregisterEvent("QUEST_LOG_UPDATE")
+	self.QUEST_LOG_UPDATE = nil
+end
+
+function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
+	if unit ~= "player" then
+		return
+	end
+
+	if spell_id == LOREWALKER_ITEMS.MAP.spell and event == "UNIT_SPELLCAST_SUCCEEDED" then
+		if private.distance_indicator_frame.loritemButton and private.distance_indicator_frame.loritemButton:IsShown() then
+			self:ScheduleTimer(SetLoreItemCooldown, 0.2)
+		end
+	end
+
+	if spell_id == CRATE_SPELL_ID then
+		if private.busy_crating then
+			private.busy_crating = nil
+			self:ScheduleTimer("ScanBags", 1)
+		end
+	end
+
+	if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
+		private.has_dug = true
+		if not player_position or not nearestSite then
+			survey_location.map = 0
+			survey_location.level = 0
+			survey_location.x = 0
+			survey_location.y = 0
+			return
+		end
+		survey_location.x = player_position.x
+		survey_location.y = player_position.y
+		survey_location.map = player_position.map
+		survey_location.level = player_position.level
+
+		distanceIndicatorActive = true
+		lastSite = nearestSite
+		self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
+
+		ToggleDistanceIndicator()
+		UpdateDistanceIndicator()
+
+		if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
+			local now = _G.GetTime()
+			local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
+
+			if start > 0 and duration > 0 and now < (start + duration) then
+				if duration <= GLOBAL_COOLDOWN_TIME then
+					self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
+				elseif duration > GLOBAL_COOLDOWN_TIME then -- in case they ever take it off the gcd
+				_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, start, duration, enable)
+				end
+			end
+		end
+
+		if private.db.minimap.fragmentColorBySurveyDistance then
+			local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
+			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
+			local min_red, max_red = max_yellow, 500
+
+			for id, poi in pairs(allPois) do
+				if poi.active and poi.type == "survey" then
+					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
+
+					if distance >= min_green and distance <= max_green then
+						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
+					elseif distance >= min_yellow and distance <= max_yellow then
+						poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
+					elseif distance >= min_red and distance <= max_red then
+						poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+					end
+				end
+			end
+		end
+		tomtomActive = false
+		RefreshTomTom()
+		self:RefreshDigSiteDisplay()
+	end
+end
+
+function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
+	if unit == "player" and spell == CRATE_SPELL_NAME then
+		private.busy_crating = true
+	end
+end
+
