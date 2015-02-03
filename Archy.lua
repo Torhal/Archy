@@ -450,10 +450,10 @@ do
 			return
 		end
 
-		local edge = Astrolabe:IsIconOnEdge(self)
+		local isOnEdge = Astrolabe:IsIconOnEdge(self)
 
 		if self.type == "site" then
-			if edge then
+			if isOnEdge then
 				if self.icon:IsShown() then
 					self.icon:Hide()
 				end
@@ -463,27 +463,29 @@ do
 				end
 
 				-- Rotate the icon, as required
-				local angle = Astrolabe:GetDirectionToIcon(self)
-				angle = angle + RAD_135
-
+				local angle = Astrolabe:GetDirectionToIcon(self) + RAD_135
 				if _G.GetCVar("rotateMinimap") == "1" then
-					local cring = _G.GetPlayerFacing()
-					angle = angle - cring
+					angle = angle - _G.GetPlayerFacing()
 				end
 
 				local sin, cos = math.sin(angle) * SQUARE_HALF, math.cos(angle) * SQUARE_HALF
 				self.arrow:SetTexCoord(0.5 - sin, 0.5 + cos, 0.5 + cos, 0.5 + sin, 0.5 - cos, 0.5 - sin, 0.5 + sin, 0.5 - cos)
 			else
-				if not self.icon:IsShown() then self.icon:Show()
+				if not self.icon:IsShown() then
+					self.icon:Show()
 				end
-				if self.arrow:IsShown() then self.arrow:Hide()
+
+				if self.arrow:IsShown() then
+					self.arrow:Hide()
 				end
 			end
-		elseif edge then
-			if self.icon:IsShown() then self.icon:Hide()
+		elseif isOnEdge then
+			if self.icon:IsShown() then
+				self.icon:Hide()
 			end
 		else
-			if not self.icon:IsShown() then self.icon:Show()
+			if not self.icon:IsShown() then
+				self.icon:Show()
 			end
 		end
 	end
