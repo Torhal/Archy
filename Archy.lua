@@ -411,9 +411,8 @@ local UpdateMinimapPOIs
 local UpdateAllSites
 
 -----------------------------------------------------------------------
--- Metatables.
+-- Local helper functions
 -----------------------------------------------------------------------
-
 local function POI_OnEnter(self)
 	if not self.tooltip then
 		return
@@ -491,37 +490,6 @@ do
 	end
 end
 
-local pois = setmetatable({}, {
-	__index = function(t, k)
-		local poi = _G.CreateFrame("Frame", "ArchyMinimap_POI" .. k, _G.Minimap)
-		poi:SetWidth(10)
-		poi:SetHeight(10)
-		poi:SetScript("OnEnter", POI_OnEnter)
-		poi:SetScript("OnLeave", POI_OnLeave)
-
-		local arrow = _G.CreateFrame("Frame", nil, poi)
-		arrow:SetPoint("CENTER", poi)
-		arrow:SetScript("OnUpdate", Arrow_OnUpdate)
-		arrow:SetWidth(32)
-		arrow:SetHeight(32)
-
-		local arrowtexture = arrow:CreateTexture(nil, "OVERLAY")
-		arrowtexture:SetTexture([[Interface\Minimap\ROTATING-MINIMAPGUIDEARROW]])
-		arrowtexture:SetAllPoints(arrow)
-		arrow.texture = arrowtexture
-		arrow.t = 0
-		arrow.poi = poi
-		arrow:Hide()
-		poi.useArrow = false
-		poi.arrow = arrow
-		poi:Hide()
-		return poi
-	end
-})
-
------------------------------------------------------------------------
--- Local helper functions
------------------------------------------------------------------------
 local function IsFishingPoleEquipped()
 	-- 1 = "Weapon" class which contains the "Fishing Poles" subclasscheck with GetAuctionItemClasses() for index of "Weapons" if this stops working
 	-- We were using the much simpler IsUsableSpell(FISHING_SPELL_NAME) until WoW 5.0.4 but this function changed behavior and reports true for fishing even without pole
