@@ -421,8 +421,22 @@ end
 
 private.HasArchaeology = HasArchaeology
 
+local function HideFrames()
+	private.digsite_frame:Hide()
+	private.races_frame:Hide()
+end
+
 local function FramesShouldBeHidden()
 	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not HasArchaeology())
+end
+
+local function ShowFrames()
+	if private.in_combat or FramesShouldBeHidden() then
+		return
+	end
+	private.digsite_frame:Show()
+	private.races_frame:Show()
+	Archy:ConfigUpdated()
 end
 
 local function POI_OnEnter(self)
@@ -3148,8 +3162,7 @@ function Archy:PLAYER_REGEN_DISABLED()
 	end
 
 	if private.db.general.combathide then
-		private.digsite_frame:Hide()
-		private.races_frame:Hide()
+		HideFrames()
 	end
 end
 
@@ -3193,9 +3206,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 	end
 
 	if private.db.general.combathide then
-		private.digsite_frame:Show()
-		private.races_frame:Show()
-		self:ConfigUpdated()
+		ShowFrames()
 	end
 end
 
