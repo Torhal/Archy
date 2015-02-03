@@ -3152,6 +3152,14 @@ function Archy:PLAYER_ENTERING_WORLD()
 		private.tomtomWarned = true
 		Dialog:Spawn("ArchyTomTomError")
 	end
+
+
+	if _G.IsInInstance() then
+		HideFrames()
+	else
+		ShowFrames()
+	end
+
 end
 
 function Archy:PLAYER_REGEN_DISABLED()
