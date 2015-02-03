@@ -313,7 +313,7 @@ local SURVEYS_PER_DIGSITE = 6
 local SURVEY_SPELL_ID = 80451
 local CRATE_SPELL_ID = 126935
 local CRATE_SPELL_NAME = (_G.GetSpellInfo(CRATE_SPELL_ID))
-local CRATE_USE_STRING -- Populate in HasArchaeology()
+local CRATE_USE_STRING -- Populate in Archy:OnEnable()
 
 local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
