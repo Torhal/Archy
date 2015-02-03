@@ -413,6 +413,18 @@ local UpdateAllSites
 -----------------------------------------------------------------------
 -- Local helper functions
 -----------------------------------------------------------------------
+-- Returns true if the player has the archaeology secondary skill
+local function HasArchaeology()
+	local _, _, arch = _G.GetProfessions()
+	return arch
+end
+
+private.HasArchaeology = HasArchaeology
+
+local function FramesShouldBeHidden()
+	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not HasArchaeology())
+end
+
 local function POI_OnEnter(self)
 	if not self.tooltip then
 		return
@@ -542,14 +554,6 @@ end
 
 private.GetArchaeologyRank = GetArchaeologyRank
 
--- Returns true if the player has the archaeology secondary skill
-local function HasArchaeology()
-	local _, _, arch = _G.GetProfessions()
-	return arch
-end
-
-private.HasArchaeology = HasArchaeology
-
 local function IsTaintable()
 	return (private.in_combat or _G.InCombatLockdown() or (_G.UnitAffectingCombat("player") or _G.UnitAffectingCombat("pet")))
 end
@@ -566,10 +570,6 @@ function private:ResetPositions()
 	self.db.artifact.anchor = PROFILE_DEFAULTS.profile.artifact.anchor
 	Archy:ConfigUpdated()
 	Archy:UpdateFramePositions()
-end
-
-local function ShouldBeHidden()
-	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not HasArchaeology())
 end
 
 local function SolveRaceArtifact(raceID, useStones)
@@ -615,7 +615,7 @@ local function ToggleDistanceIndicator()
 		return
 	end
 
-	if not private.db.digsite.distanceIndicator.enabled or ShouldBeHidden() then
+	if not private.db.digsite.distanceIndicator.enabled or FramesShouldBeHidden() then
 		private.distance_indicator_frame:Hide()
 		return
 	end
@@ -1671,7 +1671,7 @@ function Archy:OnInitialize()
 		local MIN_ACTION_DOUBLECLICK = 0.05
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not ShouldBeHidden() and not IsFishingPoleEquipped() then
+			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not FramesShouldBeHidden() and not IsFishingPoleEquipped() then
 				local perform_survey = false
 				local num_loot_items = _G.GetNumLootItems()
 
@@ -2227,11 +2227,11 @@ function Archy:UpdateRacesFrame()
 	end
 
 	if races_frame:IsVisible() then
-		if private.db.general.stealthMode or not private.db.artifact.show or ShouldBeHidden() then
+		if private.db.general.stealthMode or not private.db.artifact.show or FramesShouldBeHidden() then
 			races_frame:Hide()
 		end
 	else
-		if not private.db.general.stealthMode and private.db.artifact.show and not ShouldBeHidden() then
+		if not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden() then
 			races_frame:Show()
 		end
 	end
@@ -2249,7 +2249,7 @@ local function ContinentRaces(continent_id)
 end
 
 function Archy:RefreshRacesDisplay()
-	if ShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
+	if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
 		return
 	end
 	local maxWidth, maxHeight = 0, 0
@@ -2577,11 +2577,11 @@ function Archy:UpdateDigSiteFrame()
 	local continent_id = private.current_continent
 
 	if private.digsite_frame:IsVisible() then
-		if private.db.general.stealthMode or not private.db.digsite.show or ShouldBeHidden() or not continent_digsites[continent_id] or #continent_digsites[continent_id] == 0 then
+		if private.db.general.stealthMode or not private.db.digsite.show or FramesShouldBeHidden() or not continent_digsites[continent_id] or #continent_digsites[continent_id] == 0 then
 			private.digsite_frame:Hide()
 		end
 	else
-		if not private.db.general.stealthMode and private.db.digsite.show and not ShouldBeHidden() and continent_digsites[continent_id] and #continent_digsites[continent_id] > 0 then
+		if not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continent_digsites[continent_id] and #continent_digsites[continent_id] > 0 then
 			private.digsite_frame:Show()
 		end
 	end
@@ -2738,7 +2738,7 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 end
 
 function Archy:RefreshDigSiteDisplay()
-	if ShouldBeHidden() then
+	if FramesShouldBeHidden() then
 		return
 	end
 	local continent_id = private.current_continent
