@@ -596,14 +596,18 @@ end
 local function HasArchaeology()
 	local _, _, arch = _G.GetProfessions()
 	if arch then
-		private.scantip = private.scantip or _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
-		private.scantip:SetOwner(_G.UIParent, "ANCHOR_NONE")
-		CRATE_USE_STRING = CRATE_USE_STRING or GetCrateUseString(CRATE_SPELL_ID)
+		if not CRATE_USE_STRING then
+			private.scantip = private.scantip or _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
+			private.scantip:SetOwner(_G.UIParent, "ANCHOR_NONE")
+			CRATE_USE_STRING = CRATE_USE_STRING or GetCrateUseString(CRATE_SPELL_ID)
+		end
 
-		for i = 1, _G.GetNumTrackingTypes() do
-			if (_G.GetTrackingInfo(i)) == _G.MINIMAP_TRACKING_DIGSITES then
-				digsitesTrackingID = i
-				break
+		if not digsitesTrackingID then
+			for trackingTypeIndex = 1, _G.GetNumTrackingTypes() do
+				if (_G.GetTrackingInfo(trackingTypeIndex)) == _G.MINIMAP_TRACKING_DIGSITES then
+					digsitesTrackingID = trackingTypeIndex
+					break
+				end
 			end
 		end
 	end
