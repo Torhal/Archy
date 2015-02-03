@@ -425,7 +425,6 @@ local function POI_OnLeave(self)
 	_G.GameTooltip:Hide()
 end
 
-
 local Arrow_OnUpdate
 do
 	local ARROW_UPDATE_THRESHOLD = 0.1
@@ -1270,24 +1269,6 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 	return poi
 end
 
-local function ClearSitePOI(poi)
-	if not poi then
-		return
-	end
-	Astrolabe:RemoveIconFromMinimap(poi)
-	poi.icon:Hide()
-	poi.arrow:Hide()
-	poi:Hide()
-	poi.active = false
-	poi.tooltip = nil
-	poi.location = nil
-	poi.siteId = nil
-	poi:SetScript("OnEnter", nil)
-	poi:SetScript("OnLeave", nil)
-	poi:SetScript("OnUpdate", nil)
-	table.insert(sitePool, poi)
-end
-
 local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 	local poi = table.remove(surveyPool)
 
@@ -1332,21 +1313,29 @@ local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 	return poi
 end
 
-local function ClearSurveyPOI(poi)
+local function ClearPOI(poi)
 	if not poi then
 		return
 	end
 	Astrolabe:RemoveIconFromMinimap(poi)
+
+	poi.active = nil
+	poi.location = nil
+	poi.siteId = nil
+	poi.tooltip = nil
+
 	poi.icon:Hide()
 	poi:Hide()
-	poi.active = nil
-	poi.tooltip = nil
-	poi.siteId = nil
-	poi.location = nil
 	poi:SetScript("OnEnter", nil)
 	poi:SetScript("OnLeave", nil)
 	poi:SetScript("OnUpdate", nil)
-	table.insert(surveyPool, poi)
+
+	if poi.type == "site" then
+		poi.arrow:Hide()
+		table.insert(sitePool, poi)
+	elseif poi.type == "survey" then
+		table.insert(surveyPool, poi)
+	end
 end
 
 local lastNearestSite
@@ -1368,26 +1357,20 @@ end
 
 local function ClearAllPOIs()
 	for idx, poi in ipairs(allPois) do
-		if poi.type == "site" then
-			ClearSitePOI(poi)
-		elseif poi.type == "survey" then
-			ClearSurveyPOI(poi)
-		end
+		ClearPOI(poi)
 	end
 end
 
 local function ClearInvalidPOIs()
 	local validSiteIDs = GetContinentSiteIDs()
 
-	for idx, poi in ipairs(allPois) do
+	for index = 1, #allPois do
+		local poi = allPois[index]
+
 		if not validSiteIDs[poi.siteId] then
-			if poi.type == "site" then
-				ClearSitePOI(poi)
-			else
-				ClearSurveyPOI(poi)
-			end
+			ClearPOI(poi)
 		elseif poi.type == "survey" and lastNearestSite.id ~= nearestSite.id and lastNearestSite.id == poi.siteId then
-			ClearSurveyPOI(poi)
+			ClearPOI(poi)
 		end
 	end
 end
