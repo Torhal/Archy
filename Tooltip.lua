@@ -507,13 +507,17 @@ end
 -----------------------------------------------------------------------
 -- LDB_object methods
 -----------------------------------------------------------------------
+local function Tooltip_OnRelease()
+	Archy.LDB_Tooltip = nil
+end
+
 function LDB_object:OnEnter()
 	if private.IsTaintable() then
 		return
 	end
 	local tooltip = QTip:Acquire("ArchyTooltip")
 	tooltip:SetScale(private.db.tooltip.scale)
-	tooltip:SetAutoHideDelay(0.25, self)
+	tooltip:SetAutoHideDelay(0.25, self, Tooltip_OnRelease)
 	tooltip:EnableMouse()
 	tooltip:SmartAnchorTo(self)
 
