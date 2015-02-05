@@ -1569,6 +1569,36 @@ local SUBCOMMAND_FUNCS = {
 		end
 		debugger:Display()
 	end,
+	-- @debug@
+	scan = function()
+		local sites = {}
+		local found = 0
+		local currentMapID = _G.GetCurrentMapAreaID()
+
+		Debug("Scanning digsites:\n")
+
+		for continentIndex, continentID in pairs({1,2,3,4,6,7}) do
+			_G.SetMapZoom(continentID)
+
+			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
+				local landmarkName, _, textureIndex, x, y = _G.GetMapLandmarkInfo(landmarkIndex)
+
+				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+					local siteKey = ("%d:%f:%f"):format(_G.GetCurrentMapContinent(), x, y)
+
+					if not sites[siteKey] then
+						Debug(("%s {blobID=,map=,race=} -- \"%s\""):format(siteKey, landmarkName))
+						sites[siteKey] = true
+						found = found + 1
+					end
+				end
+			end
+		end
+		Debug(("%d found"):format(found))
+
+		_G.SetMapByID(currentMapID)
+	end,
+	-- @end-debug@
 }
 
 local function SlashHandler(msg, editbox)
