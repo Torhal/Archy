@@ -423,8 +423,8 @@ local UpdateAllSites
 -----------------------------------------------------------------------
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
-	local _, _, arch = _G.GetProfessions()
-	return arch
+	local _, _, archaeologyIndex = _G.GetProfessions()
+	return archaeologyIndex and true or false
 end
 
 private.HasArchaeology = HasArchaeology
