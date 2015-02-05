@@ -883,11 +883,6 @@ function Archy:SocketClicked(keystone_button, mouseButtonName, down)
 end
 
 --[[ Dig Site List Functions ]] --
-local function IncrementDigCounter(id)
-	local site_stats = Archy.db.char.digsites.stats
-	site_stats[id].counter = (site_stats[id].counter or 0) + 1
-end
-
 local function CompareAndResetDigCounters(a, b)
 	if not a or not b or (#a == 0) or (#b == 0) then
 		return
@@ -3067,10 +3062,10 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			-- Drii: for now let's just avoid the error
 			-- TODO: Figure out why the fuck this was done. Burying errors instead of figureout out and fixing their cause is...WTF?!?
 			if type(lastSite.id) == "number" and lastSite.id > 0 then
-
 				-- Only increment when digging; not when looting from world objects.
 				if private.has_dug then
-					IncrementDigCounter(lastSite.id)
+					local siteStats = Archy.db.char.digsites.stats
+					siteStats[lastSite.id].counter = (siteStats[lastSite.id].counter or 0) + 1
 					private.has_dug = nil
 				end
 				site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
