@@ -972,77 +972,74 @@ local function CacheMapData()
 	end
 end
 
-local function UpdateSite(continentID)
-	_G.SetMapZoom(continentID)
-
-	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
-	-- So make sure we enable and show blobs and restore the setting at the end.
-	local showDig = _G.GetCVarBool("digSites")
-	if not showDig then
-		_G.SetCVar("digSites", "1")
-		_G.WorldMapArchaeologyDigSites:Show()
-		_G.RefreshWorldMap()
-		showDig = "0"
-	end
-
-	local sites = {}
-	for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-		local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
-
-		if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
-			local site = DIG_SITES[landmarkName]
-			local mapID = site.map
-			local _, mapFilePath = _G.UpdateMapHighlight(mapPositionX, mapPositionY)
-			local mc, fc = Astrolabe:GetMapID(continentID, 0)
-			local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
-
-			table.insert(sites, {
-				continent = mc,
-				distance = 999999,
-				id = site.blob_id,
-				level = 0,
-				mapFile = mapFilePath,
-				map = mapID,
-				name = landmarkName,
-				raceId = site.race,
-				x = x,
-				y = y,
-				zoneId = MAP_ID_TO_ZONE_ID[mapID],
-				zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
-			})
-		end
-	end
-
-	-- restore initial setting
-	if showDig == "0" then
-		_G.SetCVar("digSites", showDig)
-		_G.WorldMapArchaeologyDigSites:Hide()
-		_G.RefreshWorldMap()
-	end
-
-	if #sites > 0 then
-		if continent_digsites[continentID] then
-			CompareAndResetDigCounters(continent_digsites[continentID], sites)
-			CompareAndResetDigCounters(sites, continent_digsites[continentID])
-		end
-		continent_digsites[continentID] = sites
-	end
-end
-
-UpdateAllSites = function()
-	-- Set this for restoration at the end of the loop since it's changed when UpdateSite() is called.
-	local original_map_id = _G.GetCurrentMapAreaID()
+function UpdateAllSites()
+	-- Set this for restoration at the end of the loop, since it's changed every iteration.
+	local originalMapID = _G.GetCurrentMapAreaID()
 
 	if CacheMapData then
 		CacheMapData()
 	end
 
 	if next(MAP_CONTINENTS) then
-		for continent_id, continent_name in pairs(MAP_CONTINENTS) do
-			UpdateSite(continent_id)
+		for continentID, continentName in pairs(MAP_CONTINENTS) do
+			_G.SetMapZoom(continentID)
+
+			-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
+			-- So make sure we enable and show blobs and restore the setting at the end.
+			local showDig = _G.GetCVarBool("digSites")
+			if not showDig then
+				_G.SetCVar("digSites", "1")
+				_G.WorldMapArchaeologyDigSites:Show()
+				_G.RefreshWorldMap()
+				showDig = "0"
+			end
+
+			local sites = {}
+
+			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
+				local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
+
+				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+					local site = DIG_SITES[landmarkName]
+					local mapID = site.map
+					local _, mapFilePath = _G.UpdateMapHighlight(mapPositionX, mapPositionY)
+					local mc, fc = Astrolabe:GetMapID(continentID, 0)
+					local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
+
+					table.insert(sites, {
+						continent = mc,
+						distance = 999999,
+						id = site.blob_id,
+						level = 0,
+						mapFile = mapFilePath,
+						map = mapID,
+						name = landmarkName,
+						raceId = site.race,
+						x = x,
+						y = y,
+						zoneId = MAP_ID_TO_ZONE_ID[mapID],
+						zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
+					})
+				end
+			end
+
+			-- restore initial setting
+			if showDig == "0" then
+				_G.SetCVar("digSites", showDig)
+				_G.WorldMapArchaeologyDigSites:Hide()
+				_G.RefreshWorldMap()
+			end
+
+			if #sites > 0 then
+				if continent_digsites[continentID] then
+					CompareAndResetDigCounters(continent_digsites[continentID], sites)
+					CompareAndResetDigCounters(sites, continent_digsites[continentID])
+				end
+				continent_digsites[continentID] = sites
+			end
 		end
 	end
-	_G.SetMapByID(original_map_id)
+	_G.SetMapByID(originalMapID)
 end
 
 function Archy:IsSiteBlacklisted(name)
