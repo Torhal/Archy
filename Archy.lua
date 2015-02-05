@@ -2225,6 +2225,7 @@ function Archy:UpdateRacesFrame()
 end
 
 -- returns a list of race ids for the continent map id
+-- TODO: This should be a static list. Creating throwaway tables to perform costly iterations on, every time this information is requested, is madness.
 local function ContinentRaces(continent_id)
 	local races = {}
 	for _, site in pairs(DIG_SITES) do
