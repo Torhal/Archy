@@ -342,6 +342,13 @@ local CRATE_OF_FRAGMENTS = {
 	[87541] = true, -- Vrykul
 }
 
+local FISHING_POLE_NAME
+do
+	--  If this stops working, check for the index of "Weapon" via GetAuctionItemClasses(), then find the index of "Fishing Poles" via GetAuctionItemSubClasses().
+	local auctionItemSubClassNames = { _G.GetAuctionItemSubClasses(1) }
+	FISHING_POLE_NAME = auctionItemSubClassNames[#auctionItemSubClassNames]
+end
+
 _G.BINDING_HEADER_ARCHY = "Archy"
 _G.BINDING_NAME_OPTIONSARCHY = L["BINDING_NAME_OPTIONS"]
 _G.BINDING_NAME_TOGGLEARCHY = L["BINDING_NAME_TOGGLE"]
@@ -512,23 +519,13 @@ do
 	end
 end
 
-local function IsFishingPoleEquipped()
-	-- 1 = "Weapon" class which contains the "Fishing Poles" subclasscheck with GetAuctionItemClasses() for index of "Weapons" if this stops working
-	-- We were using the much simpler IsUsableSpell(FISHING_SPELL_NAME) until WoW 5.0.4 but this function changed behavior and reports true for fishing even without pole
-	local pole_type_name = (select(select("#", _G.GetAuctionItemSubClasses(1)), _G.GetAuctionItemSubClasses(1))) -- "Fishing Poles" is the last return
-
-	if pole_type_name then
-		return _G.IsEquippedItemType(pole_type_name)
-	end
-end
-
 local SuspendClickToMove
 do
 	local click_to_move
 
 	function SuspendClickToMove()
 		-- we're not using easy cast, no need to mess with click to move
-		if not private.db.general.easyCast or IsFishingPoleEquipped() then
+		if not private.db.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_NAME) then
 			return
 		end
 
@@ -1698,7 +1695,7 @@ function Archy:OnInitialize()
 		local MIN_ACTION_DOUBLECLICK = 0.05
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not FramesShouldBeHidden() and not IsFishingPoleEquipped() then
+			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not FramesShouldBeHidden() and not _G.IsEquippedItemType(FISHING_POLE_NAME) then
 				local perform_survey = false
 				local num_loot_items = _G.GetNumLootItems()
 
