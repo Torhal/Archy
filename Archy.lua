@@ -1299,12 +1299,6 @@ end
 
 local lastNearestSite
 
-local function ClearAllPOIs()
-	for poi in pairs(PointsOfInterest) do
-		ClearPOI(poi)
-	end
-end
-
 local function ClearInvalidPOIs()
 	local validSiteIDs = {}
 
@@ -1340,7 +1334,9 @@ function UpdateMinimapPOIs(force)
 	local sites = continent_digsites[private.current_continent]
 
 	if not sites or #sites == 0 or _G.IsInInstance() then
-		ClearAllPOIs()
+		for poi in pairs(PointsOfInterest) do
+			ClearPOI(poi)
+		end
 		return
 	end
 	ClearInvalidPOIs()
