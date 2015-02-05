@@ -314,6 +314,7 @@ local SURVEY_SPELL_ID = 80451
 local CRATE_SPELL_ID = 126935
 local CRATE_SPELL_NAME = (_G.GetSpellInfo(CRATE_SPELL_ID))
 local CRATE_USE_STRING -- Populate in Archy:OnEnable()
+local DIG_LOCATION_TEXTURE_INDEX = 177
 
 local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
@@ -907,7 +908,6 @@ local function CompareAndResetDigCounters(a, b)
 	end
 end
 
-local DIG_LOCATION_TEXTURE = 177
 local function GetContinentSites(continent_id)
 	local new_sites = {}
 
@@ -924,7 +924,7 @@ local function GetContinentSites(continent_id)
 	for index = 1, _G.GetNumMapLandmarks() do
 		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
 
-		if texture_index == DIG_LOCATION_TEXTURE then
+		if texture_index == DIG_LOCATION_TEXTURE_INDEX then
 			local zone_name, map_file, texPctX, texPctY, texX, texY, scrollX, scrollY = _G.UpdateMapHighlight(px, py)
 			local site = DIG_SITES[name]
 			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
