@@ -549,7 +549,7 @@ function LDB_object:OnClick(button, down)
 		end
 	elseif button == "RightButton" then
 		private.db.general.locked = not private.db.general.locked
-		Archy:Print(private.db.general.locked and _G.LOCKED or _G.UNLOCK)
+		Archy:Pour(_G.SUBTITLE_FORMAT:format(_G.LOCKED, private.db.general.locked and _G.YES or _G.NO))
 		Archy:ConfigUpdated()
 	elseif button == "MiddleButton" then
 		Archy:ShowArchaeology()
