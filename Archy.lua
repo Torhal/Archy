@@ -1299,7 +1299,13 @@ end
 
 local lastNearestSite
 
-local function GetContinentSiteIDs()
+local function ClearAllPOIs()
+	for poi in pairs(PointsOfInterest) do
+		ClearPOI(poi)
+	end
+end
+
+local function ClearInvalidPOIs()
 	local validSiteIDs = {}
 
 	if private.db.general.show and private.db.minimap.show then
@@ -1311,17 +1317,6 @@ local function GetContinentSiteIDs()
 			table.insert(validSiteIDs, site.id)
 		end
 	end
-	return validSiteIDs
-end
-
-local function ClearAllPOIs()
-	for poi in pairs(PointsOfInterest) do
-		ClearPOI(poi)
-	end
-end
-
-local function ClearInvalidPOIs()
-	local validSiteIDs = GetContinentSiteIDs()
 
 	for poi in pairs(PointsOfInterest) do
 		if not validSiteIDs[poi.siteId] then
