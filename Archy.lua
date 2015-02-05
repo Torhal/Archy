@@ -908,58 +908,6 @@ local function CompareAndResetDigCounters(a, b)
 	end
 end
 
-local function GetContinentSites(continent_id)
-	local new_sites = {}
-
-	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
-	-- So make sure we enable and show blobs and restore the setting at the end.
-	local showDig = _G.GetCVarBool("digSites")
-	if not showDig then
-		_G.SetCVar("digSites", "1")
-		_G.WorldMapArchaeologyDigSites:Show()
-		_G.RefreshWorldMap()
-		showDig = "0"
-	end
-
-	for index = 1, _G.GetNumMapLandmarks() do
-		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
-
-		if texture_index == DIG_LOCATION_TEXTURE_INDEX then
-			local zone_name, map_file, texPctX, texPctY, texX, texY, scrollX, scrollY = _G.UpdateMapHighlight(px, py)
-			local site = DIG_SITES[name]
-			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
-			mc, fc = Astrolabe:GetMapID(continent_id, 0)
-			mz = site.map
-			zoneID = MAP_ID_TO_ZONE_ID[mz]
-
-			local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
-			local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
-
-			table.insert(new_sites, {
-				continent = mc,
-				zoneId = zoneID,
-				zoneName = MAP_ID_TO_ZONE_NAME[mz] or _G.UNKNOWN,
-				mapFile = map_file,
-				map = mz,
-				level = fz,
-				x = x,
-				y = y,
-				name = name,
-				raceId = site.race,
-				id = site.blob_id,
-				distance = 999999,
-			})
-		end
-	end
-
-	if showDig == "0" then -- restore initial setting
-		_G.SetCVar("digSites", showDig)
-		_G.WorldMapArchaeologyDigSites:Hide()
-		_G.RefreshWorldMap()
-	end
-	return new_sites
-end
-
 local function CacheMapData()
 	if not next(MAP_CONTINENTS) then
 		local continent_data = { _G.GetMapContinents() }
@@ -1027,7 +975,54 @@ end
 local function UpdateSite(continent_id)
 	_G.SetMapZoom(continent_id)
 
-	local sites = GetContinentSites(continent_id)
+	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
+	-- So make sure we enable and show blobs and restore the setting at the end.
+	local showDig = _G.GetCVarBool("digSites")
+	if not showDig then
+		_G.SetCVar("digSites", "1")
+		_G.WorldMapArchaeologyDigSites:Show()
+		_G.RefreshWorldMap()
+		showDig = "0"
+	end
+
+	local sites = {}
+	for index = 1, _G.GetNumMapLandmarks() do
+		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
+
+		if texture_index == DIG_LOCATION_TEXTURE_INDEX then
+			local zone_name, map_file, texPctX, texPctY, texX, texY, scrollX, scrollY = _G.UpdateMapHighlight(px, py)
+			local site = DIG_SITES[name]
+			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
+			mc, fc = Astrolabe:GetMapID(continent_id, 0)
+			mz = site.map
+			zoneID = MAP_ID_TO_ZONE_ID[mz]
+
+			local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
+			local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
+
+			table.insert(sites, {
+				continent = mc,
+				zoneId = zoneID,
+				zoneName = MAP_ID_TO_ZONE_NAME[mz] or _G.UNKNOWN,
+				mapFile = map_file,
+				map = mz,
+				level = fz,
+				x = x,
+				y = y,
+				name = name,
+				raceId = site.race,
+				id = site.blob_id,
+				distance = 999999,
+			})
+		end
+	end
+
+	-- restore initial setting
+	if showDig == "0" then
+		_G.SetCVar("digSites", showDig)
+		_G.WorldMapArchaeologyDigSites:Hide()
+		_G.RefreshWorldMap()
+	end
 
 	if #sites > 0 then
 		if continent_digsites[continent_id] then
