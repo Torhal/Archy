@@ -3058,21 +3058,25 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			end
 
 		elseif diff > 0 then
-			local site_stats = self.db.char.digsites.stats
 			-- we've gained fragments, aka. Successfully dug at a dig site
+			local site_stats = self.db.char.digsites.stats
 
 			distanceIndicatorActive = false
 			ToggleDistanceIndicator()
 
-			if type(lastSite.id) == "number" and lastSite.id > 0 then -- Drii: for now let's just avoid the error
-			if private.has_dug then -- only increment once for each dig else fragments looted from 'ancient haunt' throw counter off (bonus fix: ticket 469)
-			IncrementDigCounter(lastSite.id)
-			private.has_dug = nil
-			end
-			site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
-			site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
+			-- Drii: for now let's just avoid the error
+			-- TODO: Figure out why the fuck this was done. Burying errors instead of figureout out and fixing their cause is...WTF?!?
+			if type(lastSite.id) == "number" and lastSite.id > 0 then
 
-			AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
+				-- Only increment when digging; not when looting from world objects.
+				if private.has_dug then
+					IncrementDigCounter(lastSite.id)
+					private.has_dug = nil
+				end
+				site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
+				site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
+
+				AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
 			end
 			survey_location.map = 0
 			survey_location.level = 0
