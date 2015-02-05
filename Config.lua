@@ -13,6 +13,7 @@ local ADDON_NAME, private = ...
 local LibStub = _G.LibStub
 
 local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
+local Dialog = LibStub("LibDialog-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local LSM = LibStub("LibSharedMedia-3.0")
 
@@ -35,6 +36,24 @@ local FONT_OUTLINES = {
 -----------------------------------------------------------------------
 -- Config option functions.
 -----------------------------------------------------------------------
+Dialog:Register("ArchyConfirmThemeChange", {
+	text = _G.REQUIRES_RELOAD,
+	buttons = {
+		{
+			text = _G.OKAY,
+			on_click = function(self, themeName)
+				private.db.general.theme = themeName
+				_G.ReloadUI()
+			end,
+		},
+		{
+			text = _G.CANCEL,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+})
+
 local general_options
 
 local function GetGeneralOptions()
@@ -93,10 +112,11 @@ local function GetGeneralOptions()
 					type = "select",
 					name = L["Style"],
 					desc = L["The style of display for Archy.  This will reload your UI after selecting"],
-					get = function() return db.general.theme end,
+					get = function()
+						return db.general.theme
+					end,
 					set = function(_, value)
-						db.general.theme = value
-						_G.ReloadUI()
+						Dialog:Spawn("ArchyConfirmThemeChange", value)
 					end,
 					values = {
 						["Graphical"] = L["Graphical"],
