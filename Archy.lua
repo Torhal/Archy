@@ -799,6 +799,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 	end,
 	tomtom = function(option)
 		local db = private.db
+		private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 
 		if db.tomtom.enabled and private.tomtomExists then
 			if _G.TomTom.profile then
@@ -825,7 +826,6 @@ function Archy:ConfigUpdated(namespace, option)
 		SuspendClickToMove()
 	end
 end
-
 
 function Archy:SolveAnyArtifact(use_stones)
 	local found = false
