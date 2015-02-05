@@ -764,36 +764,6 @@ local function GetIDFromLink(link)
 	return tonumber(id)
 end
 
--- deformat substitute
-local function MatchFormat(msg, pattern)
-	return msg:match(pattern:gsub("(%%s)", "(.+)"):gsub("(%%d)", "(.+)"))
-end
-
--- return the player, itemlink and quantity of the item in the chat_msg_loot
-local function ParseLootMessage(msg)
-	local player = _G.UnitName("player")
-	local item, quantity = MatchFormat(msg, _G.LOOT_ITEM_SELF_MULTIPLE)
-
-	if item and quantity then
-		return player, item, tonumber(quantity)
-	end
-	quantity = 1
-	item = MatchFormat(msg, _G.LOOT_ITEM_SELF)
-
-	if item then
-		return player, item, tonumber(quantity)
-	end
-	player, item, quantity = MatchFormat(msg, _G.LOOT_ITEM_MULTIPLE)
-
-	if player and item and quantity then
-		return player, item, tonumber(quantity)
-	end
-	quantity = 1
-	player, item = MatchFormat(msg, _G.LOOT_ITEM)
-
-	return player, item, tonumber(quantity)
-end
-
 local CONFIG_UPDATE_FUNCTIONS = {
 	artifact = function(option)
 		if option == "autofill" then
@@ -3005,22 +2975,52 @@ function Archy:BAG_UPDATE_DELAYED()
 	keystoneLootRaceID = nil
 end
 
-function Archy:CHAT_MSG_LOOT(event, msg)
-	local _, itemLink, amount = ParseLootMessage(msg)
-
-	if not itemLink then
-		return
+do
+	local function MatchFormat(msg, pattern)
+		return msg:match(pattern:gsub("(%%s)", "(.+)"):gsub("(%%d)", "(.+)"))
 	end
-	local itemID = GetIDFromLink(itemLink)
-	local race_id = keystoneIDToRaceID[itemID]
 
-	if race_id then
-		if lastSite.id then
-			self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
+	local function ParseLootMessage(msg)
+		local player = _G.UnitName("player")
+		local itemLink, quantity = MatchFormat(msg, _G.LOOT_ITEM_SELF_MULTIPLE)
+
+		if itemLink and quantity then
+			return player, itemLink, tonumber(quantity)
 		end
-		keystoneLootRaceID = race_id
+		quantity = 1
+		itemLink = MatchFormat(msg, _G.LOOT_ITEM_SELF)
+
+		if itemLink then
+			return player, itemLink, tonumber(quantity)
+		end
+		player, itemLink, quantity = MatchFormat(msg, _G.LOOT_ITEM_MULTIPLE)
+
+		if player and itemLink and quantity then
+			return player, itemLink, tonumber(quantity)
+		end
+		quantity = 1
+		player, itemLink = MatchFormat(msg, _G.LOOT_ITEM)
+
+		return player, itemLink, tonumber(quantity)
 	end
-end
+
+	function Archy:CHAT_MSG_LOOT(event, msg)
+		local _, itemLink, amount = ParseLootMessage(msg)
+
+		if not itemLink then
+			return
+		end
+		local itemID = GetIDFromLink(itemLink)
+		local race_id = keystoneIDToRaceID[itemID]
+
+		if race_id then
+			if lastSite.id then
+				self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
+			end
+			keystoneLootRaceID = race_id
+		end
+	end
+end -- do-block
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
 	local raceCount = _G.GetNumArchaeologyRaces()
