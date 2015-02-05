@@ -60,10 +60,10 @@ local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of va
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
 
-local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in OnInitialize()
-local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in OnInitialize()
-local MAP_ID_TO_ZONE_ID = {} -- Popupated in OnInitialize()
-local MAP_ID_TO_ZONE_NAME = {} -- Popupated in OnInitialize()
+local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in Archy:OnInitialize()
+local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in Archy:OnInitialize()
+local MAP_ID_TO_ZONE_ID = {} -- Popupated in Archy:OnInitialize()
+local MAP_ID_TO_ZONE_NAME = {} -- Popupated in Archy:OnInitialize()
 
 local MINIMAP_SIZES = {
 	indoor = {
@@ -307,7 +307,7 @@ local PROFILE_DEFAULTS = {
 }
 
 local GLOBAL_COOLDOWN_TIME = 1.5
-local SECURE_ACTION_BUTTON -- Populated in OnInitialize()
+local SECURE_ACTION_BUTTON -- Populated in Archy:OnInitialize()
 local SITES_PER_CONTINENT = 4
 local SURVEYS_PER_DIGSITE = 6
 local SURVEY_SPELL_ID = 80451
@@ -319,7 +319,7 @@ local DIG_LOCATION_TEXTURE_INDEX = 177
 local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
 
-local ZONE_ID_TO_NAME = {} -- Popupated in OnInitialize()
+local ZONE_ID_TO_NAME = {} -- Popupated in Archy:OnInitialize()
 local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
 
 local LOREWALKER_ITEMS = {
@@ -371,7 +371,7 @@ private.continent_digsites = continent_digsites
 local distanceIndicatorActive = false
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
-local digsitesTrackingID -- set in HasArchaeology()
+local digsitesTrackingID -- set in Archy:OnEnable()
 local lastSite = {}
 local nearestSite
 local player_position = {
