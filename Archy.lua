@@ -972,8 +972,8 @@ local function CacheMapData()
 	end
 end
 
-local function UpdateSite(continent_id)
-	_G.SetMapZoom(continent_id)
+local function UpdateSite(continentID)
+	_G.SetMapZoom(continentID)
 
 	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
 	-- So make sure we enable and show blobs and restore the setting at the end.
@@ -986,33 +986,29 @@ local function UpdateSite(continent_id)
 	end
 
 	local sites = {}
-	for index = 1, _G.GetNumMapLandmarks() do
-		local name, description, texture_index, px, py = _G.GetMapLandmarkInfo(index)
+	for landmarkIndex = 1, _G.GetNumMapLandmarks() do
+		local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
 
-		if texture_index == DIG_LOCATION_TEXTURE_INDEX then
-			local zone_name, map_file, texPctX, texPctY, texX, texY, scrollX, scrollY = _G.UpdateMapHighlight(px, py)
-			local site = DIG_SITES[name]
-			local mc, fc, mz, fz, zoneID = 0, 0, 0, 0, 0
-			mc, fc = Astrolabe:GetMapID(continent_id, 0)
-			mz = site.map
-			zoneID = MAP_ID_TO_ZONE_ID[mz]
-
-			local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, px, py, mz, fz)
-			local raceName, raceCrestTexture = _G.GetArchaeologyRaceInfo(site.race)
+		if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+			local site = DIG_SITES[landmarkName]
+			local mapID = site.map
+			local _, mapFilePath = _G.UpdateMapHighlight(mapPositionX, mapPositionY)
+			local mc, fc = Astrolabe:GetMapID(continentID, 0)
+			local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
 
 			table.insert(sites, {
 				continent = mc,
-				zoneId = zoneID,
-				zoneName = MAP_ID_TO_ZONE_NAME[mz] or _G.UNKNOWN,
-				mapFile = map_file,
-				map = mz,
-				level = fz,
+				distance = 999999,
+				id = site.blob_id,
+				level = 0,
+				mapFile = mapFilePath,
+				map = mapID,
+				name = landmarkName,
+				raceId = site.race,
 				x = x,
 				y = y,
-				name = name,
-				raceId = site.race,
-				id = site.blob_id,
-				distance = 999999,
+				zoneId = MAP_ID_TO_ZONE_ID[mapID],
+				zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
 			})
 		end
 	end
@@ -1025,11 +1021,11 @@ local function UpdateSite(continent_id)
 	end
 
 	if #sites > 0 then
-		if continent_digsites[continent_id] then
-			CompareAndResetDigCounters(continent_digsites[continent_id], sites)
-			CompareAndResetDigCounters(sites, continent_digsites[continent_id])
+		if continent_digsites[continentID] then
+			CompareAndResetDigCounters(continent_digsites[continentID], sites)
+			CompareAndResetDigCounters(sites, continent_digsites[continentID])
 		end
-		continent_digsites[continent_id] = sites
+		continent_digsites[continentID] = sites
 	end
 end
 
