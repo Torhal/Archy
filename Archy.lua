@@ -1367,111 +1367,6 @@ function UpdateMinimapPOIs(force)
 	end
 end
 
---[[ Slash command handler ]] --
-local SUBCOMMAND_FUNCS = {
-	[L["config"]:lower()] = function()
-		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
-	end,
-	[L["stealth"]:lower()] = function()
-		private.db.general.stealthMode = not private.db.general.stealthMode
-		Archy:ConfigUpdated()
-	end,
-	[L["dig sites"]:lower()] = function()
-		private.db.digsite.show = not private.db.digsite.show
-		Archy:ConfigUpdated('digsite')
-	end,
-	[L["artifacts"]:lower()] = function()
-		private.db.artifact.show = not private.db.artifact.show
-		Archy:ConfigUpdated('artifact')
-	end,
-	[_G.SOLVE:lower()] = function()
-		Archy:SolveAnyArtifact()
-	end,
-	[L["solve stone"]:lower()] = function()
-		Archy:SolveAnyArtifact(true)
-	end,
-	[L["nearest"]:lower()] = AnnounceNearestSite,
-	[L["closest"]:lower()] = AnnounceNearestSite,
-	[L["reset"]:lower()] = function()
-		private:ResetPositions()
-	end,
-	[_G.MINIMAP_LABEL:lower()] = function()
-		private.db.minimap.show = not private.db.minimap.show
-		Archy:ConfigUpdated('minimap')
-	end,
-	tomtom = function()
-		private.db.tomtom.enabled = not private.db.tomtom.enabled
-		private.TomTomHandler:Refresh(nearestSite)
-	end,
-	test = function()
-		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
-	end,
-	debug = function()
-		if not debugger then
-			CreateDebugFrame()
-		end
-
-		if debugger:Lines() == 0 then
-			debugger:AddLine("Nothing to report.")
-			debugger:Display()
-			debugger:Clear()
-			return
-		end
-		debugger:Display()
-	end,
-	-- @debug@
-	scan = function()
-		local sites = {}
-		local found = 0
-		local currentMapID = _G.GetCurrentMapAreaID()
-
-		Debug("Scanning digsites:\n")
-
-		for continentIndex, continentID in pairs({1,2,3,4,6,7}) do
-			_G.SetMapZoom(continentID)
-
-			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-				local landmarkName, _, textureIndex, x, y = _G.GetMapLandmarkInfo(landmarkIndex)
-
-				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
-					local siteKey = ("%d:%f:%f"):format(_G.GetCurrentMapContinent(), x, y)
-
-					if not sites[siteKey] then
-						Debug(("%s {blobID=,map=,race=} -- \"%s\""):format(siteKey, landmarkName))
-						sites[siteKey] = true
-						found = found + 1
-					end
-				end
-			end
-		end
-		Debug(("%d found"):format(found))
-
-		_G.SetMapByID(currentMapID)
-	end,
-	-- @end-debug@
-}
-
-local function SlashHandler(msg, editbox)
-	local command = msg:lower()
-
-	local func = SUBCOMMAND_FUNCS[command]
-	if func then
-		func()
-	else
-		Archy:Print(L["Available commands are:"])
-		Archy:Print("|cFF00FF00" .. L["config"] .. "|r - " .. L["Shows the Options"])
-		Archy:Print("|cFF00FF00" .. L["stealth"] .. "|r - " .. L["Toggles the display of the Artifacts and Dig Sites lists"])
-		Archy:Print("|cFF00FF00" .. L["dig sites"] .. "|r - " .. L["Toggles the display of the Dig Sites list"])
-		Archy:Print("|cFF00FF00" .. L["artifacts"] .. "|r - " .. L["Toggles the display of the Artifacts list"])
-		Archy:Print("|cFF00FF00" .. _G.SOLVE .. "|r - " .. L["Solves the first artifact it finds that it can solve"])
-		Archy:Print("|cFF00FF00" .. L["solve stone"] .. "|r - " .. L["Solves the first artifact it finds that it can solve (including key stones)"])
-		Archy:Print("|cFF00FF00" .. L["nearest"] .. "|r or |cFF00FF00" .. L["closest"] .. "|r - " .. L["Announces the nearest dig site to you"])
-		Archy:Print("|cFF00FF00" .. L["reset"] .. "|r - " .. L["Reset the window positions to defaults"])
-		Archy:Print("|cFF00FF00" .. "tomtom" .. "|r - " .. L["Toggles TomTom Integration"])
-		Archy:Print("|cFF00FF00" .. _G.MINIMAP_LABEL .. "|r - " .. L["Toggles the dig site icons on the minimap"])
-	end
-end
-
 function Archy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("ArchyDB", PROFILE_DEFAULTS, 'Default')
 	self.db.RegisterCallback(self, "OnNewProfile", "OnProfileUpdate")
@@ -1636,9 +1531,6 @@ end
 local timer_handle
 
 function Archy:OnEnable()
-	_G["SLASH_ARCHY1"] = "/archy"
-	_G.SlashCmdList["ARCHY"] = SlashHandler
-
 	-- Ignore this event for now as it's can break other Archaeology UIs
 	-- Would have been nice if Blizzard passed the race index or artifact name with the event
 	--    self:RegisterEvent("ARTIFACT_UPDATE")
@@ -1713,6 +1605,114 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 	if private.frames_init_done then -- Drii: ticket 394 'OnNewProfile' fires for fresh installations too it seems.
 		self:ConfigUpdated()
 		self:UpdateFramePositions()
+	end
+end
+
+-----------------------------------------------------------------------
+-- Slash command handler
+-----------------------------------------------------------------------
+local SUBCOMMAND_FUNCS = {
+	[L["config"]:lower()] = function()
+		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
+	end,
+	[L["stealth"]:lower()] = function()
+		private.db.general.stealthMode = not private.db.general.stealthMode
+		Archy:ConfigUpdated()
+	end,
+	[L["dig sites"]:lower()] = function()
+		private.db.digsite.show = not private.db.digsite.show
+		Archy:ConfigUpdated('digsite')
+	end,
+	[L["artifacts"]:lower()] = function()
+		private.db.artifact.show = not private.db.artifact.show
+		Archy:ConfigUpdated('artifact')
+	end,
+	[_G.SOLVE:lower()] = function()
+		Archy:SolveAnyArtifact()
+	end,
+	[L["solve stone"]:lower()] = function()
+		Archy:SolveAnyArtifact(true)
+	end,
+	[L["nearest"]:lower()] = AnnounceNearestSite,
+	[L["closest"]:lower()] = AnnounceNearestSite,
+	[L["reset"]:lower()] = function()
+		private:ResetPositions()
+	end,
+	[_G.MINIMAP_LABEL:lower()] = function()
+		private.db.minimap.show = not private.db.minimap.show
+		Archy:ConfigUpdated('minimap')
+	end,
+	tomtom = function()
+		private.db.tomtom.enabled = not private.db.tomtom.enabled
+		private.TomTomHandler:Refresh(nearestSite)
+	end,
+	test = function()
+		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
+	end,
+	debug = function()
+		if not debugger then
+			CreateDebugFrame()
+		end
+
+		if debugger:Lines() == 0 then
+			debugger:AddLine("Nothing to report.")
+			debugger:Display()
+			debugger:Clear()
+			return
+		end
+		debugger:Display()
+	end,
+	-- @debug@
+	scan = function()
+		local sites = {}
+		local found = 0
+		local currentMapID = _G.GetCurrentMapAreaID()
+
+		Debug("Scanning digsites:\n")
+
+		for continentIndex, continentID in pairs({1,2,3,4,6,7}) do
+			_G.SetMapZoom(continentID)
+
+			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
+				local landmarkName, _, textureIndex, x, y = _G.GetMapLandmarkInfo(landmarkIndex)
+
+				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+					local siteKey = ("%d:%f:%f"):format(_G.GetCurrentMapContinent(), x, y)
+
+					if not sites[siteKey] then
+						Debug(("%s {blobID=,map=,race=} -- \"%s\""):format(siteKey, landmarkName))
+						sites[siteKey] = true
+						found = found + 1
+					end
+				end
+			end
+		end
+		Debug(("%d found"):format(found))
+
+		_G.SetMapByID(currentMapID)
+	end,
+	-- @end-debug@
+}
+
+_G["SLASH_ARCHY1"] = "/archy"
+_G.SlashCmdList["ARCHY"] = function(msg, editbox)
+	local command = msg:lower()
+
+	local func = SUBCOMMAND_FUNCS[command]
+	if func then
+		func()
+	else
+		Archy:Print(L["Available commands are:"])
+		Archy:Print("|cFF00FF00" .. L["config"] .. "|r - " .. L["Shows the Options"])
+		Archy:Print("|cFF00FF00" .. L["stealth"] .. "|r - " .. L["Toggles the display of the Artifacts and Dig Sites lists"])
+		Archy:Print("|cFF00FF00" .. L["dig sites"] .. "|r - " .. L["Toggles the display of the Dig Sites list"])
+		Archy:Print("|cFF00FF00" .. L["artifacts"] .. "|r - " .. L["Toggles the display of the Artifacts list"])
+		Archy:Print("|cFF00FF00" .. _G.SOLVE .. "|r - " .. L["Solves the first artifact it finds that it can solve"])
+		Archy:Print("|cFF00FF00" .. L["solve stone"] .. "|r - " .. L["Solves the first artifact it finds that it can solve (including key stones)"])
+		Archy:Print("|cFF00FF00" .. L["nearest"] .. "|r or |cFF00FF00" .. L["closest"] .. "|r - " .. L["Announces the nearest dig site to you"])
+		Archy:Print("|cFF00FF00" .. L["reset"] .. "|r - " .. L["Reset the window positions to defaults"])
+		Archy:Print("|cFF00FF00" .. "tomtom" .. "|r - " .. L["Toggles TomTom Integration"])
+		Archy:Print("|cFF00FF00" .. _G.MINIMAP_LABEL .. "|r - " .. L["Toggles the dig site icons on the minimap"])
 	end
 end
 
