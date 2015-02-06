@@ -1380,7 +1380,7 @@ function Archy:OnInitialize()
 		self.optionsFrame = about_panel.new(nil, "Archy")
 	end
 	self:DefineSinkToast(ADDON_NAME, [[Interface\Archeology\Arch-Icon-Marker]])
-	self:SetSinkStorage(Archy.db.profile.general.sinkOptions)
+	self:SetSinkStorage(self.db.profile.general.sinkOptions)
 	self:SetupOptions()
 
 	self.db.global.surveyNodes = self.db.global.surveyNodes or {}
@@ -2737,14 +2737,14 @@ function Archy:SaveFramePosition(frame)
 	local anchor, position
 
 	if frame == private.digsite_frame then
-		anchor = Archy.db.profile.digsite.anchor
-		position = Archy.db.profile.digsite.position
+		anchor = self.db.profile.digsite.anchor
+		position = self.db.profile.digsite.position
 	elseif frame == private.races_frame then
-		anchor = Archy.db.profile.artifact.anchor
-		position = Archy.db.profile.artifact.position
+		anchor = self.db.profile.artifact.anchor
+		position = self.db.profile.artifact.position
 	elseif frame == private.distance_indicator_frame then
-		anchor = Archy.db.profile.digsite.distanceIndicator.anchor
-		position = Archy.db.profile.digsite.distanceIndicator.position
+		anchor = self.db.profile.digsite.distanceIndicator.anchor
+		position = self.db.profile.digsite.distanceIndicator.position
 	end
 
 	if not anchor or not position then
