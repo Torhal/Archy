@@ -40,16 +40,15 @@ local TomTomHandler = {
 			Dialog:Spawn("ArchyTomTomError")
 		end
 	end,
-	Refresh = function(self, targetDigsite)
+	Refresh = function(self, digsite)
 		if not self.hasTomTom then
 			return
 		end
 
-		if not targetDigsite or not private.db.tomtom.enabled or not private.db.general.show or not self.isActive then
+		if not digsite or not private.db.tomtom.enabled or not private.db.general.show or not self.isActive then
 			self:ClearWaypoint()
 			return
 		end
-		local digsite = targetDigsite
 
 		local waypointExists
 		if _G.TomTom.WaypointExists then
