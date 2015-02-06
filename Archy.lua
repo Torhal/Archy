@@ -34,11 +34,6 @@ local LDBI = LibStub("LibDBIcon-1.0")
 local LSM = LibStub("LibSharedMedia-3.0")
 local Toast = LibStub("LibToast-1.0")
 
-if not LSM then
-	_G.LoadAddOn("LibSharedMedia-3.0")
-	LSM = LibStub("LibSharedMedia-3.0", true)
-end
-
 local debugger -- Only defined if needed.
 
 local DatamineTooltip = _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
