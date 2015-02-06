@@ -385,8 +385,6 @@ local survey_location = {
 	y = 0
 }
 
-local tomtomPoint, tomtomActive, tomtomFrame, tomtomSite
-
 local prevTheme
 
 -------------------------------------------------------------------------------
@@ -411,7 +409,6 @@ private.Debug = Debug
 -- Function upvalues
 -----------------------------------------------------------------------
 local Blizzard_SolveArtifact
-local ClearTomTomPoint, UpdateTomTomPoint, RefreshTomTom
 local UpdateMinimapPOIs
 local UpdateAllSites
 
@@ -691,34 +688,6 @@ Dialog:Register("ArchyConfirmSolve", {
 	hide_on_escape = true,
 })
 
-Dialog:Register("ArchyTomTomError", {
-	text = "",
-	on_show = function(self, data)
-		self.text:SetFormattedText("%s%s|r\nIncompatible TomTom setting detected. \"%s%s|r\".\nDo you want to reset it?", "|cFFFFCC00", ADDON_NAME, "|cFFFFCC00", _G.TomTomLocals and _G.TomTomLocals["Enable automatic quest objective waypoints"] or "")
-	end,
-	buttons = {
-		{
-			text = _G.YES .. " (reloads UI)",
-			on_click = function(self, data)
-				_G.TomTom.profile.poi.setClosest = false
-				_G.TomTom:EnableDisablePOIIntegration()
-				_G.ReloadUI()
-			end,
-		},
-		{
-			text = _G.NO,
-		},
-		{
-			text = _G.IGNORE,
-			on_click = function(self, data)
-				private.db.tomtom.noerrorwarn = Archy.version
-			end,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
-
 -----------------------------------------------------------------------
 -- AddOn methods
 -----------------------------------------------------------------------
@@ -796,15 +765,16 @@ local CONFIG_UPDATE_FUNCTIONS = {
 	end,
 	tomtom = function(option)
 		local db = private.db
-		private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
+		local handler = private.TomTomHandler
+		handler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 
-		if db.tomtom.enabled and private.tomtomExists then
+		if handler.hasTomTom and db.tomtom.enabled then
 			if _G.TomTom.profile then
 				_G.TomTom.profile.arrow.arrival = db.tomtom.distance
 				_G.TomTom.profile.arrow.enablePing = db.tomtom.ping
 			end
 		end
-		RefreshTomTom()
+		handler:Refresh(nearestSite)
 	end,
 }
 
@@ -817,10 +787,12 @@ function Archy:ConfigUpdated(namespace, option)
 		self:UpdateDigSiteFrame()
 		self:RefreshDigSiteDisplay()
 		self:UpdateTracking()
+
 		ToggleDistanceIndicator()
 		UpdateMinimapPOIs(true)
-		RefreshTomTom()
 		SuspendClickToMove()
+
+		private.TomTomHandler:Refresh(nearestSite)
 	end
 end
 
@@ -1056,8 +1028,8 @@ function Archy:UpdateSiteDistances()
 	if nearest and (not nearestSite or nearestSite.id ~= nearest.id) then
 		-- nearest dig site has changed
 		nearestSite = nearest
-		tomtomActive = true
-		RefreshTomTom()
+		private.TomTomHandler.isActive = true
+		private.TomTomHandler:Refresh(nearestSite)
 		UpdateMinimapPOIs()
 
 		if private.db.digsite.announceNearest and private.db.general.show then
@@ -1395,71 +1367,6 @@ function UpdateMinimapPOIs(force)
 	end
 end
 
---[[ TomTom Functions ]] --
--- clear the waypoint we gave tomtom
-function ClearTomTomPoint()
-	if not tomtomPoint then
-		return
-	end
-	tomtomPoint = _G.TomTom:RemoveWaypoint(tomtomPoint)
-end
-
-function UpdateTomTomPoint()
-	if not tomtomSite and not nearestSite then
-		-- we have no information to pass tomtom
-		ClearTomTomPoint()
-		return
-	end
-
-	if nearestSite then
-		tomtomSite = nearestSite
-	else
-		nearestSite = tomtomSite
-	end
-
-	if not tomtomFrame then
-		tomtomFrame = _G.CreateFrame("Frame")
-	end
-
-	if not tomtomFrame:IsShown() then
-		tomtomFrame:Show()
-	end
-	local waypointExists
-
-	if _G.TomTom.WaypointExists then -- do we have the legit TomTom?
-		waypointExists = _G.TomTom:WaypointExists(MAP_ID_TO_CONTINENT_ID[tomtomSite.continent], tomtomSite.zoneId, tomtomSite.x * 100, tomtomSite.y * 100, tomtomSite.name .. "\n" .. tomtomSite.zoneName)
-	end
-
-	if not waypointExists then -- waypoint doesn't exist or we have a TomTom emulator
-		ClearTomTomPoint()
-		tomtomPoint = _G.TomTom:AddMFWaypoint(tomtomSite.map, nil, tomtomSite.x, tomtomSite.y, { title = tomtomSite.name .. "\n" .. tomtomSite.zoneName })
-	end
-end
-
-function RefreshTomTom()
-	if private.db.general.show and private.db.tomtom.enabled and private.tomtomExists and tomtomActive then
-		UpdateTomTomPoint()
-	else
-		if private.db.tomtom.enabled and not private.tomtomExists then
-			-- TomTom (or emulator) was disabled, disabling TomTom support
-			private.db.tomtom.enabled = false
-			Archy:Print("TomTom doesn't exist... disabling it")
-		end
-
-		if tomtomPoint then
-			ClearTomTomPoint()
-			tomtomPoint = nil
-		end
-
-		if tomtomFrame then
-			if tomtomFrame:IsShown() then
-				tomtomFrame:Hide()
-			end
-			tomtomFrame = nil
-		end
-	end
-end
-
 --[[ Slash command handler ]] --
 local SUBCOMMAND_FUNCS = {
 	[L["config"]:lower()] = function()
@@ -1494,7 +1401,7 @@ local SUBCOMMAND_FUNCS = {
 	end,
 	tomtom = function()
 		private.db.tomtom.enabled = not private.db.tomtom.enabled
-		RefreshTomTom()
+		private.TomTomHandler:Refresh(nearestSite)
 	end,
 	test = function()
 		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
@@ -1768,11 +1675,12 @@ function Archy:OnEnable()
 			break
 		end
 	end
-
 	self:UpdateTracking()
-	tomtomActive = true
-	private.tomtomExists = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
-	private.tomtomPoiIntegration = private.tomtomExists and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
+
+	local handler = private.TomTomHandler
+	handler.isActive = true
+	handler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
+	handler.hasPOIIntegration = handler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = self:AddRace(raceID)
@@ -2000,8 +1908,8 @@ function Archy:UpdatePlayerPosition(force)
 		ToggleDistanceIndicator()
 	end
 
-	ClearTomTomPoint()
-	RefreshTomTom()
+	private.TomTomHandler:ClearWaypoint()
+	private.TomTomHandler:Refresh(nearestSite)
 	UpdateAllSites()
 
 	if _G.GetNumArchaeologyRaces() > 0 then
@@ -3151,13 +3059,10 @@ function Archy:PLAYER_ENTERING_WORLD()
 	end
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 
-	if private.db.tomtom.noerrorwarn and (private.db.tomtom.noerrorwarn == Archy.version) then
-		-- TODO: Figure out what the hell is supposed to happen (if anything) here.
-	elseif private.tomtomPoiIntegration and _G.TomTom.profile.poi.setClosest and not private.tomtomWarned then
-		private.tomtomWarned = true
-		Dialog:Spawn("ArchyTomTomError")
+	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
+	if private.TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
+		private.TomTomHandler:DisplayConflictError()
 	end
-
 
 	if _G.IsInInstance() then
 		HideFrames()
@@ -3327,8 +3232,8 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 				end
 			end
 		end
-		tomtomActive = false
-		RefreshTomTom()
+		private.TomTomHandler.isActive = false
+		private.TomTomHandler:Refresh(nearestSite)
 		self:RefreshDigSiteDisplay()
 	end
 end

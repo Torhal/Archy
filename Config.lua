@@ -1331,8 +1331,9 @@ local function GetTomTomOptions()
 						db.tomtom.distance = value
 						Archy:ConfigUpdated('tomtom')
 					end,
-					disabled = function() return not db.tomtom.enabled or not private.tomtomExists end,
-					--            width = "double"
+					disabled = function()
+						return not db.tomtom.enabled or not private.TomTomHandler.hasTomTom
+					end,
 				},
 				arrivalPing = {
 					order = 3,
@@ -1345,7 +1346,9 @@ local function GetTomTomOptions()
 						db.tomtom.ping = value
 						Archy:ConfigUpdated('tomtom')
 					end,
-					disabled = function() return not db.tomtom.enabled or not private.tomtomExists end,
+					disabled = function()
+						return not db.tomtom.enabled or not private.TomTomHandler.hasTomTom
+					end,
 					width = "double"
 				},
 			},
