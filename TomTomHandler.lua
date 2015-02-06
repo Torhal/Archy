@@ -68,7 +68,8 @@ private.TomTomHandler = TomTomHandler
 Dialog:Register("ArchyTomTomError", {
 	text = "",
 	on_show = function(self, data)
-		self.text:SetFormattedText("%s%s|r\nIncompatible TomTom setting detected. \"%s%s|r\".\nDo you want to reset it?", "|cFFFFCC00", ADDON_NAME, "|cFFFFCC00", _G.TomTomLocals and _G.TomTomLocals["Enable automatic quest objective waypoints"] or "")
+		self.text:SetFormattedText("An incompatible TomTom setting was detected.\n\nThe \"%s%s|r\" setting will cause %s to lose control of TomTom when approaching quest POIs.\n\nDo you want to reset it?",
+			"|cFFFFCC00", _G.TomTomLocals and _G.TomTomLocals["Enable automatic quest objective waypoints"] or "", ADDON_NAME)
 	end,
 	buttons = {
 		{
@@ -85,7 +86,6 @@ Dialog:Register("ArchyTomTomError", {
 	},
 	hide_on_escape = true,
 	show_while_dead = true,
-	text_justify_h = "LEFT",
-	width = 350,
+	width = 450,
 })
 
