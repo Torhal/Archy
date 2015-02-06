@@ -1991,4 +1991,4 @@ _G.setmetatable(DIG_SITES, {
 	end
 })
 
-private.dig_sites = DIG_SITES
+private.DIG_SITES = DIG_SITES
