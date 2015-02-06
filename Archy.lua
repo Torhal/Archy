@@ -1015,18 +1015,15 @@ function Archy:UpdateSiteDistances()
 			site.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, site.map, site.level, site.x, site.y)
 		end
 
-		if site.x then
-		if not Archy:IsSiteBlacklisted(site.name) then
+		if site.x and not Archy:IsSiteBlacklisted(site.name) then
 			if not distance or site.distance < distance then
 				distance = site.distance
 				nearest = site
 			end
 		end
-		end
 	end
 
 	if nearest and (not nearestSite or nearestSite.id ~= nearest.id) then
-		-- nearest dig site has changed
 		nearestSite = nearest
 		private.TomTomHandler.isActive = true
 		private.TomTomHandler:Refresh(nearestSite)
