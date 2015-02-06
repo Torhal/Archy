@@ -58,6 +58,9 @@ Locale\ptBR.lua
 Locale\zhCN.lua
 Locale\zhTW.lua
 
+## Must be loaded first.
+Constants.lua
+
 Database\Digsites.lua
 Database\Artifacts.lua
 Archy.xml

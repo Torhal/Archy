@@ -61,7 +61,6 @@ local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
 
 local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in Archy:OnInitialize()
-local MAP_ID_TO_CONTINENT_ID = {} -- Popupated in Archy:OnInitialize()
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in Archy:OnInitialize()
 local MAP_ID_TO_ZONE_NAME = {} -- Popupated in Archy:OnInitialize()
 
@@ -311,8 +310,6 @@ local SECURE_ACTION_BUTTON -- Populated in Archy:OnInitialize()
 local SITES_PER_CONTINENT = 4
 local SURVEYS_PER_DIGSITE = 6
 local SURVEY_SPELL_ID = 80451
-local CRATE_SPELL_ID = 126935
-local CRATE_SPELL_NAME = (_G.GetSpellInfo(CRATE_SPELL_ID))
 local CRATE_USE_STRING -- Populate in Archy:OnEnable()
 local DIG_LOCATION_TEXTURE_INDEX = 177
 
@@ -887,8 +884,8 @@ local function CacheMapData()
 
 				MAP_CONTINENTS[continent_id] = continent_name
 				MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
-				MAP_ID_TO_CONTINENT_ID[map_id] = continent_id
 				MAP_ID_TO_ZONE_NAME[map_id] = continent_name
+				private.MAP_ID_TO_CONTINENT_ID[map_id] = continent_id
 
 				ZONE_DATA[map_id] = {
 					continent = continent_id,
@@ -1762,7 +1759,7 @@ function Archy:OnEnable()
 	InitializeFrames()
 
 	DatamineTooltip:ClearLines()
-	DatamineTooltip:SetSpellByID(CRATE_SPELL_ID)
+	DatamineTooltip:SetSpellByID(private.CRATE_SPELL_ID)
 	CRATE_USE_STRING = ("%s %s"):format(_G.ITEM_SPELL_TRIGGER_ONUSE, _G["ArchyScanTipTextLeft" .. DatamineTooltip:NumLines()]:GetText())
 
 	for trackingTypeIndex = 1, _G.GetNumTrackingTypes() do
@@ -3270,7 +3267,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 		end
 	end
 
-	if spell_id == CRATE_SPELL_ID then
+	if spell_id == private.CRATE_SPELL_ID then
 		if private.busy_crating then
 			private.busy_crating = nil
 			self:ScheduleTimer("ScanBags", 1)
@@ -3337,7 +3334,7 @@ function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell
 end
 
 function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
-	if unit == "player" and spell == CRATE_SPELL_NAME then
+	if unit == "player" and spell == private.CRATE_SPELL_NAME then
 		private.busy_crating = true
 	end
 end
