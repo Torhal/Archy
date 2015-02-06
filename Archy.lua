@@ -403,6 +403,7 @@ local function Debug(...)
 	end
 	debugger:AddLine(string.format(...))
 end
+
 private.Debug = Debug
 
 -----------------------------------------------------------------------
@@ -523,14 +524,14 @@ do
 			return
 		end
 
-		if private.db.general.show then -- Archy enabled
-			if _G.GetCVarBool("autointeract") then -- and click to move 'on'
-				_G.SetCVar("autointeract", "0") -- suspend it
-				click_to_move = "1" -- and store previous state
+		if private.db.general.show then
+			if _G.GetCVarBool("autointeract") then
+				_G.SetCVar("autointeract", "0")
+				click_to_move = "1"
 			end
-		else -- archy disabled
-			if click_to_move and click_to_move == "1" then -- did we suspend click to move previously?
-				_G.SetCVar("autointeract", "1") -- restore it
+		else
+			if click_to_move and click_to_move == "1" then
+				_G.SetCVar("autointeract", "1")
 				click_to_move = nil
 			end
 		end
@@ -1593,11 +1594,12 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 	end
 	private.db = database and database.profile or self.db.profile
 
-	if newTheme and prevTheme and (newTheme ~= prevTheme) then -- Drii: fix for ticket 406?
+	if newTheme and prevTheme and (newTheme ~= prevTheme) then
 		_G.ReloadUI()
 	end
 
-	if private.frames_init_done then -- Drii: ticket 394 'OnNewProfile' fires for fresh installations too it seems.
+	-- 'OnNewProfile' fires for fresh installations too it seems.
+	if private.frames_init_done then
 		self:ConfigUpdated()
 		self:UpdateFramePositions()
 	end
@@ -1665,7 +1667,7 @@ local SUBCOMMAND_FUNCS = {
 
 		Debug("Scanning digsites:\n")
 
-		for continentIndex, continentID in pairs({1,2,3,4,6,7}) do
+		for continentIndex, continentID in pairs({ 1, 2, 3, 4, 6, 7 }) do
 			_G.SetMapZoom(continentID)
 
 			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
@@ -1723,7 +1725,8 @@ local function FindCrateable(bag, slot)
 	local item_id = _G.GetContainerItemID(bag, slot)
 
 	if item_id then
-		if CRATE_OF_FRAGMENTS[item_id] then -- 86068,73410 for debug or any book-type item
+		-- 86068,73410 for debug or any book-type item
+		if CRATE_OF_FRAGMENTS[item_id] then
 			private.crate_item_id = item_id
 			return true
 		end
@@ -2000,24 +2003,23 @@ local function BattleFieldMinimap_Digsites(show)
 end
 
 function Archy:UpdateTracking()
-	-- do nothing if user has selected to manually configure tracking and blobs.
 	if not HasArchaeology() or private.db.general.manualTrack then
 		return
 	end
 
-	if IsTaintable() then -- Drii: need the check for battlefield blobs, if we don't provide those it can be removed
+	-- TODO: need the check for battlefield blobs, if we don't provide those it can be removed
+	if IsTaintable() then
 		private.regen_update_tracking = true
 		return
 	end
 
-	-- manage minimap tracking
 	if digsitesTrackingID then
 		_G.SetTracking(digsitesTrackingID, private.db.general.show)
 	end
-	-- manage worldmap and battlefield map digsites display
-	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
-	local showDig = _G.GetCVarBool("digSites")
 
+	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
+
+	local showDig = _G.GetCVarBool("digSites")
 	if showDig then
 		_G.WorldMapArchaeologyDigSites:Show()
 		BattleFieldMinimap_Digsites(true)
@@ -2312,11 +2314,13 @@ function Archy:RefreshRacesDisplay()
 				end
 			end
 
-			if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then -- Drii: actual user-filled sockets enough to solve so enable the manual solve button
+			-- Actual user-filled sockets enough to solve so enable the manual solve button
+			if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then
 				child.solveButton:Enable()
 				barColor = private.db.artifact.fragmentBarColors["Solvable"]
 			else
-				if artifact.canSolveInventory then -- Drii: solve available with stones from inventory but not enough socketed
+				-- Can solve with available stones from inventory, but not enough are socketed.
+				if artifact.canSolveInventory then
 					barColor = private.db.artifact.fragmentBarColors["AttachToSolve"]
 				end
 				child.solveButton:Disable()
@@ -2721,7 +2725,7 @@ function Archy:SetFramePosition(frame)
 	frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
 	frame:SetFrameLevel(2)
 
-	if frame:GetParent() == _G.UIParent and not IsTaintable() and not private.db.general.locked then -- Drii: ticket 390
+	if frame:GetParent() == _G.UIParent and not IsTaintable() and not private.db.general.locked then
 		frame:SetUserPlaced(false)
 	end
 end
@@ -3064,7 +3068,6 @@ function Archy:PLAYER_ENTERING_WORLD()
 	else
 		ShowFrames()
 	end
-
 end
 
 function Archy:PLAYER_REGEN_DISABLED()
