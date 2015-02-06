@@ -995,7 +995,7 @@ local function SortSitesByDistance(a, b)
 	end
 end
 
-local function SortSitesByName(a, b)
+local function SortSitesByZoneNameAndName(a, b)
 	return a.zoneName .. ":" .. a.name < b.zoneName .. ":" .. b.name
 end
 
@@ -1037,13 +1037,11 @@ function Archy:UpdateSiteDistances()
 		end
 	end
 
-	-- Sort sites
 	local sites = continent_digsites[private.current_continent]
-
 	if private.db.digsite.sortByDistance then
 		table.sort(sites, SortSitesByDistance)
-	else -- sort by zone then name
-		table.sort(sites, SortSitesByName)
+	else
+		table.sort(sites, SortSitesByZoneNameAndName)
 	end
 end
 
