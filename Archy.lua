@@ -39,14 +39,6 @@ if not LSM then
 	LSM = LibStub("LibSharedMedia-3.0", true)
 end
 
-if LSM then
-	local DEFAULT_LSM_FONT = "Arial Narrow"
-
-	if not LSM:IsValid("font", DEFAULT_LSM_FONT) then
-		DEFAULT_LSM_FONT = LSM:GetDefault("font")
-	end
-end
-
 local debugger -- Only defined if needed.
 
 local DatamineTooltip = _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
