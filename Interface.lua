@@ -24,8 +24,8 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -----------------------------------------------------------------------
 -- Constants.
 -----------------------------------------------------------------------
-local SURVEYS_PER_DIGSITE_DEFAULT = 6
-local SURVEYS_PER_DIGSITE_DRAENOR = 8
+local NUM_DIGSITE_FINDS_DEFAULT = 6
+local NUM_DIGSITE_FINDS_DRAENOR = 9
 
 local CONTINENT_RACES = {}
 for _, site in pairs(private.DIG_SITES) do
@@ -664,7 +664,7 @@ function Archy:RefreshDigSiteDisplay()
 		end
 	end
 
-	local maxSurveyCount = (continent_id == _G.WORLDMAP_DRAENOR_ID) and SURVEYS_PER_DIGSITE_DRAENOR or SURVEYS_PER_DIGSITE_DEFAULT
+	local maxSurveyCount = (continent_id == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
 
 	for site_index, site in pairs(continentDigsites[continent_id]) do
 		local site_frame = private.digsite_frame.children[site_index]
