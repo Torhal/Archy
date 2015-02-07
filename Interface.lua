@@ -53,27 +53,20 @@ local function FontString_SetShadow(fs, hasShadow)
 	end
 end
 
+local DigSiteFrame
+local RacesFrame
+local DistanceIndicatorFrame
+
 local function InitializeFrames()
 	if private.IsTaintable() then
 		private.regen_create_frames = true
 		return
 	end
-	private.digsite_frame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
-	private.digsite_frame.children = setmetatable({}, {
+	DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
+	DigSiteFrame.children = setmetatable({}, {
 		__index = function(t, k)
 			if k then
-				local f = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, private.digsite_frame, (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
-				f:Show()
-				t[k] = f
-				return f
-			end
-		end
-	})
-	private.races_frame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
-	private.races_frame.children = setmetatable({}, {
-		__index = function(t, k)
-			if k then
-				local f = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, private.races_frame, (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
+				local f = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, DigSiteFrame, (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
 				f:Show()
 				t[k] = f
 				return f
@@ -81,8 +74,26 @@ local function InitializeFrames()
 		end
 	})
 
-	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
-	private.distance_indicator_frame.circle:SetScale(0.65)
+	private.digsite_frame = DigSiteFrame
+
+	RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
+	RacesFrame.children = setmetatable({}, {
+		__index = function(t, k)
+			if k then
+				local f = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, RacesFrame, (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
+				f:Show()
+				t[k] = f
+				return f
+			end
+		end
+	})
+
+	private.races_frame = RacesFrame
+
+	DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
+	DistanceIndicatorFrame.circle:SetScale(0.65)
+
+	private.distance_indicator_frame = DistanceIndicatorFrame
 
 	private.frames_init_done = true
 
@@ -101,63 +112,59 @@ function Archy:UpdateRacesFrame()
 		private.regen_update_races = true
 		return
 	end
-	local races_frame = private.races_frame
 
-	races_frame:SetScale(private.db.artifact.scale)
-	races_frame:SetAlpha(private.db.artifact.alpha)
+	RacesFrame:SetScale(private.db.artifact.scale)
+	RacesFrame:SetAlpha(private.db.artifact.alpha)
 
 	local is_movable = not private.db.general.locked
-	races_frame:SetMovable(is_movable)
-	races_frame:EnableMouse(is_movable)
+	RacesFrame:SetMovable(is_movable)
+	RacesFrame:EnableMouse(is_movable)
 
 	if is_movable then
-		races_frame:RegisterForDrag("LeftButton")
+		RacesFrame:RegisterForDrag("LeftButton")
 	else
-		races_frame:RegisterForDrag()
+		RacesFrame:RegisterForDrag()
 	end
 
-	local artifact_font_data = private.db.artifact.font
-	local artifact_fragment_font_data = private.db.artifact.fragmentFont
+	local artifactFont = private.db.artifact.font
+	local fragmentFont = private.db.artifact.fragmentFont
+	local keystoneFont = private.db.artifact.keystoneFont
 
-	local font = LSM:Fetch("font", artifact_font_data.name)
-	local fragment_font = LSM:Fetch("font", artifact_fragment_font_data.name)
-	local keystone_font = LSM:Fetch("font", private.db.artifact.keystoneFont.name)
+	local artifactFontName = LSM:Fetch("font", artifactFont.name)
+	local fragmentFontName = LSM:Fetch("font", fragmentFont.name)
+	local keystoneFontName = LSM:Fetch("font", keystoneFont.name)
 
-	for _, child in pairs(races_frame.children) do
+	for _, child in pairs(RacesFrame.children) do
 		if private.db.general.theme == "Graphical" then
-			child.fragmentBar.artifact:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
-			child.fragmentBar.artifact:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+			child.fragmentBar.artifact:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.fragmentBar.artifact:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.fragmentBar.artifact, artifactFont.shadow)
 
-			child.fragmentBar.fragments:SetFont(fragment_font, artifact_fragment_font_data.size, artifact_fragment_font_data.outline)
-			child.fragmentBar.fragments:SetTextColor(artifact_fragment_font_data.color.r, artifact_fragment_font_data.color.g, artifact_fragment_font_data.color.b, artifact_fragment_font_data.color.a)
+			child.fragmentBar.fragments:SetFont(fragmentFontName, fragmentFont.size, fragmentFont.outline)
+			child.fragmentBar.fragments:SetTextColor(fragmentFont.color.r, fragmentFont.color.g, fragmentFont.color.b, fragmentFont.color.a)
+			FontString_SetShadow(child.fragmentBar.fragments, fragmentFont.shadow)
 
-			child.fragmentBar.keystones.count:SetFont(keystone_font, private.db.artifact.keystoneFont.size, private.db.artifact.keystoneFont.outline)
-			child.fragmentBar.keystones.count:SetTextColor(private.db.artifact.keystoneFont.color.r, private.db.artifact.keystoneFont.color.g, private.db.artifact.keystoneFont.color.b, private.db.artifact.keystoneFont.color.a)
-
-			FontString_SetShadow(child.fragmentBar.artifact, artifact_font_data.shadow)
-			FontString_SetShadow(child.fragmentBar.fragments, artifact_fragment_font_data.shadow)
-			FontString_SetShadow(child.fragmentBar.keystones.count, private.db.artifact.keystoneFont.shadow)
+			child.fragmentBar.keystones.count:SetFont(keystoneFontName, keystoneFont.size, keystoneFont.outline)
+			child.fragmentBar.keystones.count:SetTextColor(keystoneFont.color.r, keystoneFont.color.g, keystoneFont.color.b, keystoneFont.color.a)
+			FontString_SetShadow(child.fragmentBar.keystones.count, keystoneFont.shadow)
 		else
-			child.fragments.text:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
-			child.fragments.text:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+			child.fragments.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.fragments.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.fragments.text, artifactFont.shadow)
 
-			child.sockets.text:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
-			child.sockets.text:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
+			child.sockets.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.sockets.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.sockets.text, artifactFont.shadow)
 
-			child.artifact.text:SetFont(font, artifact_font_data.size, artifact_font_data.outline)
-			child.artifact.text:SetTextColor(artifact_font_data.color.r, artifact_font_data.color.g, artifact_font_data.color.b, artifact_font_data.color.a)
-
-			FontString_SetShadow(child.fragments.text, artifact_font_data.shadow)
-			FontString_SetShadow(child.sockets.text, artifact_font_data.shadow)
-			FontString_SetShadow(child.artifact.text, artifact_font_data.shadow)
+			child.artifact.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.artifact.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.artifact.text, artifactFont.shadow)
 		end
 	end
-	local borderTexture = LSM:Fetch('border', private.db.artifact.borderTexture)
-	local backgroundTexture = LSM:Fetch('background', private.db.artifact.backgroundTexture)
 
-	races_frame:SetBackdrop({
-		bgFile = backgroundTexture,
-		edgeFile = borderTexture,
+	RacesFrame:SetBackdrop({
+		bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
+		edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
 		tile = false,
 		edgeSize = 8,
 		tileSize = 8,
@@ -168,26 +175,27 @@ function Archy:UpdateRacesFrame()
 			bottom = 2
 		}
 	})
-	races_frame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
-	races_frame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
+
+	RacesFrame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
+	RacesFrame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
 
 
 	if not private.IsTaintable() then
-		local height = races_frame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
+		local height = RacesFrame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
 		if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
 			height = height + 30
 		end
-		races_frame:SetHeight(height)
-		races_frame:SetWidth(races_frame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
+		RacesFrame:SetHeight(height)
+		RacesFrame:SetWidth(RacesFrame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
 	end
 
-	if races_frame:IsVisible() then
+	if RacesFrame:IsVisible() then
 		if private.db.general.stealthMode or not private.db.artifact.show or FramesShouldBeHidden() then
-			races_frame:Hide()
+			RacesFrame:Hide()
 		end
 	else
 		if not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden() then
-			races_frame:Show()
+			RacesFrame:Show()
 		end
 	end
 end
@@ -199,7 +207,7 @@ function Archy:RefreshRacesDisplay()
 	local maxWidth, maxHeight = 0, 0
 	self:UpdateSkillBar()
 
-	local races_frame = private.races_frame
+	local races_frame = RacesFrame
 	local topFrame = races_frame.container
 	local hiddenAnchor = races_frame
 	local count = 0
@@ -471,65 +479,67 @@ function Archy:UpdateDigSiteFrame()
 		private.regen_update_digsites = true
 		return
 	end
-	private.digsite_frame:SetScale(private.db.digsite.scale)
-	private.digsite_frame:SetAlpha(private.db.digsite.alpha)
 
-	local borderTexture = LSM:Fetch('border', private.db.digsite.borderTexture)
-	local backgroundTexture = LSM:Fetch('background', private.db.digsite.backgroundTexture)
+	DigSiteFrame:SetScale(private.db.digsite.scale)
+	DigSiteFrame:SetAlpha(private.db.digsite.alpha)
 
-	private.digsite_frame:SetBackdrop({
-		bgFile = backgroundTexture,
-		edgeFile = borderTexture,
+	DigSiteFrame:SetBackdrop({
+		bgFile = LSM:Fetch('background', private.db.digsite.backgroundTexture),
+		edgeFile = LSM:Fetch('border', private.db.digsite.borderTexture),
 		tile = false,
 		edgeSize = 8,
 		tileSize = 8,
 		insets = { left = 2, top = 2, right = 2, bottom = 2 }
 	})
 
-	private.digsite_frame:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
-	private.digsite_frame:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
+	DigSiteFrame:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
+	DigSiteFrame:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
 
-	local font = LSM:Fetch("font", private.db.digsite.font.name)
-	local zoneFont = LSM:Fetch("font", private.db.digsite.zoneFont.name)
-	local digsite_font = private.db.digsite.font
+	local digsiteFont = private.db.digsite.font
+	local digsiteFontName = LSM:Fetch("font", digsiteFont.name)
 
-	for _, siteFrame in pairs(private.digsite_frame.children) do
-		siteFrame.site.name:SetFont(font, digsite_font.size, digsite_font.outline)
-		siteFrame.digCounter.value:SetFont(font, digsite_font.size, digsite_font.outline)
-		siteFrame.site.name:SetTextColor(digsite_font.color.r, digsite_font.color.g, digsite_font.color.b, digsite_font.color.a)
-		siteFrame.digCounter.value:SetTextColor(digsite_font.color.r, digsite_font.color.g, digsite_font.color.b, digsite_font.color.a)
-		FontString_SetShadow(siteFrame.site.name, digsite_font.shadow)
-		FontString_SetShadow(siteFrame.digCounter.value, digsite_font.shadow)
+	local zoneFont = private.db.digsite.zoneFont
+	local zoneFontName = LSM:Fetch("font", zoneFont.name)
+
+	for _, siteFrame in pairs(DigSiteFrame.children) do
+		siteFrame.site.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+		siteFrame.site.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+		FontString_SetShadow(siteFrame.site.name, digsiteFont.shadow)
+
+		siteFrame.digCounter.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+		siteFrame.digCounter.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+		FontString_SetShadow(siteFrame.digCounter.value, digsiteFont.shadow)
 
 		if private.db.general.theme == "Graphical" then
-			local zone_font = private.db.digsite.zoneFont
+			siteFrame.zone.name:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
+			siteFrame.zone.name:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
+			FontString_SetShadow(siteFrame.zone.name, zoneFont.shadow)
 
-			siteFrame.zone.name:SetFont(zoneFont, zone_font.size, zone_font.outline)
-			siteFrame.distance.value:SetFont(zoneFont, zone_font.size, zone_font.outline)
-			siteFrame.zone.name:SetTextColor(zone_font.color.r, zone_font.color.g, zone_font.color.b, zone_font.color.a)
-			siteFrame.distance.value:SetTextColor(zone_font.color.r, zone_font.color.g, zone_font.color.b, zone_font.color.a)
-			FontString_SetShadow(siteFrame.zone.name, zone_font.shadow)
-			FontString_SetShadow(siteFrame.distance.value, zone_font.shadow)
+			siteFrame.distance.value:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
+			siteFrame.distance.value:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
+			FontString_SetShadow(siteFrame.distance.value, zoneFont.shadow)
 		else
-			siteFrame.zone.name:SetFont(font, digsite_font.size, digsite_font.outline)
-			siteFrame.distance.value:SetFont(font, digsite_font.size, digsite_font.outline)
-			siteFrame.zone.name:SetTextColor(digsite_font.color.r, digsite_font.color.g, digsite_font.color.b, digsite_font.color.a)
-			siteFrame.distance.value:SetTextColor(digsite_font.color.r, digsite_font.color.g, digsite_font.color.b, digsite_font.color.a)
-			FontString_SetShadow(siteFrame.zone.name, digsite_font.shadow)
-			FontString_SetShadow(siteFrame.distance.value, digsite_font.shadow)
+			siteFrame.zone.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+			siteFrame.zone.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+			FontString_SetShadow(siteFrame.zone.name, digsiteFont.shadow)
+
+			siteFrame.distance.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+			siteFrame.distance.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+			FontString_SetShadow(siteFrame.distance.value, digsiteFont.shadow)
 		end
 	end
 
 	local continentID = private.current_continent
 	local continentDigsites = private.continent_digsites
 
-	if private.digsite_frame:IsVisible() then
-		if private.db.general.stealthMode or not private.db.digsite.show or FramesShouldBeHidden() or not continentDigsites[continentID] or #continentDigsites[continentID] == 0 then
-			private.digsite_frame:Hide()
+	local canShow = not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0
+	if DigSiteFrame:IsVisible() then
+		if not canShow then
+			DigSiteFrame:Hide()
 		end
 	else
-		if not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0 then
-			private.digsite_frame:Show()
+		if canShow then
+			DigSiteFrame:Show()
 		end
 	end
 end
@@ -567,11 +577,11 @@ end
 
 function Archy:ResizeMinimalDigSiteDisplay()
 	local maxWidth, maxHeight = 0, 0
-	local topFrame = private.digsite_frame.container
+	local topFrame = DigSiteFrame.container
 	local siteIndex = 0
 	local maxNameWidth, maxZoneWidth, maxDistWidth, maxDigCounterWidth = 0, 0, 70, 20
 
-	for _, siteFrame in pairs(private.digsite_frame.children) do
+	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteIndex = siteIndex + 1
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
@@ -617,7 +627,7 @@ function Archy:ResizeMinimalDigSiteDisplay()
 	end
 	maxWidth = 57 + maxDigCounterWidth + maxNameWidth + maxZoneWidth + maxDistWidth
 
-	for _, siteFrame in pairs(private.digsite_frame.children) do
+	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteFrame.zone:SetWidth(maxZoneWidth == 0 and 1 or maxZoneWidth)
 		siteFrame.site:SetWidth(maxNameWidth)
 		siteFrame.distance:SetWidth(maxDistWidth == 0 and 1 or maxDistWidth)
@@ -625,22 +635,22 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteFrame.distance:SetAlpha(private.db.digsite.minimal.showDistance and 1 or 0)
 		siteFrame.zone:SetAlpha(private.db.digsite.minimal.showZone and 1 or 0)
 	end
-	private.digsite_frame.container:SetWidth(maxWidth)
-	private.digsite_frame.container:SetHeight(maxHeight)
+	DigSiteFrame.container:SetWidth(maxWidth)
+	DigSiteFrame.container:SetHeight(maxHeight)
 
 	if not private.IsTaintable() then
-		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
-		private.digsite_frame:SetHeight(maxHeight + cyOfs + 40)
-		private.digsite_frame:SetWidth(maxWidth + cxOfs + 30)
+		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = DigSiteFrame.container:GetPoint()
+		DigSiteFrame:SetHeight(maxHeight + cyOfs + 40)
+		DigSiteFrame:SetWidth(maxWidth + cxOfs + 30)
 	end
 end
 
 function Archy:ResizeGraphicalDigSiteDisplay()
 	local maxWidth, maxHeight = 0, 0
-	local topFrame = private.digsite_frame.container
+	local topFrame = DigSiteFrame.container
 	local siteIndex = 0
 
-	for _, siteFrame in pairs(private.digsite_frame.children) do
+	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteIndex = siteIndex + 1
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
@@ -671,16 +681,16 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 		topFrame = siteFrame
 	end
 
-	for _, siteFrame in pairs(private.digsite_frame.children) do
+	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteFrame:SetWidth(maxWidth)
 	end
-	private.digsite_frame.container:SetWidth(maxWidth)
-	private.digsite_frame.container:SetHeight(maxHeight)
+	DigSiteFrame.container:SetWidth(maxWidth)
+	DigSiteFrame.container:SetHeight(maxHeight)
 
 	if not private.IsTaintable() then
-		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = private.digsite_frame.container:GetPoint()
-		private.digsite_frame:SetHeight(maxHeight + cyOfs + 40)
-		private.digsite_frame:SetWidth(maxWidth + cxOfs + 30)
+		local cpoint, crelTo, crelPoint, cxOfs, cyOfs = DigSiteFrame.container:GetPoint()
+		DigSiteFrame:SetHeight(maxHeight + cyOfs + 40)
+		DigSiteFrame:SetWidth(maxWidth + cxOfs + 30)
 	end
 end
 
@@ -695,7 +705,7 @@ function Archy:RefreshDigSiteDisplay()
 		return
 	end
 
-	for _, site_frame in pairs(private.digsite_frame.children) do
+	for _, site_frame in pairs(DigSiteFrame.children) do
 		site_frame:Hide()
 	end
 
@@ -708,7 +718,7 @@ function Archy:RefreshDigSiteDisplay()
 	local maxSurveyCount = (continent_id == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
 
 	for site_index, site in pairs(continentDigsites[continent_id]) do
-		local site_frame = private.digsite_frame.children[site_index]
+		local site_frame = DigSiteFrame.children[site_index]
 		local count = self.db.char.digsites.stats[site.id].counter
 
 		if private.db.general.theme == "Graphical" then
@@ -765,15 +775,15 @@ function Archy:SetFramePosition(frame)
 	local bPoint, bRelativePoint, bXofs, bYofs
 	local bRelativeTo = _G.UIParent
 
-	if frame == private.digsite_frame then
+	if frame == DigSiteFrame then
 		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.position)
-	elseif frame == private.races_frame then
+	elseif frame == RacesFrame then
 		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.artifact.position)
-	elseif frame == private.distance_indicator_frame then
+	elseif frame == DistanceIndicatorFrame then
 		if not private.db.digsite.distanceIndicator.undocked then
-			bRelativeTo = private.digsite_frame
+			bRelativeTo = DigSiteFrame
 			bPoint, bRelativePoint, bXofs, bYofs = "CENTER", "TOPLEFT", 50, -5
-			frame:SetParent(private.digsite_frame)
+			frame:SetParent(DigSiteFrame)
 		else
 			frame:SetParent(_G.UIParent)
 			bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.distanceIndicator.position)
@@ -793,13 +803,13 @@ function Archy:SaveFramePosition(frame)
 	local width, height
 	local anchor, position
 
-	if frame == private.digsite_frame then
+	if frame == DigSiteFrame then
 		anchor = self.db.profile.digsite.anchor
 		position = self.db.profile.digsite.position
-	elseif frame == private.races_frame then
+	elseif frame == RacesFrame then
 		anchor = self.db.profile.artifact.anchor
 		position = self.db.profile.artifact.position
-	elseif frame == private.distance_indicator_frame then
+	elseif frame == DistanceIndicatorFrame then
 		anchor = self.db.profile.digsite.distanceIndicator.anchor
 		position = self.db.profile.digsite.distanceIndicator.position
 	end
@@ -853,11 +863,11 @@ function Archy:SaveFramePosition(frame)
 		}
 	end
 
-	if frame == private.digsite_frame then
+	if frame == DigSiteFrame then
 		private.db.digsite.position = position
-	elseif frame == private.races_frame then
+	elseif frame == RacesFrame then
 		private.db.artifact.position = position
-	elseif frame == private.distance_indicator_frame then
+	elseif frame == DistanceIndicatorFrame then
 		private.db.digsite.distanceIndicator.position = position
 	end
 end
