@@ -304,7 +304,7 @@ local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
 
 local ZONE_ID_TO_NAME = {} -- Popupated in Archy:OnInitialize()
-local MAP_CONTINENTS = {} -- Popupated in CacheMapData()
+local MAP_CONTINENTS = {} -- Popupated in Archy:OnEnable()
 
 local LOREWALKER_ITEMS = {
 	MAP = { id = 87549, spell = 126957 },
@@ -456,7 +456,6 @@ local function ToggleDigsiteVisibility(show)
 			BattlefieldMinimapDigsites:Hide()
 		end
 	end
-
 end
 
 -- Returns true if the player has the archaeology secondary skill
@@ -879,77 +878,9 @@ local function CompareAndResetDigCounters(a, b)
 	end
 end
 
-local function CacheMapData()
-	if not next(MAP_CONTINENTS) then
-		local continent_data = { _G.GetMapContinents() }
-
-		for continent_data_index = 1, #continent_data do
-			-- Odd indices are IDs, even are names.
-			if continent_data_index % 2 == 0 then
-				local continent_id = continent_data_index / 2
-				local continent_name = continent_data[continent_data_index]
-
-				_G.SetMapZoom(continent_id)
-
-				local map_id = _G.GetCurrentMapAreaID()
-				local map_file_name = _G.GetMapInfo()
-
-				MAP_CONTINENTS[continent_id] = continent_name
-				MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
-				MAP_ID_TO_ZONE_NAME[map_id] = continent_name
-				private.MAP_ID_TO_CONTINENT_ID[map_id] = continent_id
-
-				ZONE_DATA[map_id] = {
-					continent = continent_id,
-					id = 0,
-					level = 0,
-					map = map_id,
-					mapFile = map_file_name,
-					name = continent_name
-				}
-
-				local zone_data = { _G.GetMapZones(continent_id) }
-				for zone_data_index = 1, #zone_data do
-					-- Odd indices are IDs, even are names.
-					if zone_data_index % 2 == 0 then
-						_G.SetMapByID(map_id)
-
-						local map_file_name = _G.GetMapInfo()
-						local zone_id = _G.GetCurrentMapZone()
-						local zone_name = zone_data[zone_data_index]
-
-						MAP_FILENAME_TO_MAP_ID[map_file_name] = map_id
-						MAP_ID_TO_ZONE_ID[map_id] = zone_id
-						MAP_ID_TO_ZONE_NAME[map_id] = zone_name
-						ZONE_ID_TO_NAME[zone_id] = zone_name
-						ZONE_DATA[map_id] = {
-							continent = continent_id,
-							id = zone_id,
-							level = _G.GetCurrentMapDungeonLevel(),
-							map = map_id,
-							mapFile = map_file_name,
-							name = zone_name
-						}
-					else
-						map_id = zone_data[zone_data_index]
-					end
-				end
-			end
-		end
-	end
-
-	if next(ZONE_DATA) then
-		CacheMapData = nil
-	end
-end
-
 function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
-
-	if CacheMapData then
-		CacheMapData()
-	end
 
 	if next(MAP_CONTINENTS) then
 		for continentID, continentName in pairs(MAP_CONTINENTS) do
@@ -1584,6 +1515,61 @@ function Archy:OnEnable()
 		InitializeBattlefieldDigsites()
 	else
 		Archy:RegisterEvent("ADDON_LOADED")
+	end
+
+	local continentData = { _G.GetMapContinents() }
+	for continentDataIndex = 1, #continentData do
+		-- Odd indices are IDs, even are names.
+		if continentDataIndex % 2 == 0 then
+			local continentID = continentDataIndex / 2
+			local continentName = continentData[continentDataIndex]
+
+			_G.SetMapZoom(continentID)
+
+			local mapID = _G.GetCurrentMapAreaID()
+			local mapFileName = _G.GetMapInfo()
+
+			MAP_CONTINENTS[continentID] = continentName
+			MAP_FILENAME_TO_MAP_ID[mapFileName] = mapID
+			MAP_ID_TO_ZONE_NAME[mapID] = continentName
+			private.MAP_ID_TO_CONTINENT_ID[mapID] = continentID
+
+			ZONE_DATA[mapID] = {
+				continent = continentID,
+				id = 0,
+				level = 0,
+				map = mapID,
+				mapFile = mapFileName,
+				name = continentName
+			}
+
+			local zoneData = { _G.GetMapZones(continentID) }
+			for zoneDataIndex = 1, #zoneData do
+				-- Odd indices are IDs, even are names.
+				if zoneDataIndex % 2 == 0 then
+					_G.SetMapByID(mapID)
+
+					local mapFileName = _G.GetMapInfo()
+					local zoneID = _G.GetCurrentMapZone()
+					local zoneName = zoneData[zoneDataIndex]
+
+					MAP_FILENAME_TO_MAP_ID[mapFileName] = mapID
+					MAP_ID_TO_ZONE_ID[mapID] = zoneID
+					MAP_ID_TO_ZONE_NAME[mapID] = zoneName
+					ZONE_ID_TO_NAME[zoneID] = zoneName
+					ZONE_DATA[mapID] = {
+						continent = continentID,
+						id = zoneID,
+						level = _G.GetCurrentMapDungeonLevel(),
+						map = mapID,
+						mapFile = mapFileName,
+						name = zoneName
+					}
+				else
+					mapID = zoneData[zoneDataIndex]
+				end
+			end
+		end
 	end
 end
 
