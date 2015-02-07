@@ -27,6 +27,12 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local SURVEYS_PER_DIGSITE_DEFAULT = 6
 local SURVEYS_PER_DIGSITE_DRAENOR = 8
 
+local CONTINENT_RACES = {}
+for _, site in pairs(private.DIG_SITES) do
+	CONTINENT_RACES[site.continent] = CONTINENT_RACES[site.continent] or {}
+	CONTINENT_RACES[site.continent][site.race] = true
+end
+
 -----------------------------------------------------------------------
 -- Helpers.
 -----------------------------------------------------------------------
@@ -143,18 +149,6 @@ function Archy:UpdateRacesFrame()
 			races_frame:Show()
 		end
 	end
-end
-
--- returns a list of race ids for the continent map id
--- TODO: This should be a static list. Creating throwaway tables to perform costly iterations on, every time this information is requested, is madness.
-local function ContinentRaces(continent_id)
-	local races = {}
-	for _, site in pairs(private.DIG_SITES) do
-		if site.continent == continent_id and not _G.tContains(races, site.race) then
-			table.insert(races, site.race)
-		end
-	end
-	return races
 end
 
 function Archy:RefreshRacesDisplay()
@@ -374,7 +368,7 @@ function Archy:RefreshRacesDisplay()
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
 
-		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or _G.tContains(ContinentRaces(private.current_continent), raceID)) then
+		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or CONTINENT_RACES[private.current_continent][raceID]) then
 			child:ClearAllPoints()
 
 			if topFrame == races_frame.container then
