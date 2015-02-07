@@ -697,72 +697,66 @@ function Archy:RefreshDigSiteDisplay()
 	if FramesShouldBeHidden() then
 		return
 	end
-	local continent_id = private.current_continent
+	local continentID = private.current_continent
 	local continentDigsites = private.continent_digsites
 
-	if not continent_id or not continentDigsites[continent_id] or #continentDigsites[continent_id] == 0 then
+	if not continentID or not continentDigsites[continentID] or #continentDigsites[continentID] == 0 then
 		return
 	end
 
-	for _, site_frame in pairs(DigSiteFrame.children) do
-		site_frame:Hide()
-	end
+	local maxSurveyCount = (continentID == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
 
-	for _, site in pairs(continentDigsites[continent_id]) do
-		if not site.distance then
-			return
-		end
-	end
-
-	local maxSurveyCount = (continent_id == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
-
-	for site_index, site in pairs(continentDigsites[continent_id]) do
-		local site_frame = DigSiteFrame.children[site_index]
-		local count = self.db.char.digsites.stats[site.id].counter
+	for digSiteIndex, digSite in pairs(continentDigsites[continentID]) do
+		local childFrame = DigSiteFrame.children[digSiteIndex]
+		local count = self.db.char.digsites.stats[digSite.id].counter
 
 		if private.db.general.theme == "Graphical" then
-			if site_frame.style ~= private.db.digsite.style then
+			if childFrame.style ~= private.db.digsite.style then
 				if private.db.digsite.style == "Compact" then
-					site_frame.crest:SetWidth(20)
-					site_frame.crest:SetHeight(20)
-					site_frame.crest.icon:SetWidth(20)
-					site_frame.crest.icon:SetHeight(20)
-					site_frame.zone:Hide()
-					site_frame.distance:Hide()
-					site_frame:SetHeight(24)
+					childFrame.crest:SetWidth(20)
+					childFrame.crest:SetHeight(20)
+					childFrame.crest.icon:SetWidth(20)
+					childFrame.crest.icon:SetHeight(20)
+					childFrame.zone:Hide()
+					childFrame.distance:Hide()
+					childFrame:SetHeight(24)
 				else
-					site_frame.crest:SetWidth(40)
-					site_frame.crest:SetHeight(40)
-					site_frame.crest.icon:SetWidth(40)
-					site_frame.crest.icon:SetHeight(40)
-					site_frame.zone:Show()
-					site_frame.distance:Show()
-					site_frame:SetHeight(40)
+					childFrame.crest:SetWidth(40)
+					childFrame.crest:SetHeight(40)
+					childFrame.crest.icon:SetWidth(40)
+					childFrame.crest.icon:SetHeight(40)
+					childFrame.zone:Show()
+					childFrame.distance:Show()
+					childFrame:SetHeight(40)
 				end
 			end
-			site_frame.digCounter.value:SetText(count or "")
+			childFrame.digCounter.value:SetText(count or "")
 		else
-			site_frame.digCounter.value:SetFormattedText("%d/%d", count or 0, maxSurveyCount)
+			childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, maxSurveyCount)
 		end
 
-		site_frame.distance.value:SetFormattedText(L["%d yards"], site.distance)
-
-		if self:IsSiteBlacklisted(site.name) then
-			site_frame.site.name:SetFormattedText("|cFFFF0000%s", site.name)
+		if digSite.distance then
+			childFrame.distance.value:SetFormattedText(L["%d yards"], digSite.distance)
 		else
-			site_frame.site.name:SetText(site.name)
+			childFrame.distance.value:SetText(_G.UNKNOWN)
 		end
 
-		if site_frame.site.siteName ~= site.name then
-			local race = private.Races[site.raceId]
-			site_frame.crest.icon:SetTexture(race.texture)
-			site_frame.crest.tooltip = race.name
-			site_frame.zone.name:SetText(site.zoneName)
-			site_frame.site.siteName = site.name
-			site_frame.site.zoneId = site.zoneId
-			site_frame:SetID(site.id)
+
+		if self:IsSiteBlacklisted(digSite.name) then
+			childFrame.site.name:SetFormattedText("|cFFFF0000%s", digSite.name)
+		else
+			childFrame.site.name:SetText(digSite.name)
 		end
-		site_frame:Show()
+
+		if childFrame.site.siteName ~= digSite.name then
+			local race = private.Races[digSite.raceId]
+			childFrame.crest.icon:SetTexture(race.texture)
+			childFrame.crest.tooltip = race.name
+			childFrame.zone.name:SetText(digSite.zoneName)
+			childFrame.site.siteName = digSite.name or _G.UNKNOWN
+			childFrame.site.zoneId = digSite.zoneId
+			childFrame:SetID(digSite.id)
+		end
 	end
 	self:ResizeDigSiteDisplay()
 end
