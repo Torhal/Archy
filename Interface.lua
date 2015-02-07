@@ -24,7 +24,8 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -----------------------------------------------------------------------
 -- Constants.
 -----------------------------------------------------------------------
-local SURVEYS_PER_DIGSITE = 6
+local SURVEYS_PER_DIGSITE_DEFAULT = 6
+local SURVEYS_PER_DIGSITE_DRAENOR = 8
 
 -----------------------------------------------------------------------
 -- Helpers.
@@ -669,6 +670,8 @@ function Archy:RefreshDigSiteDisplay()
 		end
 	end
 
+	local maxSurveyCount = (continent_id == _G.WORLDMAP_DRAENOR_ID) and SURVEYS_PER_DIGSITE_DRAENOR or SURVEYS_PER_DIGSITE_DEFAULT
+
 	for site_index, site in pairs(continentDigsites[continent_id]) do
 		local site_frame = private.digsite_frame.children[site_index]
 		local count = self.db.char.digsites.stats[site.id].counter
@@ -695,7 +698,7 @@ function Archy:RefreshDigSiteDisplay()
 			end
 			site_frame.digCounter.value:SetText(count or "")
 		else
-			site_frame.digCounter.value:SetFormattedText("%d/%d", count or 0, SURVEYS_PER_DIGSITE)
+			site_frame.digCounter.value:SetFormattedText("%d/%d", count or 0, maxSurveyCount)
 		end
 
 		site_frame.distance.value:SetFormattedText(L["%d yards"], site.distance)
