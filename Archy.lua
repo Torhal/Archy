@@ -1526,44 +1526,6 @@ function Archy:UpdateFramePositions()
 	self:SetFramePosition(private.races_frame)
 end
 
-local function InitializeFrames()
-	if IsTaintable() then
-		private.regen_create_frames = true
-		return
-	end
-	private.digsite_frame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
-	private.digsite_frame.children = setmetatable({}, {
-		__index = function(t, k)
-			if k then
-				local f = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, private.digsite_frame, (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
-				f:Show()
-				t[k] = f
-				return f
-			end
-		end
-	})
-	private.races_frame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
-	private.races_frame.children = setmetatable({}, {
-		__index = function(t, k)
-			if k then
-				local f = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, private.races_frame, (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
-				f:Show()
-				t[k] = f
-				return f
-			end
-		end
-	})
-
-	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
-	private.distance_indicator_frame.circle:SetScale(0.65)
-
-	private.frames_init_done = true
-
-	Archy:UpdateFramePositions()
-	Archy:UpdateDigSiteFrame()
-	Archy:UpdateRacesFrame()
-end
-
 local timer_handle
 
 function Archy:OnEnable()
@@ -1591,7 +1553,7 @@ function Archy:OnEnable()
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
-	InitializeFrames()
+	private.InitializeFrames()
 
 	DatamineTooltip:ClearLines()
 	DatamineTooltip:SetSpellByID(private.CRATE_SPELL_ID)
@@ -2278,7 +2240,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 
 	if private.regen_create_frames then
 		private.regen_create_frames = nil
-		InitializeFrames()
+		private.InitializeFrames()
 	end
 
 	if private.regen_toggle_distance then

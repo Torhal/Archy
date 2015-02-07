@@ -9,6 +9,7 @@ local table = _G.table
 
 -- Functions
 local pairs = _G.pairs
+local setmetatable = _G.setmetatable
 local unpack = _G.unpack
 
 -----------------------------------------------------------------------
@@ -51,6 +52,46 @@ local function FontString_SetShadow(fs, hasShadow)
 		fs:SetShadowOffset(0, 0)
 	end
 end
+
+local function InitializeFrames()
+	if private.IsTaintable() then
+		private.regen_create_frames = true
+		return
+	end
+	private.digsite_frame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
+	private.digsite_frame.children = setmetatable({}, {
+		__index = function(t, k)
+			if k then
+				local f = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, private.digsite_frame, (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
+				f:Show()
+				t[k] = f
+				return f
+			end
+		end
+	})
+	private.races_frame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
+	private.races_frame.children = setmetatable({}, {
+		__index = function(t, k)
+			if k then
+				local f = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, private.races_frame, (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
+				f:Show()
+				t[k] = f
+				return f
+			end
+		end
+	})
+
+	private.distance_indicator_frame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
+	private.distance_indicator_frame.circle:SetScale(0.65)
+
+	private.frames_init_done = true
+
+	Archy:UpdateFramePositions()
+	Archy:UpdateDigSiteFrame()
+	Archy:UpdateRacesFrame()
+end
+
+private.InitializeFrames = InitializeFrames
 
 -----------------------------------------------------------------------
 -- Methods.
