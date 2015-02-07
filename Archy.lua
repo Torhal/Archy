@@ -401,8 +401,64 @@ local UpdateMinimapPOIs
 local UpdateAllSites
 
 -----------------------------------------------------------------------
+-- Initialization.
+-----------------------------------------------------------------------
+local BattlefieldMinimapDigsites
+
+local function InitializeBattlefieldDigsites()
+	_G.BattlefieldMinimap:HookScript("OnShow", Archy.UpdateTracking)
+
+	BattlefieldMinimapDigsites = _G.CreateFrame("ArchaeologyDigSiteFrame", "ArchyBattleFieldDigsites", _G.BattlefieldMinimap)
+	BattlefieldMinimapDigsites:SetSize(225, 150)
+	BattlefieldMinimapDigsites:SetPoint("TOPLEFT", _G.BattlefieldMinimap)
+	BattlefieldMinimapDigsites:SetPoint("BOTTOMRIGHT", _G.BattlefieldMinimap)
+	BattlefieldMinimapDigsites:SetFillAlpha(128)
+	BattlefieldMinimapDigsites:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
+	BattlefieldMinimapDigsites:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
+	BattlefieldMinimapDigsites:EnableSmoothing(true)
+	BattlefieldMinimapDigsites:SetBorderScalar(0.1)
+	BattlefieldMinimapDigsites.lastUpdate = 0
+
+	local texture = BattlefieldMinimapDigsites:CreateTexture("ArchyBattleFieldDigsitesTexture", "OVERLAY")
+	texture:SetAllPoints()
+
+	BattlefieldMinimapDigsites:SetScript("OnUpdate", function(self, elapsed)
+		self.lastUpdate = self.lastUpdate + elapsed
+
+		if self.lastUpdate < _G.TOOLTIP_UPDATE_TIME then
+			return
+		end
+
+		self.lastUpdate = 0
+		self:DrawNone()
+
+		local numEntries = _G.ArchaeologyMapUpdateAll()
+		for index = 1, numEntries do
+			self:DrawBlob(_G.ArcheologyGetVisibleBlobID(index), true)
+		end
+	end)
+end
+
+-----------------------------------------------------------------------
 -- Local helper functions
 -----------------------------------------------------------------------
+local function ToggleDigsiteVisibility(show)
+	if show then
+		_G.WorldMapArchaeologyDigSites:Show()
+	else
+		_G.WorldMapArchaeologyDigSites:Hide()
+	end
+
+	if BattlefieldMinimapDigsites then
+		if show then
+			BattlefieldMinimapDigsites:Show()
+		else
+			BattlefieldMinimapDigsites:Hide()
+		end
+	end
+
+end
+
 -- Returns true if the player has the archaeology secondary skill
 local function HasArchaeology()
 	local _, _, archaeologyIndex = _G.GetProfessions()
@@ -904,8 +960,9 @@ function UpdateAllSites()
 			local showDig = _G.GetCVarBool("digSites")
 			if not showDig then
 				_G.SetCVar("digSites", "1")
-				_G.WorldMapArchaeologyDigSites:Show()
+				ToggleDigsiteVisibility(true)
 				_G.RefreshWorldMap()
+
 				showDig = "0"
 			end
 
@@ -941,7 +998,7 @@ function UpdateAllSites()
 			-- restore initial setting
 			if showDig == "0" then
 				_G.SetCVar("digSites", showDig)
-				_G.WorldMapArchaeologyDigSites:Hide()
+				ToggleDigsiteVisibility(false)
 				_G.RefreshWorldMap()
 			end
 
@@ -1560,6 +1617,12 @@ function Archy:OnEnable()
 		end
 	end
 	_G.RequestArtifactCompletionHistory()
+
+	if _G.BattlefieldMinimap then
+		InitializeBattlefieldDigsites()
+	else
+		Archy:RegisterEvent("ADDON_LOADED")
+	end
 end
 
 function Archy:OnDisable()
@@ -1914,67 +1977,11 @@ end
 
 
 --[[ UI functions ]] --
-local function BattlefieldDigsites_OnUpdate(self, elapsed)
-	if private.battlefield_digsites.lastUpdate > _G.TOOLTIP_UPDATE_TIME then
-		private.battlefield_digsites:DrawNone()
-
-		local num_entries = _G.ArchaeologyMapUpdateAll()
-
-		for index = 1, num_entries do
-			private.battlefield_digsites:DrawBlob(_G.ArcheologyGetVisibleBlobID(index), true)
-		end
-		private.battlefield_digsites.lastUpdate = 0
-	else
-		private.battlefield_digsites.lastUpdate = private.battlefield_digsites.lastUpdate + elapsed
-	end
-end
-
-local function BattleFieldMinimap_Digsites(show)
-	if not _G.BattlefieldMinimap then
-		Archy:RegisterEvent("ADDON_LOADED")
-		return
-	end
-
-	if not _G.BattlefieldMinimap:IsShown() then
-		if not private.battlefield_hooked then
-			_G.BattlefieldMinimap:HookScript("OnShow", Archy.UpdateTracking)
-			private.battlefield_hooked = true
-		end
-		return
-	end
-
-	if show then
-		if not private.battlefield_digsites then
-			private.battlefield_digsites = _G.CreateFrame("ArchaeologyDigSiteFrame", "ArchyBattleFieldDigsites", _G.BattlefieldMinimap)
-			private.battlefield_digsites:SetSize(225, 150)
-			private.battlefield_digsites:SetPoint("TOPLEFT", _G.BattlefieldMinimap)
-			private.battlefield_digsites:SetPoint("BOTTOMRIGHT", _G.BattlefieldMinimap)
-
-			local tex = private.battlefield_digsites:CreateTexture("ArchyBattleFieldDigsitesTexture", "OVERLAY")
-			tex:SetAllPoints()
-			private.battlefield_digsites:SetFillAlpha(128)
-			private.battlefield_digsites:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
-			private.battlefield_digsites:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
-			private.battlefield_digsites:EnableSmoothing(true)
-			private.battlefield_digsites:SetBorderScalar(0.1)
-			private.battlefield_digsites.lastUpdate = 0
-
-			private.battlefield_digsites:SetScript("OnUpdate", BattlefieldDigsites_OnUpdate)
-		end
-		private.battlefield_digsites:Show()
-	else
-		if private.battlefield_digsites then
-			private.battlefield_digsites:Hide()
-		end
-	end
-end
-
 function Archy:UpdateTracking()
 	if not HasArchaeology() or private.db.general.manualTrack then
 		return
 	end
 
-	-- TODO: need the check for battlefield blobs, if we don't provide those it can be removed
 	if IsTaintable() then
 		private.regen_update_tracking = true
 		return
@@ -1986,14 +1993,8 @@ function Archy:UpdateTracking()
 
 	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
 
-	local showDig = _G.GetCVarBool("digSites")
-	if showDig then
-		_G.WorldMapArchaeologyDigSites:Show()
-		BattleFieldMinimap_Digsites(true)
-	else
-		_G.WorldMapArchaeologyDigSites:Hide()
-		BattleFieldMinimap_Digsites(false)
-	end
+	ToggleDigsiteVisibility(_G.GetCVarBool("digSites"))
+
 	_G.RefreshWorldMap()
 end
 
@@ -2002,10 +2003,7 @@ end
 -------------------------------------------------------------------------------
 function Archy:ADDON_LOADED(event, addon)
 	if addon == "Blizzard_BattlefieldMinimap" then
-		if not private.battlefield_hooked then
-			_G.BattlefieldMinimap:HookScript("OnShow", self.UpdateTracking)
-			private.battlefield_hooked = true
-		end
+		InitializeBattlefieldDigsites()
 		self:UnregisterEvent("ADDON_LOADED")
 	end
 end
