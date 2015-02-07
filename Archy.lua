@@ -6,8 +6,10 @@ local _G = getfenv(0)
 -- Libraries
 local math = _G.math
 local table = _G.table
+local string = _G.string
 
 -- Functions
+local date = _G.date
 local ipairs = _G.ipairs
 local next = _G.next
 local pairs = _G.pairs
@@ -388,7 +390,14 @@ local function Debug(...)
 	if not debugger then
 		CreateDebugFrame()
 	end
-	debugger:AddLine(string.format(...))
+	local message = ("[%s] %s"):format(date("%X"), string.format(...))
+
+	debugger:AddLine(message)
+	return message
+end
+
+local function DebugPour(...)
+	Archy:Pour(Debug(...), 1, 1, 1)
 end
 
 private.Debug = Debug
