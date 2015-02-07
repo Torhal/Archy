@@ -207,21 +207,20 @@ function Archy:RefreshRacesDisplay()
 	local maxWidth, maxHeight = 0, 0
 	self:UpdateSkillBar()
 
-	local races_frame = RacesFrame
-	local topFrame = races_frame.container
-	local hiddenAnchor = races_frame
+	local topFrame = RacesFrame.container
+	local hiddenAnchor = RacesFrame
 	local count = 0
 
 	if private.db.general.theme == "Minimal" then
-		races_frame.title.text:SetText(L["Artifacts"])
+		RacesFrame.title.text:SetText(L["Artifacts"])
 	end
 
-	for _, child in pairs(races_frame.children) do
+	for _, child in pairs(RacesFrame.children) do
 		child:Hide()
 	end
 
 	for raceID, race in pairs(private.Races) do
-		local child = races_frame.children[raceID]
+		local child = RacesFrame.children[raceID]
 		local artifact = race.artifact
 		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 
@@ -420,7 +419,7 @@ function Archy:RefreshRacesDisplay()
 		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or CONTINENT_RACES[private.current_continent][raceID]) then
 			child:ClearAllPoints()
 
-			if topFrame == races_frame.container then
+			if topFrame == RacesFrame.container then
 				child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
 			else
 				child:SetPoint("TOPLEFT", topFrame, "BOTTOMLEFT", 0, -5)
@@ -441,36 +440,36 @@ function Archy:RefreshRacesDisplay()
 		containerXofs = -10
 	end
 
-	races_frame.container:SetHeight(maxHeight)
-	races_frame.container:SetWidth(maxWidth)
+	RacesFrame.container:SetHeight(maxHeight)
+	RacesFrame.container:SetWidth(maxWidth)
 
-	if races_frame.skillBar then
-		races_frame.skillBar:SetWidth(maxWidth)
-		races_frame.skillBar.border:SetWidth(maxWidth + 9)
+	if RacesFrame.skillBar then
+		RacesFrame.skillBar:SetWidth(maxWidth)
+		RacesFrame.skillBar.border:SetWidth(maxWidth + 9)
 
 		if private.db.general.showSkillBar then
-			races_frame.skillBar:Show()
-			races_frame.container:ClearAllPoints()
-			races_frame.container:SetPoint("TOP", races_frame.skillBar, "BOTTOM", containerXofs, -10)
+			RacesFrame.skillBar:Show()
+			RacesFrame.container:ClearAllPoints()
+			RacesFrame.container:SetPoint("TOP", RacesFrame.skillBar, "BOTTOM", containerXofs, -10)
 			maxHeight = maxHeight + 30
 		else
-			races_frame.skillBar:Hide()
-			races_frame.container:ClearAllPoints()
-			races_frame.container:SetPoint("TOP", races_frame, "TOP", containerXofs, -20)
+			RacesFrame.skillBar:Hide()
+			RacesFrame.container:ClearAllPoints()
+			RacesFrame.container:SetPoint("TOP", RacesFrame, "TOP", containerXofs, -20)
 			maxHeight = maxHeight + 10
 		end
 	else
-		races_frame.container:ClearAllPoints()
-		races_frame.container:SetPoint("TOP", races_frame, "TOP", containerXofs, -20)
+		RacesFrame.container:ClearAllPoints()
+		RacesFrame.container:SetPoint("TOP", RacesFrame, "TOP", containerXofs, -20)
 		maxHeight = maxHeight + 10
 	end
 
 	if not private.IsTaintable() then
 		if count == 0 then
-			races_frame:Hide()
+			RacesFrame:Hide()
 		end
-		races_frame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
-		races_frame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
+		RacesFrame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
+		RacesFrame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
 	end
 end
 
