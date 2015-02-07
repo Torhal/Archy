@@ -73,11 +73,10 @@ Dialog:Register("ArchyTomTomError", {
 	end,
 	buttons = {
 		{
-			text = ("%s %s"):format(_G.YES, _G.PARENS_TEMPLATE:format(_G.REQUIRES_RELOAD)),
+			text = _G.YES,
 			on_click = function(self, data)
 				_G.TomTom.profile.poi.setClosest = false
 				_G.TomTom:EnableDisablePOIIntegration()
-				_G.ReloadUI()
 			end,
 		},
 		{
