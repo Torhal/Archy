@@ -1888,21 +1888,21 @@ function Archy:UpdatePlayerPosition(force)
 
 		self:RefreshAll()
 	end
-	local continent = _G.GetCurrentMapContinent()
+	local continentID = _G.GetCurrentMapContinent()
 
-	if private.current_continent == continent then
+	if private.current_continent == continentID then
 		if force then
 			if private.current_continent then
 				UpdateAllSites()
 				ToggleDistanceIndicator()
-			elseif not continent then
+			elseif not continentID then
 				-- Edge case where continent and private.current_continent are both nil
 				self:ScheduleTimer("UpdatePlayerPosition", 1, true)
 			end
 		end
 		return
 	end
-	private.current_continent = continent
+	private.current_continent = continentID
 
 	if force then
 		ToggleDistanceIndicator()
