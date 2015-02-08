@@ -2251,7 +2251,7 @@ do
 		end
 
 		if spell_id == LOREWALKER_ITEMS.MAP.spell and event == "UNIT_SPELLCAST_SUCCEEDED" then
-			if DistanceIndicatorFrame.loritemButton and DistanceIndicatorFrame.loritemButton:IsShown() then
+			if DistanceIndicatorFrame.loritemButton:IsShown() then
 				self:ScheduleTimer(SetLoreItemCooldown, 0.2)
 			end
 		end
@@ -2265,7 +2265,7 @@ do
 
 		if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
 			private.has_dug = true
-			if not player_position or not nearestSite then
+			if not nearestSite then
 				survey_location.map = 0
 				survey_location.level = 0
 				survey_location.x = 0
