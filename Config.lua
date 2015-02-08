@@ -1059,7 +1059,7 @@ local function GetDigSiteOptions()
 							get = function() return db.digsite.anchor end,
 							set = function(_, value)
 								db.digsite.anchor = value
-								Archy:SaveFramePosition(private.digsite_frame)
+								Archy:SaveFramePosition(private.DigSiteFrame)
 							end,
 							values = FRAME_ANCHOR_OPTIONS,
 						},
