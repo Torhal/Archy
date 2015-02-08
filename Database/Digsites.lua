@@ -3,6 +3,9 @@
 -----------------------------------------------------------------------
 local _G = getfenv(0)
 
+-- Functions
+local pairs = _G.pairs
+
 -----------------------------------------------------------------------
 -- AddOn namespace.
 -----------------------------------------------------------------------
@@ -36,6 +39,13 @@ local DigsiteRaces = {
 }
 
 private.DigsiteRaces = DigsiteRaces
+
+local DigsiteRaceLabelFromID = {}
+for raceName, raceID in pairs(DigsiteRaces) do
+	DigsiteRaceLabelFromID[raceID] = raceName
+end
+
+private.DigsiteRaceLabelFromID = DigsiteRaceLabelFromID
 
 local DIG_SITES = {
 	-----------------------------------------------------------------------
