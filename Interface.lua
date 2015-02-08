@@ -98,8 +98,6 @@ local function InitializeFrames()
 
 	private.distance_indicator_frame = DistanceIndicatorFrame
 
-	private.frames_init_done = true
-
 	Archy:UpdateFramePositions()
 	Archy:UpdateDigSiteFrame()
 	Archy:UpdateRacesFrame()

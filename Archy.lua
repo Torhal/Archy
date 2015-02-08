@@ -1610,11 +1610,8 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 		_G.ReloadUI()
 	end
 
-	-- 'OnNewProfile' fires for fresh installations too it seems.
-	if private.frames_init_done then
-		self:ConfigUpdated()
-		self:UpdateFramePositions()
-	end
+	self:ConfigUpdated()
+	self:UpdateFramePositions()
 end
 
 -----------------------------------------------------------------------
@@ -1861,10 +1858,8 @@ end
 function Archy:UpdatePlayerPosition(force)
 	if not PositionUpdateTimerHandle then
 		self:ScheduleTimer(function()
-			if private.frames_init_done then
-				self:UpdateDigSiteFrame()
-				self:UpdateRacesFrame()
-			end
+			self:UpdateDigSiteFrame()
+			self:UpdateRacesFrame()
 			PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
 		end, 1)
 	end
@@ -2290,9 +2285,7 @@ function Archy:QUEST_LOG_UPDATE()
 		end
 	end
 
-	if private.frames_init_done then
-		self:ConfigUpdated()
-	end
+	self:ConfigUpdated()
 	self:UnregisterEvent("QUEST_LOG_UPDATE")
 	self.QUEST_LOG_UPDATE = nil
 end
