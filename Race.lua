@@ -86,6 +86,7 @@ function Archy:AddRace(raceID)
 		RaceKeystoneProcessingQueue[raceID] = keystoneItemID
 		Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
+	race:UpdateArtifact()
 
 	return Races[raceID]
 end
