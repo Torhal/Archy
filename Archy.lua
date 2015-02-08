@@ -413,6 +413,7 @@ local UpdateAllSites
 -- Frames. Assigned in Archy:OnEnable()
 -----------------------------------------------------------------------
 local DistanceIndicatorFrame
+local DigSiteFrame
 
 -----------------------------------------------------------------------
 -- Initialization.
@@ -481,7 +482,7 @@ end
 private.HasArchaeology = HasArchaeology
 
 local function HideFrames()
-	private.digsite_frame:Hide()
+	DigSiteFrame:Hide()
 	private.races_frame:Hide()
 end
 
@@ -489,7 +490,7 @@ local function ShowFrames()
 	if private.in_combat or private.FramesShouldBeHidden() then
 		return
 	end
-	private.digsite_frame:Show()
+	DigSiteFrame:Show()
 	private.races_frame:Show()
 	Archy:ConfigUpdated()
 end
@@ -761,7 +762,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		else
 			Archy:RefreshDigSiteDisplay()
 		end
-		Archy:SetFramePosition(private.digsite_frame)
+		Archy:SetFramePosition(DigSiteFrame)
 		Archy:SetFramePosition(DistanceIndicatorFrame)
 		DistanceIndicatorFrame:Toggle()
 	end,
@@ -1401,7 +1402,7 @@ end
 
 function Archy:UpdateFramePositions()
 	self:SetFramePosition(DistanceIndicatorFrame)
-	self:SetFramePosition(private.digsite_frame)
+	self:SetFramePosition(DigSiteFrame)
 	self:SetFramePosition(private.races_frame)
 end
 
@@ -1433,6 +1434,7 @@ function Archy:OnEnable()
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
 	private.InitializeFrames()
+	DigSiteFrame = private.DigSiteFrame
 	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
 	Archy:UpdateFramePositions()

@@ -143,7 +143,7 @@ do
 			end
 		})
 
-		private.digsite_frame = DigSiteFrame
+		private.DigSiteFrame = DigSiteFrame
 
 		local artifactTemplate = (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
 		RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
