@@ -938,7 +938,7 @@ local function GetDigSiteOptions()
 							get = function() return db.digsite.distanceIndicator.anchor end,
 							set = function(_, value)
 								db.digsite.distanceIndicator.anchor = value
-								Archy:SaveFramePosition(private.distance_indicator_frame)
+								Archy:SaveFramePosition(private.DistanceIndicatorFrame)
 							end,
 							values = FRAME_ANCHOR_OPTIONS,
 							disabled = function() return not db.digsite.distanceIndicator.undocked end,

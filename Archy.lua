@@ -354,7 +354,6 @@ local artifactSolved = {
 local continent_digsites = {}
 private.continent_digsites = continent_digsites
 
-local distanceIndicatorActive = false
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in Archy:OnEnable()
@@ -409,6 +408,11 @@ private.DebugPour = DebugPour
 local Blizzard_SolveArtifact
 local UpdateMinimapPOIs
 local UpdateAllSites
+
+-----------------------------------------------------------------------
+-- Frames. Assigned in Archy:OnEnable()
+-----------------------------------------------------------------------
+local DistanceIndicatorFrame
 
 -----------------------------------------------------------------------
 -- Initialization.
@@ -664,54 +668,6 @@ local function SolveRaceArtifact(raceID, useStones)
 	Blizzard_SolveArtifact()
 end
 
-local function ToggleDistanceIndicator()
-	if IsTaintable() then
-		private.regen_toggle_distance = true
-		return
-	end
-
-	if not private.db.digsite.distanceIndicator.enabled or private.FramesShouldBeHidden() then
-		private.distance_indicator_frame:Hide()
-		return
-	end
-	private.distance_indicator_frame:Show()
-
-	if distanceIndicatorActive then
-		private.distance_indicator_frame.circle:SetAlpha(1)
-	else
-		private.distance_indicator_frame.circle.distance:SetText("0")
-		if private.db.digsite.distanceIndicator.undocked and not private.db.general.locked and (private.db.digsite.distanceIndicator.showSurveyButton or private.db.digsite.distanceIndicator.showCrateButton or private.db.digsite.distanceIndicator.showLorItemButton) then
-			private.distance_indicator_frame.circle:SetAlpha(0.25)
-		else
-			private.distance_indicator_frame.circle:SetAlpha(0)
-		end
-	end
-
-	if private.db.digsite.distanceIndicator.showSurveyButton then
-		private.distance_indicator_frame.surveyButton:Show()
-		private.distance_indicator_frame:SetWidth(52 + private.distance_indicator_frame.surveyButton:GetWidth())
-	else
-		private.distance_indicator_frame.surveyButton:Hide()
-		private.distance_indicator_frame:SetWidth(42)
-	end
-
-	if private.db.digsite.distanceIndicator.showCrateButton then
-		private.distance_indicator_frame.crateButton:Show()
-		local w = private.distance_indicator_frame:GetWidth()
-		private.distance_indicator_frame:SetWidth(w + 10 + private.distance_indicator_frame.crateButton:GetWidth())
-	else
-		private.distance_indicator_frame.crateButton:Hide()
-	end
-
-	if private.db.digsite.distanceIndicator.showLorItemButton then
-		private.distance_indicator_frame.loritemButton:Show()
-		local w = private.distance_indicator_frame:GetWidth()
-		private.distance_indicator_frame:SetWidth(w + 10 + private.distance_indicator_frame.loritemButton:GetWidth())
-	else
-		private.distance_indicator_frame.loritemButton:Hide()
-	end
-end
-
 Dialog:Register("ArchyConfirmSolve", {
 	text = "",
 	on_show = function(self, data)
@@ -806,8 +762,8 @@ local CONFIG_UPDATE_FUNCTIONS = {
 			Archy:RefreshDigSiteDisplay()
 		end
 		Archy:SetFramePosition(private.digsite_frame)
-		Archy:SetFramePosition(private.distance_indicator_frame)
-		ToggleDistanceIndicator()
+		Archy:SetFramePosition(DistanceIndicatorFrame)
+		DistanceIndicatorFrame:Toggle()
 	end,
 	minimap = function(option)
 		UpdateMinimapPOIs(true)
@@ -837,7 +793,7 @@ function Archy:ConfigUpdated(namespace, option)
 		self:RefreshDigSiteDisplay()
 		self:UpdateTracking()
 
-		ToggleDistanceIndicator()
+		DistanceIndicatorFrame:Toggle()
 		UpdateMinimapPOIs(true)
 		SuspendClickToMove()
 
@@ -1081,23 +1037,6 @@ local function AddSurveyNode(siteId, map, level, x, y)
 	end
 end
 
-local DISTANCE_COLOR_TEXCOORDS = {
-	green = {
-		0, 0.24609375, 0, 1
-	},
-	yellow = {
-		0.24609375, 0.5, 0, 1
-	},
-	red = {
-		0.5, 0.75, 0, 1
-	},
-}
-local function SetDistanceIndicatorColor(color)
-	private.distance_indicator_frame.circle.texture:SetTexCoord(unpack(DISTANCE_COLOR_TEXCOORDS[color]))
-	private.distance_indicator_frame.circle:SetAlpha(1)
-	ToggleDistanceIndicator()
-end
-
 local function UpdateDistanceIndicator()
 	if survey_location.x == 0 and survey_location.y == 0 or _G.IsInInstance() then
 		return
@@ -1112,18 +1051,17 @@ local function UpdateDistanceIndicator()
 	local redMin, redMax = yellowMax, 500
 
 	if distance >= greenMin and distance <= greenMax then
-		SetDistanceIndicatorColor("green")
+		DistanceIndicatorFrame:SetColor("green")
 	elseif distance >= yellowMin and distance <= yellowMax then
-		SetDistanceIndicatorColor("yellow")
+		DistanceIndicatorFrame:SetColor("yellow")
 	elseif distance >= redMin and distance <= redMax then
-		SetDistanceIndicatorColor("red")
+		DistanceIndicatorFrame:SetColor("red")
 	else
-		ToggleDistanceIndicator()
+		DistanceIndicatorFrame:Toggle()
 		return
 	end
-	private.distance_indicator_frame.circle.distance:SetFormattedText("%1.f", distance)
+	DistanceIndicatorFrame.circle.distance:SetFormattedText("%1.f", distance)
 end
-
 
 --[[ Minimap Functions ]] --
 local sitePool = {}
@@ -1462,7 +1400,7 @@ function Archy:OnInitialize()
 end
 
 function Archy:UpdateFramePositions()
-	self:SetFramePosition(private.distance_indicator_frame)
+	self:SetFramePosition(DistanceIndicatorFrame)
 	self:SetFramePosition(private.digsite_frame)
 	self:SetFramePosition(private.races_frame)
 end
@@ -1495,6 +1433,7 @@ function Archy:OnEnable()
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
 	private.InitializeFrames()
+	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
 	DatamineTooltip:ClearLines()
 	DatamineTooltip:SetSpellByID(private.CRATE_SPELL_ID)
@@ -1774,7 +1713,7 @@ do
 				break
 			end
 		end
-		local crateButton = private.distance_indicator_frame.crateButton
+		local crateButton = DistanceIndicatorFrame.crateButton
 
 		if private.crate_bag_id then
 			crateButton:SetAttribute("type1", "macro")
@@ -1799,7 +1738,7 @@ do
 
 		local lorewalkerMapCount = _G.GetItemCount(LOREWALKER_ITEMS.MAP.id, false, false)
 		local lorewalkerLodeCount = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.id, false, false)
-		local loreItemButton = private.distance_indicator_frame.loritemButton
+		local loreItemButton = DistanceIndicatorFrame.loritemButton
 
 		-- Prioritize map, since it affects Archy's lists. (randomize digsites)
 		if lorewalkerMapCount > 0 then
@@ -1898,7 +1837,7 @@ function Archy:UpdatePlayerPosition(force)
 		if force then
 			if private.current_continent then
 				UpdateAllSites()
-				ToggleDistanceIndicator()
+				DistanceIndicatorFrame:Toggle()
 			elseif not continentID then
 				-- Edge case where continent and private.current_continent are both nil
 				self:ScheduleTimer("UpdatePlayerPosition", 1, true)
@@ -1909,7 +1848,7 @@ function Archy:UpdatePlayerPosition(force)
 	private.current_continent = continentID
 
 	if force then
-		ToggleDistanceIndicator()
+		DistanceIndicatorFrame:Toggle()
 	end
 
 	private.TomTomHandler:ClearWaypoint()
@@ -2096,8 +2035,8 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			-- we've gained fragments, aka. Successfully dug at a dig site
 			local site_stats = self.db.char.digsites.stats
 
-			distanceIndicatorActive = false
-			ToggleDistanceIndicator()
+			DistanceIndicatorFrame.isActive = false
+			DistanceIndicatorFrame:Toggle()
 
 			-- Drii: for now let's just avoid the error
 			-- TODO: Figure out why the fuck this was done. Burying errors instead of figureout out and fixing their cause is...WTF?!?
@@ -2225,7 +2164,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 
 	if private.regen_toggle_distance then
 		private.regen_toggle_distance = nil
-		ToggleDistanceIndicator()
+		DistanceIndicatorFrame:Toggle()
 	end
 
 	if private.regen_update_tracking then
@@ -2292,11 +2231,11 @@ end
 
 do
 	local function SetLoreItemCooldown(time)
-		_G.CooldownFrame_SetTimer(private.distance_indicator_frame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id))
+		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id))
 	end
 
 	local function SetSurveyCooldown(time)
-		_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
+		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
 	end
 
 	function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
@@ -2305,7 +2244,7 @@ do
 		end
 
 		if spell_id == LOREWALKER_ITEMS.MAP.spell and event == "UNIT_SPELLCAST_SUCCEEDED" then
-			if private.distance_indicator_frame.loritemButton and private.distance_indicator_frame.loritemButton:IsShown() then
+			if DistanceIndicatorFrame.loritemButton and DistanceIndicatorFrame.loritemButton:IsShown() then
 				self:ScheduleTimer(SetLoreItemCooldown, 0.2)
 			end
 		end
@@ -2331,14 +2270,14 @@ do
 			survey_location.map = player_position.map
 			survey_location.level = player_position.level
 
-			distanceIndicatorActive = true
 			lastSite = nearestSite
 			self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
 
-			ToggleDistanceIndicator()
+			DistanceIndicatorFrame.isActive = true
+			DistanceIndicatorFrame:Toggle()
 			UpdateDistanceIndicator()
 
-			if private.distance_indicator_frame.surveyButton and private.distance_indicator_frame.surveyButton:IsShown() then
+			if DistanceIndicatorFrame.surveyButton and DistanceIndicatorFrame.surveyButton:IsShown() then
 				local now = _G.GetTime()
 				local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
 
@@ -2346,7 +2285,7 @@ do
 					if duration <= GLOBAL_COOLDOWN_TIME then
 						self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
 					elseif duration > GLOBAL_COOLDOWN_TIME then -- in case they ever take it off the gcd
-					_G.CooldownFrame_SetTimer(private.distance_indicator_frame.surveyButton.cooldown, start, duration, enable)
+					_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, start, duration, enable)
 					end
 				end
 			end

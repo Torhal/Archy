@@ -56,54 +56,124 @@ end
 local DigSiteFrame
 local RacesFrame
 local DistanceIndicatorFrame
+do
+	local DISTANCE_COLOR_TEXCOORDS = {
+		green = {
+			0, 0.24609375, 0, 1
+		},
+		yellow = {
+			0.24609375, 0.5, 0, 1
+		},
+		red = {
+			0.5, 0.75, 0, 1
+		},
+	}
 
-local function InitializeFrames()
-	if private.IsTaintable() then
-		private.regen_create_frames = true
-		return
+	local function DistanceIndicatorFrame_SetColor(self, color)
+		self.circle.texture:SetTexCoord(unpack(DISTANCE_COLOR_TEXCOORDS[color]))
+		self.circle:SetAlpha(1)
+		self:Toggle()
 	end
 
-	DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
-	DigSiteFrame.children = setmetatable({}, {
-		__index = function(t, k)
-			if k then
-				local template = (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate")
-				local child = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, DigSiteFrame, template)
-				child:Show()
-				t[k] = child
-				return child
+	local function DistanceIndicatorFrame_Toggle(self)
+		if private.IsTaintable() then
+			private.regen_toggle_distance = true
+			return
+		end
+
+		local indicatorSettings = private.db.digsite.distanceIndicator
+		if not indicatorSettings.enabled or private.FramesShouldBeHidden() then
+			self:Hide()
+			return
+		end
+		self:Show()
+
+		if self.isActive then
+			self.circle:SetAlpha(1)
+		else
+			self.circle.distance:SetText("0")
+
+			if indicatorSettings.undocked and not private.db.general.locked and (indicatorSettings.showSurveyButton or indicatorSettings.showCrateButton or indicatorSettings.showLorItemButton) then
+				self.circle:SetAlpha(0.25)
+			else
+				self.circle:SetAlpha(0)
 			end
 		end
-	})
 
-	private.digsite_frame = DigSiteFrame
-
-	RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
-	RacesFrame.children = setmetatable({}, {
-		__index = function(t, k)
-			if k then
-				local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
-				local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], RacesFrame, template)
-				child:Show()
-				t[k] = child
-				return child
-			end
+		if indicatorSettings.showSurveyButton then
+			self.surveyButton:Show()
+			self:SetWidth(52 + self.surveyButton:GetWidth())
+		else
+			self.surveyButton:Hide()
+			self:SetWidth(42)
 		end
-	})
 
-	private.races_frame = RacesFrame
+		if indicatorSettings.showCrateButton then
+			self.crateButton:Show()
+			self:SetWidth(self:GetWidth() + 10 + self.crateButton:GetWidth())
+		else
+			self.crateButton:Hide()
+		end
 
-	DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
-	DistanceIndicatorFrame.circle:SetScale(0.65)
+		if indicatorSettings.showLorItemButton then
+			self.loritemButton:Show()
+			self:SetWidth(self:GetWidth() + 10 + self.loritemButton:GetWidth())
+		else
+			self.loritemButton:Hide()
+		end
+	end
 
-	private.distance_indicator_frame = DistanceIndicatorFrame
+	local function InitializeFrames()
+		if private.IsTaintable() then
+			private.regen_create_frames = true
+			return
+		end
 
-	Archy:UpdateFramePositions()
-	Archy:UpdateDigSiteFrame()
-	Archy:UpdateRacesFrame()
-end
+		DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
+		DigSiteFrame.children = setmetatable({}, {
+			__index = function(t, k)
+				if k then
+					local template = (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate")
+					local child = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, DigSiteFrame, template)
+					child:Show()
+					t[k] = child
+					return child
+				end
+			end
+		})
 
-private.InitializeFrames = InitializeFrames
+		private.digsite_frame = DigSiteFrame
+
+		RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
+		RacesFrame.children = setmetatable({}, {
+			__index = function(t, k)
+				if k then
+					local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
+					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], RacesFrame, template)
+					child:Show()
+					t[k] = child
+					return child
+				end
+			end
+		})
+
+		private.races_frame = RacesFrame
+
+		DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
+		DistanceIndicatorFrame.circle:SetScale(0.65)
+
+		DistanceIndicatorFrame.SetColor = DistanceIndicatorFrame_SetColor
+		DistanceIndicatorFrame.Toggle = DistanceIndicatorFrame_Toggle
+
+		private.DistanceIndicatorFrame = DistanceIndicatorFrame
+
+		Archy:UpdateFramePositions()
+		Archy:UpdateDigSiteFrame()
+		Archy:UpdateRacesFrame()
+	end
+
+	private.InitializeFrames = InitializeFrames
+end -- do-block
 
 -----------------------------------------------------------------------
 -- Methods.
