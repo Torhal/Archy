@@ -409,7 +409,7 @@ local function GetArtifactOptions()
 							get = function() return db.artifact.anchor end,
 							set = function(_, value)
 								db.artifact.anchor = value
-								Archy:SaveFramePosition(private.races_frame)
+								Archy:SaveFramePosition(private.ArtifactFrame)
 							end,
 							values = FRAME_ANCHOR_OPTIONS,
 						},

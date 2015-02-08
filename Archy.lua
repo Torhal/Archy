@@ -412,8 +412,9 @@ local UpdateAllSites
 -----------------------------------------------------------------------
 -- Frames. Assigned in Archy:OnEnable()
 -----------------------------------------------------------------------
-local DistanceIndicatorFrame
+local ArtifactFrame
 local DigSiteFrame
+local DistanceIndicatorFrame
 
 -----------------------------------------------------------------------
 -- Initialization.
@@ -483,7 +484,7 @@ private.HasArchaeology = HasArchaeology
 
 local function HideFrames()
 	DigSiteFrame:Hide()
-	private.races_frame:Hide()
+	ArtifactFrame:Hide()
 end
 
 local function ShowFrames()
@@ -491,7 +492,7 @@ local function ShowFrames()
 		return
 	end
 	DigSiteFrame:Show()
-	private.races_frame:Show()
+	ArtifactFrame:Show()
 	Archy:ConfigUpdated()
 end
 
@@ -747,7 +748,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		else
 			Archy:UpdateRacesFrame()
 			Archy:RefreshRacesDisplay()
-			Archy:SetFramePosition(private.races_frame)
+			Archy:SetFramePosition(ArtifactFrame)
 		end
 	end,
 	digsite = function(option)
@@ -1403,7 +1404,7 @@ end
 function Archy:UpdateFramePositions()
 	self:SetFramePosition(DistanceIndicatorFrame)
 	self:SetFramePosition(DigSiteFrame)
-	self:SetFramePosition(private.races_frame)
+	self:SetFramePosition(ArtifactFrame)
 end
 
 local PositionUpdateTimerHandle
@@ -1434,6 +1435,7 @@ function Archy:OnEnable()
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
 	private.InitializeFrames()
+	ArtifactFrame = private.ArtifactFrame
 	DigSiteFrame = private.DigSiteFrame
 	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
@@ -1598,7 +1600,7 @@ local SUBCOMMAND_FUNCS = {
 		private.TomTomHandler:Refresh(nearestSite)
 	end,
 	test = function()
-		private.races_frame:SetBackdropBorderColor(1, 1, 1, 0.5)
+		ArtifactFrame:SetBackdropBorderColor(1, 1, 1, 0.5)
 	end,
 	debug = function()
 		if not debugger then
@@ -1787,16 +1789,12 @@ function Archy:UpdateSkillBar()
 	if not private.current_continent or not HasArchaeology() then
 		return
 	end
-	local races_frame = private.races_frame
 
-	if not races_frame or not races_frame.skillBar then
-		return
-	end
 	local rank, maxRank = GetArchaeologyRank()
 
-	races_frame.skillBar:SetMinMaxValues(0, maxRank)
-	races_frame.skillBar:SetValue(rank)
-	races_frame.skillBar.text:SetFormattedText("%s : %d/%d", _G.GetArchaeologyInfo(), rank, maxRank)
+	ArtifactFrame.skillBar:SetMinMaxValues(0, maxRank)
+	ArtifactFrame.skillBar:SetValue(rank)
+	ArtifactFrame.skillBar.text:SetFormattedText("%s : %d/%d", _G.GetArchaeologyInfo(), rank, maxRank)
 end
 
 --[[ Positional functions ]] --

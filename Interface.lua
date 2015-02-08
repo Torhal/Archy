@@ -55,7 +55,7 @@ end
 
 local DigSiteFrame
 local DistanceIndicatorFrame
-local RacesFrame
+local ArtifactFrame
 do
 	local function DigSiteFrame_UpdateChrome(self)
 		if private.IsTaintable() then
@@ -243,12 +243,12 @@ do
 		private.DigSiteFrame = DigSiteFrame
 
 		local artifactTemplate = (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
-		RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
-		RacesFrame.children = setmetatable({}, {
+		ArtifactFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
+		ArtifactFrame.children = setmetatable({}, {
 			__index = function(t, k)
 				if k then
 					local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
-					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], RacesFrame, template)
+					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], ArtifactFrame, template)
 					child:Show()
 					t[k] = child
 					return child
@@ -256,7 +256,7 @@ do
 			end
 		})
 
-		private.races_frame = RacesFrame
+		private.ArtifactFrame = ArtifactFrame
 
 		DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
 		DistanceIndicatorFrame.circle:SetScale(0.65)
@@ -279,17 +279,17 @@ function Archy:UpdateRacesFrame()
 		return
 	end
 
-	RacesFrame:SetScale(private.db.artifact.scale)
-	RacesFrame:SetAlpha(private.db.artifact.alpha)
+	ArtifactFrame:SetScale(private.db.artifact.scale)
+	ArtifactFrame:SetAlpha(private.db.artifact.alpha)
 
 	local is_movable = not private.db.general.locked
-	RacesFrame:SetMovable(is_movable)
-	RacesFrame:EnableMouse(is_movable)
+	ArtifactFrame:SetMovable(is_movable)
+	ArtifactFrame:EnableMouse(is_movable)
 
 	if is_movable then
-		RacesFrame:RegisterForDrag("LeftButton")
+		ArtifactFrame:RegisterForDrag("LeftButton")
 	else
-		RacesFrame:RegisterForDrag()
+		ArtifactFrame:RegisterForDrag()
 	end
 
 	local artifactFont = private.db.artifact.font
@@ -300,7 +300,7 @@ function Archy:UpdateRacesFrame()
 	local fragmentFontName = LSM:Fetch("font", fragmentFont.name)
 	local keystoneFontName = LSM:Fetch("font", keystoneFont.name)
 
-	for _, child in pairs(RacesFrame.children) do
+	for _, child in pairs(ArtifactFrame.children) do
 		if private.db.general.theme == "Graphical" then
 			child.fragmentBar.artifact:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
 			child.fragmentBar.artifact:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
@@ -395,7 +395,7 @@ function Archy:UpdateRacesFrame()
 		end
 	end
 
-	RacesFrame:SetBackdrop({
+	ArtifactFrame:SetBackdrop({
 		bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
 		edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
 		tile = false,
@@ -409,25 +409,25 @@ function Archy:UpdateRacesFrame()
 		}
 	})
 
-	RacesFrame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
-	RacesFrame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
+	ArtifactFrame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
+	ArtifactFrame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
 
 	if not private.IsTaintable() then
-		local height = RacesFrame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
+		local height = ArtifactFrame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
 		if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
 			height = height + 30
 		end
-		RacesFrame:SetHeight(height)
-		RacesFrame:SetWidth(RacesFrame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
+		ArtifactFrame:SetHeight(height)
+		ArtifactFrame:SetWidth(ArtifactFrame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
 	end
 
-	if RacesFrame:IsVisible() then
+	if ArtifactFrame:IsVisible() then
 		if private.db.general.stealthMode or not private.db.artifact.show or FramesShouldBeHidden() then
-			RacesFrame:Hide()
+			ArtifactFrame:Hide()
 		end
 	else
 		if not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden() then
-			RacesFrame:Show()
+			ArtifactFrame:Show()
 		end
 	end
 end
@@ -439,20 +439,20 @@ function Archy:RefreshRacesDisplay()
 	local maxWidth, maxHeight = 0, 0
 	self:UpdateSkillBar()
 
-	local topFrame = RacesFrame.container
-	local hiddenAnchor = RacesFrame
+	local topFrame = ArtifactFrame.container
+	local hiddenAnchor = ArtifactFrame
 	local racesCount = 0
 
 	if private.db.general.theme == "Minimal" then
-		RacesFrame.title.text:SetText(L["Artifacts"])
+		ArtifactFrame.title.text:SetText(L["Artifacts"])
 	end
 
-	for _, child in pairs(RacesFrame.children) do
+	for _, child in pairs(ArtifactFrame.children) do
 		child:Hide()
 	end
 
 	for raceID, race in pairs(private.Races) do
-		local child = RacesFrame.children[raceID]
+		local child = ArtifactFrame.children[raceID]
 		local artifact = race.artifact
 		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 
@@ -462,7 +462,7 @@ function Archy:RefreshRacesDisplay()
 		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
 			child:ClearAllPoints()
 
-			if topFrame == RacesFrame.container then
+			if topFrame == ArtifactFrame.container then
 				child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
 			else
 				child:SetPoint("TOPLEFT", topFrame, "BOTTOMLEFT", 0, -5)
@@ -606,36 +606,36 @@ function Archy:RefreshRacesDisplay()
 		containerXofs = -10
 	end
 
-	RacesFrame.container:SetHeight(maxHeight)
-	RacesFrame.container:SetWidth(maxWidth)
+	ArtifactFrame.container:SetHeight(maxHeight)
+	ArtifactFrame.container:SetWidth(maxWidth)
 
-	if RacesFrame.skillBar then
-		RacesFrame.skillBar:SetWidth(maxWidth)
-		RacesFrame.skillBar.border:SetWidth(maxWidth + 9)
+	if ArtifactFrame.skillBar then
+		ArtifactFrame.skillBar:SetWidth(maxWidth)
+		ArtifactFrame.skillBar.border:SetWidth(maxWidth + 9)
 
 		if private.db.general.showSkillBar then
-			RacesFrame.skillBar:Show()
-			RacesFrame.container:ClearAllPoints()
-			RacesFrame.container:SetPoint("TOP", RacesFrame.skillBar, "BOTTOM", containerXofs, -10)
+			ArtifactFrame.skillBar:Show()
+			ArtifactFrame.container:ClearAllPoints()
+			ArtifactFrame.container:SetPoint("TOP", ArtifactFrame.skillBar, "BOTTOM", containerXofs, -10)
 			maxHeight = maxHeight + 30
 		else
-			RacesFrame.skillBar:Hide()
-			RacesFrame.container:ClearAllPoints()
-			RacesFrame.container:SetPoint("TOP", RacesFrame, "TOP", containerXofs, -20)
+			ArtifactFrame.skillBar:Hide()
+			ArtifactFrame.container:ClearAllPoints()
+			ArtifactFrame.container:SetPoint("TOP", ArtifactFrame, "TOP", containerXofs, -20)
 			maxHeight = maxHeight + 10
 		end
 	else
-		RacesFrame.container:ClearAllPoints()
-		RacesFrame.container:SetPoint("TOP", RacesFrame, "TOP", containerXofs, -20)
+		ArtifactFrame.container:ClearAllPoints()
+		ArtifactFrame.container:SetPoint("TOP", ArtifactFrame, "TOP", containerXofs, -20)
 		maxHeight = maxHeight + 10
 	end
 
 	if not private.IsTaintable() then
 		if racesCount == 0 then
-			RacesFrame:Hide()
+			ArtifactFrame:Hide()
 		end
-		RacesFrame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
-		RacesFrame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
+		ArtifactFrame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
+		ArtifactFrame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
 	end
 end
 
@@ -843,7 +843,7 @@ function Archy:SetFramePosition(frame)
 
 	if frame == DigSiteFrame then
 		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.position)
-	elseif frame == RacesFrame then
+	elseif frame == ArtifactFrame then
 		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.artifact.position)
 	elseif frame == DistanceIndicatorFrame then
 		if not private.db.digsite.distanceIndicator.undocked then
@@ -872,7 +872,7 @@ function Archy:SaveFramePosition(frame)
 	if frame == DigSiteFrame then
 		anchor = self.db.profile.digsite.anchor
 		position = self.db.profile.digsite.position
-	elseif frame == RacesFrame then
+	elseif frame == ArtifactFrame then
 		anchor = self.db.profile.artifact.anchor
 		position = self.db.profile.artifact.position
 	elseif frame == DistanceIndicatorFrame then
@@ -931,7 +931,7 @@ function Archy:SaveFramePosition(frame)
 
 	if frame == DigSiteFrame then
 		private.db.digsite.position = position
-	elseif frame == RacesFrame then
+	elseif frame == ArtifactFrame then
 		private.db.artifact.position = position
 	elseif frame == DistanceIndicatorFrame then
 		private.db.digsite.distanceIndicator.position = position
