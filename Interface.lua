@@ -62,6 +62,7 @@ local function InitializeFrames()
 		private.regen_create_frames = true
 		return
 	end
+
 	DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
 	DigSiteFrame.children = setmetatable({}, {
 		__index = function(t, k)
@@ -209,7 +210,7 @@ function Archy:RefreshRacesDisplay()
 
 	local topFrame = RacesFrame.container
 	local hiddenAnchor = RacesFrame
-	local count = 0
+	local racesCount = 0
 
 	if private.db.general.theme == "Minimal" then
 		RacesFrame.title.text:SetText(L["Artifacts"])
@@ -416,7 +417,8 @@ function Archy:RefreshRacesDisplay()
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
 
-		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or CONTINENT_RACES[private.current_continent][raceID]) then
+		local continentHasRace = CONTINENT_RACES[private.current_continent][raceID]
+		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
 			child:ClearAllPoints()
 
 			if topFrame == RacesFrame.container then
@@ -428,7 +430,7 @@ function Archy:RefreshRacesDisplay()
 			child:Show()
 			maxHeight = maxHeight + child:GetHeight() + 5
 			maxWidth = (maxWidth > child:GetWidth()) and maxWidth or child:GetWidth()
-			count = count + 1
+			racesCount = racesCount + 1
 		else
 			child:Hide()
 		end
@@ -465,7 +467,7 @@ function Archy:RefreshRacesDisplay()
 	end
 
 	if not private.IsTaintable() then
-		if count == 0 then
+		if racesCount == 0 then
 			RacesFrame:Hide()
 		end
 		RacesFrame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
