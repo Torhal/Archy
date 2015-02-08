@@ -1586,6 +1586,8 @@ function Archy:OnEnable()
 	private.current_continent = _G.GetCurrentMapContinent()
 	UpdateAllSites()
 
+	player_position.map, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
+
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 end
 
