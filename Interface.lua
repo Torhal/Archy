@@ -129,7 +129,8 @@ do
 			return
 		end
 
-		DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer"))
+		local digSiteTemplate = (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer")
+		DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, digSiteTemplate)
 		DigSiteFrame.children = setmetatable({}, {
 			__index = function(t, k)
 				if k then
@@ -144,7 +145,8 @@ do
 
 		private.digsite_frame = DigSiteFrame
 
-		RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer"))
+		local artifactTemplate = (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
+		RacesFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
 		RacesFrame.children = setmetatable({}, {
 			__index = function(t, k)
 				if k then
