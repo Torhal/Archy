@@ -1435,6 +1435,10 @@ function Archy:OnEnable()
 	private.InitializeFrames()
 	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
+	Archy:UpdateFramePositions()
+	Archy:UpdateDigSiteFrame()
+	Archy:UpdateRacesFrame()
+
 	DatamineTooltip:ClearLines()
 	DatamineTooltip:SetSpellByID(private.CRATE_SPELL_ID)
 	CRATE_USE_STRING = ("%s %s"):format(_G.ITEM_SPELL_TRIGGER_ONUSE, _G["ArchyScanTipTextLeft" .. DatamineTooltip:NumLines()]:GetText())

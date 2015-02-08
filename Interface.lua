@@ -166,10 +166,6 @@ do
 		DistanceIndicatorFrame.Toggle = DistanceIndicatorFrame_Toggle
 
 		private.DistanceIndicatorFrame = DistanceIndicatorFrame
-
-		Archy:UpdateFramePositions()
-		Archy:UpdateDigSiteFrame()
-		Archy:UpdateRacesFrame()
 	end
 
 	private.InitializeFrames = InitializeFrames
