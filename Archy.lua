@@ -401,6 +401,7 @@ local function DebugPour(...)
 end
 
 private.Debug = Debug
+private.DebugPour = DebugPour
 
 -----------------------------------------------------------------------
 -- Function upvalues
@@ -1466,7 +1467,7 @@ function Archy:UpdateFramePositions()
 	self:SetFramePosition(private.races_frame)
 end
 
-local timer_handle
+local PositionUpdateTimerHandle
 
 function Archy:OnEnable()
 	-- Ignore this event for now as it's can break other Archaeology UIs
@@ -1580,10 +1581,16 @@ function Archy:OnEnable()
 			end
 		end
 	end
+
+	_G.SetMapToCurrentZone()
+	private.current_continent = _G.GetCurrentMapContinent()
+	UpdateAllSites()
+
+	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 end
 
 function Archy:OnDisable()
-	self:CancelTimer(timer_handle)
+	self:CancelTimer(PositionUpdateTimerHandle)
 end
 
 function Archy:OnProfileUpdate(event, database, ProfileKey)
@@ -1850,20 +1857,22 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not private.db.general.show and not force then
-		return
+	if not PositionUpdateTimerHandle then
+		self:ScheduleTimer(function()
+			if private.frames_init_done then
+				self:UpdateDigSiteFrame()
+				self:UpdateRacesFrame()
+			end
+			PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
+		end, 1)
 	end
 
-	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") then
+	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") or (not force and not private.db.general.show) then
 		return
 	end
 
 	if force then
 		_G.RequestArtifactCompletionHistory()
-	end
-
-	if not private.frames_init_done then
-		return
 	end
 
 	if _G.GetCurrentMapAreaID() == -1 then
@@ -1878,7 +1887,7 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	if player_position.x ~= x or player_position.y ~= y or player_position.map ~= map or player_position.level ~= level or force then
+	if force or player_position.x ~= x or player_position.y ~= y or player_position.map ~= map or player_position.level ~= level then
 		player_position.x, player_position.y, player_position.map, player_position.level = x, y, map, level
 
 		self:UpdateSiteDistances()
@@ -2185,20 +2194,6 @@ function Archy:PET_BATTLE_OPENING_START()
 end
 
 function Archy:PLAYER_ENTERING_WORLD()
-	_G.SetMapToCurrentZone()
-
-	-- Two timers are needed here: If we force a call to UpdatePlayerPosition() too soon, the site distances will not update properly and the notifications may vanish just as the player is able to see them.
-	if not timer_handle then
-		self:ScheduleTimer(function()
-			if private.frames_init_done then
-				self:UpdateDigSiteFrame()
-				self:UpdateRacesFrame()
-			end
-			timer_handle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
-		end, 1)
-	end
-	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
-
 	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
 	if private.TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
 		private.TomTomHandler:DisplayConflictError()
