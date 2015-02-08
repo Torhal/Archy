@@ -150,86 +150,7 @@ function Archy:UpdateRacesFrame()
 			child.fragmentBar.keystones.count:SetFont(keystoneFontName, keystoneFont.size, keystoneFont.outline)
 			child.fragmentBar.keystones.count:SetTextColor(keystoneFont.color.r, keystoneFont.color.g, keystoneFont.color.b, keystoneFont.color.a)
 			FontString_SetShadow(child.fragmentBar.keystones.count, keystoneFont.shadow)
-		else
-			child.fragments.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.fragments.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.fragments.text, artifactFont.shadow)
 
-			child.sockets.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.sockets.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.sockets.text, artifactFont.shadow)
-
-			child.artifact.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.artifact.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.artifact.text, artifactFont.shadow)
-		end
-	end
-
-	RacesFrame:SetBackdrop({
-		bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
-		edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
-		tile = false,
-		edgeSize = 8,
-		tileSize = 8,
-		insets = {
-			left = 2,
-			top = 2,
-			right = 2,
-			bottom = 2
-		}
-	})
-
-	RacesFrame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
-	RacesFrame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
-
-
-	if not private.IsTaintable() then
-		local height = RacesFrame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
-		if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
-			height = height + 30
-		end
-		RacesFrame:SetHeight(height)
-		RacesFrame:SetWidth(RacesFrame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
-	end
-
-	if RacesFrame:IsVisible() then
-		if private.db.general.stealthMode or not private.db.artifact.show or FramesShouldBeHidden() then
-			RacesFrame:Hide()
-		end
-	else
-		if not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden() then
-			RacesFrame:Show()
-		end
-	end
-end
-
-function Archy:RefreshRacesDisplay()
-	if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
-		return
-	end
-	local maxWidth, maxHeight = 0, 0
-	self:UpdateSkillBar()
-
-	local topFrame = RacesFrame.container
-	local hiddenAnchor = RacesFrame
-	local racesCount = 0
-
-	if private.db.general.theme == "Minimal" then
-		RacesFrame.title.text:SetText(L["Artifacts"])
-	end
-
-	for _, child in pairs(RacesFrame.children) do
-		child:Hide()
-	end
-
-	for raceID, race in pairs(private.Races) do
-		local child = RacesFrame.children[raceID]
-		local artifact = race.artifact
-		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
-
-		child:SetID(raceID)
-
-		if private.db.general.theme == "Graphical" then
 			child.solveButton:SetText(_G.SOLVE)
 			child.solveButton:SetWidth(child.solveButton:GetTextWidth() + 20)
 			child.solveButton.tooltip = _G.SOLVE
@@ -296,7 +217,103 @@ function Archy:RefreshRacesDisplay()
 					child:SetHeight(70)
 				end
 			end
+		else
+			child.fragments.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.fragments.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.fragments.text, artifactFont.shadow)
 
+			child.sockets.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.sockets.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.sockets.text, artifactFont.shadow)
+
+			child.artifact.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+			child.artifact.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+			FontString_SetShadow(child.artifact.text, artifactFont.shadow)
+		end
+	end
+
+	RacesFrame:SetBackdrop({
+		bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
+		edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
+		tile = false,
+		edgeSize = 8,
+		tileSize = 8,
+		insets = {
+			left = 2,
+			top = 2,
+			right = 2,
+			bottom = 2
+		}
+	})
+
+	RacesFrame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
+	RacesFrame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
+
+	if not private.IsTaintable() then
+		local height = RacesFrame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
+		if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
+			height = height + 30
+		end
+		RacesFrame:SetHeight(height)
+		RacesFrame:SetWidth(RacesFrame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
+	end
+
+	if RacesFrame:IsVisible() then
+		if private.db.general.stealthMode or not private.db.artifact.show or FramesShouldBeHidden() then
+			RacesFrame:Hide()
+		end
+	else
+		if not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden() then
+			RacesFrame:Show()
+		end
+	end
+end
+
+function Archy:RefreshRacesDisplay()
+	if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
+		return
+	end
+	local maxWidth, maxHeight = 0, 0
+	self:UpdateSkillBar()
+
+	local topFrame = RacesFrame.container
+	local hiddenAnchor = RacesFrame
+	local racesCount = 0
+
+	if private.db.general.theme == "Minimal" then
+		RacesFrame.title.text:SetText(L["Artifacts"])
+	end
+
+	for _, child in pairs(RacesFrame.children) do
+		child:Hide()
+	end
+
+	for raceID, race in pairs(private.Races) do
+		local child = RacesFrame.children[raceID]
+		local artifact = race.artifact
+		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
+
+		child:SetID(raceID)
+
+		local continentHasRace = CONTINENT_RACES[private.current_continent][raceID]
+		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
+			child:ClearAllPoints()
+
+			if topFrame == RacesFrame.container then
+				child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
+			else
+				child:SetPoint("TOPLEFT", topFrame, "BOTTOMLEFT", 0, -5)
+			end
+			topFrame = child
+			child:Show()
+			maxHeight = maxHeight + child:GetHeight() + 5
+			maxWidth = (maxWidth > child:GetWidth()) and maxWidth or child:GetWidth()
+			racesCount = racesCount + 1
+		else
+			child:Hide()
+		end
+
+		if private.db.general.theme == "Graphical" then
 			child.crest.texture:SetTexture(race.texture)
 			child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
 			child.crest.text:SetText(race.name)
@@ -418,24 +435,6 @@ function Archy:RefreshRacesDisplay()
 			child.artifact:SetHeight(child.artifact.text:GetStringHeight())
 			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
 		end
-
-		local continentHasRace = CONTINENT_RACES[private.current_continent][raceID]
-		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
-			child:ClearAllPoints()
-
-			if topFrame == RacesFrame.container then
-				child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
-			else
-				child:SetPoint("TOPLEFT", topFrame, "BOTTOMLEFT", 0, -5)
-			end
-			topFrame = child
-			child:Show()
-			maxHeight = maxHeight + child:GetHeight() + 5
-			maxWidth = (maxWidth > child:GetWidth()) and maxWidth or child:GetWidth()
-			racesCount = racesCount + 1
-		else
-			child:Hide()
-		end
 	end
 	local containerXofs = 0
 
@@ -492,7 +491,12 @@ function Archy:UpdateDigSiteFrame()
 		tile = false,
 		edgeSize = 8,
 		tileSize = 8,
-		insets = { left = 2, top = 2, right = 2, bottom = 2 }
+		insets = {
+			left = 2,
+			top = 2,
+			right = 2,
+			bottom = 2
+		}
 	})
 
 	DigSiteFrame:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
@@ -521,6 +525,26 @@ function Archy:UpdateDigSiteFrame()
 			siteFrame.distance.value:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
 			siteFrame.distance.value:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
 			FontString_SetShadow(siteFrame.distance.value, zoneFont.shadow)
+
+			if siteFrame.style ~= private.db.digsite.style then
+				if private.db.digsite.style == "Compact" then
+					siteFrame.crest:SetWidth(20)
+					siteFrame.crest:SetHeight(20)
+					siteFrame.crest.icon:SetWidth(20)
+					siteFrame.crest.icon:SetHeight(20)
+					siteFrame.zone:Hide()
+					siteFrame.distance:Hide()
+					siteFrame:SetHeight(24)
+				else
+					siteFrame.crest:SetWidth(40)
+					siteFrame.crest:SetHeight(40)
+					siteFrame.crest.icon:SetWidth(40)
+					siteFrame.crest.icon:SetHeight(40)
+					siteFrame.zone:Show()
+					siteFrame.distance:Show()
+					siteFrame:SetHeight(40)
+				end
+			end
 		else
 			siteFrame.zone.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
 			siteFrame.zone.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
@@ -715,25 +739,6 @@ function Archy:RefreshDigSiteDisplay()
 		local count = self.db.char.digsites.stats[digSite.id].counter
 
 		if private.db.general.theme == "Graphical" then
-			if childFrame.style ~= private.db.digsite.style then
-				if private.db.digsite.style == "Compact" then
-					childFrame.crest:SetWidth(20)
-					childFrame.crest:SetHeight(20)
-					childFrame.crest.icon:SetWidth(20)
-					childFrame.crest.icon:SetHeight(20)
-					childFrame.zone:Hide()
-					childFrame.distance:Hide()
-					childFrame:SetHeight(24)
-				else
-					childFrame.crest:SetWidth(40)
-					childFrame.crest:SetHeight(40)
-					childFrame.crest.icon:SetWidth(40)
-					childFrame.crest.icon:SetHeight(40)
-					childFrame.zone:Show()
-					childFrame.distance:Show()
-					childFrame:SetHeight(40)
-				end
-			end
 			childFrame.digCounter.value:SetText(count or "")
 		else
 			childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, maxSurveyCount)
