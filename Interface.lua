@@ -54,9 +54,104 @@ local function FontString_SetShadow(fs, hasShadow)
 end
 
 local DigSiteFrame
-local RacesFrame
 local DistanceIndicatorFrame
+local RacesFrame
 do
+	local function DigSiteFrame_UpdateChrome(self)
+		if private.IsTaintable() then
+			private.regen_update_digsites = true
+			return
+		end
+
+		self:SetScale(private.db.digsite.scale)
+		self:SetAlpha(private.db.digsite.alpha)
+
+		self:SetBackdrop({
+			bgFile = LSM:Fetch('background', private.db.digsite.backgroundTexture),
+			edgeFile = LSM:Fetch('border', private.db.digsite.borderTexture),
+			tile = false,
+			edgeSize = 8,
+			tileSize = 8,
+			insets = {
+				left = 2,
+				top = 2,
+				right = 2,
+				bottom = 2
+			}
+		})
+
+		self:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
+		self:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
+
+		local digsiteFont = private.db.digsite.font
+		local digsiteFontName = LSM:Fetch("font", digsiteFont.name)
+
+		local zoneFont = private.db.digsite.zoneFont
+		local zoneFontName = LSM:Fetch("font", zoneFont.name)
+
+		for _, siteFrame in pairs(self.children) do
+			siteFrame.site.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+			siteFrame.site.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+			FontString_SetShadow(siteFrame.site.name, digsiteFont.shadow)
+
+			siteFrame.digCounter.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+			siteFrame.digCounter.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+			FontString_SetShadow(siteFrame.digCounter.value, digsiteFont.shadow)
+
+			if private.db.general.theme == "Graphical" then
+				siteFrame.zone.name:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
+				siteFrame.zone.name:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
+				FontString_SetShadow(siteFrame.zone.name, zoneFont.shadow)
+
+				siteFrame.distance.value:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
+				siteFrame.distance.value:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
+				FontString_SetShadow(siteFrame.distance.value, zoneFont.shadow)
+
+				if siteFrame.style ~= private.db.digsite.style then
+					if private.db.digsite.style == "Compact" then
+						siteFrame.crest:SetWidth(20)
+						siteFrame.crest:SetHeight(20)
+						siteFrame.crest.icon:SetWidth(20)
+						siteFrame.crest.icon:SetHeight(20)
+						siteFrame.zone:Hide()
+						siteFrame.distance:Hide()
+						siteFrame:SetHeight(24)
+					else
+						siteFrame.crest:SetWidth(40)
+						siteFrame.crest:SetHeight(40)
+						siteFrame.crest.icon:SetWidth(40)
+						siteFrame.crest.icon:SetHeight(40)
+						siteFrame.zone:Show()
+						siteFrame.distance:Show()
+						siteFrame:SetHeight(40)
+					end
+				end
+			else
+				siteFrame.zone.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+				siteFrame.zone.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+				FontString_SetShadow(siteFrame.zone.name, digsiteFont.shadow)
+
+				siteFrame.distance.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+				siteFrame.distance.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+				FontString_SetShadow(siteFrame.distance.value, digsiteFont.shadow)
+			end
+		end
+
+		local continentID = private.current_continent
+		local continentDigsites = private.continent_digsites
+
+		local canShow = not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0
+		if self:IsVisible() then
+			if not canShow then
+				self:Hide()
+			end
+		else
+			if canShow then
+				self:Show()
+			end
+		end
+	end
+
 	local DISTANCE_COLOR_TEXCOORDS = {
 		green = {
 			0, 0.24609375, 0, 1
@@ -142,6 +237,8 @@ do
 				end
 			end
 		})
+
+		DigSiteFrame.UpdateChrome = DigSiteFrame_UpdateChrome
 
 		private.DigSiteFrame = DigSiteFrame
 
@@ -539,101 +636,6 @@ function Archy:RefreshRacesDisplay()
 		end
 		RacesFrame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
 		RacesFrame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
-	end
-end
-
-function Archy:UpdateDigSiteFrame()
-	if private.IsTaintable() then
-		private.regen_update_digsites = true
-		return
-	end
-
-	DigSiteFrame:SetScale(private.db.digsite.scale)
-	DigSiteFrame:SetAlpha(private.db.digsite.alpha)
-
-	DigSiteFrame:SetBackdrop({
-		bgFile = LSM:Fetch('background', private.db.digsite.backgroundTexture),
-		edgeFile = LSM:Fetch('border', private.db.digsite.borderTexture),
-		tile = false,
-		edgeSize = 8,
-		tileSize = 8,
-		insets = {
-			left = 2,
-			top = 2,
-			right = 2,
-			bottom = 2
-		}
-	})
-
-	DigSiteFrame:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
-	DigSiteFrame:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
-
-	local digsiteFont = private.db.digsite.font
-	local digsiteFontName = LSM:Fetch("font", digsiteFont.name)
-
-	local zoneFont = private.db.digsite.zoneFont
-	local zoneFontName = LSM:Fetch("font", zoneFont.name)
-
-	for _, siteFrame in pairs(DigSiteFrame.children) do
-		siteFrame.site.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
-		siteFrame.site.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
-		FontString_SetShadow(siteFrame.site.name, digsiteFont.shadow)
-
-		siteFrame.digCounter.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
-		siteFrame.digCounter.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
-		FontString_SetShadow(siteFrame.digCounter.value, digsiteFont.shadow)
-
-		if private.db.general.theme == "Graphical" then
-			siteFrame.zone.name:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
-			siteFrame.zone.name:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
-			FontString_SetShadow(siteFrame.zone.name, zoneFont.shadow)
-
-			siteFrame.distance.value:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
-			siteFrame.distance.value:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
-			FontString_SetShadow(siteFrame.distance.value, zoneFont.shadow)
-
-			if siteFrame.style ~= private.db.digsite.style then
-				if private.db.digsite.style == "Compact" then
-					siteFrame.crest:SetWidth(20)
-					siteFrame.crest:SetHeight(20)
-					siteFrame.crest.icon:SetWidth(20)
-					siteFrame.crest.icon:SetHeight(20)
-					siteFrame.zone:Hide()
-					siteFrame.distance:Hide()
-					siteFrame:SetHeight(24)
-				else
-					siteFrame.crest:SetWidth(40)
-					siteFrame.crest:SetHeight(40)
-					siteFrame.crest.icon:SetWidth(40)
-					siteFrame.crest.icon:SetHeight(40)
-					siteFrame.zone:Show()
-					siteFrame.distance:Show()
-					siteFrame:SetHeight(40)
-				end
-			end
-		else
-			siteFrame.zone.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
-			siteFrame.zone.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
-			FontString_SetShadow(siteFrame.zone.name, digsiteFont.shadow)
-
-			siteFrame.distance.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
-			siteFrame.distance.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
-			FontString_SetShadow(siteFrame.distance.value, digsiteFont.shadow)
-		end
-	end
-
-	local continentID = private.current_continent
-	local continentDigsites = private.continent_digsites
-
-	local canShow = not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0
-	if DigSiteFrame:IsVisible() then
-		if not canShow then
-			DigSiteFrame:Hide()
-		end
-	else
-		if canShow then
-			DigSiteFrame:Show()
-		end
 	end
 end
 

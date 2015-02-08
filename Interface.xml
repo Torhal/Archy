@@ -424,7 +424,8 @@
 						else
 							Archy.db.profile.digsite.style = "Compact"
 						end
-						Archy:UpdateDigSiteFrame()
+                        local parent = self:GetParent()
+						parent:UpdateChrome()
 						Archy:RefreshDigSiteDisplay()
 					</OnClick>
 					<OnEnter>

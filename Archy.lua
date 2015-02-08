@@ -755,7 +755,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 			UpdateAllSites()
 		end
 		Archy:UpdateSiteDistances()
-		Archy:UpdateDigSiteFrame()
+		DigSiteFrame:UpdateChrome()
 
 		if option == "font" then
 			Archy:ResizeDigSiteDisplay()
@@ -790,7 +790,7 @@ function Archy:ConfigUpdated(namespace, option)
 	else
 		self:UpdateRacesFrame()
 		self:RefreshRacesDisplay()
-		self:UpdateDigSiteFrame()
+		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
 		self:UpdateTracking()
 
@@ -1438,7 +1438,7 @@ function Archy:OnEnable()
 	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
 	Archy:UpdateFramePositions()
-	Archy:UpdateDigSiteFrame()
+	DigSiteFrame:UpdateChrome()
 	Archy:UpdateRacesFrame()
 
 	DatamineTooltip:ClearLines()
@@ -1803,7 +1803,7 @@ end
 function Archy:UpdatePlayerPosition(force)
 	if not PositionUpdateTimerHandle then
 		self:ScheduleTimer(function()
-			self:UpdateDigSiteFrame()
+			DigSiteFrame:UpdateChrome()
 			self:UpdateRacesFrame()
 			PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
 		end, 1)
@@ -1819,7 +1819,7 @@ function Archy:UpdatePlayerPosition(force)
 
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
-		self:UpdateDigSiteFrame()
+		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
 		return
 	end
@@ -1872,7 +1872,7 @@ function Archy:UpdatePlayerPosition(force)
 	if force then
 		self:UpdateSiteDistances()
 	end
-	self:UpdateDigSiteFrame()
+	DigSiteFrame:UpdateChrome()
 	self:RefreshDigSiteDisplay()
 	self:UpdateFramePositions()
 end
@@ -2186,7 +2186,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 
 	if private.regen_update_digsites then
 		private.regen_update_digsites = nil
-		self:UpdateDigSiteFrame()
+		DigSiteFrame:UpdateChrome()
 	end
 
 	if private.regen_update_races then
