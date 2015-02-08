@@ -1881,7 +1881,10 @@ function Archy:UpdatePlayerPosition(force)
 	if player_position.x ~= x or player_position.y ~= y or player_position.map ~= map or player_position.level ~= level or force then
 		player_position.x, player_position.y, player_position.map, player_position.level = x, y, map, level
 
-		self:RefreshAll()
+		self:UpdateSiteDistances()
+		UpdateDistanceIndicator()
+		UpdateMinimapPOIs()
+		self:RefreshDigSiteDisplay()
 	end
 	local continentID = _G.GetCurrentMapContinent()
 
@@ -1922,16 +1925,6 @@ function Archy:UpdatePlayerPosition(force)
 	self:RefreshDigSiteDisplay()
 	self:UpdateFramePositions()
 end
-
-function Archy:RefreshAll()
-	if not _G.IsInInstance() then
-		self:UpdateSiteDistances()
-		UpdateDistanceIndicator()
-		UpdateMinimapPOIs()
-	end
-	self:RefreshDigSiteDisplay()
-end
-
 
 --[[ UI functions ]] --
 function Archy:UpdateTracking()
