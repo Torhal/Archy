@@ -67,10 +67,11 @@ local function InitializeFrames()
 	DigSiteFrame.children = setmetatable({}, {
 		__index = function(t, k)
 			if k then
-				local f = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, DigSiteFrame, (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate"))
-				f:Show()
-				t[k] = f
-				return f
+				local template = (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate")
+				local child = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, DigSiteFrame, template)
+				child:Show()
+				t[k] = child
+				return child
 			end
 		end
 	})
@@ -81,10 +82,11 @@ local function InitializeFrames()
 	RacesFrame.children = setmetatable({}, {
 		__index = function(t, k)
 			if k then
-				local f = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. k, RacesFrame, (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate"))
-				f:Show()
-				t[k] = f
-				return f
+				local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
+				local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], RacesFrame, template)
+				child:Show()
+				t[k] = child
+				return child
 			end
 		end
 	})
