@@ -53,10 +53,176 @@ local function FontString_SetShadow(fs, hasShadow)
 	end
 end
 
+local ArtifactFrame
 local DigSiteFrame
 local DistanceIndicatorFrame
-local ArtifactFrame
 do
+	-----------------------------------------------------------------------
+	-- ArtifactFrame
+	-----------------------------------------------------------------------
+	local function ArtifactFrame_UpdateChrome(self)
+		if private.IsTaintable() then
+			private.regen_update_races = true
+			return
+		end
+
+		self:SetScale(private.db.artifact.scale)
+		self:SetAlpha(private.db.artifact.alpha)
+
+		local is_movable = not private.db.general.locked
+		self:SetMovable(is_movable)
+		self:EnableMouse(is_movable)
+
+		if is_movable then
+			self:RegisterForDrag("LeftButton")
+		else
+			self:RegisterForDrag()
+		end
+
+		local artifactFont = private.db.artifact.font
+		local fragmentFont = private.db.artifact.fragmentFont
+		local keystoneFont = private.db.artifact.keystoneFont
+
+		local artifactFontName = LSM:Fetch("font", artifactFont.name)
+		local fragmentFontName = LSM:Fetch("font", fragmentFont.name)
+		local keystoneFontName = LSM:Fetch("font", keystoneFont.name)
+
+		for _, child in pairs(self.children) do
+			if private.db.general.theme == "Graphical" then
+				child.fragmentBar.artifact:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+				child.fragmentBar.artifact:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+				FontString_SetShadow(child.fragmentBar.artifact, artifactFont.shadow)
+
+				child.fragmentBar.fragments:SetFont(fragmentFontName, fragmentFont.size, fragmentFont.outline)
+				child.fragmentBar.fragments:SetTextColor(fragmentFont.color.r, fragmentFont.color.g, fragmentFont.color.b, fragmentFont.color.a)
+				FontString_SetShadow(child.fragmentBar.fragments, fragmentFont.shadow)
+
+				child.fragmentBar.keystones.count:SetFont(keystoneFontName, keystoneFont.size, keystoneFont.outline)
+				child.fragmentBar.keystones.count:SetTextColor(keystoneFont.color.r, keystoneFont.color.g, keystoneFont.color.b, keystoneFont.color.a)
+				FontString_SetShadow(child.fragmentBar.keystones.count, keystoneFont.shadow)
+
+				child.solveButton:SetText(_G.SOLVE)
+				child.solveButton:SetWidth(child.solveButton:GetTextWidth() + 20)
+				child.solveButton.tooltip = _G.SOLVE
+
+				if child.style ~= private.db.artifact.style then
+					if private.db.artifact.style == "Compact" then
+						child.crest:ClearAllPoints()
+						child.crest:SetPoint("TOPLEFT", child, "TOPLEFT", 0, 0)
+
+						child.icon:ClearAllPoints()
+						child.icon:SetPoint("LEFT", child.crest, "RIGHT", 0, 0)
+						child.icon:SetWidth(32)
+						child.icon:SetHeight(32)
+						child.icon.texture:SetWidth(32)
+						child.icon.texture:SetHeight(32)
+
+						child.crest.text:Hide()
+						child.crest:SetWidth(36)
+						child.crest:SetHeight(36)
+						child.solveButton:SetText("")
+						child.solveButton:SetWidth(34)
+						child.solveButton:SetHeight(34)
+						child.solveButton:SetNormalTexture([[Interface\ICONS\TRADE_ARCHAEOLOGY_AQIR_ARTIFACTFRAGMENT]])
+						child.solveButton:SetDisabledTexture([[Interface\ICONS\TRADE_ARCHAEOLOGY_AQIR_ARTIFACTFRAGMENT]])
+						child.solveButton:GetDisabledTexture():SetBlendMode("MOD")
+
+						child.solveButton:ClearAllPoints()
+						child.solveButton:SetPoint("LEFT", child.fragmentBar, "RIGHT", 5, 0)
+						child.fragmentBar.fragments:ClearAllPoints()
+						child.fragmentBar.fragments:SetPoint("RIGHT", child.fragmentBar.keystones, "LEFT", -7, 2)
+						child.fragmentBar.keystone1:Hide()
+						child.fragmentBar.keystone2:Hide()
+						child.fragmentBar.keystone3:Hide()
+						child.fragmentBar.keystone4:Hide()
+						child.fragmentBar.artifact:SetWidth(160)
+
+						child:SetWidth(315 + child.solveButton:GetWidth())
+						child:SetHeight(36)
+					else
+						child.icon:ClearAllPoints()
+						child.icon:SetPoint("TOPLEFT", child, "TOPLEFT", 0, 0)
+						child.icon:SetWidth(36)
+						child.icon:SetHeight(36)
+						child.icon.texture:SetWidth(36)
+						child.icon.texture:SetHeight(36)
+
+						child.icon:Show()
+						child.crest.text:Show()
+						child.crest:SetWidth(24)
+						child.crest:SetHeight(24)
+						child.crest:ClearAllPoints()
+						child.crest:SetPoint("TOPLEFT", child.icon, "BOTTOMLEFT", 0, 0)
+						child.solveButton:SetHeight(24)
+						child.solveButton:SetNormalTexture(nil)
+						child.solveButton:SetDisabledTexture(nil)
+						child.solveButton:ClearAllPoints()
+						child.solveButton:SetPoint("TOPRIGHT", child.fragmentBar, "BOTTOMRIGHT", 0, -3)
+						child.fragmentBar.fragments:ClearAllPoints()
+						child.fragmentBar.fragments:SetPoint("RIGHT", child.fragmentBar, "RIGHT", -5, 2)
+						child.fragmentBar.keystones:Hide()
+						child.fragmentBar.artifact:SetWidth(200)
+
+						child:SetWidth(295)
+						child:SetHeight(70)
+					end
+				end
+			else
+				child.fragments.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+				child.fragments.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+				FontString_SetShadow(child.fragments.text, artifactFont.shadow)
+
+				child.sockets.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+				child.sockets.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+				FontString_SetShadow(child.sockets.text, artifactFont.shadow)
+
+				child.artifact.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
+				child.artifact.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
+				FontString_SetShadow(child.artifact.text, artifactFont.shadow)
+			end
+		end
+
+		self:SetBackdrop({
+			bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
+			edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
+			tile = false,
+			edgeSize = 8,
+			tileSize = 8,
+			insets = {
+				left = 2,
+				top = 2,
+				right = 2,
+				bottom = 2
+			}
+		})
+
+		self:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
+		self:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
+
+		if not private.IsTaintable() then
+			local height = self.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
+			if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
+				height = height + 30
+			end
+			self:SetHeight(height)
+			self:SetWidth(self.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
+		end
+
+		local canShow = not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden()
+		if self:IsVisible() then
+			if not canShow then
+				self:Hide()
+			end
+		else
+			if canShow then
+				self:Show()
+			end
+		end
+	end
+
+	-----------------------------------------------------------------------
+	-- DigSiteFrame
+	-----------------------------------------------------------------------
 	local function DigSiteFrame_UpdateChrome(self)
 		if private.IsTaintable() then
 			private.regen_update_digsites = true
@@ -152,6 +318,9 @@ do
 		end
 	end
 
+	-----------------------------------------------------------------------
+	-- DistanceIndicatorFrame
+	-----------------------------------------------------------------------
 	local DISTANCE_COLOR_TEXCOORDS = {
 		green = {
 			0, 0.24609375, 0, 1
@@ -224,6 +393,30 @@ do
 			return
 		end
 
+		-----------------------------------------------------------------------
+		-- ArtifactFrame
+		-----------------------------------------------------------------------
+		local artifactTemplate = (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
+		ArtifactFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
+		ArtifactFrame.children = setmetatable({}, {
+			__index = function(t, k)
+				if k then
+					local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
+					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], ArtifactFrame, template)
+					child:Show()
+					t[k] = child
+					return child
+				end
+			end
+		})
+
+		ArtifactFrame.UpdateChrome = ArtifactFrame_UpdateChrome
+
+		private.ArtifactFrame = ArtifactFrame
+
+		-----------------------------------------------------------------------
+		-- DigSiteFrame
+		-----------------------------------------------------------------------
 		local digSiteTemplate = (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer")
 		DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, digSiteTemplate)
 		DigSiteFrame.children = setmetatable({}, {
@@ -242,22 +435,9 @@ do
 
 		private.DigSiteFrame = DigSiteFrame
 
-		local artifactTemplate = (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
-		ArtifactFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
-		ArtifactFrame.children = setmetatable({}, {
-			__index = function(t, k)
-				if k then
-					local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
-					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], ArtifactFrame, template)
-					child:Show()
-					t[k] = child
-					return child
-				end
-			end
-		})
-
-		private.ArtifactFrame = ArtifactFrame
-
+		-----------------------------------------------------------------------
+		-- DistanceIndicatorFrame
+		-----------------------------------------------------------------------
 		DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
 		DistanceIndicatorFrame.circle:SetScale(0.65)
 
@@ -273,165 +453,6 @@ end -- do-block
 -----------------------------------------------------------------------
 -- Methods.
 -----------------------------------------------------------------------
-function Archy:UpdateRacesFrame()
-	if private.IsTaintable() then
-		private.regen_update_races = true
-		return
-	end
-
-	ArtifactFrame:SetScale(private.db.artifact.scale)
-	ArtifactFrame:SetAlpha(private.db.artifact.alpha)
-
-	local is_movable = not private.db.general.locked
-	ArtifactFrame:SetMovable(is_movable)
-	ArtifactFrame:EnableMouse(is_movable)
-
-	if is_movable then
-		ArtifactFrame:RegisterForDrag("LeftButton")
-	else
-		ArtifactFrame:RegisterForDrag()
-	end
-
-	local artifactFont = private.db.artifact.font
-	local fragmentFont = private.db.artifact.fragmentFont
-	local keystoneFont = private.db.artifact.keystoneFont
-
-	local artifactFontName = LSM:Fetch("font", artifactFont.name)
-	local fragmentFontName = LSM:Fetch("font", fragmentFont.name)
-	local keystoneFontName = LSM:Fetch("font", keystoneFont.name)
-
-	for _, child in pairs(ArtifactFrame.children) do
-		if private.db.general.theme == "Graphical" then
-			child.fragmentBar.artifact:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.fragmentBar.artifact:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.fragmentBar.artifact, artifactFont.shadow)
-
-			child.fragmentBar.fragments:SetFont(fragmentFontName, fragmentFont.size, fragmentFont.outline)
-			child.fragmentBar.fragments:SetTextColor(fragmentFont.color.r, fragmentFont.color.g, fragmentFont.color.b, fragmentFont.color.a)
-			FontString_SetShadow(child.fragmentBar.fragments, fragmentFont.shadow)
-
-			child.fragmentBar.keystones.count:SetFont(keystoneFontName, keystoneFont.size, keystoneFont.outline)
-			child.fragmentBar.keystones.count:SetTextColor(keystoneFont.color.r, keystoneFont.color.g, keystoneFont.color.b, keystoneFont.color.a)
-			FontString_SetShadow(child.fragmentBar.keystones.count, keystoneFont.shadow)
-
-			child.solveButton:SetText(_G.SOLVE)
-			child.solveButton:SetWidth(child.solveButton:GetTextWidth() + 20)
-			child.solveButton.tooltip = _G.SOLVE
-
-			if child.style ~= private.db.artifact.style then
-				if private.db.artifact.style == "Compact" then
-					child.crest:ClearAllPoints()
-					child.crest:SetPoint("TOPLEFT", child, "TOPLEFT", 0, 0)
-
-					child.icon:ClearAllPoints()
-					child.icon:SetPoint("LEFT", child.crest, "RIGHT", 0, 0)
-					child.icon:SetWidth(32)
-					child.icon:SetHeight(32)
-					child.icon.texture:SetWidth(32)
-					child.icon.texture:SetHeight(32)
-
-					child.crest.text:Hide()
-					child.crest:SetWidth(36)
-					child.crest:SetHeight(36)
-					child.solveButton:SetText("")
-					child.solveButton:SetWidth(34)
-					child.solveButton:SetHeight(34)
-					child.solveButton:SetNormalTexture([[Interface\ICONS\TRADE_ARCHAEOLOGY_AQIR_ARTIFACTFRAGMENT]])
-					child.solveButton:SetDisabledTexture([[Interface\ICONS\TRADE_ARCHAEOLOGY_AQIR_ARTIFACTFRAGMENT]])
-					child.solveButton:GetDisabledTexture():SetBlendMode("MOD")
-
-					child.solveButton:ClearAllPoints()
-					child.solveButton:SetPoint("LEFT", child.fragmentBar, "RIGHT", 5, 0)
-					child.fragmentBar.fragments:ClearAllPoints()
-					child.fragmentBar.fragments:SetPoint("RIGHT", child.fragmentBar.keystones, "LEFT", -7, 2)
-					child.fragmentBar.keystone1:Hide()
-					child.fragmentBar.keystone2:Hide()
-					child.fragmentBar.keystone3:Hide()
-					child.fragmentBar.keystone4:Hide()
-					child.fragmentBar.artifact:SetWidth(160)
-
-					child:SetWidth(315 + child.solveButton:GetWidth())
-					child:SetHeight(36)
-				else
-					child.icon:ClearAllPoints()
-					child.icon:SetPoint("TOPLEFT", child, "TOPLEFT", 0, 0)
-					child.icon:SetWidth(36)
-					child.icon:SetHeight(36)
-					child.icon.texture:SetWidth(36)
-					child.icon.texture:SetHeight(36)
-
-					child.icon:Show()
-					child.crest.text:Show()
-					child.crest:SetWidth(24)
-					child.crest:SetHeight(24)
-					child.crest:ClearAllPoints()
-					child.crest:SetPoint("TOPLEFT", child.icon, "BOTTOMLEFT", 0, 0)
-					child.solveButton:SetHeight(24)
-					child.solveButton:SetNormalTexture(nil)
-					child.solveButton:SetDisabledTexture(nil)
-					child.solveButton:ClearAllPoints()
-					child.solveButton:SetPoint("TOPRIGHT", child.fragmentBar, "BOTTOMRIGHT", 0, -3)
-					child.fragmentBar.fragments:ClearAllPoints()
-					child.fragmentBar.fragments:SetPoint("RIGHT", child.fragmentBar, "RIGHT", -5, 2)
-					child.fragmentBar.keystones:Hide()
-					child.fragmentBar.artifact:SetWidth(200)
-
-					child:SetWidth(295)
-					child:SetHeight(70)
-				end
-			end
-		else
-			child.fragments.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.fragments.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.fragments.text, artifactFont.shadow)
-
-			child.sockets.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.sockets.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.sockets.text, artifactFont.shadow)
-
-			child.artifact.text:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
-			child.artifact.text:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
-			FontString_SetShadow(child.artifact.text, artifactFont.shadow)
-		end
-	end
-
-	ArtifactFrame:SetBackdrop({
-		bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
-		edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
-		tile = false,
-		edgeSize = 8,
-		tileSize = 8,
-		insets = {
-			left = 2,
-			top = 2,
-			right = 2,
-			bottom = 2
-		}
-	})
-
-	ArtifactFrame:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
-	ArtifactFrame:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
-
-	if not private.IsTaintable() then
-		local height = ArtifactFrame.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
-		if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
-			height = height + 30
-		end
-		ArtifactFrame:SetHeight(height)
-		ArtifactFrame:SetWidth(ArtifactFrame.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
-	end
-
-	if ArtifactFrame:IsVisible() then
-		if private.db.general.stealthMode or not private.db.artifact.show or FramesShouldBeHidden() then
-			ArtifactFrame:Hide()
-		end
-	else
-		if not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden() then
-			ArtifactFrame:Show()
-		end
-	end
-end
-
 function Archy:RefreshRacesDisplay()
 	if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
 		return

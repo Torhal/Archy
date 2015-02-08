@@ -657,7 +657,8 @@
 						else
 							Archy.db.profile.artifact.style = "Compact"
 						end
-						Archy:UpdateRacesFrame()
+                        local parent = self:GetParent()
+                        parent:UpdateChrome()
 						Archy:RefreshRacesDisplay()
 					</OnClick>
 					<OnEnter>

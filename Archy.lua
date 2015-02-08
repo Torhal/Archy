@@ -746,7 +746,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		elseif option == "color" then
 			Archy:RefreshRacesDisplay()
 		else
-			Archy:UpdateRacesFrame()
+			ArtifactFrame:UpdateChrome()
 			Archy:RefreshRacesDisplay()
 			Archy:SetFramePosition(ArtifactFrame)
 		end
@@ -789,7 +789,7 @@ function Archy:ConfigUpdated(namespace, option)
 	if namespace then
 		CONFIG_UPDATE_FUNCTIONS[namespace](option)
 	else
-		self:UpdateRacesFrame()
+		ArtifactFrame:UpdateChrome()
 		self:RefreshRacesDisplay()
 		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
@@ -1441,7 +1441,7 @@ function Archy:OnEnable()
 
 	Archy:UpdateFramePositions()
 	DigSiteFrame:UpdateChrome()
-	Archy:UpdateRacesFrame()
+	ArtifactFrame:UpdateChrome()
 
 	DatamineTooltip:ClearLines()
 	DatamineTooltip:SetSpellByID(private.CRATE_SPELL_ID)
@@ -1802,7 +1802,7 @@ function Archy:UpdatePlayerPosition(force)
 	if not PositionUpdateTimerHandle then
 		self:ScheduleTimer(function()
 			DigSiteFrame:UpdateChrome()
-			self:UpdateRacesFrame()
+			ArtifactFrame:UpdateChrome()
 			PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
 		end, 1)
 	end
@@ -1863,7 +1863,7 @@ function Archy:UpdatePlayerPosition(force)
 		for raceID = 1, _G.GetNumArchaeologyRaces() do
 			private.Races[raceID]:UpdateArtifact()
 		end
-		self:UpdateRacesFrame()
+		ArtifactFrame:UpdateChrome()
 		self:RefreshRacesDisplay()
 	end
 
@@ -2189,7 +2189,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 
 	if private.regen_update_races then
 		private.regen_update_races = nil
-		self:UpdateRacesFrame()
+		ArtifactFrame:UpdateChrome()
 	end
 
 	if private.regen_scan_bags then
