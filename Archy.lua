@@ -852,66 +852,65 @@ function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
 
-	if next(MAP_CONTINENTS) then
-		for continentID, continentName in pairs(MAP_CONTINENTS) do
-			_G.SetMapZoom(continentID)
+	for continentID, continentName in pairs(MAP_CONTINENTS) do
+		_G.SetMapZoom(continentID)
 
-			-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
-			-- So make sure we enable and show blobs and restore the setting at the end.
-			local showDig = _G.GetCVarBool("digSites")
-			if not showDig then
-				_G.SetCVar("digSites", "1")
-				ToggleDigsiteVisibility(true)
-				_G.RefreshWorldMap()
+		-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
+		-- So make sure we enable and show blobs and restore the setting at the end.
+		local showDig = _G.GetCVarBool("digSites")
+		if not showDig then
+			_G.SetCVar("digSites", "1")
+			ToggleDigsiteVisibility(true)
+			_G.RefreshWorldMap()
 
-				showDig = "0"
-			end
+			showDig = "0"
+		end
 
-			local sites = {}
+		local sites = {}
 
-			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-				local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
+		for landmarkIndex = 1, _G.GetNumMapLandmarks() do
+			local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
 
-				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
-					local site = DIG_SITES[landmarkName]
-					local mapID = site.map
-					local _, mapFilePath = _G.UpdateMapHighlight(mapPositionX, mapPositionY)
-					local mc, fc = Astrolabe:GetMapID(continentID, 0)
-					local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
+			if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+				local site = DIG_SITES[landmarkName]
+				local mapID = site.map
+				local _, mapFilePath = _G.UpdateMapHighlight(mapPositionX, mapPositionY)
+				local mc, fc = Astrolabe:GetMapID(continentID, 0)
+				local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
 
-					table.insert(sites, {
-						continent = mc,
-						distance = 999999,
-						id = site.blob_id,
-						level = 0,
-						mapFile = mapFilePath,
-						map = mapID,
-						name = landmarkName,
-						raceId = site.race,
-						x = x,
-						y = y,
-						zoneId = MAP_ID_TO_ZONE_ID[mapID],
-						zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
-					})
-				end
-			end
-
-			-- restore initial setting
-			if showDig == "0" then
-				_G.SetCVar("digSites", showDig)
-				ToggleDigsiteVisibility(false)
-				_G.RefreshWorldMap()
-			end
-
-			if #sites > 0 then
-				if continent_digsites[continentID] then
-					CompareAndResetDigCounters(continent_digsites[continentID], sites)
-					CompareAndResetDigCounters(sites, continent_digsites[continentID])
-				end
-				continent_digsites[continentID] = sites
+				table.insert(sites, {
+					continent = mc,
+					distance = 999999,
+					id = site.blob_id,
+					level = 0,
+					mapFile = mapFilePath,
+					map = mapID,
+					name = landmarkName,
+					raceId = site.race,
+					x = x,
+					y = y,
+					zoneId = MAP_ID_TO_ZONE_ID[mapID],
+					zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
+				})
 			end
 		end
+
+		-- restore initial setting
+		if showDig == "0" then
+			_G.SetCVar("digSites", showDig)
+			ToggleDigsiteVisibility(false)
+			_G.RefreshWorldMap()
+		end
+
+		if #sites > 0 then
+			if continent_digsites[continentID] then
+				CompareAndResetDigCounters(continent_digsites[continentID], sites)
+				CompareAndResetDigCounters(sites, continent_digsites[continentID])
+			end
+			continent_digsites[continentID] = sites
+		end
 	end
+
 	_G.SetMapByID(originalMapID)
 end
 
