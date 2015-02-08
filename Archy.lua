@@ -410,11 +410,12 @@ local UpdateMinimapPOIs
 local UpdateAllSites
 
 -----------------------------------------------------------------------
--- Frames. Assigned in Archy:OnEnable()
+-- External objects. Assigned in Archy:OnEnable()
 -----------------------------------------------------------------------
 local ArtifactFrame
 local DigSiteFrame
 local DistanceIndicatorFrame
+local TomTomHandler
 
 -----------------------------------------------------------------------
 -- Initialization.
@@ -772,16 +773,15 @@ local CONFIG_UPDATE_FUNCTIONS = {
 	end,
 	tomtom = function(option)
 		local db = private.db
-		local handler = private.TomTomHandler
-		handler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
+		TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 
-		if handler.hasTomTom and db.tomtom.enabled then
+		if TomTomHandler.hasTomTom and db.tomtom.enabled then
 			if _G.TomTom.profile then
 				_G.TomTom.profile.arrow.arrival = db.tomtom.distance
 				_G.TomTom.profile.arrow.enablePing = db.tomtom.ping
 			end
 		end
-		handler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestSite)
 	end,
 }
 
@@ -791,15 +791,17 @@ function Archy:ConfigUpdated(namespace, option)
 	else
 		ArtifactFrame:UpdateChrome()
 		self:RefreshRacesDisplay()
+
 		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
+
 		self:UpdateTracking()
 
 		DistanceIndicatorFrame:Toggle()
 		UpdateMinimapPOIs(true)
 		SuspendClickToMove()
 
-		private.TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestSite)
 	end
 end
 
@@ -965,8 +967,8 @@ function Archy:UpdateSiteDistances()
 
 	if nearest and (not nearestSite or nearestSite.id ~= nearest.id) then
 		nearestSite = nearest
-		private.TomTomHandler.isActive = true
-		private.TomTomHandler:Refresh(nearestSite)
+		TomTomHandler.isActive = true
+		TomTomHandler:Refresh(nearestSite)
 		UpdateMinimapPOIs()
 
 		if private.db.digsite.announceNearest and private.db.general.show then
@@ -1455,10 +1457,10 @@ function Archy:OnEnable()
 	end
 	self:UpdateTracking()
 
-	local handler = private.TomTomHandler
-	handler.isActive = true
-	handler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
-	handler.hasPOIIntegration = handler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
+	TomTomHandler = private.TomTomHandler
+	TomTomHandler.isActive = true
+	TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
+	TomTomHandler.hasPOIIntegration = TomTomHandler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = self:AddRace(raceID)
@@ -1597,7 +1599,7 @@ local SUBCOMMAND_FUNCS = {
 	end,
 	tomtom = function()
 		private.db.tomtom.enabled = not private.db.tomtom.enabled
-		private.TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestSite)
 	end,
 	test = function()
 		ArtifactFrame:SetBackdropBorderColor(1, 1, 1, 0.5)
@@ -1855,8 +1857,9 @@ function Archy:UpdatePlayerPosition(force)
 		DistanceIndicatorFrame:Toggle()
 	end
 
-	private.TomTomHandler:ClearWaypoint()
-	private.TomTomHandler:Refresh(nearestSite)
+	TomTomHandler:ClearWaypoint()
+	TomTomHandler:Refresh(nearestSite)
+
 	UpdateAllSites()
 
 	if _G.GetNumArchaeologyRaces() > 0 then
@@ -2135,8 +2138,8 @@ end
 
 function Archy:PLAYER_ENTERING_WORLD()
 	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
-	if private.TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
-		private.TomTomHandler:DisplayConflictError()
+	if TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
+		TomTomHandler:DisplayConflictError()
 	end
 
 	if _G.IsInInstance() then
@@ -2313,8 +2316,9 @@ do
 					end
 				end
 			end
-			private.TomTomHandler.isActive = false
-			private.TomTomHandler:Refresh(nearestSite)
+			TomTomHandler.isActive = false
+			TomTomHandler:Refresh(nearestSite)
+
 			self:RefreshDigSiteDisplay()
 		end
 	end
