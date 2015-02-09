@@ -659,7 +659,7 @@
 						end
                         local parent = self:GetParent()
                         parent:UpdateChrome()
-						Archy:RefreshRacesDisplay()
+						parent:RefreshDisplay()
 					</OnClick>
 					<OnEnter>
 						self:SetAlpha(1)

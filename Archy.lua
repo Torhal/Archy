@@ -745,10 +745,10 @@ local CONFIG_UPDATE_FUNCTIONS = {
 				private.Races[raceID]:UpdateArtifact()
 			end
 		elseif option == "color" then
-			Archy:RefreshRacesDisplay()
+			ArtifactFrame:RefreshDisplay()
 		else
 			ArtifactFrame:UpdateChrome()
-			Archy:RefreshRacesDisplay()
+			ArtifactFrame:RefreshDisplay()
 			Archy:SetFramePosition(ArtifactFrame)
 		end
 	end,
@@ -790,7 +790,7 @@ function Archy:ConfigUpdated(namespace, option)
 		CONFIG_UPDATE_FUNCTIONS[namespace](option)
 	else
 		ArtifactFrame:UpdateChrome()
-		self:RefreshRacesDisplay()
+		ArtifactFrame:RefreshDisplay()
 
 		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
@@ -824,7 +824,7 @@ end
 function Archy:SocketClicked(keystone_button, mouseButtonName, down)
 	local raceID = keystone_button:GetParent():GetParent():GetID()
 	private.Races[raceID]:KeystoneSocketOnClick(mouseButtonName)
-	Archy:RefreshRacesDisplay()
+	ArtifactFrame:RefreshDisplay()
 end
 
 --[[ Dig Site List Functions ]] --
@@ -1859,7 +1859,7 @@ function Archy:UpdatePlayerPosition(force)
 			private.Races[raceID]:UpdateArtifact()
 		end
 		ArtifactFrame:UpdateChrome()
-		self:RefreshRacesDisplay()
+		ArtifactFrame:RefreshDisplay()
 	end
 
 	if force then
@@ -1905,7 +1905,7 @@ end
 do
 	local function UpdateAndRefresh(race)
 		race:UpdateArtifact()
-		Archy:RefreshRacesDisplay()
+		ArtifactFrame:RefreshDisplay()
 	end
 
 	function Archy:ARTIFACT_COMPLETE(event, name)
@@ -1942,7 +1942,7 @@ function Archy:ARTIFACT_HISTORY_READY()
 			artifact.completionCount = completionCount
 		end
 	end
-	self:RefreshRacesDisplay()
+	ArtifactFrame:RefreshDisplay()
 end
 
 function Archy:BAG_UPDATE_DELAYED()
@@ -1952,7 +1952,7 @@ function Archy:BAG_UPDATE_DELAYED()
 		return
 	end
 	private.Races[keystoneLootRaceID]:UpdateArtifact()
-	self:RefreshRacesDisplay()
+	ArtifactFrame:RefreshDisplay()
 	keystoneLootRaceID = nil
 end
 
@@ -2060,7 +2060,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			self:RefreshDigSiteDisplay()
 		end
 	end
-	self:RefreshRacesDisplay()
+	ArtifactFrame:RefreshDisplay()
 end
 
 function Archy:GET_ITEM_INFO_RECEIVED(event)

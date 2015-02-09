@@ -60,6 +60,213 @@ do
 	-----------------------------------------------------------------------
 	-- ArtifactFrame
 	-----------------------------------------------------------------------
+	local function ArtifactFrame_RefreshDisplay(self)
+		if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
+			return
+		end
+		local maxWidth, maxHeight = 0, 0
+		Archy:UpdateSkillBar()
+
+		local topFrame = self.container
+		local hiddenAnchor = self
+		local racesCount = 0
+
+		if private.db.general.theme == "Minimal" then
+			self.title.text:SetText(L["Artifacts"])
+		end
+
+		for _, child in pairs(self.children) do
+			child:Hide()
+		end
+
+		for raceID, race in pairs(private.Races) do
+			local child = self.children[raceID]
+			local artifact = race.artifact
+			local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
+
+			child:SetID(raceID)
+
+			local continentHasRace = CONTINENT_RACES[private.current_continent][raceID]
+			if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
+				child:ClearAllPoints()
+
+				if topFrame == self.container then
+					child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
+				else
+					child:SetPoint("TOPLEFT", topFrame, "BOTTOMLEFT", 0, -5)
+				end
+				topFrame = child
+				child:Show()
+				maxHeight = maxHeight + child:GetHeight() + 5
+				maxWidth = (maxWidth > child:GetWidth()) and maxWidth or child:GetWidth()
+				racesCount = racesCount + 1
+			else
+				child:Hide()
+			end
+
+			if private.db.general.theme == "Graphical" then
+				child.crest.texture:SetTexture(race.texture)
+				child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
+				child.crest.text:SetText(race.name)
+				child.icon.texture:SetTexture(artifact.icon)
+				child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+
+				-- setup the bar texture here
+				local barTexture = (LSM and LSM:Fetch('statusbar', private.db.artifact.fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
+				child.fragmentBar.barTexture:SetTexture(barTexture)
+				child.fragmentBar.barTexture:SetHorizTile(false)
+
+				local barColor
+				if artifact.isRare then
+					barColor = private.db.artifact.fragmentBarColors["Rare"]
+					child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625)
+				else
+					if completionCount == 0 then
+						barColor = private.db.artifact.fragmentBarColors["FirstTime"]
+					else
+						barColor = private.db.artifact.fragmentBarColors["Normal"]
+					end
+					child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875)
+				end
+				child.fragmentBar:SetMinMaxValues(0, artifact.fragments_required)
+				child.fragmentBar:SetValue(math.min(artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required))
+
+				local adjust = (artifact.keystone_adjustment > 0) and (" (|cFF00FF00+%d|r)"):format(artifact.keystone_adjustment) or ""
+				child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact.fragments, adjust, artifact.fragments_required)
+				child.fragmentBar.artifact:SetText(artifact.name)
+				child.fragmentBar.artifact:SetWordWrap(true)
+
+				local endFound = false
+				local artifactNameSize = child.fragmentBar:GetWidth() - 10
+
+				if private.db.artifact.style == "Compact" then
+					artifactNameSize = artifactNameSize - 40
+
+					if artifact.sockets > 0 then
+						child.fragmentBar.keystones.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
+						child.fragmentBar.keystones:Show()
+
+						if child.fragmentBar.keystones and child.fragmentBar.keystones.count then
+							child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact.keystones_added, artifact.sockets)
+						end
+
+						if artifact.keystones_added > 0 then
+							child.fragmentBar.keystones.icon:SetTexture(race.keystone.texture)
+						else
+							child.fragmentBar.keystones.icon:SetTexture(nil)
+						end
+					else
+						child.fragmentBar.keystones:Hide()
+					end
+				else
+					for keystone_index = 1, (_G.ARCHAEOLOGY_MAX_STONES or 4) do
+						local field = "keystone" .. keystone_index
+
+						if keystone_index > artifact.sockets or not race.keystone.name then
+							child.fragmentBar[field]:Hide()
+						else
+							child.fragmentBar[field].icon:SetTexture(race.keystone.texture)
+
+							if keystone_index <= artifact.keystones_added then
+								child.fragmentBar[field].icon:Show()
+								child.fragmentBar[field].tooltip = _G.ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP:format(race.keystone.name)
+								child.fragmentBar[field]:Enable()
+							else
+								child.fragmentBar[field].icon:Hide()
+								child.fragmentBar[field].tooltip = _G.ARCHAEOLOGY_KEYSTONE_ADD_TOOLTIP:format(race.keystone.name)
+								child.fragmentBar[field]:Enable()
+
+								if endFound then
+									child.fragmentBar[field]:Disable()
+								end
+								endFound = true
+							end
+							child.fragmentBar[field]:Show()
+						end
+					end
+				end
+
+				-- Actual user-filled sockets enough to solve so enable the manual solve button
+				if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then
+					child.solveButton:Enable()
+					barColor = private.db.artifact.fragmentBarColors["Solvable"]
+				else
+					-- Can solve with available stones from inventory, but not enough are socketed.
+					if artifact.canSolveInventory then
+						barColor = private.db.artifact.fragmentBarColors["AttachToSolve"]
+					end
+					child.solveButton:Disable()
+				end
+
+				child.fragmentBar.barTexture:SetVertexColor(barColor.r, barColor.g, barColor.b, 1)
+
+				artifactNameSize = artifactNameSize - child.fragmentBar.fragments:GetStringWidth()
+				child.fragmentBar.artifact:SetWidth(artifactNameSize)
+
+			else
+				local fragmentColor = (artifact.canSolve and "|cFF00FF00" or (artifact.canSolveStone and "|cFFFFFF00" or ""))
+				local nameColor = (artifact.isRare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
+				child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragments_required)
+
+				if race.keystone.inventory > 0 or artifact.sockets > 0 then
+					child.sockets.text:SetFormattedText("%d/%d", race.keystone.inventory, artifact.sockets)
+					child.sockets.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
+				else
+					child.sockets.text:SetText("")
+					child.sockets.tooltip = nil
+				end
+				child.crest:SetNormalTexture(race.texture)
+				child.crest:SetHighlightTexture(race.texture)
+				child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race.name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
+
+				child.artifact.text:SetFormattedText("%s%s", nameColor, artifact.name)
+				child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+
+				child.artifact:SetWidth(child.artifact.text:GetStringWidth())
+				child.artifact:SetHeight(child.artifact.text:GetStringHeight())
+				child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
+			end
+		end
+		local containerXofs = 0
+
+		if private.db.general.theme == "Graphical" and private.db.artifact.style == "Compact" then
+			maxHeight = maxHeight + 10
+			containerXofs = -10
+		end
+
+		self.container:SetHeight(maxHeight)
+		self.container:SetWidth(maxWidth)
+
+		if self.skillBar then
+			self.skillBar:SetWidth(maxWidth)
+			self.skillBar.border:SetWidth(maxWidth + 9)
+
+			if private.db.general.showSkillBar then
+				self.skillBar:Show()
+				self.container:ClearAllPoints()
+				self.container:SetPoint("TOP", self.skillBar, "BOTTOM", containerXofs, -10)
+				maxHeight = maxHeight + 30
+			else
+				self.skillBar:Hide()
+				self.container:ClearAllPoints()
+				self.container:SetPoint("TOP", self, "TOP", containerXofs, -20)
+				maxHeight = maxHeight + 10
+			end
+		else
+			self.container:ClearAllPoints()
+			self.container:SetPoint("TOP", self, "TOP", containerXofs, -20)
+			maxHeight = maxHeight + 10
+		end
+
+		if not private.IsTaintable() then
+			if racesCount == 0 then
+				self:Hide()
+			end
+			self:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
+			self:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
+		end
+	end
+
 	local function ArtifactFrame_UpdateChrome(self)
 		if private.IsTaintable() then
 			private.regen_update_races = true
@@ -410,6 +617,7 @@ do
 			end
 		})
 
+		ArtifactFrame.RefreshDisplay = ArtifactFrame_RefreshDisplay
 		ArtifactFrame.UpdateChrome = ArtifactFrame_UpdateChrome
 
 		private.ArtifactFrame = ArtifactFrame
@@ -453,213 +661,6 @@ end -- do-block
 -----------------------------------------------------------------------
 -- Methods.
 -----------------------------------------------------------------------
-function Archy:RefreshRacesDisplay()
-	if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
-		return
-	end
-	local maxWidth, maxHeight = 0, 0
-	self:UpdateSkillBar()
-
-	local topFrame = ArtifactFrame.container
-	local hiddenAnchor = ArtifactFrame
-	local racesCount = 0
-
-	if private.db.general.theme == "Minimal" then
-		ArtifactFrame.title.text:SetText(L["Artifacts"])
-	end
-
-	for _, child in pairs(ArtifactFrame.children) do
-		child:Hide()
-	end
-
-	for raceID, race in pairs(private.Races) do
-		local child = ArtifactFrame.children[raceID]
-		local artifact = race.artifact
-		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
-
-		child:SetID(raceID)
-
-		local continentHasRace = CONTINENT_RACES[private.current_continent][raceID]
-		if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
-			child:ClearAllPoints()
-
-			if topFrame == ArtifactFrame.container then
-				child:SetPoint("TOPLEFT", topFrame, "TOPLEFT", 0, 0)
-			else
-				child:SetPoint("TOPLEFT", topFrame, "BOTTOMLEFT", 0, -5)
-			end
-			topFrame = child
-			child:Show()
-			maxHeight = maxHeight + child:GetHeight() + 5
-			maxWidth = (maxWidth > child:GetWidth()) and maxWidth or child:GetWidth()
-			racesCount = racesCount + 1
-		else
-			child:Hide()
-		end
-
-		if private.db.general.theme == "Graphical" then
-			child.crest.texture:SetTexture(race.texture)
-			child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
-			child.crest.text:SetText(race.name)
-			child.icon.texture:SetTexture(artifact.icon)
-			child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
-
-			-- setup the bar texture here
-			local barTexture = (LSM and LSM:Fetch('statusbar', private.db.artifact.fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
-			child.fragmentBar.barTexture:SetTexture(barTexture)
-			child.fragmentBar.barTexture:SetHorizTile(false)
-
-			local barColor
-			if artifact.isRare then
-				barColor = private.db.artifact.fragmentBarColors["Rare"]
-				child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625) -- rare
-			else
-				if completionCount == 0 then
-					barColor = private.db.artifact.fragmentBarColors["FirstTime"]
-				else
-					barColor = private.db.artifact.fragmentBarColors["Normal"]
-				end
-				child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875) -- bg
-			end
-			child.fragmentBar:SetMinMaxValues(0, artifact.fragments_required)
-			child.fragmentBar:SetValue(math.min(artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required))
-
-			local adjust = (artifact.keystone_adjustment > 0) and (" (|cFF00FF00+%d|r)"):format(artifact.keystone_adjustment) or ""
-			child.fragmentBar.fragments:SetFormattedText("%d%s / %d", artifact.fragments, adjust, artifact.fragments_required)
-			child.fragmentBar.artifact:SetText(artifact.name)
-			child.fragmentBar.artifact:SetWordWrap(true)
-
-			local endFound = false
-			local artifactNameSize = child.fragmentBar:GetWidth() - 10
-
-			if private.db.artifact.style == "Compact" then
-				artifactNameSize = artifactNameSize - 40
-
-				if artifact.sockets > 0 then
-					child.fragmentBar.keystones.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
-					child.fragmentBar.keystones:Show()
-
-					if child.fragmentBar.keystones and child.fragmentBar.keystones.count then
-						child.fragmentBar.keystones.count:SetFormattedText("%d/%d", artifact.keystones_added, artifact.sockets)
-					end
-
-					if artifact.keystones_added > 0 then
-						child.fragmentBar.keystones.icon:SetTexture(race.keystone.texture)
-					else
-						child.fragmentBar.keystones.icon:SetTexture(nil)
-					end
-				else
-					child.fragmentBar.keystones:Hide()
-				end
-			else
-				for keystone_index = 1, (_G.ARCHAEOLOGY_MAX_STONES or 4) do
-					local field = "keystone" .. keystone_index
-
-					if keystone_index > artifact.sockets or not race.keystone.name then
-						child.fragmentBar[field]:Hide()
-					else
-						child.fragmentBar[field].icon:SetTexture(race.keystone.texture)
-
-						if keystone_index <= artifact.keystones_added then
-							child.fragmentBar[field].icon:Show()
-							child.fragmentBar[field].tooltip = _G.ARCHAEOLOGY_KEYSTONE_REMOVE_TOOLTIP:format(race.keystone.name)
-							child.fragmentBar[field]:Enable()
-						else
-							child.fragmentBar[field].icon:Hide()
-							child.fragmentBar[field].tooltip = _G.ARCHAEOLOGY_KEYSTONE_ADD_TOOLTIP:format(race.keystone.name)
-							child.fragmentBar[field]:Enable()
-
-							if endFound then
-								child.fragmentBar[field]:Disable()
-							end
-							endFound = true
-						end
-						child.fragmentBar[field]:Show()
-					end
-				end
-			end
-
-			-- Actual user-filled sockets enough to solve so enable the manual solve button
-			if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then
-				child.solveButton:Enable()
-				barColor = private.db.artifact.fragmentBarColors["Solvable"]
-			else
-				-- Can solve with available stones from inventory, but not enough are socketed.
-				if artifact.canSolveInventory then
-					barColor = private.db.artifact.fragmentBarColors["AttachToSolve"]
-				end
-				child.solveButton:Disable()
-			end
-
-			child.fragmentBar.barTexture:SetVertexColor(barColor.r, barColor.g, barColor.b, 1)
-
-			artifactNameSize = artifactNameSize - child.fragmentBar.fragments:GetStringWidth()
-			child.fragmentBar.artifact:SetWidth(artifactNameSize)
-
-		else
-			local fragmentColor = (artifact.canSolve and "|cFF00FF00" or (artifact.canSolveStone and "|cFFFFFF00" or ""))
-			local nameColor = (artifact.isRare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
-			child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, artifact.fragments, artifact.fragments_required)
-
-			if race.keystone.inventory > 0 or artifact.sockets > 0 then
-				child.sockets.text:SetFormattedText("%d/%d", race.keystone.inventory, artifact.sockets)
-				child.sockets.tooltip = L["%d Key stone sockets available"]:format(artifact.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
-			else
-				child.sockets.text:SetText("")
-				child.sockets.tooltip = nil
-			end
-			child.crest:SetNormalTexture(race.texture)
-			child.crest:SetHighlightTexture(race.texture)
-			child.crest.tooltip = artifact.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race.name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
-
-			child.artifact.text:SetFormattedText("%s%s", nameColor, artifact.name)
-			child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
-
-			child.artifact:SetWidth(child.artifact.text:GetStringWidth())
-			child.artifact:SetHeight(child.artifact.text:GetStringHeight())
-			child:SetWidth(child.fragments:GetWidth() + child.sockets:GetWidth() + child.crest:GetWidth() + child.artifact:GetWidth() + 30)
-		end
-	end
-	local containerXofs = 0
-
-	if private.db.general.theme == "Graphical" and private.db.artifact.style == "Compact" then
-		maxHeight = maxHeight + 10
-		containerXofs = -10
-	end
-
-	ArtifactFrame.container:SetHeight(maxHeight)
-	ArtifactFrame.container:SetWidth(maxWidth)
-
-	if ArtifactFrame.skillBar then
-		ArtifactFrame.skillBar:SetWidth(maxWidth)
-		ArtifactFrame.skillBar.border:SetWidth(maxWidth + 9)
-
-		if private.db.general.showSkillBar then
-			ArtifactFrame.skillBar:Show()
-			ArtifactFrame.container:ClearAllPoints()
-			ArtifactFrame.container:SetPoint("TOP", ArtifactFrame.skillBar, "BOTTOM", containerXofs, -10)
-			maxHeight = maxHeight + 30
-		else
-			ArtifactFrame.skillBar:Hide()
-			ArtifactFrame.container:ClearAllPoints()
-			ArtifactFrame.container:SetPoint("TOP", ArtifactFrame, "TOP", containerXofs, -20)
-			maxHeight = maxHeight + 10
-		end
-	else
-		ArtifactFrame.container:ClearAllPoints()
-		ArtifactFrame.container:SetPoint("TOP", ArtifactFrame, "TOP", containerXofs, -20)
-		maxHeight = maxHeight + 10
-	end
-
-	if not private.IsTaintable() then
-		if racesCount == 0 then
-			ArtifactFrame:Hide()
-		end
-		ArtifactFrame:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
-		ArtifactFrame:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
-	end
-end
-
 function Archy:ShowDigSiteTooltip(digsite)
 	local site_id = digsite:GetParent():GetID()
 	local normal_font = _G.NORMAL_FONT_COLOR_CODE
