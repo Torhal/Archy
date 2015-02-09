@@ -1540,10 +1540,6 @@ function Archy:OnEnable()
 	self:ScheduleTimer(function() PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2) end, 3)
 end
 
-function Archy:OnDisable()
-	self:CancelTimer(PositionUpdateTimerHandle)
-end
-
 function Archy:OnProfileUpdate(event, database, ProfileKey)
 	local newTheme
 	if database then
