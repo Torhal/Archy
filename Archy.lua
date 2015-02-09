@@ -1537,6 +1537,7 @@ function Archy:OnEnable()
 	player_position.map, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
 
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
+	self:ScheduleTimer(function() PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2) end, 3)
 end
 
 function Archy:OnDisable()
@@ -1800,14 +1801,6 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not PositionUpdateTimerHandle then
-		self:ScheduleTimer(function()
-			DigSiteFrame:UpdateChrome()
-			ArtifactFrame:UpdateChrome()
-			PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2)
-		end, 1)
-	end
-
 	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") or (not force and not private.db.general.show) then
 		return
 	end
