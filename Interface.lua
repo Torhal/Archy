@@ -29,9 +29,10 @@ local NUM_DIGSITE_FINDS_DEFAULT = 6
 local NUM_DIGSITE_FINDS_DRAENOR = 9
 
 local CONTINENT_RACES = {}
-for _, site in pairs(private.DIG_SITES) do
-	CONTINENT_RACES[site.continent] = CONTINENT_RACES[site.continent] or {}
-	CONTINENT_RACES[site.continent][site.race] = true
+for siteKey, site in pairs(private.DIG_SITES) do
+	local continentID = site.continentID or (":"):split(siteKey)
+	CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
+	CONTINENT_RACES[continentID][site.typeID] = true
 end
 
 -----------------------------------------------------------------------
