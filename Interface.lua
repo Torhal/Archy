@@ -704,10 +704,13 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
 		siteFrame.site:SetWidth(siteFrame.site.name:GetStringWidth())
+		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
 		local width
 		local nameWidth = siteFrame.site:GetWidth()
 		local zoneWidth = siteFrame.zone:GetWidth()
+		local digCounterWidth = siteFrame.digCounter:GetWidth()
+		local distWidth = siteFrame.distance:GetWidth()
 
 		if maxNameWidth < nameWidth then
 			maxNameWidth = nameWidth
@@ -717,8 +720,12 @@ function Archy:ResizeMinimalDigSiteDisplay()
 			maxZoneWidth = zoneWidth
 		end
 
-		if maxDistWidth < siteFrame.distance:GetWidth() then
-			maxDistWidth = siteFrame.distance:GetWidth()
+		if maxDistWidth < distWidth then
+			maxDistWidth = distWidth
+		end
+
+		if maxDigCounterWidth < digCounterWidth then
+			maxDigCounterWidth = digCounterWidth
 		end
 
 		maxHeight = maxHeight + siteFrame:GetHeight() + 5
@@ -773,6 +780,7 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
 		siteFrame.site:SetWidth(siteFrame.site.name:GetStringWidth())
+		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
 		local width
 		local nameWidth = siteFrame.site:GetWidth()
@@ -783,6 +791,7 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 		else
 			width = siteFrame.crest:GetWidth() + zoneWidth + siteFrame.distance:GetWidth() + 6
 		end
+		width = width + siteFrame.digCounter:GetWidth()
 
 		if width > maxWidth then
 			maxWidth = width
