@@ -829,7 +829,7 @@ function Archy:RefreshDigSiteDisplay()
 		local childFrame = DigSiteFrame.children[digSiteIndex]
 		local count = self.db.char.digsites.stats[digSite.id].counter
 
-		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, maxSurveyCount)
+		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, digSite.findCount or maxSurveyCount)
 
 		if digSite.distance then
 			childFrame.distance.value:SetFormattedText(L["%d yards"], digSite.distance)

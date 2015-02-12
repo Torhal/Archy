@@ -898,6 +898,7 @@ function UpdateAllSites()
 				table.insert(sites, {
 					continent = mc,
 					distance = 999999,
+					findCount = site.findCount,
 					id = site.blobID,
 					level = 0,
 					map = mapID,
