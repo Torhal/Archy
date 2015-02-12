@@ -50,7 +50,6 @@ local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of va
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
 
-local MAP_FILENAME_TO_MAP_ID = {} -- Popupated in Archy:OnInitialize()
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in Archy:OnInitialize()
 local MAP_ID_TO_ZONE_NAME = {} -- Popupated in Archy:OnInitialize()
 
@@ -874,7 +873,6 @@ function UpdateAllSites()
 			if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
 				local site = DIG_SITES[landmarkName]
 				local mapID = site.map
-				local _, mapFilePath = _G.UpdateMapHighlight(mapPositionX, mapPositionY)
 				local mc, fc = Astrolabe:GetMapID(continentID, 0)
 				local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
 
@@ -883,7 +881,6 @@ function UpdateAllSites()
 					distance = 999999,
 					id = site.blob_id,
 					level = 0,
-					mapFile = mapFilePath,
 					map = mapID,
 					name = landmarkName,
 					raceId = site.race,
@@ -1485,10 +1482,8 @@ function Archy:OnEnable()
 			_G.SetMapZoom(continentID)
 
 			local mapID = _G.GetCurrentMapAreaID()
-			local mapFileName = _G.GetMapInfo()
 
 			MAP_CONTINENTS[continentID] = continentName
-			MAP_FILENAME_TO_MAP_ID[mapFileName] = mapID
 			MAP_ID_TO_ZONE_NAME[mapID] = continentName
 			private.MAP_ID_TO_CONTINENT_ID[mapID] = continentID
 
@@ -1497,7 +1492,6 @@ function Archy:OnEnable()
 				id = 0,
 				level = 0,
 				map = mapID,
-				mapFile = mapFileName,
 				name = continentName
 			}
 
@@ -1507,11 +1501,9 @@ function Archy:OnEnable()
 				if zoneDataIndex % 2 == 0 then
 					_G.SetMapByID(mapID)
 
-					local mapFileName = _G.GetMapInfo()
 					local zoneID = _G.GetCurrentMapZone()
 					local zoneName = zoneData[zoneDataIndex]
 
-					MAP_FILENAME_TO_MAP_ID[mapFileName] = mapID
 					MAP_ID_TO_ZONE_ID[mapID] = zoneID
 					MAP_ID_TO_ZONE_NAME[mapID] = zoneName
 					ZONE_ID_TO_NAME[zoneID] = zoneName
@@ -1520,7 +1512,6 @@ function Archy:OnEnable()
 						id = zoneID,
 						level = _G.GetCurrentMapDungeonLevel(),
 						map = mapID,
-						mapFile = mapFileName,
 						name = zoneName
 					}
 				else
