@@ -607,9 +607,8 @@ local DIG_SITES = {
 		mapID = 29,
 		typeID = DigsiteRaces.Fossil,
 	},
-	[DS["Terrorweb Tunnel Digsite"]] = {
-		blobID = 55443,
-		continentID = 2,
+	["2:0.516013:0.297438"] = { -- Terrorweb Tunnel Digsite
+		blobID = 60442,
 		mapID = 23,
 		typeID = DigsiteRaces.Nerubian,
 	},
