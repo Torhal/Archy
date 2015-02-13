@@ -56,9 +56,8 @@ local DIG_SITES = {
 		mapID = 161,
 		typeID = DigsiteRaces.Fossil,
 	},
-	[DS["Akhenet Fields Digsite"]] = {
-		blobID = 56608,
-		continentID = 1,
+	["1:0.490535:0.938357"] = { -- Akhenet Fields Digsite
+		blobID = 60356,
 		mapID = 720,
 		typeID = DigsiteRaces.Tolvir,
 	},
@@ -82,9 +81,8 @@ local DIG_SITES = {
 		mapID = 182,
 		typeID = DigsiteRaces.Nightelf,
 	},
-	[DS["Cursed Landing Digsite"]] = {
-		blobID = 56609,
-		continentID = 1,
+	["1:0.539285:0.932202"] = { -- Cursed Landing Digsite
+		blobID = 60352,
 		mapID = 720,
 		typeID = DigsiteRaces.Tolvir,
 	},
@@ -144,9 +142,8 @@ local DIG_SITES = {
 		mapID = 182,
 		typeID = DigsiteRaces.Nightelf,
 	},
-	[DS["Keset Pass Digsite"]] = {
-		blobID = 56611,
-		continentID = 1,
+	["1:0.530861:0.926699"] = { -- Keset Pass Digsite
+		blobID = 60354,
 		mapID = 720,
 		typeID = DigsiteRaces.Tolvir,
 	},
