@@ -481,13 +481,7 @@ local DIG_SITES = {
 		mapID = 40,
 		typeID = DigsiteRaces.Fossil,
 	},
-	[DS["Grim Batol Digsite"]] = {
-		blobID = 56589,
-		continentID = 2,
-		mapID = 700,
-		typeID = DigsiteRaces.Dwarf,
-	},
-	["2:0.488252:0.669339"] = { -- Grimesilt Digsite
+	["2:0.488252:0.669339"] = { -- Grimsilt Digsite
 		blobID = 55438,
 		mapID = 28,
 		typeID = DigsiteRaces.Dwarf,
