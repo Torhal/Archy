@@ -33,7 +33,7 @@ local NUM_DIGSITE_FINDS_DRAENOR = 9
 -- Helpers.
 -----------------------------------------------------------------------
 local function FramesShouldBeHidden()
-	return (not private.db.general.show or not private.current_continent or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.HasArchaeology())
+	return (not private.db.general.show or not private.current_continent or private.current_continent == -1 or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.HasArchaeology())
 end
 
 private.FramesShouldBeHidden = FramesShouldBeHidden
