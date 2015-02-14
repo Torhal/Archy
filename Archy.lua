@@ -2561,7 +2561,16 @@ function Archy:GET_ITEM_INFO_RECEIVED(event)
 		end
 	end
 
-	if not next(private.RaceKeystoneProcessingQueue) then
+	for data, race in pairs(private.RaceArtifactProcessingQueue) do
+		local artifactName = _G.GetItemInfo(data.itemID)
+		if artifactName then
+			private.Debug("AddRace: Adding %s to %s", artifactName, race.name)
+			race.ArtifactItemIDs[artifactName] = data.itemID
+			race.ArtifactSpellIDs[artifactName] = data.spellID
+		end
+	end
+
+	if not next(private.RaceKeystoneProcessingQueue) and not next(private.RaceArtifactProcessingQueue) then
 		self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end

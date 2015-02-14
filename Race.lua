@@ -20,6 +20,9 @@ local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 local Races = {}
 private.Races = Races
 
+local RaceArtifactProcessingQueue = {}
+private.RaceArtifactProcessingQueue = RaceArtifactProcessingQueue
+
 local RaceKeystoneProcessingQueue = {}
 private.RaceKeystoneProcessingQueue = RaceKeystoneProcessingQueue
 
@@ -47,9 +50,11 @@ function Archy:AddRace(raceID)
 	end
 
 	local raceName, raceTexture, keystoneItemID, currencyAmount = _G.GetArchaeologyRaceInfo(raceID)
-	local itemName, _, _, _, _, _, _, _, _, itemTexture, _ = _G.GetItemInfo(keystoneItemID)
+	local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
 
 	local race = _G.setmetatable({
+		ArtifactItemIDs = {},
+		ArtifactSpellIDs = {},
 		currency = currencyAmount,
 		id = raceID,
 		name = raceName,
@@ -67,25 +72,38 @@ function Archy:AddRace(raceID)
 		},
 		keystone = {
 			id = keystoneItemID,
-			name = itemName,
-			texture = itemTexture,
+			name = keystoneName,
+			texture = keystoneTexture,
 			inventory = 0
 		}
 	}, raceMetatable)
 
 	Races[raceID] = race
 
-	local artifactNameToIDMapping = {}
+	local artifactNameToInfoIndexMapping = {}
 	for artifactIndex = 1, _G.GetNumArtifactsByRace(raceID) do
 		local artifactName = _G.GetArtifactInfoByRace(raceID, artifactIndex)
-		artifactNameToIDMapping[artifactName] = artifactIndex
+		artifactNameToInfoIndexMapping[artifactName] = artifactIndex
 	end
-	race.ArtifactNameToIDMapping = artifactNameToIDMapping
+	race.ArtifactNameToInfoIndexMapping = artifactNameToInfoIndexMapping
 
-	if keystoneItemID and keystoneItemID > 0 and (not itemName or itemName == "") then
+	if keystoneItemID and keystoneItemID > 0 and (not keystoneName or keystoneName == "") then
 		RaceKeystoneProcessingQueue[raceID] = keystoneItemID
 		Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
+
+	for itemID, data in pairs(private.ARTIFACTS[raceID]) do
+		local artifactName = _G.GetItemInfo(itemID)
+		if artifactName then
+			race.ArtifactItemIDs[artifactName] = data.itemID
+			race.ArtifactSpellIDs[artifactName] = data.spellID
+		else
+			RaceArtifactProcessingQueue[data] = race
+			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+		end
+	end
+
+
 	race:UpdateArtifact()
 
 	return Races[raceID]
@@ -99,7 +117,7 @@ function Race:GetArtifactCompletionDataByName(artifactName)
 		return
 	end
 
-	local artifactIndex = self.ArtifactNameToIDMapping[artifactName]
+	local artifactIndex = self.ArtifactNameToInfoIndexMapping[artifactName]
 	if not artifactIndex then
 		return 0, 0, 0
 	end
@@ -149,9 +167,11 @@ function Race:UpdateArtifact()
 	artifact.fragments_required = totalFragments
 	artifact.icon = icon
 	artifact.isRare = (rarity ~= 0)
+	artifact.itemID = self.ArtifactItemIDs[artifactName]
 	artifact.keystone_adjustment = 0
 	artifact.name = artifactName
 	artifact.sockets = numSockets
+	artifact.spellID = self.ArtifactSpellIDs[artifactName]
 	artifact.tooltip = spellDescription
 
 	self.keystone.inventory = _G.GetItemCount(self.keystone.id) or 0

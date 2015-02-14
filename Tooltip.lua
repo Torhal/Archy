@@ -36,7 +36,6 @@ local IsTaintable = private.IsTaintable
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
-local ARTIFACTS = private.artifacts_db
 local MAX_ARCHAEOLOGY_RANK = private.MAX_ARCHAEOLOGY_RANK
 local ZONE_DATA = private.ZONE_DATA
 
@@ -67,10 +66,12 @@ local function Archy_cell_script(_, what, button)
 		current_tooltip_mode = TOOLTIP_MODES[nextmode] and nextmode or 1
 	end
 	local key, value = (":"):split(what)
+	value = tonumber(value)
 
-	if key == "raceid" and value then -- race was clicked show/hide uncomplete artifacts lists
+	-- Race was clicked. Show/hide uncomplete artifacts lists.
+	if key == "raceID" and value then
 		for raceID, race in pairs(private.Races) do
-			if tonumber(value) ~= raceID then
+			if value ~= raceID then
 				race.expand = nil
 			else
 				race.expand = not race.expand
@@ -78,8 +79,9 @@ local function Archy_cell_script(_, what, button)
 		end
 	end
 
-	if key == "spellid" and value then -- project link was clicked
-		Archy:Print((_G.GetSpellLink(tonumber(value))))
+	-- Project link was clicked.
+	if key == "spellID" and value then
+		Archy:Print((_G.GetSpellLink(value)))
 	end
 	Archy:LDBTooltipShow()
 end
@@ -199,46 +201,46 @@ local function GetAchievementProgress()
 	return rare:gsub("^.+:", ""):trim(), common
 end
 
-local function GetArtifactsDelta(race_id, missing_data)
+local function GetArtifactsDelta(raceID, missing_data)
 	local rare_count, common_count, total_count = 0, 0, 0
 	local rare_missing, common_missing, total_missing = 0, 0, 0
 
 	table.wipe(missing_data)
 
-	for artifact, info in pairs(ARTIFACTS) do
-		if info.raceid == race_id then
-			if info.rarity == 0 then
-				common_count = common_count + 1
-			else
-				rare_count = rare_count + 1
-			end
-			total_count = total_count + 1
-			missing_data[artifact] = info -- flag all race artifacts as missing
-		end
+	local race = private.Races[raceID]
+	local artifact = race.artifact
+
+	if artifact.isRare then
+		rare_count = rare_count + 1
+	else
+		common_count = common_count + 1
 	end
+	total_count = total_count + 1
+	missing_data[artifact.name] = artifact
 
 	-- then remove the ones we've already solved at least once so we have the actual missing.
 	local artifact_index = 1
-	local artifact, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
+	local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(raceID, artifact_index)
 
-	if artifact and completionCount > 0 and missing_data[artifact] then -- TODO: Maybe display "in progress" but not yet obtained artifacts different?
-		missing_data[artifact] = nil
+	-- TODO: Maybe display "in progress" but not yet obtained artifacts different?
+	if artifactName and completionCount > 0 and missing_data[artifactName] then
+		missing_data[artifactName] = nil
 		artifact_index = artifact_index + 1
 	end
 
-	while artifact do
-		artifact, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race_id, artifact_index)
-		if artifact and completionCount > 0 and missing_data[artifact] then
-			missing_data[artifact] = nil
+	while artifactName do
+		artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(raceID, artifact_index)
+		if artifactName and completionCount > 0 and missing_data[artifactName] then
+			missing_data[artifactName] = nil
 		end
 		artifact_index = artifact_index + 1
 	end
 
-	for artifact, info in pairs(missing_data) do
-		if info.rarity == 0 then
-			common_missing = common_missing + 1
-		else
+	for artifactName, artifact in pairs(missing_data) do
+		if artifact.isRare then
 			rare_missing = rare_missing + 1
+		else
+			common_missing = common_missing + 1
 		end
 		total_missing = total_missing + 1
 	end
@@ -408,7 +410,7 @@ function Archy:LDBTooltipShow()
 						line = tooltip:AddLine(" ")
 						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
 						tooltip:SetCell(line, 2, race.name .. "*", "LEFT", 1)
-						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceid:" .. raceID)
+						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceID:" .. raceID)
 						tooltip:SetCell(line, 3, missing_data.rare_counts, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 5, missing_data.common_counts, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
@@ -449,13 +451,16 @@ function Archy:LDBTooltipShow()
 						local start_line, end_line
 
 						-- Rares first
-						for artifact, info in pairs(missing_data) do
-							if not COUNT_DESCRIPTORS[artifact] and info.rarity > 0 then
+						for artifactName, artifact in pairs(missing_data) do
+							if not COUNT_DESCRIPTORS[artifactName] and artifact.isRare then
 								line = tooltip:AddLine(" ")
 								tooltip:SetCell(line, 1, " ", "LEFT", 1)
-								tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, artifact) .. "*", "LEFT", 1)
-								tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "spellid:" .. info.spellid)
-								if not start_line then start_line = line end
+								tooltip:SetCell(line, 2, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, artifactName) .. "*", "LEFT", 1)
+								tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "spellID:" .. artifact.spellID)
+
+								if not start_line then
+									start_line = line
+								end
 								end_line = line
 							end
 						end
@@ -464,10 +469,10 @@ function Archy:LDBTooltipShow()
 						if end_line and end_line >= start_line then
 							local line, cell = start_line, 3
 
-							for artifact, info in pairs(missing_data) do
-								if not COUNT_DESCRIPTORS[artifact] and info.rarity == 0 then
+							for artifactName, artifact in pairs(missing_data) do
+								if not COUNT_DESCRIPTORS[artifactName] and not artifact.isRare then
 									if line <= end_line and cell <= 5 then
-										tooltip:SetCell(line, cell, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[1].hex, artifact), "LEFT", 2)
+										tooltip:SetCell(line, cell, ("%s%s|r"):format(_G.ITEM_QUALITY_COLORS[1].hex, artifactName), "LEFT", 2)
 										cell = cell + 2
 
 										if cell > 5 then
