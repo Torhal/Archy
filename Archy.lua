@@ -114,7 +114,7 @@ local PROFILE_DEFAULTS = {
 			position = {
 				"TOPRIGHT",
 				"TOPRIGHT",
-				-200,
+				-400,
 				-425
 			},
 			anchor = "TOPRIGHT",
@@ -202,7 +202,7 @@ local PROFILE_DEFAULTS = {
 		digsite = {
 			show = true,
 			position = {
-				"TOPRIGHT", "TOPRIGHT", -200, -200
+				"TOPRIGHT", "TOPRIGHT", -400, -200
 			},
 			anchor = "TOPRIGHT",
 			positionX = 400,
