@@ -4,6 +4,7 @@
 local _G = getfenv(0)
 
 -- Functions
+local pairs = _G.pairs
 
 -- Libraries
 local math = _G.math
@@ -88,7 +89,7 @@ function Archy:AddRace(raceID)
 	race.ArtifactNameToInfoIndexMapping = artifactNameToInfoIndexMapping
 
 	if keystoneItemID and keystoneItemID > 0 and (not keystoneName or keystoneName == "") then
-		RaceKeystoneProcessingQueue[raceID] = keystoneItemID
+		RaceKeystoneProcessingQueue[race] = keystoneItemID
 		Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 
@@ -124,13 +125,6 @@ function Race:GetArtifactCompletionDataByName(artifactName)
 
 	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.id, artifactIndex)
 	return artifactIndex, firstCompletionTime, completionCount
-end
-
-function Race:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
-	RaceKeystoneProcessingQueue[self.id] = nil
-
-	self.keystone.name = keystoneName
-	self.keystone.texture = keystoneTexture
 end
 
 function Race:KeystoneSocketOnClick(mouseButtonName)

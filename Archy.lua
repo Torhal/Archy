@@ -2554,19 +2554,21 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 end
 
 function Archy:GET_ITEM_INFO_RECEIVED(event)
-	for raceID, keystoneItemID in next, private.RaceKeystoneProcessingQueue, nil do
+	for race, keystoneItemID in next, private.RaceKeystoneProcessingQueue, nil do
 		local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
 		if keystoneName and keystoneTexture then
-			private.Races[raceID]:SetKeystoneNameAndTexture(keystoneName, keystoneTexture)
+			race.keystone.name = keystoneName
+			race.keystone.texture = keystoneTexture
+			private.RaceKeystoneProcessingQueue[race] = nil
 		end
 	end
 
-	for data, race in pairs(private.RaceArtifactProcessingQueue) do
+	for data, race in next, private.RaceArtifactProcessingQueue, nil do
 		local artifactName = _G.GetItemInfo(data.itemID)
 		if artifactName then
-			private.Debug("AddRace: Adding %s to %s", artifactName, race.name)
 			race.ArtifactItemIDs[artifactName] = data.itemID
 			race.ArtifactSpellIDs[artifactName] = data.spellID
+			private.RaceArtifactProcessingQueue[data] = nil
 		end
 	end
 
