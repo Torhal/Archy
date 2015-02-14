@@ -2402,11 +2402,11 @@ do
 		ArtifactFrame:RefreshDisplay()
 	end
 
-	function Archy:ARTIFACT_COMPLETE(event, name)
+	function Archy:ARTIFACT_COMPLETE(event, artifactName)
 		for raceID, race in pairs(private.Races) do
 			local artifact = race.artifact
 
-			if artifact and artifact.name == name then
+			if artifact and artifact.name == artifactName then
 				artifact.hasAnnounced = nil
 				artifact.hasPinged = nil
 
@@ -2486,13 +2486,13 @@ do
 			return
 		end
 		local itemID = GetIDFromLink(itemLink)
-		local race_id = keystoneIDToRaceID[itemID]
+		local raceID = keystoneIDToRaceID[itemID]
 
-		if race_id then
+		if raceID then
 			if lastSite.id then
 				self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
 			end
-			keystoneLootRaceID = race_id
+			keystoneLootRaceID = raceID
 		end
 	end
 end -- do-block
