@@ -878,15 +878,17 @@ function UpdateAllSites()
 				-- TODO: Remove landmarkName check once LibBabble-Digsites is gone.
 				local site = DIG_SITES[siteKey] or DIG_SITES[landmarkName]
 				if not site then
+					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
+
 					if not sessionErrors[siteKey] then
-						local message = "Archy is missing data for dig site %s (%s)"
-						Archy:Printf(message, landmarkName, siteKey)
-						DebugPour(message, landmarkName, siteKey)
+						local message = "Archy is missing data for dig site %s (key: %s blobID: %d)"
+						Archy:Printf(message, landmarkName, siteKey, blobID)
+						DebugPour(message, landmarkName, siteKey, blobID)
 						sessionErrors[siteKey] = true
 					end
 
 					site = {
-						blobID = 0,
+						blobID = blobID,
 						mapID = 0,
 						typeID = private.DigsiteRaces.Unknown
 					}
@@ -1642,7 +1644,7 @@ local SUBCOMMAND_FUNCS = {
 					local siteKey = ("%d:%.6f:%.6f"):format(_G.GetCurrentMapContinent(), mapPositionX, mapPositionY)
 
 					if not DIG_SITES[siteKey] and not sites[siteKey] then
-						Debug(("%s { blobID = 0, map = 0, race = DigsiteRaces.Unknown} -- \"%s\""):format(siteKey, landmarkName))
+						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteRaces.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
 						sites[siteKey] = true
 						found = found + 1
 					end
