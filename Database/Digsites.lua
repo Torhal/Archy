@@ -935,9 +935,8 @@ local DIG_SITES = {
 		mapID = 486,
 		typeID = DigsiteRaces.Nerubian,
 	},
-	[DS["Valkyrion Digsite"]] = {
+	["4:0.514109:0.272545"] = { -- Valkyrion Digsite
 		blobID = 56553,
-		continentID = 4,
 		mapID = 495,
 		typeID = DigsiteRaces.Vrykul,
 	},
