@@ -367,9 +367,8 @@ local DIG_SITES = {
 		mapID = 201,
 		typeID = DigsiteRaces.Fossil,
 	},
-	[DS["Tombs of the Precursors Digsite"]] = {
+	["1:0.523062:0.924376"] = { -- Tombs of the Precursors Digsite
 		blobID = 56593,
-		continentID = 1,
 		mapID = 720,
 		typeID = DigsiteRaces.Tolvir,
 	},
