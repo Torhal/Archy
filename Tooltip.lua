@@ -297,9 +297,10 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 				for raceID, race in pairs(private.Races) do
+					local continentHasRace = not private.db.tooltip.filter_continent or private.CONTINENT_RACES[private.current_continent][raceID]
 					local artifact = race.artifact
 
-					if artifact.fragments_required > 0 then
+					if continentHasRace and artifact.fragments_required > 0 then
 						local race = private.Races[raceID]
 
 						line = tooltip:AddLine(" ")
