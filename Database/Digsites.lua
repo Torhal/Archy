@@ -826,9 +826,8 @@ local DIG_SITES = {
 		mapID = 496,
 		typeID = DigsiteRaces.Troll,
 	},
-	[DS["Altar of Sseratus Digsite"]] = {
+	["4:0.665477:0.371495"] = { -- Altar of Sseratus Digsite
 		blobID = 56533,
-		continentID = 4,
 		mapID = 496,
 		typeID = DigsiteRaces.Troll,
 	},
