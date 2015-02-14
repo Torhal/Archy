@@ -311,9 +311,7 @@ local LOREWALKER_ITEMS = {
 	MAP = { id = 87549, spell = 126957 },
 	LODESTONE = { id = 87548, spell = 126956 },
 }
-local QUEST_ITEM_IDS = {
-	[79049] = true
-}
+
 local CRATE_OF_FRAGMENTS = {
 	-- all pre-MoP races at Mists of Pandaria expansion
 	[87533] = true, -- Dwarven
@@ -2577,31 +2575,39 @@ function Archy:GET_ITEM_INFO_RECEIVED(event)
 	end
 end
 
-function Archy:LOOT_OPENED(event, ...)
-	local auto_loot_enabled = ...
+do
+	local QUEST_ITEM_IDS = {
+		[79049] = true, -- Serpentrider Relic
+		[97986] = true, -- Digmaster's Earthblade
+		[114212] = true, -- Pristine Rylak Riding Harness
+	}
 
-	if not private.db.general.autoLoot or auto_loot_enabled == 1 then
-		return
-	end
+	function Archy:LOOT_OPENED(event, ...)
+		local auto_loot_enabled = ...
 
-	for slot_id = 1, _G.GetNumLootItems() do
-		local slot_type = _G.GetLootSlotType(slot_id)
+		if not private.db.general.autoLoot or auto_loot_enabled == 1 then
+			return
+		end
 
-		if slot_type == _G.LOOT_SLOT_CURRENCY then
-			_G.LootSlot(slot_id)
-		elseif slot_type == _G.LOOT_SLOT_ITEM then
-			local link = _G.GetLootSlotLink(slot_id)
+		for slotID = 1, _G.GetNumLootItems() do
+			local slotType = _G.GetLootSlotType(slotID)
 
-			if link then
-				local item_id = GetIDFromLink(link)
+			if slotType == _G.LOOT_SLOT_CURRENCY then
+				_G.LootSlot(slotID)
+			elseif slotType == _G.LOOT_SLOT_ITEM then
+				local itemLink = _G.GetLootSlotLink(slotID)
 
-				if item_id and (keystoneIDToRaceID[item_id] or QUEST_ITEM_IDS[item_id]) then
-					_G.LootSlot(slot_id)
+				if itemLink then
+					local itemID = GetIDFromLink(itemLink)
+
+					if itemID and (keystoneIDToRaceID[itemID] or QUEST_ITEM_IDS[itemID]) then
+						_G.LootSlot(slotID)
+					end
 				end
 			end
 		end
 	end
-end
+end -- do-block
 
 function Archy:PET_BATTLE_CLOSE()
 	if private.pet_battle_shown then
