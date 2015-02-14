@@ -251,14 +251,14 @@ end
 local progress_data, missing_data = {}, {}
 
 function Archy:LDBTooltipShow()
-	local num_columns, column_index, line
+	local num_columns
 	local tooltip = self.LDB_Tooltip
 
 	if current_tooltip_mode == 1 then -- artifacts_digsites
-		num_columns, column_index, line = 10, 0, 0
+		num_columns = 10
 		tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
 	elseif current_tooltip_mode == 2 then -- overall_completion
-		num_columns, column_index, line = 6, 0, 0
+		num_columns = 6
 		tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT")
 	end
 	tooltip:Hide()
@@ -334,7 +334,7 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 					end
 				end
-				local site_stats = Archy.db.char.digsites.stats
+				local siteStats = Archy.db.char.digsites.stats
 
 				line = tooltip:AddLine(" ")
 				line = tooltip:AddLine(" ")
@@ -342,7 +342,7 @@ function Archy:LDBTooltipShow()
 				tooltip:AddSeparator()
 
 				for continent_id, continent_sites in pairs(private.continent_digsites) do
-					if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == private.current_continent) then -- current_continent) then
+					if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == private.current_continent) then
 						local continent_name
 						for _, zone in pairs(ZONE_DATA) do
 							if zone.continent == continent_id and zone.id == 0 then
@@ -353,7 +353,7 @@ function Archy:LDBTooltipShow()
 
 						if continent_name then
 							line = tooltip:AddLine(" ")
-							tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns) -- Drii: ticket 384
+							tooltip:SetCell(line, 1, "  " .. _G.ORANGE_FONT_COLOR_CODE .. continent_name .. "|r", "LEFT", num_columns)
 						end
 						line = tooltip:AddLine(" ")
 						tooltip:SetCell(line, 1, " ", "LEFT", 1)
@@ -373,10 +373,10 @@ function Archy:LDBTooltipShow()
 							tooltip:SetCell(line, 2, race.name, "LEFT", 2)
 							tooltip:SetCell(line, 4, site.name, "LEFT", 1)
 							tooltip:SetCell(line, 5, site.zoneName, "LEFT", 2)
-							tooltip:SetCell(line, 7, site_stats[site.id].surveys, "CENTER", 1)
-							tooltip:SetCell(line, 8, site_stats[site.id].looted, "CENTER", 1)
-							tooltip:SetCell(line, 9, site_stats[site.id].fragments, "CENTER", 1)
-							tooltip:SetCell(line, 10, site_stats[site.id].keystones, "CENTER", 1)
+							tooltip:SetCell(line, 7, siteStats[site.id].surveys, "CENTER", 1)
+							tooltip:SetCell(line, 8, siteStats[site.id].looted, "CENTER", 1)
+							tooltip:SetCell(line, 9, siteStats[site.id].fragments, "CENTER", 1)
+							tooltip:SetCell(line, 10, siteStats[site.id].keystones, "CENTER", 1)
 						end
 						line = tooltip:AddLine(" ")
 					end
