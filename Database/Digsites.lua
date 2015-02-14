@@ -1619,8 +1619,8 @@ local DIG_SITES = {
 	},
 	["7:0.291098:0.541459"] = { -- Stonecrag Excavation Digsite
 		blobID = 307981,
-		findCount = 13,
 		mapID = 950,
+		maxFindCount = 13,
 		typeID = DigsiteRaces.Ogre,
 	},
 	["7:0.474597:0.356333"] = { -- The Broken Spine Digsite
