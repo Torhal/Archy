@@ -2293,14 +2293,26 @@ end
 -------------------------------------------------------------------------------
 -- Event handlers.
 -------------------------------------------------------------------------------
-function Archy:ADDON_LOADED(event, addon)
-	if addon == "Blizzard_BattlefieldMinimap" then
+function Archy:ADDON_LOADED(event, addonName)
+	if addonName == "Blizzard_BattlefieldMinimap" then
 		InitializeBattlefieldDigsites()
 		self:UnregisterEvent("ADDON_LOADED")
 	end
 end
 
 do
+	local function DisableProgressBar()
+		local bar = _G.ArcheologyDigsiteProgressBar
+		bar:UnregisterEvent("ARCHAEOLOGY_SURVEY_CAST")
+		bar:UnregisterEvent("ARCHAEOLOGY_FIND_COMPLETE")
+		bar:UnregisterEvent("ARTIFACT_DIGSITE_COMPLETE")
+		bar:SetScript("OnEvent", nil)
+		bar:SetScript("OnHide", nil)
+		bar:SetScript("OnShow", nil)
+		bar:SetScript("OnUpdate", nil)
+		bar:Hide()
+	end
+
 	local function UpdateDigsiteCounter(numFindsCompleted)
 		Archy.db.char.digsites.stats[lastSite.id].counter = numFindsCompleted
 	end
@@ -2314,6 +2326,11 @@ do
 	end
 
 	function Archy:ARCHAEOLOGY_SURVEY_CAST(eventName, numFindsCompleted, totalFinds)
+		if DisableProgressBar then
+			DisableProgressBar()
+			DisableProgressBar = nil
+		end
+
 		if not nearestSite then
 			survey_location.map = 0
 			survey_location.level = 0
