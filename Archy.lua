@@ -1433,6 +1433,8 @@ function Archy:OnEnable()
 	-- Ignore this event for now as it's can break other Archaeology UIs
 	-- Would have been nice if Blizzard passed the race index or artifact name with the event
 	--    self:RegisterEvent("ARTIFACT_UPDATE")
+	self:RegisterEvent("ARCHAEOLOGY_FIND_COMPLETE")
+	self:RegisterEvent("ARCHAEOLOGY_SURVEY_CAST")
 	self:RegisterEvent("ARTIFACT_COMPLETE")
 	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
@@ -2299,6 +2301,79 @@ function Archy:ADDON_LOADED(event, addon)
 end
 
 do
+	local function UpdateDigsiteCounter(numFindsCompleted)
+		Archy.db.char.digsites.stats[lastSite.id].counter = numFindsCompleted
+	end
+
+	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
+		UpdateDigsiteCounter(numFindsCompleted)
+	end
+
+	local function SetSurveyCooldown(time)
+		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
+	end
+
+	function Archy:ARCHAEOLOGY_SURVEY_CAST(eventName, numFindsCompleted, totalFinds)
+		if not nearestSite then
+			survey_location.map = 0
+			survey_location.level = 0
+			survey_location.x = 0
+			survey_location.y = 0
+			return
+		end
+		survey_location.level = player_position.level
+		survey_location.map = player_position.map
+		survey_location.x = player_position.x
+		survey_location.y = player_position.y
+
+		lastSite = nearestSite
+		self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
+
+		DistanceIndicatorFrame.isActive = true
+		DistanceIndicatorFrame:Toggle()
+		UpdateDistanceIndicator()
+
+		if DistanceIndicatorFrame.surveyButton and DistanceIndicatorFrame.surveyButton:IsShown() then
+			local now = _G.GetTime()
+			local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
+
+			if start > 0 and duration > 0 and now < (start + duration) then
+				if duration <= GLOBAL_COOLDOWN_TIME then
+					self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
+				elseif duration > GLOBAL_COOLDOWN_TIME then
+					_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, start, duration, enable)
+				end
+			end
+		end
+
+		if private.db.minimap.fragmentColorBySurveyDistance then
+			local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
+			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
+			local min_red, max_red = max_yellow, 500
+
+			for poi in pairs(PointsOfInterest) do
+				if poi.type == "survey" then
+					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
+
+					if distance >= min_green and distance <= max_green then
+						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
+					elseif distance >= min_yellow and distance <= max_yellow then
+						poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
+					elseif distance >= min_red and distance <= max_red then
+						poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+					end
+				end
+			end
+		end
+		TomTomHandler.isActive = false
+		TomTomHandler:Refresh(nearestSite)
+
+		UpdateDigsiteCounter(numFindsCompleted)
+		self:RefreshDigSiteDisplay()
+	end
+end
+
+do
 	local function UpdateAndRefresh(race)
 		race:UpdateArtifact()
 		ArtifactFrame:RefreshDisplay()
@@ -2428,7 +2503,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 
 		elseif diff > 0 then
 			-- we've gained fragments, aka. Successfully dug at a dig site
-			local site_stats = self.db.char.digsites.stats
+			local siteStats = self.db.char.digsites.stats
 
 			DistanceIndicatorFrame.isActive = false
 			DistanceIndicatorFrame:Toggle()
@@ -2436,14 +2511,8 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			-- Drii: for now let's just avoid the error
 			-- TODO: Figure out why the fuck this was done. Burying errors instead of figureout out and fixing their cause is...WTF?!?
 			if type(lastSite.id) == "number" and lastSite.id > 0 then
-				-- Only increment when digging; not when looting from world objects.
-				if private.has_dug then
-					local siteStats = Archy.db.char.digsites.stats
-					siteStats[lastSite.id].counter = (siteStats[lastSite.id].counter or 0) + 1
-					private.has_dug = nil
-				end
-				site_stats[lastSite.id].looted = (site_stats[lastSite.id].looted or 0) + 1
-				site_stats[lastSite.id].fragments = site_stats[lastSite.id].fragments + diff
+				siteStats[lastSite.id].looted = (siteStats[lastSite.id].looted or 0) + 1
+				siteStats[lastSite.id].fragments = siteStats[lastSite.id].fragments + diff
 
 				AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
 			end
@@ -2629,10 +2698,6 @@ do
 		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id))
 	end
 
-	local function SetSurveyCooldown(time)
-		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
-	end
-
 	function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
 		if unit ~= "player" then
 			return
@@ -2649,65 +2714,6 @@ do
 				private.busy_crating = nil
 				self:ScheduleTimer("ScanBags", 1)
 			end
-		end
-
-		if spell_id == SURVEY_SPELL_ID and event == "UNIT_SPELLCAST_SUCCEEDED" then
-			private.has_dug = true
-			if not nearestSite then
-				survey_location.map = 0
-				survey_location.level = 0
-				survey_location.x = 0
-				survey_location.y = 0
-				return
-			end
-			survey_location.x = player_position.x
-			survey_location.y = player_position.y
-			survey_location.map = player_position.map
-			survey_location.level = player_position.level
-
-			lastSite = nearestSite
-			self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
-
-			DistanceIndicatorFrame.isActive = true
-			DistanceIndicatorFrame:Toggle()
-			UpdateDistanceIndicator()
-
-			if DistanceIndicatorFrame.surveyButton and DistanceIndicatorFrame.surveyButton:IsShown() then
-				local now = _G.GetTime()
-				local start, duration, enable = _G.GetSpellCooldown(SURVEY_SPELL_ID)
-
-				if start > 0 and duration > 0 and now < (start + duration) then
-					if duration <= GLOBAL_COOLDOWN_TIME then
-						self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
-					elseif duration > GLOBAL_COOLDOWN_TIME then -- in case they ever take it off the gcd
-					_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, start, duration, enable)
-					end
-				end
-			end
-
-			if private.db.minimap.fragmentColorBySurveyDistance then
-				local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
-				local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
-				local min_red, max_red = max_yellow, 500
-
-				for poi in pairs(PointsOfInterest) do
-					if poi.type == "survey" then
-						local distance = Astrolabe:GetDistanceToIcon(poi) or 0
-
-						if distance >= min_green and distance <= max_green then
-							poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
-						elseif distance >= min_yellow and distance <= max_yellow then
-							poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
-						elseif distance >= min_red and distance <= max_red then
-							poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
-						end
-					end
-				end
-			end
-			TomTomHandler.isActive = false
-			TomTomHandler:Refresh(nearestSite)
-
-			self:RefreshDigSiteDisplay()
 		end
 	end
 end -- do-block
