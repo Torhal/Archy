@@ -10,6 +10,7 @@ local table = _G.table
 -- Functions
 local pairs = _G.pairs
 local setmetatable = _G.setmetatable
+local tonumber = _G.tonumber
 local unpack = _G.unpack
 
 -----------------------------------------------------------------------
@@ -30,7 +31,7 @@ local NUM_DIGSITE_FINDS_DRAENOR = 9
 
 local CONTINENT_RACES = {}
 for siteKey, site in pairs(private.DIG_SITES) do
-	local continentID = site.continentID or (":"):split(siteKey)
+	local continentID = site.continentID or tonumber(((":"):split(siteKey)))
 	CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
 	CONTINENT_RACES[continentID][site.typeID] = true
 end
