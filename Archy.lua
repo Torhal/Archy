@@ -283,7 +283,7 @@ local PROFILE_DEFAULTS = {
 			useBlobDistance = true,
 		},
 		tooltip = {
-			filter_continent = false,
+			filter_continent = true,
 			scale = 1,
 		},
 		tomtom = {
