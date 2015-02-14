@@ -191,9 +191,8 @@ local DIG_SITES = {
 		mapID = 720,
 		typeID = DigsiteRaces.Tolvir,
 	},
-	[DS["Nightmare Scar Digsite"]] = {
+	["1:0.524285:0.590665"] = { -- Nightmare Scar Digsite
 		blobID = 56362,
-		continentID = 1,
 		mapID = 607,
 		typeID = DigsiteRaces.Nightelf,
 	},
