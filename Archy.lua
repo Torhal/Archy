@@ -287,8 +287,9 @@ local PROFILE_DEFAULTS = {
 			scale = 1,
 		},
 		tomtom = {
-			enabled = true,
+			crazyArrowEnabled = true,
 			distance = 125,
+			enabled = true,
 			ping = true,
 		},
 	},

@@ -94,6 +94,7 @@ L["Display Options"] = true
 L["Double right-click on the screen to cast Survey.  This is experimental and may interfere with other addons with similar functionality when enabled."] = true
 L["Enable \"Arrival Distance\""] = true
 L["Enable EasyCast"] = true
+L["Enable TomTom Crazy Arrow"] = true
 L["Enable TomTom integration"] = true
 L["Enable the Survey Distance Indicator"] = true
 L["Enable the addon to auto-loot fragments and key stones for you."] = true

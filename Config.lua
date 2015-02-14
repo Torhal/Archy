@@ -1318,8 +1318,24 @@ local function GetTomTomOptions()
 						Archy:ConfigUpdated('tomtom')
 					end,
 				},
-				arrivalDistance = {
+				crazyArrowEnabled = {
 					order = 2,
+					type = "toggle",
+					name = L["Enable TomTom Crazy Arrow"],
+					width = "double",
+					get = function()
+						return db.tomtom.crazyArrowEnabled
+					end,
+					set = function(_, value)
+						db.tomtom.crazyArrowEnabled = value
+						Archy:ConfigUpdated('tomtom')
+					end,
+					disabled = function()
+						return not db.tomtom.enabled or not private.TomTomHandler.hasTomTom
+					end,
+				},
+				arrivalDistance = {
+					order = 3,
 					type = "range",
 					name = L["\"Arrival Distance\""],
 					desc = L["This setting will control the distance at which the waypoint arrow switches to a downwards arrow, indicating you have arrived at your destination.\nNOTE: This may not work with emulation addons if they do not support this."],
@@ -1336,7 +1352,7 @@ local function GetTomTomOptions()
 					end,
 				},
 				arrivalPing = {
-					order = 3,
+					order = 4,
 					type = "toggle",
 					name = L["Play a sound when arriving at a waypoint"],
 					desc = L["When you 'arrive' at a waypoint (this distance is controlled by the 'Arrival Distance' setting in this group) a sound can be played to indicate this.  You can enable or disable this sound using this setting."],

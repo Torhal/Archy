@@ -58,7 +58,13 @@ local TomTomHandler = {
 		-- Waypoint doesn't exist or we have an imperfect TomTom emulator
 		if not waypointExists then
 			self:ClearWaypoint()
-			self.waypoint = _G.TomTom:AddMFWaypoint(digsite.map, nil, digsite.x, digsite.y, { title = digsite.name .. "\n" .. digsite.zoneName })
+
+			local waypointData = {
+				crazy = private.db.tomtom.crazyArrowEnabled,
+				title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(private.Races[digsite.raceId].name), digsite.zoneName),
+			}
+
+			self.waypoint = _G.TomTom:AddMFWaypoint(digsite.map, nil, digsite.x, digsite.y, waypointData)
 		end
 	end
 }
