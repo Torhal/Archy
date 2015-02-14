@@ -41,14 +41,14 @@ local MAX_ARCHAEOLOGY_RANK = private.MAX_ARCHAEOLOGY_RANK
 local ZONE_DATA = private.ZONE_DATA
 
 local TOOLTIP_MODES = {
-"artifacts_digsites",
-"overall_completion"
+	"artifacts_digsites",
+	"overall_completion"
 }
 
 local COUNT_DESCRIPTORS = {
-rare_counts = true,
-common_counts = true,
-total_counts = true
+	rare_counts = true,
+	common_counts = true,
+	total_counts = true
 }
 
 -----------------------------------------------------------------------
