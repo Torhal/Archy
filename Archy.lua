@@ -1488,6 +1488,14 @@ function Archy:OnEnable()
 			keystoneIDToRaceID[race.keystone.id] = raceID
 		end
 	end
+
+	local CONTINENT_RACES = private.CONTINENT_RACES
+	for siteKey, site in pairs(private.DIG_SITES) do
+		local continentID = site.continentID or tonumber(((":"):split(siteKey)))
+		CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
+		CONTINENT_RACES[continentID][site.typeID] = true
+	end
+
 	_G.RequestArtifactCompletionHistory()
 
 	if _G.BattlefieldMinimap then

@@ -29,13 +29,6 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local NUM_DIGSITE_FINDS_DEFAULT = 6
 local NUM_DIGSITE_FINDS_DRAENOR = 9
 
-local CONTINENT_RACES = {}
-for siteKey, site in pairs(private.DIG_SITES) do
-	local continentID = site.continentID or tonumber(((":"):split(siteKey)))
-	CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
-	CONTINENT_RACES[continentID][site.typeID] = true
-end
-
 -----------------------------------------------------------------------
 -- Helpers.
 -----------------------------------------------------------------------
@@ -88,7 +81,7 @@ do
 
 			child:SetID(raceID)
 
-			local continentHasRace = CONTINENT_RACES[private.current_continent][raceID]
+			local continentHasRace = private.CONTINENT_RACES[private.current_continent][raceID]
 			if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
 				child:ClearAllPoints()
 

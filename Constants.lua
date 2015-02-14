@@ -11,6 +11,8 @@ local ADDON_NAME, private = ...
 -----------------------------------------------------------------------
 -- Constants.
 -----------------------------------------------------------------------
+private.CONTINENT_RACES = {}
+
 private.CRATE_SPELL_ID = 126935
 private.CRATE_SPELL_NAME = (_G.GetSpellInfo(private.CRATE_SPELL_ID))
 
