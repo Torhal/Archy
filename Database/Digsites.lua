@@ -116,9 +116,8 @@ local DIG_SITES = {
 		mapID = 607,
 		typeID = DigsiteRaces.Fossil,
 	},
-	[DS["Forest Song Digsite"]] = {
+	["1:0.548497:0.403449"] = { -- Forest Song Digsite
 		blobID = 55402,
-		continentID = 1,
 		mapID = 43,
 		typeID = DigsiteRaces.Nightelf,
 	},
