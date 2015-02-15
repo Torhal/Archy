@@ -315,12 +315,11 @@ local LOREWALKER_ITEMS = {
 }
 
 local CRATE_OF_FRAGMENTS = {
-	-- all pre-MoP races at Mists of Pandaria expansion
-	[87533] = true, -- Dwarven
 	[87534] = true, -- Draenei
+	[87533] = true, -- Dwarven
 	[87535] = true, -- Fossil
-	[87536] = true, -- Night Elf
 	[87537] = true, -- Nerubian
+	[87536] = true, -- Night Elf
 	[87538] = true, -- Orc
 	[87539] = true, -- Tol'vir
 	[87540] = true, -- Troll
