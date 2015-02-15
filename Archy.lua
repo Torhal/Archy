@@ -1561,7 +1561,7 @@ local SUBCOMMAND_FUNCS = {
 					local siteKey = ("%d:%.6f:%.6f"):format(_G.GetCurrentMapContinent(), mapPositionX, mapPositionY)
 
 					if not DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
-						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteRaces.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
+						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteType.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
 						sites[siteKey] = true
 						found = found + 1
 					end

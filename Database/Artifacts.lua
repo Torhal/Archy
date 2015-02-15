@@ -11,7 +11,7 @@ local ADDON_NAME, private = ...
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
-local DigsiteRaces = private.DigsiteRaces
+local DigsiteType = private.DigsiteType
 
 -- Extracted from ResearchProject.dbc
 -- ItemIDs from wowhead (haven't found a lookup table in the dbcs yet)
@@ -19,7 +19,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Arakkoa
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Arakkoa] = {
+	[DigsiteType.Arakkoa] = {
 		[117354] = { -- Ancient Nest Guardian
 			itemID = 117354,
 			spellID = 172460,
@@ -73,7 +73,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Draenei
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Draenei] = {
+	[DigsiteType.Draenei] = {
 		[64440] = { -- Anklet with Golden Bells
 			itemID = 64440,
 			spellID = 90853,
@@ -119,7 +119,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- DraenorClans
 	-----------------------------------------------------------------------
-	[DigsiteRaces.DraenorClans] = {
+	[DigsiteType.DraenorClans] = {
 		[116985] = { -- Headdress of the First Shaman
 			itemID = 116985,
 			spellID = 139787,
@@ -209,7 +209,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Dwarf
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Dwarf] = {
+	[DigsiteType.Dwarf] = {
 		[63113] = { -- Belt Buckle with Anvilmar Crest
 			itemID = 63113,
 			spellID = 88910,
@@ -339,7 +339,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Fossil
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Fossil] = {
+	[DigsiteType.Fossil] = {
 		[69776] = { -- Ancient Amber
 			itemID = 69776,
 			spellID = 98560,
@@ -413,7 +413,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Mantid
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Mantid] = {
+	[DigsiteType.Mantid] = {
 		[95376] = { -- Ancient Sap Feeder
 			itemID = 95376,
 			spellID = 139779,
@@ -459,7 +459,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Mogu
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Mogu] = {
+	[DigsiteType.Mogu] = {
 		[89614] = { -- Anatomical Dummy
 			itemID = 89614,
 			spellID = 113993,
@@ -513,7 +513,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Nerubian
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Nerubian] = {
+	[DigsiteType.Nerubian] = {
 		[64481] = { -- Blessing of the Old God
 			itemID = 64481,
 			spellID = 91214,
@@ -555,7 +555,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Nightelf
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Nightelf] = {
+	[DigsiteType.Nightelf] = {
 		[64646] = { -- Bones of Transformation
 			itemID = 64646,
 			spellID = 91761,
@@ -661,7 +661,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Ogre
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Ogre] = {
+	[DigsiteType.Ogre] = {
 		[114191] = { -- Eye of Har'gunn the Blind
 			itemID = 114191,
 			spellID = 168315,
@@ -715,7 +715,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Orc
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Orc] = {
+	[DigsiteType.Orc] = {
 		[64436] = { -- Fiendish Whip
 			itemID = 64436,
 			spellID = 90831,
@@ -761,7 +761,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Pandaren
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Pandaren] = {
+	[DigsiteType.Pandaren] = {
 		[79903] = { -- Apothecary Tins
 			itemID = 79903,
 			spellID = 113977,
@@ -815,7 +815,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Tolvir
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Tolvir] = {
+	[DigsiteType.Tolvir] = {
 		[64657] = { -- Canopic Jar
 			itemID = 64657,
 			spellID = 91790,
@@ -873,7 +873,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Troll
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Troll] = {
+	[DigsiteType.Troll] = {
 		[64348] = { -- Atal'ai Scepter
 			itemID = 64348,
 			spellID = 90429,
@@ -947,7 +947,7 @@ local ARTIFACTS = {
 	-----------------------------------------------------------------------
 	-- Vrykul
 	-----------------------------------------------------------------------
-	[DigsiteRaces.Vrykul] = {
+	[DigsiteType.Vrykul] = {
 		[64464] = { -- Fanged Cloak Pin
 			itemID = 64464,
 			spellID = 91014,
