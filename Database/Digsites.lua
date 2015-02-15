@@ -47,7 +47,7 @@ end
 
 private.DigsiteRaceLabelFromID = DigsiteRaceLabelFromID
 
-local DIG_SITES = {
+local DIGSITE_TEMPLATES = {
 	-----------------------------------------------------------------------
 	-- Kalimdor
 	-----------------------------------------------------------------------
@@ -1664,4 +1664,4 @@ local DIG_SITES = {
 	},
 }
 
-private.DIG_SITES = DIG_SITES
+private.DIGSITE_TEMPLATES = DIGSITE_TEMPLATES

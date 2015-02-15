@@ -45,7 +45,7 @@ DatamineTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
-local DIG_SITES = private.DIG_SITES
+local DIGSITE_TEMPLATES = private.DIGSITE_TEMPLATES
 local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of vanilla
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
@@ -875,7 +875,7 @@ function UpdateAllSites()
 				local mc, fc = Astrolabe:GetMapID(continentID, 0)
 
 				-- TODO: Remove landmarkName check once LibBabble-Digsites is gone.
-				local site = DIG_SITES[siteKey] or DIG_SITES[landmarkName]
+				local site = DIGSITE_TEMPLATES[siteKey] or DIGSITE_TEMPLATES[landmarkName]
 				if not site then
 					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
 
@@ -1463,7 +1463,8 @@ function Archy:OnEnable()
 	end
 
 	local CONTINENT_RACES = private.CONTINENT_RACES
-	for siteKey, site in pairs(private.DIG_SITES) do
+	for siteKey, site in pairs(DIGSITE_TEMPLATES) do
+		-- TODO: Remove check for continentID when removing LibBabble-Digsites-3.0
 		local continentID = site.continentID or tonumber(((":"):split(siteKey)))
 		CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
 		CONTINENT_RACES[continentID][site.typeID] = true
@@ -1626,7 +1627,7 @@ local SUBCOMMAND_FUNCS = {
 				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
 					local siteKey = ("%d:%.6f:%.6f"):format(_G.GetCurrentMapContinent(), mapPositionX, mapPositionY)
 
-					if not DIG_SITES[siteKey] and not sites[siteKey] then
+					if not DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
 						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteRaces.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
 						sites[siteKey] = true
 						found = found + 1
