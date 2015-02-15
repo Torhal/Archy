@@ -1521,6 +1521,22 @@ local function GetTooltipOptions()
 						db.tooltip.scale = _G.math.max(0.5, _G.math.min(1.5, value))
 					end,
 				},
+				hideDelay = {
+					order = 3,
+					type = "range",
+					width = "full",
+					name = L.TOOLTIP_HIDEDELAY_LABEL,
+					desc = L.TOOLTIP_HIDEDELAY_DESC,
+					min = 0.01,
+					max = 2,
+					step = 0.01,
+					get = function()
+						return db.tooltip.hideDelay
+					end,
+					set = function(info, value)
+						db.tooltip.hideDelay = _G.math.max(0, _G.math.min(2, value))
+					end,
+				},
 			},
 		}
 	end

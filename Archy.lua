@@ -284,6 +284,7 @@ local PROFILE_DEFAULTS = {
 		},
 		tooltip = {
 			filter_continent = true,
+			hideDelay = 0.1,
 			scale = 1,
 		},
 		tomtom = {

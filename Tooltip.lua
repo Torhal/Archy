@@ -523,7 +523,7 @@ function LDB_object:OnEnter()
 	end
 	local tooltip = QTip:Acquire("ArchyTooltip")
 	tooltip:SetScale(private.db.tooltip.scale)
-	tooltip:SetAutoHideDelay(0.25, self, Tooltip_OnRelease)
+	tooltip:SetAutoHideDelay(private.db.tooltip.hideDelay, self, Tooltip_OnRelease)
 	tooltip:EnableMouse()
 	tooltip:SmartAnchorTo(self)
 
