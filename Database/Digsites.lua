@@ -1506,7 +1506,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 941,
 		typeID = DigsiteRaces.DraenorClans,
 	},
-	["7:0.266863:0.472119"] = { -- Highmaul Watchtower Digsite
+	["7:0.287140:0.497124"] = { -- Highmaul Watchtower Digsite
 		blobID = 308001,
 		mapID = 950,
 		typeID = DigsiteRaces.Ogre,
