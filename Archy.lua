@@ -1001,34 +1001,6 @@ function Archy:UpdateSiteDistances()
 	end
 end
 
-function Archy:ImportOldStatsDB()
-	local siteStats = self.db.char.digsites.stats
-
-	for key, st in pairs(self.db.char.digsites) do
-		if type(key) == "string" and key ~= "blacklist" and key ~= "stats" and key ~= "counter" and key ~= "" and DIG_SITES[key] then
-			local site = DIG_SITES[key]
-			if type(site.blob_id) == "number" and site.blob_id > 0 then
-				local blobStats = siteStats[site.blob_id]
-				blobStats.surveys = (blobStats.surveys or 0) + (st.surveys or 0)
-				blobStats.fragments = (blobStats.fragments or 0) + (st.fragments or 0)
-				blobStats.looted = (blobStats.looted or 0) + (st.looted or 0)
-				blobStats.keystones = (blobStats.keystones or 0) + (st.keystones or 0)
-
-				self.db.char.digsites[key] = nil
-			end
-		end
-	end
-
-	-- Drii: let's also try to fix whatever crap was put in the SV by the old version of this function so users don't have to delete their variables.
-	if next(siteStats) then
-		for blobID, _ in pairs(siteStats) do
-			if type(blobID) ~= "number" or blobID <= 0 then
-				siteStats[blobID] = nil
-			end
-		end
-	end
-end
-
 --[[ Survey Functions ]] --
 local function AddSurveyNode(siteId, map, level, x, y)
 	local exists = false
@@ -1417,7 +1389,6 @@ function Archy:OnInitialize()
 			end
 		end)
 	end
-	self:ImportOldStatsDB()
 end
 
 function Archy:UpdateFramePositions()
