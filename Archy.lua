@@ -53,41 +53,6 @@ private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
 local MAP_ID_TO_ZONE_ID = {} -- Popupated in Archy:OnInitialize()
 local MAP_ID_TO_ZONE_NAME = {} -- Popupated in Archy:OnInitialize()
 
-local MINIMAP_SIZES = {
-	indoor = {
-		[0] = 300,
-		[1] = 240,
-		[2] = 180,
-		[3] = 120,
-		[4] = 80,
-		[5] = 50,
-	},
-	outdoor = {
-		[0] = 466 + 2 / 3,
-		[1] = 400,
-		[2] = 333 + 1 / 3,
-		[3] = 266 + 2 / 6,
-		[4] = 200,
-		[5] = 133 + 1 / 3,
-	},
-	indoor_scale = {
-		[0] = 1,
-		[1] = 1.25,
-		[2] = 5 / 3,
-		[3] = 2.5,
-		[4] = 3.75,
-		[5] = 6,
-	},
-	outdoor_scale = {
-		[0] = 1,
-		[1] = 7 / 6,
-		[2] = 1.4,
-		[3] = 1.75,
-		[4] = 7 / 3,
-		[5] = 3.5,
-	},
-}
-
 local PROFILE_DEFAULTS = {
 	profile = {
 		general = {
@@ -298,7 +263,6 @@ local PROFILE_DEFAULTS = {
 
 local GLOBAL_COOLDOWN_TIME = 1.5
 local SECURE_ACTION_BUTTON -- Populated in Archy:OnInitialize()
-local SITES_PER_CONTINENT = 4
 local SURVEY_SPELL_ID = 80451
 local CRATE_USE_STRING -- Populate in Archy:OnEnable()
 local DIG_LOCATION_TEXTURE_INDEX = 177
@@ -306,7 +270,6 @@ local DIG_LOCATION_TEXTURE_INDEX = 177
 local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
 
-local ZONE_ID_TO_NAME = {} -- Popupated in Archy:OnInitialize()
 local MAP_CONTINENTS = {} -- Popupated in Archy:OnEnable()
 
 local LOREWALKER_ITEMS = {
@@ -1498,7 +1461,6 @@ function Archy:OnEnable()
 
 					MAP_ID_TO_ZONE_ID[mapID] = zoneID
 					MAP_ID_TO_ZONE_NAME[mapID] = zoneName
-					ZONE_ID_TO_NAME[zoneID] = zoneName
 					ZONE_DATA[mapID] = {
 						continent = continentID,
 						id = zoneID,
