@@ -1398,7 +1398,7 @@ function Archy:OnEnable()
 	TomTomHandler.hasPOIIntegration = TomTomHandler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
-		local race = self:AddRace(raceID)
+		local race = private.AddRace(raceID)
 		if race then
 			keystoneIDToRaceID[race.keystone.id] = raceID
 		end

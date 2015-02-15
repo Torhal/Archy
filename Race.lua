@@ -38,7 +38,7 @@ local raceMetatable = {
 -----------------------------------------------------------------------
 -- Helpers.
 -----------------------------------------------------------------------
-function Archy:AddRace(raceID)
+function private.AddRace(raceID)
 	if _G.GetNumArchaeologyRaces() == 0 then
 		-- TODO: Debug output
 		return
