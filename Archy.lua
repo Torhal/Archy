@@ -1310,17 +1310,8 @@ function Archy:OnInitialize()
 
 	self.db.char.digsites.blacklist = self.db.char.digsites.blacklist or {}
 
-	for digsiteName, value in pairs(self.db.char.digsites.blacklist) do
-		if value == false then
-			self.db.char.digsites.blacklist[digsiteName] = nil
-		end
-	end
-
 	private.db = self.db.profile
 	prevTheme = private.db and private.db.general and private.db.general.theme or PROFILE_DEFAULTS.profile.general.theme
-
-	private.db.data = private.db.data or {}
-	private.db.data.imported = false
 
 	LDBI:Register("Archy", private.LDB_object, private.db.general.icon)
 
@@ -1381,6 +1372,17 @@ function Archy:OnInitialize()
 			end
 		end)
 	end
+
+	-----------------------------------------------------------------------
+	-- DB cleanups.
+	-----------------------------------------------------------------------
+	for digsiteName, value in pairs(self.db.char.digsites.blacklist) do
+		if value == false then
+			self.db.char.digsites.blacklist[digsiteName] = nil
+		end
+	end
+
+	private.db.data = nil
 end
 
 function Archy:UpdateFramePositions()
