@@ -1730,7 +1730,7 @@ do
 end -- do-block
 
 function Archy:UpdateSkillBar()
-	if not private.current_continent or not HasArchaeology() then
+	if not ArtifactFrame.skillBar or not private.current_continent or not HasArchaeology() then
 		return
 	end
 
