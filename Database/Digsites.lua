@@ -5,6 +5,7 @@ local _G = getfenv(0)
 
 -- Functions
 local pairs = _G.pairs
+local tonumber = _G.tonumber
 
 -----------------------------------------------------------------------
 -- AddOn namespace.
@@ -1663,5 +1664,16 @@ local DIGSITE_TEMPLATES = {
 		typeID = DigsiteRaces.Ogre,
 	},
 }
+
+local CONTINENT_RACES = {}
+private.CONTINENT_RACES = CONTINENT_RACES
+
+for siteKey, site in pairs(DIGSITE_TEMPLATES) do
+	-- TODO: Remove check for continentID when removing LibBabble-Digsites-3.0
+	local continentID = site.continentID or tonumber(((":"):split(siteKey)))
+	CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
+	CONTINENT_RACES[continentID][site.typeID] = true
+end
+
 
 private.DIGSITE_TEMPLATES = DIGSITE_TEMPLATES

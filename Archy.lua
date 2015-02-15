@@ -1462,14 +1462,6 @@ function Archy:OnEnable()
 		end
 	end
 
-	local CONTINENT_RACES = private.CONTINENT_RACES
-	for siteKey, site in pairs(DIGSITE_TEMPLATES) do
-		-- TODO: Remove check for continentID when removing LibBabble-Digsites-3.0
-		local continentID = site.continentID or tonumber(((":"):split(siteKey)))
-		CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
-		CONTINENT_RACES[continentID][site.typeID] = true
-	end
-
 	_G.RequestArtifactCompletionHistory()
 
 	if _G.BattlefieldMinimap then
