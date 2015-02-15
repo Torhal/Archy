@@ -305,9 +305,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 720,
 		typeID = DigsiteRaces.Tolvir,
 	},
-	[DS["Scorched Plain Digsite"]] = {
+	["1:0.550481:0.333259"] = { -- Scorched Plain Digsite
 		blobID = 56574,
-		continentID = 1,
 		mapID = 606,
 		typeID = DigsiteRaces.Nightelf,
 	},
