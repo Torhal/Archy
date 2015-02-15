@@ -908,9 +908,8 @@ local DIG_SITES = {
 		mapID = 486,
 		typeID = DigsiteRaces.Nerubian,
 	},
-	[DS["Scourgeholme Digsite"]] = {
+	["4:0.485548:0.323499"] = { -- Scourgeholme Digsite
 		blobID = 56555,
-		continentID = 4,
 		mapID = 492,
 		typeID = DigsiteRaces.Nerubian,
 	},
