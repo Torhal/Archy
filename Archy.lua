@@ -937,7 +937,12 @@ function Archy:IsSiteBlacklisted(name)
 end
 
 function Archy:ToggleSiteBlacklist(name)
-	self.db.char.digsites.blacklist[name] = not self.db.char.digsites.blacklist[name]
+	local blacklist = self.db.char.digsites.blacklist
+	if blacklist[name] then
+		blacklist[name] = nil
+	else
+		blacklist[name] = true
+	end
 end
 
 local function SortSitesByDistance(a, b)
