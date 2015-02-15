@@ -1315,12 +1315,6 @@ function Archy:OnInitialize()
 	})
 
 	self.db.char.digsites.blacklist = self.db.char.digsites.blacklist or {}
-	setmetatable(self.db.char.digsites.blacklist, {
-		__index = function(t, k)
-			if k then
-				t[k] = false
-				return t[k]
-			end
 		end
 	})
 
