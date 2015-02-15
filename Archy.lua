@@ -277,21 +277,6 @@ local LOREWALKER_ITEMS = {
 	LODESTONE = { id = 87548, spell = 126956 },
 }
 
-local CRATE_OF_FRAGMENTS = {
-	[87534] = true, -- Draenei
-	[87533] = true, -- Dwarven
-	[87535] = true, -- Fossil
-	[117388] = true, -- Mantid
-	[117387] = true, -- Mogu
-	[87537] = true, -- Nerubian
-	[87536] = true, -- Night Elf
-	[87538] = true, -- Orc
-	[117386] = true, -- Pandaren
-	[87539] = true, -- Tol'vir
-	[87540] = true, -- Troll
-	[87541] = true, -- Vrykul
-}
-
 local FISHING_POLE_NAME
 do
 	--  If this stops working, check for the index of "Weapon" via GetAuctionItemClasses(), then find the index of "Fishing Poles" via GetAuctionItemSubClasses().
@@ -1614,6 +1599,21 @@ _G.SlashCmdList["ARCHY"] = function(msg, editbox)
 end
 
 do
+	local CRATE_OF_FRAGMENTS = {
+		[87534] = true, -- Draenei
+		[87533] = true, -- Dwarven
+		[87535] = true, -- Fossil
+		[117388] = true, -- Mantid
+		[117387] = true, -- Mogu
+		[87537] = true, -- Nerubian
+		[87536] = true, -- Night Elf
+		[87538] = true, -- Orc
+		[117386] = true, -- Pandaren
+		[87539] = true, -- Tol'vir
+		[87540] = true, -- Troll
+		[87541] = true, -- Vrykul
+	}
+
 	local function FindCrateable(bag, slot)
 		if not HasArchaeology() then
 			return
