@@ -263,7 +263,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 81,
 		typeID = DigsiteType.Nightelf,
 	},
-	[DS["Ruins of Khintaset Digsite"]] = {
+	["1:0.455915:0.877786"] = { -- Ruins of Khintaset Digsite
 		blobID = 56603,
 		continentID = 1,
 		mapID = 720,
