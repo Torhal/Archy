@@ -232,7 +232,7 @@
 							<TexCoords left="0.0" right="0.24609375" top="0.0" bottom="1" />
 						</Texture>
 						<FontString name="$parentDistance" parentKey="distance" inherits="DistanceIndicatorFont" justifyH="CENTER">
-							<Size x="50" y="50" />
+							<Size x="55" y="55" />
 							<Anchors>
 								<Anchor point="CENTER" x="3" y="0" />
 							</Anchors>
