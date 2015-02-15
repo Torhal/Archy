@@ -846,7 +846,6 @@ local function CompareAndResetDigCounters(a, b)
 	end
 end
 
-local sessionErrors = {}
 function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
@@ -874,42 +873,32 @@ function UpdateAllSites()
 				local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
 				local mc, fc = Astrolabe:GetMapID(continentID, 0)
 
-				-- TODO: Remove landmarkName check once LibBabble-Digsites is gone.
-				local site = DIGSITE_TEMPLATES[siteKey] or DIGSITE_TEMPLATES[landmarkName]
-				if not site then
+				-- TODO: Remove landmarkName check once LibBabble-Digsites-3.0 is gone.
+				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey] or DIGSITE_TEMPLATES[landmarkName]
+				if digsiteTemplate then
+					local mapID = digsiteTemplate.mapID
+					local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
+
+					table.insert(sites, {
+						continent = mc,
+						distance = 999999,
+						maxFindCount = digsiteTemplate.maxFindCount,
+						id = digsiteTemplate.blobID,
+						level = 0,
+						map = mapID,
+						name = landmarkName,
+						raceId = digsiteTemplate.typeID,
+						x = x,
+						y = y,
+						zoneId = MAP_ID_TO_ZONE_ID[mapID],
+						zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
+					})
+				else
 					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
-
-					if not sessionErrors[siteKey] then
-						local message = "Archy is missing data for dig site %s (key: %s blobID: %d)"
-						Archy:Printf(message, landmarkName, siteKey, blobID)
-						DebugPour(message, landmarkName, siteKey, blobID)
-						sessionErrors[siteKey] = true
-					end
-
-					site = {
-						blobID = blobID,
-						mapID = 0,
-						typeID = private.DigsiteRaces.Unknown
-					}
+					local message = "Archy is missing data for dig site %s (key: %s blobID: %d)"
+					Archy:Printf(message, landmarkName, siteKey, blobID)
+					DebugPour(message, landmarkName, siteKey, blobID)
 				end
-
-				local mapID = site.mapID
-				local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
-
-				table.insert(sites, {
-					continent = mc,
-					distance = 999999,
-					maxFindCount = site.maxFindCount,
-					id = site.blobID,
-					level = 0,
-					map = mapID,
-					name = landmarkName,
-					raceId = site.typeID,
-					x = x,
-					y = y,
-					zoneId = MAP_ID_TO_ZONE_ID[mapID],
-					zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
-				})
 			end
 		end
 
