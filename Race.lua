@@ -39,11 +39,6 @@ local raceMetatable = {
 -- Helpers.
 -----------------------------------------------------------------------
 function private.AddRace(raceID)
-	if _G.GetNumArchaeologyRaces() == 0 then
-		-- TODO: Debug output
-		return
-	end
-
 	local existingRace = Races[raceID]
 	if existingRace then
 		-- TODO: Debug output

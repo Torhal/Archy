@@ -1796,13 +1796,11 @@ function Archy:UpdatePlayerPosition(force)
 
 	UpdateAllSites()
 
-	if _G.GetNumArchaeologyRaces() > 0 then
-		for raceID = 1, _G.GetNumArchaeologyRaces() do
-			private.Races[raceID]:UpdateArtifact()
-		end
-		ArtifactFrame:UpdateChrome()
-		ArtifactFrame:RefreshDisplay()
+	for raceID = 1, _G.GetNumArchaeologyRaces() do
+		private.Races[raceID]:UpdateArtifact()
 	end
+	ArtifactFrame:UpdateChrome()
+	ArtifactFrame:RefreshDisplay()
 
 	if force then
 		self:UpdateSiteDistances()
@@ -2036,13 +2034,11 @@ do
 end -- do-block
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
-	local raceCount = _G.GetNumArchaeologyRaces()
-
-	if not private.current_continent or raceCount == 0 then
+	if not private.current_continent then
 		return
 	end
 
-	for raceID = 1, raceCount do
+	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.Races[raceID]
 		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
 		local diff = currency_amount - (race.currency or 0)

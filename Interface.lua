@@ -56,7 +56,7 @@ do
 	-- ArtifactFrame
 	-----------------------------------------------------------------------
 	local function ArtifactFrame_RefreshDisplay(self)
-		if FramesShouldBeHidden() or _G.GetNumArchaeologyRaces() == 0 then
+		if FramesShouldBeHidden() then
 			return
 		end
 		local maxWidth, maxHeight = 0, 0
