@@ -82,7 +82,7 @@ do
 			child:SetID(raceID)
 
 			local continentHasRace = private.CONTINENT_RACES[private.current_continent][raceID]
-			if not private.db.artifact.blacklist[raceID] and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
+			if not race:IsOnArtifactBlacklist() and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
 				child:ClearAllPoints()
 
 				if topFrame == self.container then

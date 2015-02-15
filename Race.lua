@@ -104,7 +104,6 @@ function Archy:AddRace(raceID)
 		end
 	end
 
-
 	race:UpdateArtifact()
 
 	return Races[raceID]
@@ -125,6 +124,10 @@ function Race:GetArtifactCompletionDataByName(artifactName)
 
 	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.id, artifactIndex)
 	return artifactIndex, firstCompletionTime, completionCount
+end
+
+function Race:IsOnArtifactBlacklist()
+	return private.db.artifact.blacklist[self.id]
 end
 
 function Race:KeystoneSocketOnClick(mouseButtonName)
@@ -205,7 +208,7 @@ function Race:UpdateArtifact()
 
 	_G.RequestArtifactCompletionHistory()
 
-	if not private.db.general.show or private.db.artifact.blacklist[self.id] then
+	if not private.db.general.show or self:IsOnArtifactBlacklist() then
 		return
 	end
 
