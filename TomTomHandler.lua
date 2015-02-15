@@ -10,7 +10,6 @@ local ADDON_NAME, private = ...
 
 local LibStub = _G.LibStub
 
-local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 local Dialog = LibStub("LibDialog-1.0")
 
 -----------------------------------------------------------------------
@@ -93,4 +92,3 @@ Dialog:Register("ArchyTomTomError", {
 	show_while_dead = true,
 	width = 450,
 })
-
