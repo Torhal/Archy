@@ -1372,12 +1372,6 @@ local DIG_SITES = {
 		mapID = 810,
 		typeID = DigsiteRaces.Mantid,
 	},
-	[DS["West Summer Fields Digsite"]] = {
-		blobID = 92160,
-		continentID = 6,
-		mapID = 811,
-		typeID = DigsiteRaces.Mogu,
-	},
 	["6:0.451481:0.551857"] = { -- Winterbough Digsite
 		blobID = 92150,
 		mapID = 811,
