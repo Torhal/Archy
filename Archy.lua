@@ -305,8 +305,10 @@ private.continent_digsites = continent_digsites
 local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in Archy:OnEnable()
-local lastSite = {}
+
+local lastSite
 local nearestSite
+
 local player_position = {
 	map = 0,
 	level = 0,
