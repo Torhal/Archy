@@ -30,7 +30,6 @@ local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEv
 Archy.version = _G.GetAddOnMetadata(ADDON_NAME, "Version")
 _G["Archy"] = Archy
 
-
 local Astrolabe = _G.DongleStub("Astrolabe-1.0")
 local Dialog = LibStub("LibDialog-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
@@ -355,7 +354,7 @@ private.DebugPour = DebugPour
 -- Function upvalues
 -----------------------------------------------------------------------
 local Blizzard_SolveArtifact
-local UpdateMinimapPOIs
+local UpdateMinimapIcons
 local UpdateAllSites
 
 -----------------------------------------------------------------------
@@ -444,78 +443,6 @@ local function ShowFrames()
 	DigSiteFrame:Show()
 	ArtifactFrame:Show()
 	Archy:ConfigUpdated()
-end
-
-local function POI_OnEnter(self)
-	if not self.tooltip then
-		return
-	end
-	_G.GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
-	_G.GameTooltip:SetText(self.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1) --, true)
-end
-
-local function POI_OnLeave(self)
-	_G.GameTooltip:Hide()
-end
-
-local Arrow_OnUpdate
-do
-	local ARROW_UPDATE_THRESHOLD = 0.1
-	local RAD_135 = math.rad(135)
-	local SQUARE_HALF = math.sqrt(0.5)
-
-	function Arrow_OnUpdate(self, elapsed)
-		self.t = self.t + elapsed
-
-		if self.t < ARROW_UPDATE_THRESHOLD then
-			return
-		end
-		self.t = 0
-
-		if _G.IsInInstance() then
-			self:Hide()
-			return
-		end
-
-		local isOnEdge = Astrolabe:IsIconOnEdge(self)
-
-		if self.type == "site" then
-			if isOnEdge then
-				if self.icon:IsShown() then
-					self.icon:Hide()
-				end
-
-				if not self.arrow:IsShown() then
-					self.arrow:Show()
-				end
-
-				-- Rotate the icon, as required
-				local angle = Astrolabe:GetDirectionToIcon(self) + RAD_135
-				if _G.GetCVar("rotateMinimap") == "1" then
-					angle = angle - _G.GetPlayerFacing()
-				end
-
-				local sin, cos = math.sin(angle) * SQUARE_HALF, math.cos(angle) * SQUARE_HALF
-				self.arrow:SetTexCoord(0.5 - sin, 0.5 + cos, 0.5 + cos, 0.5 + sin, 0.5 - cos, 0.5 - sin, 0.5 + sin, 0.5 - cos)
-			else
-				if not self.icon:IsShown() then
-					self.icon:Show()
-				end
-
-				if self.arrow:IsShown() then
-					self.arrow:Hide()
-				end
-			end
-		elseif isOnEdge then
-			if self.icon:IsShown() then
-				self.icon:Hide()
-			end
-		else
-			if not self.icon:IsShown() then
-				self.icon:Show()
-			end
-		end
-	end
 end
 
 local SuspendClickToMove
@@ -718,7 +645,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		DistanceIndicatorFrame:Toggle()
 	end,
 	minimap = function(option)
-		UpdateMinimapPOIs(true)
+		UpdateMinimapIcons(true)
 	end,
 	tomtom = function(option)
 		local db = private.db
@@ -747,7 +674,7 @@ function Archy:ConfigUpdated(namespace, option)
 		self:UpdateTracking()
 
 		DistanceIndicatorFrame:Toggle()
-		UpdateMinimapPOIs(true)
+		UpdateMinimapIcons(true)
 		SuspendClickToMove()
 
 		TomTomHandler:Refresh(nearestSite)
@@ -793,6 +720,8 @@ local function CompareAndResetDigCounters(a, b)
 
 		if not exists then
 			Archy.db.char.digsites.stats[siteA.blobID].counter = 0
+			siteA:DisableMapIcon()
+			siteA:DisableSurveyNodes()
 		end
 	end
 end
@@ -893,8 +822,8 @@ function Archy:UpdateSiteDistances()
 	for index = 1, #continent_digsites[private.current_continent] do
 		local digsite = continent_digsites[private.current_continent][index]
 
-		if digsite.poi then
-			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.poi)
+		if digsite.mapIconFrame:IsShown() then
+			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.mapIconFrame)
 		else
 			digsite.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
@@ -911,7 +840,7 @@ function Archy:UpdateSiteDistances()
 		nearestSite = nearest
 		TomTomHandler.isActive = true
 		TomTomHandler:Refresh(nearestSite)
-		UpdateMinimapPOIs()
+		UpdateMinimapIcons()
 
 		if private.db.digsite.announceNearest and private.db.general.show then
 			AnnounceNearestSite()
@@ -927,34 +856,6 @@ function Archy:UpdateSiteDistances()
 end
 
 --[[ Survey Functions ]] --
-local function AddSurveyNode(siteId, map, level, x, y)
-	local exists = false
-
-	Archy.db.global.surveyNodes = Archy.db.global.surveyNodes or {}
-	Archy.db.global.surveyNodes[siteId] = Archy.db.global.surveyNodes[siteId] or {}
-
-	for _, node in pairs(Archy.db.global.surveyNodes[siteId]) do
-		local distance = Astrolabe:ComputeDistance(map, level, x, y, node.m, node.f, node.x, node.y)
-		if not distance or _G.IsInInstance() then
-			distance = 0
-		end
-
-		if distance <= 10 then
-			exists = true
-			break
-		end
-	end
-
-	if not exists then
-		table.insert(Archy.db.global.surveyNodes[siteId], {
-			m = map,
-			f = level,
-			x = x,
-			y = y
-		})
-	end
-end
-
 local function UpdateDistanceIndicator()
 	if survey_location.x == 0 and survey_location.y == 0 or _G.IsInInstance() then
 		return
@@ -982,199 +883,38 @@ local function UpdateDistanceIndicator()
 end
 
 --[[ Minimap Functions ]] --
-local sitePool = {}
-local surveyPool = {}
-local PointsOfInterest = {}
-local sitePoiCount, surveyPoiCount = 0, 0
-
-local function GetSitePOI(siteId, map, level, x, y, tooltip)
-	local poi = table.remove(sitePool)
-
-	if not poi then
-		sitePoiCount = sitePoiCount + 1
-		poi = _G.CreateFrame("Frame", "ArchyMinimap_SitePOI" .. sitePoiCount, _G.Minimap)
-		poi.index = sitePoiCount
-		poi:SetWidth(10)
-		poi:SetHeight(10)
-
-		poi.icon = poi:CreateTexture("BACKGROUND")
-		poi.icon:SetTexture([[Interface\Archeology\Arch-Icon-Marker.blp]])
-		poi.icon:SetPoint("CENTER", 0, 0)
-		poi.icon:SetHeight(14)
-		poi.icon:SetWidth(14)
-		poi.icon:Hide()
-
-		poi.arrow = poi:CreateTexture("BACKGROUND")
-		poi.arrow:SetTexture([[Interface\Minimap\ROTATING-MINIMAPGUIDEARROW.tga]])
-		poi.arrow:SetPoint("CENTER", 0, 0)
-		poi.arrow:SetWidth(32)
-		poi.arrow:SetHeight(32)
-		poi.arrow:Hide()
-		poi:Hide()
-	end
-	poi:SetScript("OnEnter", POI_OnEnter)
-	poi:SetScript("OnLeave", POI_OnLeave)
-	poi:SetScript("OnUpdate", Arrow_OnUpdate)
-	poi.type = "site"
-	poi.tooltip = tooltip
-	poi.siteId = siteId
-	poi.t = 0
-
-	PointsOfInterest[poi] = true
-	return poi
-end
-
-local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
-	local poi = table.remove(surveyPool)
-
-	if not poi then
-		surveyPoiCount = surveyPoiCount + 1
-		poi = _G.CreateFrame("Frame", "ArchyMinimap_SurveyPOI" .. surveyPoiCount, _G.Minimap)
-		poi.index = surveyPoiCount
-		poi:SetWidth(8)
-		poi:SetHeight(8)
-
-		poi.icon = poi:CreateTexture("BACKGROUND")
-		poi.icon:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
-
-		if private.db.minimap.fragmentIcon == "Cross" then
-			poi.icon:SetTexCoord(0, 0.46875, 0, 0.453125)
-		else
-			poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
-		end
-		poi.icon:SetPoint("CENTER", 0, 0)
-		poi.icon:SetHeight(8)
-		poi.icon:SetWidth(8)
-		poi.icon:Hide()
-
-		poi:Hide()
-	end
-	poi:SetScript("OnEnter", POI_OnEnter)
-	poi:SetScript("OnLeave", POI_OnLeave)
-	poi:SetScript("OnUpdate", Arrow_OnUpdate)
-	poi.type = "survey"
-	poi.tooltip = tooltip
-	poi.siteId = siteId
-	poi.t = 0
-
-	PointsOfInterest[poi] = true
-	return poi
-end
-
-local function ClearPOI(poi)
-	if not poi then
-		return
-	end
-	Astrolabe:RemoveIconFromMinimap(poi)
-
-	poi.siteId = nil
-	poi.tooltip = nil
-
-	poi.icon:Hide()
-	poi:Hide()
-	poi:SetScript("OnEnter", nil)
-	poi:SetScript("OnLeave", nil)
-	poi:SetScript("OnUpdate", nil)
-
-	PointsOfInterest[poi] = nil
-
-	if poi.type == "site" then
-		poi.arrow:Hide()
-		table.insert(sitePool, poi)
-	elseif poi.type == "survey" then
-		table.insert(surveyPool, poi)
-	end
-end
-
 local lastNearestSite
 
-function UpdateMinimapPOIs(force)
-	if _G.WorldMapButton:IsVisible() then
+function UpdateMinimapIcons(isForced)
+	if _G.WorldMapButton:IsVisible() or (lastNearestSite == nearestSite and not isForced) then
 		return
 	end
 
-	if lastNearestSite == nearestSite and not force then
-		return
-	end
 	lastNearestSite = nearestSite
-
-	local continentDigsites = continent_digsites[private.current_continent]
-
-	if not continentDigsites or #continentDigsites == 0 or _G.IsInInstance() then
-		for poi in pairs(PointsOfInterest) do
-			ClearPOI(poi)
-		end
-		return
-	end
-	local validSiteIDs = {}
-
-	if continent_digsites[private.current_continent] then
-		for _, site in pairs(continent_digsites[private.current_continent]) do
-			table.insert(validSiteIDs, site.blobID)
-		end
-	end
-
-	for poi in pairs(PointsOfInterest) do
-		if not validSiteIDs[poi.siteId] then
-			ClearPOI(poi)
-		elseif poi.type == "survey" and lastNearestSite.blobID ~= nearestSite.blobID and lastNearestSite.blobID == poi.siteId then
-			ClearPOI(poi)
-		end
-	end
 
 	if not player_position.x and not player_position.y then
 		return
 	end
-	local i = 1
+
+	local continentDigsites = continent_digsites[private.current_continent]
+	local canShow = private.db.general.show and private.db.minimap.show
 
 	for _, digsite in pairs(continentDigsites) do
-		digsite.poi = GetSitePOI(digsite.blobID, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY, ("%s\n(%s)"):format(digsite.name, digsite.zoneName))
+		if canShow then
+			if nearestSite == digsite or not private.db.minimap.nearest then
+				digsite:EnableMapIcon()
+			else
+				digsite:DisableMapIcon()
+			end
 
-		if digsite.mapID > 0 then
-			Astrolabe:PlaceIconOnMinimap(digsite.poi, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
-		end
-
-		if (not private.db.minimap.nearest or (nearestSite and nearestSite.blobID == digsite.blobID)) and private.db.general.show and private.db.minimap.show then
-			digsite.poi:Show()
-			digsite.poi.icon:Show()
+			if nearestSite == digsite and private.db.minimap.fragmentNodes then
+				digsite:EnableSurveyNodes()
+			else
+				digsite:DisableSurveyNodes()
+			end
 		else
-			digsite.poi:Hide()
-			digsite.poi.icon:Hide()
-		end
-
-		if nearestSite and nearestSite.blobID == digsite.blobID then
-			if not digsite.surveyPOIs then
-				digsite.surveyPOIs = {}
-			end
-
-			if Archy.db.global.surveyNodes[digsite.blobID] and private.db.minimap.fragmentNodes then
-				for index, node in pairs(Archy.db.global.surveyNodes[digsite.blobID]) do
-					digsite.surveyPOIs[index] = GetSurveyPOI(digsite.blobID, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, digsite.name, digsite.zoneName))
-
-					local POI = digsite.surveyPOIs[index]
-
-					Astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
-
-					if private.db.general.show then
-						POI:Show()
-						POI.icon:Show()
-					else
-						POI:Hide()
-						POI.icon:Hide()
-					end
-					Arrow_OnUpdate(POI, 5)
-				end
-			end
-		end
-
-		Arrow_OnUpdate(digsite.poi, 5)
-	end
-
-	if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
-		for poi in pairs(PointsOfInterest) do
-			if poi.type == "survey" then
-				poi.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
-			end
+			digsite:DisableMapIcon()
+			digsite:DisableSurveyNodes()
 		end
 	end
 end
@@ -1725,7 +1465,7 @@ function Archy:UpdatePlayerPosition(force)
 
 		self:UpdateSiteDistances()
 		UpdateDistanceIndicator()
-		UpdateMinimapPOIs()
+		UpdateMinimapIcons()
 		self:RefreshDigSiteDisplay()
 	end
 	local continentID = _G.GetCurrentMapContinent()
@@ -1862,25 +1602,8 @@ do
 			end
 		end
 
-		if private.db.minimap.fragmentColorBySurveyDistance then
-			local min_green, max_green = 0, private.db.digsite.distanceIndicator.green or 0
-			local min_yellow, max_yellow = max_green, private.db.digsite.distanceIndicator.yellow or 0
-			local min_red, max_red = max_yellow, 500
+		lastSite:UpdateSurveyNodeDistanceColors()
 
-			for poi in pairs(PointsOfInterest) do
-				if poi.type == "survey" then
-					local distance = Astrolabe:GetDistanceToIcon(poi) or 0
-
-					if distance >= min_green and distance <= max_green then
-						poi.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
-					elseif distance >= min_yellow and distance <= max_yellow then
-						poi.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
-					elseif distance >= min_red and distance <= max_red then
-						poi.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
-					end
-				end
-			end
-		end
 		TomTomHandler.isActive = false
 		TomTomHandler:Refresh(nearestSite)
 
@@ -2030,14 +1753,14 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 				siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
 				siteStats[blobID].fragments = siteStats[blobID].fragments + diff
 
-				AddSurveyNode(blobID, player_position.map, player_position.level, player_position.x, player_position.y)
+				lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
 			end
 			survey_location.map = 0
 			survey_location.level = 0
 			survey_location.x = 0
 			survey_location.y = 0
 
-			UpdateMinimapPOIs(true)
+			UpdateMinimapIcons(true)
 			self:RefreshDigSiteDisplay()
 		end
 	end
