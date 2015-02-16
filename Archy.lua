@@ -813,7 +813,7 @@ end
 
 function Archy:UpdateSiteDistances()
 	local continentDigsites = continent_digsites[private.current_continent]
-	if continentDigsites == nil or #continentDigsites == 0 then
+	if not continentDigsites or #continentDigsites == 0 then
 		nearestSite = nil
 		return
 	end
@@ -1739,11 +1739,10 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			DistanceIndicatorFrame.isActive = false
 			DistanceIndicatorFrame:Toggle()
 
-			if lastSite then
-				local siteStats = self.db.char.digsites.stats
-				local blobID = lastSite.blobID
-				siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
-				siteStats[blobID].fragments = siteStats[blobID].fragments + diff
+			local siteStats = lastSite and self.db.char.digsites.stats[lastSite.blobID]
+			if siteStats then
+				siteStats.looted = (siteStats.looted or 0) + 1
+				siteStats.fragments = siteStats.fragments + diff
 
 				lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
 			end
