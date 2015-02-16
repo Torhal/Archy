@@ -854,7 +854,7 @@ function Archy:RefreshDigSiteDisplay()
 			childFrame.zone.name:SetText(digsite.zoneName)
 			childFrame:SetID(digsite.blobID)
 
-			local race = private.Races[digsite.typeID]
+			local race = digsite.race
 			childFrame.crest.icon:SetTexture(race.texture)
 			childFrame.crest.tooltip = race.name
 		end

@@ -60,7 +60,7 @@ local TomTomHandler = {
 
 			local waypointData = {
 				crazy = private.db.tomtom.crazyArrowEnabled,
-				title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(private.Races[digsite.typeID].name), digsite.zoneName),
+				title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(digsite.race.name), digsite.zoneName),
 			}
 
 			self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, waypointData)

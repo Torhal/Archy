@@ -369,7 +369,7 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 
 						for _, digsite in pairs(continent_sites) do
-							local race = private.Races[digsite.typeID]
+							local race = digsite.race
 
 							line = tooltip:AddLine(" ")
 							tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
