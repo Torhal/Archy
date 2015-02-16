@@ -890,7 +890,9 @@ function UpdateMinimapIcons(isForced)
 	end
 
 	local continentDigsites = continent_digsites[private.current_continent]
-	if continentDigsites == nil then return end
+	if not continentDigsites then
+		return
+	end
 
 	local canShow = private.db.general.show and private.db.minimap.show
 
@@ -1712,9 +1714,6 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		return
 	end
 
-	_G.SetMapToCurrentZone()
-	local mapName = _G.GetMapInfo()
-	if not mapName:find("garrison") then
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.Races[raceID]
 		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
@@ -1758,7 +1757,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			self:RefreshDigSiteDisplay()
 		end
 	end
-	end
+
 	ArtifactFrame:RefreshDisplay()
 end
 
