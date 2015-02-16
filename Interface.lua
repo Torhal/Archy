@@ -23,6 +23,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 local LSM = LibStub("LibSharedMedia-3.0")
 
+local Astrolabe = _G.DongleStub("Astrolabe-1.0")
+
 -----------------------------------------------------------------------
 -- Constants.
 -----------------------------------------------------------------------
@@ -535,10 +537,39 @@ do
 		},
 	}
 
+	local function DistanceIndicatorFrame_Reset(self)
+		self:SetColor("green")
+		self.circle.distance:SetFormattedText("%1.f", 0)
+	end
+
 	local function DistanceIndicatorFrame_SetColor(self, color)
 		self.circle.texture:SetTexCoord(unpack(DISTANCE_COLOR_TEXCOORDS[color]))
 		self.circle:SetAlpha(1)
 		self:Toggle()
+	end
+
+	local function DistanceIndicatorFrame_Update(self, mapID, mapLevel, mapX, mapY, surveyMapID, surveyMapLevel, surveyMapX, surveyMapY)
+		if surveyMapX == 0 and surveyMapY == 0 or _G.IsInInstance() then
+			return
+		end
+
+		local distance = Astrolabe:ComputeDistance(mapID, mapLevel, mapX, mapY, surveyMapID, surveyMapLevel, surveyMapX, surveyMapY) or 0
+		local greenMin, greenMax = 0, private.db.digsite.distanceIndicator.green
+		local yellowMin, yellowMax = greenMax, private.db.digsite.distanceIndicator.yellow
+		local redMin, redMax = yellowMax, 500
+
+		if distance >= greenMin and distance <= greenMax then
+			self:SetColor("green")
+		elseif distance >= yellowMin and distance <= yellowMax then
+			self:SetColor("yellow")
+		elseif distance >= redMin and distance <= redMax then
+			self:SetColor("red")
+		else
+			self:Toggle()
+			return
+		end
+
+		self.circle.distance:SetFormattedText("%1.f", distance)
 	end
 
 	local function DistanceIndicatorFrame_Toggle(self)
@@ -644,8 +675,10 @@ do
 		DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
 		DistanceIndicatorFrame.circle:SetScale(0.65)
 
+		DistanceIndicatorFrame.Reset = DistanceIndicatorFrame_Reset
 		DistanceIndicatorFrame.SetColor = DistanceIndicatorFrame_SetColor
 		DistanceIndicatorFrame.Toggle = DistanceIndicatorFrame_Toggle
+		DistanceIndicatorFrame.Update = DistanceIndicatorFrame_Update
 
 		private.DistanceIndicatorFrame = DistanceIndicatorFrame
 	end

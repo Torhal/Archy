@@ -850,33 +850,6 @@ function Archy:UpdateSiteDistances()
 	table.sort(continentDigsites, private.db.digsite.sortByDistance and SortSitesByDistance or SortSitesByZoneNameAndName)
 end
 
---[[ Survey Functions ]] --
-local function UpdateDistanceIndicator()
-	if survey_location.x == 0 and survey_location.y == 0 or _G.IsInInstance() then
-		return
-	end
-	local distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, survey_location.map, survey_location.level, survey_location.x, survey_location.y)
-
-	if not distance then
-		distance = 0
-	end
-	local greenMin, greenMax = 0, private.db.digsite.distanceIndicator.green
-	local yellowMin, yellowMax = greenMax, private.db.digsite.distanceIndicator.yellow
-	local redMin, redMax = yellowMax, 500
-
-	if distance >= greenMin and distance <= greenMax then
-		DistanceIndicatorFrame:SetColor("green")
-	elseif distance >= yellowMin and distance <= yellowMax then
-		DistanceIndicatorFrame:SetColor("yellow")
-	elseif distance >= redMin and distance <= redMax then
-		DistanceIndicatorFrame:SetColor("red")
-	else
-		DistanceIndicatorFrame:Toggle()
-		return
-	end
-	DistanceIndicatorFrame.circle.distance:SetFormattedText("%1.f", distance)
-end
-
 --[[ Minimap Functions ]] --
 local lastNearestSite
 
@@ -1451,17 +1424,18 @@ function Archy:UpdatePlayerPosition(force)
 		self:RefreshDigSiteDisplay()
 		return
 	end
-	local map, level, x, y = Astrolabe:GetCurrentPlayerPosition()
+	local mapID, mapLevel, mapX, mapY = Astrolabe:GetCurrentPlayerPosition()
 
-	if not map or not level or (x == 0 and y == 0) then
+	if not mapID or not mapLevel or (mapX == 0 and mapY == 0) then
 		return
 	end
 
-	if force or player_position.x ~= x or player_position.y ~= y or player_position.map ~= map or player_position.level ~= level then
-		player_position.x, player_position.y, player_position.map, player_position.level = x, y, map, level
+	if force or player_position.x ~= mapX or player_position.y ~= mapY or player_position.map ~= mapID or player_position.level ~= mapLevel then
+		player_position.x, player_position.y, player_position.map, player_position.level = mapX, mapY, mapID, mapLevel
 
 		self:UpdateSiteDistances()
-		UpdateDistanceIndicator()
+
+		DistanceIndicatorFrame:Update(mapID, mapLevel, mapX, mapY, survey_location.map, survey_location.level, survey_location.x, survey_location.y)
 		UpdateMinimapIcons()
 		self:RefreshDigSiteDisplay()
 	end
@@ -1584,7 +1558,7 @@ do
 
 		DistanceIndicatorFrame.isActive = true
 		DistanceIndicatorFrame:Toggle()
-		UpdateDistanceIndicator()
+		DistanceIndicatorFrame:Reset()
 
 		if DistanceIndicatorFrame.surveyButton and DistanceIndicatorFrame.surveyButton:IsShown() then
 			local now = _G.GetTime()
