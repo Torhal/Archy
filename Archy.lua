@@ -1600,7 +1600,7 @@ do
 		lastSite:UpdateSurveyNodeDistanceColors()
 
 		TomTomHandler.isActive = false
-		TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh()
 
 		UpdateDigsiteCounter(numFindsCompleted)
 		self:RefreshDigSiteDisplay()
