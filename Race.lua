@@ -207,13 +207,18 @@ function Race:UpdateArtifact()
 		return
 	end
 
-	if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
-		artifact.hasAnnounced = true
-		Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", artifact.fragments + artifact.keystone_adjustment, artifact.fragments_required), 1, 1, 1)
-	end
+	local currencyOwned = artifact.fragments + artifact.keystone_adjustment
+	local currencyRequired = artifact.fragments_required
 
-	if not artifact.hasPinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
-		artifact.hasPinged = true
-		_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+	if currencyOwned > 0 and currencyRequired > 0 then
+		if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
+			artifact.hasAnnounced = true
+			Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
+		end
+
+		if not artifact.hasPinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
+			artifact.hasPinged = true
+			_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+		end
 	end
 end
