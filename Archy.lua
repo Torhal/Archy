@@ -939,7 +939,6 @@ function Archy:OnInitialize()
 		blacklist = {}
 	}
 
-	self.db.char.digsites.stats = self.db.char.digsites.stats or {}
 	setmetatable(self.db.char.digsites.stats, {
 		__index = function(t, k)
 			if k then
