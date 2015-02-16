@@ -881,7 +881,7 @@ end
 local lastNearestSite
 
 function UpdateMinimapIcons(isForced)
-	if _G.WorldMapButton:IsVisible() or (lastNearestSite == nearestSite and not isForced) then
+	if not HasArchaeology() or _G.WorldMapButton:IsVisible() or (lastNearestSite == nearestSite and not isForced) then
 		return
 	end
 
