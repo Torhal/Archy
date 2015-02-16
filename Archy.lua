@@ -712,7 +712,7 @@ local function CompareAndResetDigCounters(a, b)
 	for _, siteA in pairs(a) do
 		local exists = false
 		for _, siteB in pairs(b) do
-			if siteA.blobID == siteB.blobID then
+			if siteA == siteB then
 				exists = true
 				break
 			end
@@ -1701,9 +1701,7 @@ do
 
 		if raceID then
 			local blobID = lastSite.blobID
-			if blobID then
-				self.db.char.digsites.stats[blobID].keystones = self.db.char.digsites.stats[blobID].keystones + 1
-			end
+			self.db.char.digsites.stats[blobID].keystones = self.db.char.digsites.stats[blobID].keystones + 1
 			keystoneLootRaceID = raceID
 		end
 	end
@@ -1733,7 +1731,6 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 				artifactSolved.raceId = 0
 				artifactSolved.name = ""
 			end
-
 		elseif diff > 0 then
 			-- we've gained fragments, aka. Successfully dug at a dig site
 			local siteStats = self.db.char.digsites.stats
@@ -1741,15 +1738,12 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			DistanceIndicatorFrame.isActive = false
 			DistanceIndicatorFrame:Toggle()
 
-			-- Drii: for now let's just avoid the error
-			-- TODO: Figure out why the fuck this was done. Burying errors instead of figureout out and fixing their cause is...WTF?!?
 			local blobID = lastSite.blobID
-			if type(blobID) == "number" and blobID > 0 then
-				siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
-				siteStats[blobID].fragments = siteStats[blobID].fragments + diff
+			siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
+			siteStats[blobID].fragments = siteStats[blobID].fragments + diff
 
-				lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
-			end
+			lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
+
 			survey_location.map = 0
 			survey_location.level = 0
 			survey_location.x = 0
