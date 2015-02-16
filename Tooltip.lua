@@ -337,10 +337,10 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 					end
 				end
-				local siteStats = Archy.db.char.digsites.stats
 
 				line = tooltip:AddLine(" ")
 				line = tooltip:AddLine(" ")
+
 				tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", num_columns)
 				tooltip:AddSeparator()
 
@@ -376,10 +376,10 @@ function Archy:LDBTooltipShow()
 							tooltip:SetCell(line, 2, race.name, "LEFT", 2)
 							tooltip:SetCell(line, 4, digsite.name, "LEFT", 1)
 							tooltip:SetCell(line, 5, digsite.zoneName, "LEFT", 2)
-							tooltip:SetCell(line, 7, siteStats[digsite.blobID].surveys, "CENTER", 1)
-							tooltip:SetCell(line, 8, siteStats[digsite.blobID].looted, "CENTER", 1)
-							tooltip:SetCell(line, 9, siteStats[digsite.blobID].fragments, "CENTER", 1)
-							tooltip:SetCell(line, 10, siteStats[digsite.blobID].keystones, "CENTER", 1)
+							tooltip:SetCell(line, 7, digsite.stats.surveys, "CENTER", 1)
+							tooltip:SetCell(line, 8, digsite.stats.looted, "CENTER", 1)
+							tooltip:SetCell(line, 9, digsite.stats.fragments, "CENTER", 1)
+							tooltip:SetCell(line, 10, digsite.stats.keystones, "CENTER", 1)
 						end
 						line = tooltip:AddLine(" ")
 					end

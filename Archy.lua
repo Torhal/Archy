@@ -719,7 +719,7 @@ local function CompareAndResetDigCounters(a, b)
 		end
 
 		if not exists then
-			Archy.db.char.digsites.stats[siteA.blobID].counter = 0
+			siteA.stats.counter = 0
 			siteA:DisableMapIcon()
 			siteA:DisableSurveyNodes()
 		end
@@ -1548,7 +1548,7 @@ do
 	end
 
 	local function UpdateDigsiteCounter(numFindsCompleted)
-		Archy.db.char.digsites.stats[lastSite.blobID].counter = numFindsCompleted
+		lastSite.stats.counter = numFindsCompleted
 	end
 
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
@@ -1578,7 +1578,7 @@ do
 		survey_location.y = player_position.y
 
 		lastSite = nearestSite
-		self.db.char.digsites.stats[lastSite.blobID].surveys = self.db.char.digsites.stats[lastSite.blobID].surveys + 1
+		lastSite.stats.surveys = lastSite.stats.surveys + 1
 
 		DistanceIndicatorFrame.isActive = true
 		DistanceIndicatorFrame:Toggle()
@@ -1700,8 +1700,7 @@ do
 		local raceID = keystoneIDToRaceID[itemID]
 
 		if raceID then
-			local blobID = lastSite.blobID
-			self.db.char.digsites.stats[blobID].keystones = self.db.char.digsites.stats[blobID].keystones + 1
+			lastSite.stats.keystones = lastSite.stats.keystones + 1
 			keystoneLootRaceID = raceID
 		end
 	end
@@ -1737,10 +1736,9 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			DistanceIndicatorFrame.isActive = false
 			DistanceIndicatorFrame:Toggle()
 
-			local siteStats = lastSite and self.db.char.digsites.stats[lastSite.blobID]
-			if siteStats then
-				siteStats.looted = (siteStats.looted or 0) + 1
-				siteStats.fragments = siteStats.fragments + diff
+			if lastSite then
+				lastSite.stats.looted = lastSite.stats.looted + 1
+				lastSite.stats.fragments = lastSite.stats.fragments + diff
 
 				lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
 			end

@@ -657,18 +657,16 @@ end -- do-block
 -- Methods.
 -----------------------------------------------------------------------
 function Archy:ShowDigSiteChildFrameSiteButtonTooltip(siteButton)
-	local buttonParent = siteButton:GetParent()
-	local blobID = buttonParent:GetID()
-	local normalFont = _G.NORMAL_FONT_COLOR_CODE
+	local digsite = siteButton.digsite
 	local highlightFont = _G.HIGHLIGHT_FONT_COLOR_CODE
-	local siteStats = self.db.char.digsites.stats
+	local normalFont = _G.NORMAL_FONT_COLOR_CODE
 
 	siteButton.tooltip = siteButton.name:GetText()
-	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s%s%s|r"):format(normalFont, _G.ZONE .. ": ", highlightFont, buttonParent.zone.name:GetText())
-	siteButton.tooltip = siteButton.tooltip .. ("\n\n%s%s %s%s|r"):format(normalFont, L["Surveys:"], highlightFont, siteStats[blobID].surveys or 0)
-	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, L["Digs"] .. ": ", highlightFont, siteStats[blobID].looted or 0)
-	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlightFont, siteStats[blobID].fragments or 0)
-	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, L["Key Stones:"], highlightFont, siteStats[blobID].keystones or 0)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s: %s%s|r"):format(normalFont, _G.ZONE, highlightFont, digsite.zoneName)
+	siteButton.tooltip = siteButton.tooltip .. ("\n\n%s%s %s%s|r"):format(normalFont, L["Surveys:"], highlightFont, digsite.stats.surveys)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s: %s%s|r"):format(normalFont, L["Digs"], highlightFont, digsite.stats.looted)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s: %s%s|r"):format(normalFont, _G.ARCHAEOLOGY_RUNE_STONES, highlightFont, digsite.stats.fragments)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, L["Key Stones:"], highlightFont, digsite.stats.keystones)
 	siteButton.tooltip = siteButton.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
 
 	if siteButton.digsite:IsBlacklisted() then
@@ -831,7 +829,7 @@ function Archy:RefreshDigSiteDisplay()
 
 	for digsiteIndex, digsite in pairs(continentDigsites[continentID]) do
 		local childFrame = DigSiteFrame.children[digsiteIndex]
-		local count = self.db.char.digsites.stats[digsite.blobID].counter
+		local count = digsite.stats.counter
 
 		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, digsite.maxFindCount or maxSurveyCount)
 
