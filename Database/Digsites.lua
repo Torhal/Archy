@@ -1112,6 +1112,11 @@ local DIGSITE_TEMPLATES = {
 		mapID = 858,
 		typeID = DigsiteType.Mantid,
 	},
+	["6:0.400886:0.725589"] = { -- Lake of Stars Digsite
+		blobID = 92200,
+		mapID = 858,
+		typeID = DigsiteType.Mogu,
+	},
 	["6:0.578517:0.720755"] = { -- Lost Dynasty Digsite
 		blobID = 66951,
 		mapID = 857,
