@@ -828,11 +828,9 @@ function Archy:UpdateSiteDistances()
 			digsite.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
-		if digsite.coordX and not digsite:IsBlacklisted() then
-			if not distance or digsite.distance < distance then
-				distance = digsite.distance
-				nearest = digsite
-			end
+		if digsite.coordX and digsite.distance and not digsite:IsBlacklisted() and (not distance or digsite.distance < distance) then
+			distance = digsite.distance
+			nearest = digsite
 		end
 	end
 
@@ -1738,16 +1736,18 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			end
 		elseif diff > 0 then
 			-- we've gained fragments, aka. Successfully dug at a dig site
-			local siteStats = self.db.char.digsites.stats
 
 			DistanceIndicatorFrame.isActive = false
 			DistanceIndicatorFrame:Toggle()
 
-			local blobID = lastSite.blobID
-			siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
-			siteStats[blobID].fragments = siteStats[blobID].fragments + diff
+			if lastSite then
+				local siteStats = self.db.char.digsites.stats
+				local blobID = lastSite.blobID
+				siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
+				siteStats[blobID].fragments = siteStats[blobID].fragments + diff
 
-			lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
+				lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
+			end
 
 			survey_location.map = 0
 			survey_location.level = 0
