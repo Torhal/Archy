@@ -76,7 +76,7 @@ do
 
 		for raceID, race in pairs(private.Races) do
 			local child = self.children[raceID]
-			local artifact = race.artifact
+			local artifact = race.currentProject
 			local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 
 			child:SetID(raceID)

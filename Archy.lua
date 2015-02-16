@@ -514,7 +514,7 @@ local function SolveRaceArtifact(raceID, useStones)
 	-- The check for raceID exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
 	if raceID then
 		local race = private.Races[raceID]
-		local artifact = race.artifact
+		local artifact = race.currentProject
 
 		_G.SetSelectedArtifact(raceID)
 		artifactSolved.raceId = raceID
@@ -618,7 +618,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 	artifact = function(option)
 		if option == "autofill" then
 			for raceID = 1, _G.GetNumArchaeologyRaces() do
-				private.Races[raceID]:UpdateArtifact()
+				private.Races[raceID]:UpdateCurrentProject()
 			end
 		elseif option == "color" then
 			ArtifactFrame:RefreshDisplay()
@@ -684,7 +684,7 @@ end
 function Archy:SolveAnyArtifact(use_stones)
 	local found = false
 	for raceID, race in pairs(private.Races) do
-		local artifact = race.artifact
+		local artifact = race.currentProject
 		if not race:IsOnArtifactBlacklist() and (artifact.canSolve or (use_stones and artifact.canSolveInventory)) then
 			SolveRaceArtifact(raceID, use_stones)
 			found = true
@@ -1489,7 +1489,7 @@ function Archy:UpdatePlayerPosition(force)
 	UpdateAllSites()
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
-		private.Races[raceID]:UpdateArtifact()
+		private.Races[raceID]:UpdateCurrentProject()
 	end
 	ArtifactFrame:UpdateChrome()
 	ArtifactFrame:RefreshDisplay()
@@ -1609,19 +1609,19 @@ end
 
 do
 	local function UpdateAndRefresh(race)
-		race:UpdateArtifact()
+		race:UpdateCurrentProject()
 		ArtifactFrame:RefreshDisplay()
 	end
 
 	function Archy:ARTIFACT_COMPLETE(event, artifactName)
 		for raceID, race in pairs(private.Races) do
-			local artifact = race.artifact
+			local artifact = race.currentProject
 
 			if artifact and artifact.name == artifactName then
 				artifact.hasAnnounced = nil
 				artifact.hasPinged = nil
 
-				race:UpdateArtifact()
+				race:UpdateCurrentProject()
 				self:ScheduleTimer(UpdateAndRefresh, 2, race)
 				break
 			end
@@ -1640,7 +1640,7 @@ end
 
 function Archy:ARTIFACT_HISTORY_READY()
 	for raceID, race in pairs(private.Races) do
-		local artifact = race.artifact
+		local artifact = race.currentProject
 
 		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
 		if completionCount then
@@ -1656,7 +1656,7 @@ function Archy:BAG_UPDATE_DELAYED()
 	if not private.current_continent or not keystoneLootRaceID then
 		return
 	end
-	private.Races[keystoneLootRaceID]:UpdateArtifact()
+	private.Races[keystoneLootRaceID]:UpdateCurrentProject()
 	ArtifactFrame:RefreshDisplay()
 	keystoneLootRaceID = nil
 end
@@ -1718,11 +1718,11 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		local diff = currency_amount - (race.currency or 0)
 
 		race.currency = currency_amount
-		race:UpdateArtifact()
+		race:UpdateCurrentProject()
 
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
-			race.artifact.keystones_added = 0
+			race.currentProject.keystones_added = 0
 
 			if artifactSolved.raceId == race.id then
 				local _, _, completionCount = race:GetArtifactCompletionDataByName(artifactSolved.name)

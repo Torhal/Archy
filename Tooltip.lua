@@ -208,7 +208,7 @@ local function GetArtifactsDelta(raceID, missing_data)
 	table.wipe(missing_data)
 
 	local race = private.Races[raceID]
-	local artifact = race.artifact
+	local artifact = race.currentProject
 
 	if artifact.isRare then
 		rare_count = rare_count + 1
@@ -300,7 +300,7 @@ function Archy:LDBTooltipShow()
 
 				for raceID, race in pairs(private.Races) do
 					local continentHasRace = not private.db.tooltip.filter_continent or private.CONTINENT_RACES[private.current_continent][raceID]
-					local artifact = race.artifact
+					local artifact = race.currentProject
 
 					if continentHasRace and artifact.fragments_required > 0 then
 						local race = private.Races[raceID]

@@ -52,10 +52,7 @@ function private.AddRace(raceID)
 		ArtifactItemIDs = {},
 		ArtifactSpellIDs = {},
 		currency = currencyAmount,
-		id = raceID,
-		name = raceName,
-		texture = raceTexture,
-		artifact = {
+		currentProject = {
 			canSolve = false,
 			fragments = 0,
 			fragments_required = 0,
@@ -66,6 +63,9 @@ function private.AddRace(raceID)
 			sockets = 0,
 			tooltip = "",
 		},
+		id = raceID,
+		name = raceName,
+		texture = raceTexture,
 		keystone = {
 			id = keystoneItemID,
 			name = keystoneName,
@@ -99,7 +99,7 @@ function private.AddRace(raceID)
 		end
 	end
 
-	race:UpdateArtifact()
+	race:UpdateCurrentProject()
 
 	return Races[raceID]
 end
@@ -126,7 +126,7 @@ function Race:IsOnArtifactBlacklist()
 end
 
 function Race:KeystoneSocketOnClick(mouseButtonName)
-	local artifact = self.artifact
+	local artifact = self.currentProject
 
 	if mouseButtonName == "LeftButton" and artifact.keystones_added < artifact.sockets and artifact.keystones_added < self.keystone.inventory then
 		artifact.keystones_added = artifact.keystones_added + 1
@@ -134,10 +134,10 @@ function Race:KeystoneSocketOnClick(mouseButtonName)
 		artifact.keystones_added = artifact.keystones_added - 1
 	end
 
-	self:UpdateArtifact()
+	self:UpdateCurrentProject()
 end
 
-function Race:UpdateArtifact()
+function Race:UpdateCurrentProject()
 	if _G.GetNumArtifactsByRace(self.id) == 0 then
 		return
 	end
@@ -150,7 +150,7 @@ function Race:UpdateArtifact()
 	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
 
-	local artifact = self.artifact
+	local artifact = self.currentProject
 	artifact.canSolve = _G.CanSolveArtifact()
 	artifact.canSolveInventory = nil
 	artifact.canSolveStone = nil
