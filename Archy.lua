@@ -1088,28 +1088,6 @@ end
 
 local lastNearestSite
 
-local function ClearInvalidPOIs()
-	local validSiteIDs = {}
-
-	if private.db.general.show and private.db.minimap.show then
-		return validSiteIDs
-	end
-
-	if continent_digsites[private.current_continent] then
-		for _, site in pairs(continent_digsites[private.current_continent]) do
-			table.insert(validSiteIDs, site.blobID)
-		end
-	end
-
-	for poi in pairs(PointsOfInterest) do
-		if not validSiteIDs[poi.siteId] then
-			ClearPOI(poi)
-		elseif poi.type == "survey" and lastNearestSite.blobID ~= nearestSite.blobID and lastNearestSite.blobID == poi.siteId then
-			ClearPOI(poi)
-		end
-	end
-end
-
 function UpdateMinimapPOIs(force)
 	if _G.WorldMapButton:IsVisible() then
 		return
@@ -1128,7 +1106,21 @@ function UpdateMinimapPOIs(force)
 		end
 		return
 	end
-	ClearInvalidPOIs()
+	local validSiteIDs = {}
+
+	if continent_digsites[private.current_continent] then
+		for _, site in pairs(continent_digsites[private.current_continent]) do
+			table.insert(validSiteIDs, site.blobID)
+		end
+	end
+
+	for poi in pairs(PointsOfInterest) do
+		if not validSiteIDs[poi.siteId] then
+			ClearPOI(poi)
+		elseif poi.type == "survey" and lastNearestSite.blobID ~= nearestSite.blobID and lastNearestSite.blobID == poi.siteId then
+			ClearPOI(poi)
+		end
+	end
 
 	if not player_position.x and not player_position.y then
 		return
