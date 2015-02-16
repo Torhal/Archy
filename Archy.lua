@@ -1528,6 +1528,9 @@ do
 	end
 
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
+		DistanceIndicatorFrame.isActive = false
+		DistanceIndicatorFrame:Toggle()
+
 		UpdateDigsiteCounter(numFindsCompleted)
 	end
 
@@ -1708,10 +1711,6 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			end
 		elseif diff > 0 then
 			-- we've gained fragments, aka. Successfully dug at a dig site
-
-			DistanceIndicatorFrame.isActive = false
-			DistanceIndicatorFrame:Toggle()
-
 			if lastSite then
 				lastSite.stats.looted = lastSite.stats.looted + 1
 				lastSite.stats.fragments = lastSite.stats.fragments + diff
