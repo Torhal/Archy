@@ -68,7 +68,7 @@ do
 
 		local isOnEdge = Astrolabe:IsIconOnEdge(self)
 
-		if self.onUpdateElapsedTimeype == "site" then
+		if self.arrow then
 			if isOnEdge then
 				if self.icon:IsShown() then
 					self.icon:Hide()
@@ -122,7 +122,6 @@ local function CreateSurveyNode(digsite, savedNode, nodeIndex)
 	node.savedData = savedNode
 	node.savedIndex = nodeIndex
 	node.tooltip = ("%s #%d\n%s\n%s"):format(L["Survey"], nodeIndex, digsite.name, _G.PARENS_TEMPLATE:format(digsite.zoneName))
-	node.type = "survey"
 
 	local icon = node:CreateTexture("BACKGROUND")
 	icon:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
@@ -174,7 +173,6 @@ function private.AddDigsite(digsiteTemplate, landmarkName, continentID, zoneID, 
 
 	mapIconFrame.onUpdateElapsedTime = 0
 	mapIconFrame.tooltip = ""
-	mapIconFrame.type = "site"
 
 	digsite.mapIconFrame = mapIconFrame
 
