@@ -1119,7 +1119,6 @@ function Archy:OnEnable()
 
 			MAP_CONTINENTS[continentID] = continentName
 			MAP_ID_TO_ZONE_NAME[mapID] = continentName
-			private.MAP_ID_TO_CONTINENT_ID[mapID] = continentID
 
 			ZONE_DATA[mapID] = {
 				continent = continentID,

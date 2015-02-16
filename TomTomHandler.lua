@@ -19,6 +19,7 @@ local TomTomHandler = {
 	-----------------------------------------------------------------------
 	-- Data.
 	-----------------------------------------------------------------------
+	currentDigsite = nil,
 	hasDisplayedError = false,
 	hasPOIIntegration = false,
 	hasTomTom = false,
@@ -31,6 +32,7 @@ local TomTomHandler = {
 		if self.waypoint then
 			 _G.TomTom:RemoveWaypoint(self.waypoint)
 			self.waypoint = nil
+			self.currentDigsite = nil
 		end
 	end,
 	DisplayConflictError = function(self)
@@ -40,31 +42,23 @@ local TomTomHandler = {
 		end
 	end,
 	Refresh = function(self, digsite)
-		if not self.hasTomTom then
+		if not self.hasTomTom or (digsite and digsite == self.currentDigsite) then
+			if digsite == self.currentDigsite then
+				private.Debug("TomTomHandler: Attempting to refresh on the same digsite.")
+			end
+			return
+		end
+		self:ClearWaypoint()
+
+		if not digsite or not self.isActive or not private.db.tomtom.enabled or not private.db.general.show then
 			return
 		end
 
-		if not digsite or not private.db.tomtom.enabled or not private.db.general.show or not self.isActive then
-			self:ClearWaypoint()
-			return
-		end
-
-		local waypointExists
-		if _G.TomTom.WaypointExists then
-			waypointExists = _G.TomTom:WaypointExists(private.MAP_ID_TO_CONTINENT_ID[digsite.continentID], digsite.zoneID, digsite.coordX * 100, digsite.coordY * 100, digsite.name .. "\n" .. digsite.zoneName)
-		end
-
-		-- Waypoint doesn't exist or we have an imperfect TomTom emulator
-		if not waypointExists then
-			self:ClearWaypoint()
-
-			local waypointData = {
-				crazy = private.db.tomtom.crazyArrowEnabled,
-				title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(digsite.race.name), digsite.zoneName),
-			}
-
-			self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, waypointData)
-		end
+		self.currentDigsite = digsite
+		self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, {
+			crazy = private.db.tomtom.crazyArrowEnabled,
+			title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(digsite.race.name), digsite.zoneName),
+		})
 	end
 }
 
