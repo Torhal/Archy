@@ -729,7 +729,6 @@ end
 function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
-	local Digsites = private.Digsites
 
 	for continentID, continentName in pairs(MAP_CONTINENTS) do
 		_G.SetMapZoom(continentID)
@@ -757,7 +756,7 @@ function UpdateAllSites()
 				-- TODO: Remove landmarkName check once LibBabble-Digsites-3.0 is gone.
 				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey] or DIGSITE_TEMPLATES[landmarkName]
 				if digsiteTemplate then
-					local digsite = Digsites[digsiteTemplate.blobID]
+					local digsite = private.Digsites[digsiteTemplate.blobID]
 					if not digsite then
 						local mapID = digsiteTemplate.mapID
 						local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
@@ -813,14 +812,15 @@ local function SortSitesByZoneNameAndName(a, b)
 end
 
 function Archy:UpdateSiteDistances()
-	if not continent_digsites[private.current_continent] or (#continent_digsites[private.current_continent] == 0) then
+	local continentDigsites = continent_digsites[private.current_continent]
+	if #continentDigsites == 0 then
 		nearestSite = nil
 		return
 	end
 	local distance, nearest
 
-	for index = 1, #continent_digsites[private.current_continent] do
-		local digsite = continent_digsites[private.current_continent][index]
+	for index = 1, #continentDigsites do
+		local digsite = continentDigsites[index]
 
 		if digsite.mapIconFrame:IsShown() then
 			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.mapIconFrame)
@@ -836,7 +836,7 @@ function Archy:UpdateSiteDistances()
 		end
 	end
 
-	if nearest and (not nearestSite or nearestSite.blobID ~= nearest.blobID) then
+	if nearest and nearestSite ~= nearest then
 		nearestSite = nearest
 		TomTomHandler.isActive = true
 		TomTomHandler:Refresh(nearestSite)
@@ -847,12 +847,7 @@ function Archy:UpdateSiteDistances()
 		end
 	end
 
-	local sites = continent_digsites[private.current_continent]
-	if private.db.digsite.sortByDistance then
-		table.sort(sites, SortSitesByDistance)
-	else
-		table.sort(sites, SortSitesByZoneNameAndName)
-	end
+	table.sort(continentDigsites, private.db.digsite.sortByDistance and SortSitesByDistance or SortSitesByZoneNameAndName)
 end
 
 --[[ Survey Functions ]] --
@@ -1843,12 +1838,12 @@ end
 function Archy:PET_BATTLE_OPENING_START()
 	if not private.db.general.show or private.db.general.stealthMode then
 		return
-	else
-		-- store our visible state to restore after pet battle
-		private.pet_battle_shown = true
-		private.db.general.show = false
-		self:ConfigUpdated()
 	end
+
+	-- store our visible state to restore after pet battle
+	private.pet_battle_shown = true
+	private.db.general.show = false
+	self:ConfigUpdated()
 end
 
 function Archy:PLAYER_ENTERING_WORLD()
