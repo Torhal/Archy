@@ -1545,9 +1545,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 950,
 		typeID = DigsiteType.DraenorClans,
 	},
-	[DS["Overgrown Highmaul Road Digsite"]] = {
+	["7:0.266863:0.472119"] = { -- Overgrown Highmaul Road Digsite
 		blobID = 307977,
-		continentID = 7,
 		mapID = 950,
 		typeID = DigsiteType.Ogre,
 	},
