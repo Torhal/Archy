@@ -813,7 +813,7 @@ end
 
 function Archy:UpdateSiteDistances()
 	local continentDigsites = continent_digsites[private.current_continent]
-	if #continentDigsites == 0 then
+	if continentDigsites == nil or #continentDigsites == 0 then
 		nearestSite = nil
 		return
 	end
@@ -892,6 +892,8 @@ function UpdateMinimapIcons(isForced)
 	end
 
 	local continentDigsites = continent_digsites[private.current_continent]
+	if continentDigsites == nil then return end
+
 	local canShow = private.db.general.show and private.db.minimap.show
 
 	for _, digsite in pairs(continentDigsites) do
