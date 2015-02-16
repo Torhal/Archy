@@ -1712,6 +1712,9 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		return
 	end
 
+	_G.SetMapToCurrentZone()
+	local mapName = _G.GetMapInfo()
+	if not mapName:find("garrison") then
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.Races[raceID]
 		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
@@ -1752,6 +1755,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			UpdateMinimapIcons(true)
 			self:RefreshDigSiteDisplay()
 		end
+	end
 	end
 	ArtifactFrame:RefreshDisplay()
 end
