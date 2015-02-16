@@ -51,7 +51,7 @@ local TomTomHandler = {
 
 		local waypointExists
 		if _G.TomTom.WaypointExists then
-			waypointExists = _G.TomTom:WaypointExists(private.MAP_ID_TO_CONTINENT_ID[digsite.continent], digsite.zoneId, digsite.x * 100, digsite.y * 100, digsite.name .. "\n" .. digsite.zoneName)
+			waypointExists = _G.TomTom:WaypointExists(private.MAP_ID_TO_CONTINENT_ID[digsite.continentID], digsite.zoneID, digsite.coordX * 100, digsite.coordY * 100, digsite.name .. "\n" .. digsite.zoneName)
 		end
 
 		-- Waypoint doesn't exist or we have an imperfect TomTom emulator
@@ -60,10 +60,10 @@ local TomTomHandler = {
 
 			local waypointData = {
 				crazy = private.db.tomtom.crazyArrowEnabled,
-				title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(private.Races[digsite.raceId].name), digsite.zoneName),
+				title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(private.Races[digsite.typeID].name), digsite.zoneName),
 			}
 
-			self.waypoint = _G.TomTom:AddMFWaypoint(digsite.map, nil, digsite.x, digsite.y, waypointData)
+			self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, waypointData)
 		end
 	end
 }

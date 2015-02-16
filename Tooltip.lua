@@ -368,18 +368,18 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. _G.ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
 						tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 
-						for _, site in pairs(continent_sites) do
-							local race = private.Races[site.raceId]
+						for _, digsite in pairs(continent_sites) do
+							local race = private.Races[digsite.typeID]
 
 							line = tooltip:AddLine(" ")
 							tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
 							tooltip:SetCell(line, 2, race.name, "LEFT", 2)
-							tooltip:SetCell(line, 4, site.name, "LEFT", 1)
-							tooltip:SetCell(line, 5, site.zoneName, "LEFT", 2)
-							tooltip:SetCell(line, 7, siteStats[site.id].surveys, "CENTER", 1)
-							tooltip:SetCell(line, 8, siteStats[site.id].looted, "CENTER", 1)
-							tooltip:SetCell(line, 9, siteStats[site.id].fragments, "CENTER", 1)
-							tooltip:SetCell(line, 10, siteStats[site.id].keystones, "CENTER", 1)
+							tooltip:SetCell(line, 4, digsite.name, "LEFT", 1)
+							tooltip:SetCell(line, 5, digsite.zoneName, "LEFT", 2)
+							tooltip:SetCell(line, 7, siteStats[digsite.blobID].surveys, "CENTER", 1)
+							tooltip:SetCell(line, 8, siteStats[digsite.blobID].looted, "CENTER", 1)
+							tooltip:SetCell(line, 9, siteStats[digsite.blobID].fragments, "CENTER", 1)
+							tooltip:SetCell(line, 10, siteStats[digsite.blobID].keystones, "CENTER", 1)
 						end
 						line = tooltip:AddLine(" ")
 					end

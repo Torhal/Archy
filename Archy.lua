@@ -543,7 +543,7 @@ do
 end -- do-block
 
 local function AnnounceNearestSite()
-	if not nearestSite or not nearestSite.distance or nearestSite.distance == 999999 then
+	if not nearestSite or not nearestSite.distance then
 		return
 	end
 	local site_name = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.name)
@@ -785,14 +785,14 @@ local function CompareAndResetDigCounters(a, b)
 	for _, siteA in pairs(a) do
 		local exists = false
 		for _, siteB in pairs(b) do
-			if siteA.id == siteB.id then
+			if siteA.blobID == siteB.blobID then
 				exists = true
 				break
 			end
 		end
 
 		if not exists then
-			Archy.db.char.digsites.stats[siteA.id].counter = 0
+			Archy.db.char.digsites.stats[siteA.blobID].counter = 0
 		end
 	end
 end
@@ -800,6 +800,7 @@ end
 function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
+	local Digsites = private.Digsites
 
 	for continentID, continentName in pairs(MAP_CONTINENTS) do
 		_G.SetMapZoom(continentID)
@@ -827,23 +828,15 @@ function UpdateAllSites()
 				-- TODO: Remove landmarkName check once LibBabble-Digsites-3.0 is gone.
 				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey] or DIGSITE_TEMPLATES[landmarkName]
 				if digsiteTemplate then
-					local mapID = digsiteTemplate.mapID
-					local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
+					local digsite = Digsites[digsiteTemplate.blobID]
+					if not digsite then
+						local mapID = digsiteTemplate.mapID
+						local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
 
-					table.insert(sites, {
-						continent = mc,
-						distance = 999999,
-						maxFindCount = digsiteTemplate.maxFindCount,
-						id = digsiteTemplate.blobID,
-						level = 0,
-						map = mapID,
-						name = landmarkName,
-						raceId = digsiteTemplate.typeID,
-						x = x,
-						y = y,
-						zoneId = MAP_ID_TO_ZONE_ID[mapID],
-						zoneName = MAP_ID_TO_ZONE_NAME[mapID] or _G.UNKNOWN,
-					})
+						digsite = private.AddDigsite(digsiteTemplate, landmarkName, continentID, MAP_ID_TO_ZONE_ID[mapID], MAP_ID_TO_ZONE_NAME[mapID], x, y)
+					end
+
+					table.insert(sites, digsite)
 				else
 					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
 					local message = "Archy is missing data for dig site %s (key: %s blobID: %d)"
@@ -872,30 +865,17 @@ function UpdateAllSites()
 	_G.SetMapByID(originalMapID)
 end
 
-function Archy:IsSiteBlacklisted(name)
-	return self.db.char.digsites.blacklist[name]
-end
-
-function Archy:ToggleSiteBlacklist(name)
-	local blacklist = self.db.char.digsites.blacklist
-	if blacklist[name] then
-		blacklist[name] = nil
-	else
-		blacklist[name] = true
-	end
-end
-
-local function SortSitesByDistance(a, b)
-	if Archy:IsSiteBlacklisted(a.name) and not Archy:IsSiteBlacklisted(b.name) then
+local function SortSitesByDistance(digsiteA, digsiteB)
+	if digsiteA:IsBlacklisted() and not digsiteB:IsBlacklisted() then
 		return 1 < 0
-	elseif not Archy:IsSiteBlacklisted(a.name) and Archy:IsSiteBlacklisted(b.name) then
+	elseif not digsiteA:IsBlacklisted() and digsiteB:IsBlacklisted() then
 		return 0 < 1
 	end
 
-	if (a.distance == -1 and b.distance == -1) or (not a.distance and not b.distance) then
-		return a.zoneName .. ":" .. a.name < b.zoneName .. ":" .. b.name
+	if (digsiteA.distance == -1 and digsiteB.distance == -1) or (not digsiteA.distance and not digsiteB.distance) then
+		return digsiteA.zoneName .. ":" .. digsiteA.name < digsiteB.zoneName .. ":" .. digsiteB.name
 	else
-		return (a.distance or 0) < (b.distance or 0)
+		return (digsiteA.distance or 0) < (digsiteB.distance or 0)
 	end
 end
 
@@ -911,23 +891,23 @@ function Archy:UpdateSiteDistances()
 	local distance, nearest
 
 	for index = 1, #continent_digsites[private.current_continent] do
-		local site = continent_digsites[private.current_continent][index]
+		local digsite = continent_digsites[private.current_continent][index]
 
-		if site.poi then
-			site.distance = Astrolabe:GetDistanceToIcon(site.poi)
+		if digsite.poi then
+			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.poi)
 		else
-			site.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, site.map, site.level, site.x, site.y)
+			digsite.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
-		if site.x and not Archy:IsSiteBlacklisted(site.name) then
-			if not distance or site.distance < distance then
-				distance = site.distance
-				nearest = site
+		if digsite.coordX and not digsite:IsBlacklisted() then
+			if not distance or digsite.distance < distance then
+				distance = digsite.distance
+				nearest = digsite
 			end
 		end
 	end
 
-	if nearest and (not nearestSite or nearestSite.id ~= nearest.id) then
+	if nearest and (not nearestSite or nearestSite.blobID ~= nearest.blobID) then
 		nearestSite = nearest
 		TomTomHandler.isActive = true
 		TomTomHandler:Refresh(nearestSite)
@@ -1130,14 +1110,14 @@ local function ClearInvalidPOIs()
 
 	if continent_digsites[private.current_continent] then
 		for _, site in pairs(continent_digsites[private.current_continent]) do
-			table.insert(validSiteIDs, site.id)
+			table.insert(validSiteIDs, site.blobID)
 		end
 	end
 
 	for poi in pairs(PointsOfInterest) do
 		if not validSiteIDs[poi.siteId] then
 			ClearPOI(poi)
-		elseif poi.type == "survey" and lastNearestSite.id ~= nearestSite.id and lastNearestSite.id == poi.siteId then
+		elseif poi.type == "survey" and lastNearestSite.blobID ~= nearestSite.blobID and lastNearestSite.blobID == poi.siteId then
 			ClearPOI(poi)
 		end
 	end
@@ -1153,9 +1133,9 @@ function UpdateMinimapPOIs(force)
 	end
 	lastNearestSite = nearestSite
 
-	local sites = continent_digsites[private.current_continent]
+	local continentDigsites = continent_digsites[private.current_continent]
 
-	if not sites or #sites == 0 or _G.IsInInstance() then
+	if not continentDigsites or #continentDigsites == 0 or _G.IsInInstance() then
 		for poi in pairs(PointsOfInterest) do
 			ClearPOI(poi)
 		end
@@ -1168,31 +1148,31 @@ function UpdateMinimapPOIs(force)
 	end
 	local i = 1
 
-	for _, site in pairs(sites) do
-		site.poi = GetSitePOI(site.id, site.map, site.level, site.x, site.y, ("%s\n(%s)"):format(site.name, site.zoneName))
+	for _, digsite in pairs(continentDigsites) do
+		digsite.poi = GetSitePOI(digsite.blobID, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY, ("%s\n(%s)"):format(digsite.name, digsite.zoneName))
 
-		if site.map > 0 then
-			Astrolabe:PlaceIconOnMinimap(site.poi, site.map, site.level, site.x, site.y)
+		if digsite.mapID > 0 then
+			Astrolabe:PlaceIconOnMinimap(digsite.poi, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
-		if (not private.db.minimap.nearest or (nearestSite and nearestSite.id == site.id)) and private.db.general.show and private.db.minimap.show then
-			site.poi:Show()
-			site.poi.icon:Show()
+		if (not private.db.minimap.nearest or (nearestSite and nearestSite.blobID == digsite.blobID)) and private.db.general.show and private.db.minimap.show then
+			digsite.poi:Show()
+			digsite.poi.icon:Show()
 		else
-			site.poi:Hide()
-			site.poi.icon:Hide()
+			digsite.poi:Hide()
+			digsite.poi.icon:Hide()
 		end
 
-		if nearestSite and nearestSite.id == site.id then
-			if not site.surveyPOIs then
-				site.surveyPOIs = {}
+		if nearestSite and nearestSite.blobID == digsite.blobID then
+			if not digsite.surveyPOIs then
+				digsite.surveyPOIs = {}
 			end
 
-			if Archy.db.global.surveyNodes[site.id] and private.db.minimap.fragmentNodes then
-				for index, node in pairs(Archy.db.global.surveyNodes[site.id]) do
-					site.surveyPOIs[index] = GetSurveyPOI(site.id, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, site.name, site.zoneName))
+			if Archy.db.global.surveyNodes[digsite.blobID] and private.db.minimap.fragmentNodes then
+				for index, node in pairs(Archy.db.global.surveyNodes[digsite.blobID]) do
+					digsite.surveyPOIs[index] = GetSurveyPOI(digsite.blobID, node.m, node.f, node.x, node.y, ("%s #%d\n%s\n(%s)"):format(L["Survey"], index, digsite.name, digsite.zoneName))
 
-					local POI = site.surveyPOIs[index]
+					local POI = digsite.surveyPOIs[index]
 
 					Astrolabe:PlaceIconOnMinimap(POI, node.m, node.f, node.x, node.y)
 
@@ -1208,7 +1188,7 @@ function UpdateMinimapPOIs(force)
 			end
 		end
 
-		Arrow_OnUpdate(site.poi, 5)
+		Arrow_OnUpdate(digsite.poi, 5)
 	end
 
 	if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
@@ -1399,9 +1379,7 @@ function Archy:OnEnable()
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.AddRace(raceID)
-		if race then
-			keystoneIDToRaceID[race.keystone.id] = raceID
-		end
+		keystoneIDToRaceID[race.keystone.id] = raceID
 	end
 
 	_G.RequestArtifactCompletionHistory()
@@ -1856,7 +1834,7 @@ do
 	end
 
 	local function UpdateDigsiteCounter(numFindsCompleted)
-		Archy.db.char.digsites.stats[lastSite.id].counter = numFindsCompleted
+		Archy.db.char.digsites.stats[lastSite.blobID].counter = numFindsCompleted
 	end
 
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
@@ -1886,7 +1864,7 @@ do
 		survey_location.y = player_position.y
 
 		lastSite = nearestSite
-		self.db.char.digsites.stats[lastSite.id].surveys = self.db.char.digsites.stats[lastSite.id].surveys + 1
+		self.db.char.digsites.stats[lastSite.blobID].surveys = self.db.char.digsites.stats[lastSite.blobID].surveys + 1
 
 		DistanceIndicatorFrame.isActive = true
 		DistanceIndicatorFrame:Toggle()
@@ -2025,8 +2003,9 @@ do
 		local raceID = keystoneIDToRaceID[itemID]
 
 		if raceID then
-			if lastSite.id then
-				self.db.char.digsites.stats[lastSite.id].keystones = self.db.char.digsites.stats[lastSite.id].keystones + 1
+			local blobID = lastSite.blobID
+			if blobID then
+				self.db.char.digsites.stats[blobID].keystones = self.db.char.digsites.stats[blobID].keystones + 1
 			end
 			keystoneLootRaceID = raceID
 		end
@@ -2067,11 +2046,12 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 
 			-- Drii: for now let's just avoid the error
 			-- TODO: Figure out why the fuck this was done. Burying errors instead of figureout out and fixing their cause is...WTF?!?
-			if type(lastSite.id) == "number" and lastSite.id > 0 then
-				siteStats[lastSite.id].looted = (siteStats[lastSite.id].looted or 0) + 1
-				siteStats[lastSite.id].fragments = siteStats[lastSite.id].fragments + diff
+			local blobID = lastSite.blobID
+			if type(blobID) == "number" and blobID > 0 then
+				siteStats[blobID].looted = (siteStats[blobID].looted or 0) + 1
+				siteStats[blobID].fragments = siteStats[blobID].fragments + diff
 
-				AddSurveyNode(lastSite.id, player_position.map, player_position.level, player_position.x, player_position.y)
+				AddSurveyNode(blobID, player_position.map, player_position.level, player_position.x, player_position.y)
 			end
 			survey_location.map = 0
 			survey_location.level = 0

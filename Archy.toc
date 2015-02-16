@@ -65,6 +65,7 @@ Database\Artifacts.lua
 Archy.lua
 Interface.xml
 Interface.lua
+Digsite.lua
 Race.lua
 Tooltip.lua
 Config.lua

@@ -458,9 +458,9 @@ do
 		local zoneFontName = LSM:Fetch("font", zoneFont.name)
 
 		for _, siteFrame in pairs(self.children) do
-			siteFrame.site.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
-			siteFrame.site.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
-			FontString_SetShadow(siteFrame.site.name, digsiteFont.shadow)
+			siteFrame.siteButton.name:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
+			siteFrame.siteButton.name:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
+			FontString_SetShadow(siteFrame.siteButton.name, digsiteFont.shadow)
 
 			siteFrame.digCounter.value:SetFont(digsiteFontName, digsiteFont.size, digsiteFont.outline)
 			siteFrame.digCounter.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
@@ -656,27 +656,28 @@ end -- do-block
 -----------------------------------------------------------------------
 -- Methods.
 -----------------------------------------------------------------------
-function Archy:ShowDigSiteTooltip(digsite)
-	local site_id = digsite:GetParent():GetID()
-	local normal_font = _G.NORMAL_FONT_COLOR_CODE
-	local highlight_font = _G.HIGHLIGHT_FONT_COLOR_CODE
-	local site_stats = self.db.char.digsites.stats
+function Archy:ShowDigSiteChildFrameSiteButtonTooltip(siteButton)
+	local buttonParent = siteButton:GetParent()
+	local blobID = buttonParent:GetID()
+	local normalFont = _G.NORMAL_FONT_COLOR_CODE
+	local highlightFont = _G.HIGHLIGHT_FONT_COLOR_CODE
+	local siteStats = self.db.char.digsites.stats
 
-	digsite.tooltip = digsite.name:GetText()
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s%s%s|r"):format(normal_font, _G.ZONE .. ": ", highlight_font, digsite:GetParent().zone.name:GetText())
-	digsite.tooltip = digsite.tooltip .. ("\n\n%s%s %s%s|r"):format(normal_font, L["Surveys:"], highlight_font, site_stats[site_id].surveys or 0)
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Digs"] .. ": ", highlight_font, site_stats[site_id].looted or 0)
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlight_font, site_stats[site_id].fragments or 0)
-	digsite.tooltip = digsite.tooltip .. ("\n%s%s %s%s|r"):format(normal_font, L["Key Stones:"], highlight_font, site_stats[site_id].keystones or 0)
-	digsite.tooltip = digsite.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
+	siteButton.tooltip = siteButton.name:GetText()
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s%s%s|r"):format(normalFont, _G.ZONE .. ": ", highlightFont, buttonParent.zone.name:GetText())
+	siteButton.tooltip = siteButton.tooltip .. ("\n\n%s%s %s%s|r"):format(normalFont, L["Surveys:"], highlightFont, siteStats[blobID].surveys or 0)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, L["Digs"] .. ": ", highlightFont, siteStats[blobID].looted or 0)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, _G.ARCHAEOLOGY_RUNE_STONES .. ": ", highlightFont, siteStats[blobID].fragments or 0)
+	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, L["Key Stones:"], highlightFont, siteStats[blobID].keystones or 0)
+	siteButton.tooltip = siteButton.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
 
-	if self:IsSiteBlacklisted(digsite.siteName) then
-		digsite.tooltip = digsite.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
+	if siteButton.digsite:IsBlacklisted() then
+		siteButton.tooltip = siteButton.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
 	else
-		digsite.tooltip = digsite.tooltip .. "\n" .. L["Right-Click to blacklist"]
+		siteButton.tooltip = siteButton.tooltip .. "\n" .. L["Right-Click to blacklist"]
 	end
-	_G.GameTooltip:SetOwner(digsite, "ANCHOR_BOTTOMRIGHT")
-	_G.GameTooltip:SetText(digsite.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1, true)
+	_G.GameTooltip:SetOwner(siteButton, "ANCHOR_BOTTOMRIGHT")
+	_G.GameTooltip:SetText(siteButton.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1, true)
 end
 
 function Archy:ResizeDigSiteDisplay()
@@ -697,11 +698,11 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteIndex = siteIndex + 1
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
-		siteFrame.site:SetWidth(siteFrame.site.name:GetStringWidth())
+		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
 		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
 		local width
-		local nameWidth = siteFrame.site:GetWidth()
+		local nameWidth = siteFrame.siteButton:GetWidth()
 		local zoneWidth = siteFrame.zone:GetWidth()
 		local digCounterWidth = siteFrame.digCounter:GetWidth()
 		local distWidth = siteFrame.distance:GetWidth()
@@ -748,7 +749,7 @@ function Archy:ResizeMinimalDigSiteDisplay()
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteFrame.zone:SetWidth(maxZoneWidth == 0 and 1 or maxZoneWidth)
-		siteFrame.site:SetWidth(maxNameWidth)
+		siteFrame.siteButton:SetWidth(maxNameWidth)
 		siteFrame.distance:SetWidth(maxDistWidth == 0 and 1 or maxDistWidth)
 		siteFrame:SetWidth(maxWidth)
 		siteFrame.distance:SetAlpha(private.db.digsite.minimal.showDistance and 1 or 0)
@@ -773,11 +774,11 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 		siteIndex = siteIndex + 1
 		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
 		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
-		siteFrame.site:SetWidth(siteFrame.site.name:GetStringWidth())
+		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
 		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
 		local width
-		local nameWidth = siteFrame.site:GetWidth()
+		local nameWidth = siteFrame.siteButton:GetWidth()
 		local zoneWidth = siteFrame.zone:GetWidth() + 10
 
 		if nameWidth > zoneWidth then
@@ -828,33 +829,34 @@ function Archy:RefreshDigSiteDisplay()
 
 	local maxSurveyCount = (continentID == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
 
-	for digSiteIndex, digSite in pairs(continentDigsites[continentID]) do
-		local childFrame = DigSiteFrame.children[digSiteIndex]
-		local count = self.db.char.digsites.stats[digSite.id].counter
+	for digsiteIndex, digsite in pairs(continentDigsites[continentID]) do
+		local childFrame = DigSiteFrame.children[digsiteIndex]
+		local count = self.db.char.digsites.stats[digsite.blobID].counter
 
-		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, digSite.maxFindCount or maxSurveyCount)
+		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, digsite.maxFindCount or maxSurveyCount)
 
-		if digSite.distance then
-			childFrame.distance.value:SetFormattedText(L["%d yards"], digSite.distance)
+		if digsite.distance then
+			childFrame.distance.value:SetFormattedText(L["%d yards"], digsite.distance)
 		else
 			childFrame.distance.value:SetText(_G.UNKNOWN)
 		end
 
 
-		if self:IsSiteBlacklisted(digSite.name) then
-			childFrame.site.name:SetFormattedText("|cFFFF0000%s", digSite.name)
+		if digsite:IsBlacklisted() then
+			childFrame.siteButton.name:SetFormattedText("|cFFFF0000%s", digsite.name)
 		else
-			childFrame.site.name:SetText(digSite.name)
+			childFrame.siteButton.name:SetText(digsite.name)
 		end
 
-		if childFrame.site.siteName ~= digSite.name then
-			local race = private.Races[digSite.raceId]
+		if childFrame.siteButton.digsite ~= digsite then
+			childFrame.siteButton.digsite = digsite
+			childFrame.siteButton.zoneID = digsite.zoneID
+			childFrame.zone.name:SetText(digsite.zoneName)
+			childFrame:SetID(digsite.blobID)
+
+			local race = private.Races[digsite.typeID]
 			childFrame.crest.icon:SetTexture(race.texture)
 			childFrame.crest.tooltip = race.name
-			childFrame.zone.name:SetText(digSite.zoneName)
-			childFrame.site.siteName = digSite.name or _G.UNKNOWN
-			childFrame.site.zoneId = digSite.zoneId
-			childFrame:SetID(digSite.id)
 		end
 	end
 	self:ResizeDigSiteDisplay()

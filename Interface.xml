@@ -171,7 +171,7 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-			<Layer level="Overlay">
+			<Layer level="OVERLAY">
 				<FontString name="$parentFragments" inherits="FragmentBarFont" parentKey="fragments" justifyH="RIGHT">
 					<Anchors>
 						<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT"><Offset><AbsDimension x="-5" y="2" /></Offset></Anchor>
@@ -493,7 +493,7 @@
 					</OnLeave>
 				</Scripts>
 			</Frame>
-			<Button name="$parentSite" parentKey="site">
+			<Button name="$parentSiteButton" parentKey="siteButton">
 				<Size x="160" y="22" />
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentCrest" relativePoint="TOPRIGHT" x="6" y="0" />
@@ -512,31 +512,32 @@
 					<OnClick>
 						if (button == "LeftButton") then
 							if WorldMapFrame:IsShown() then
-								if self.oldzoneId and (self.oldzoneId == self.zoneId) then
+								if self.oldzoneID and (self.oldzoneID == self.zoneID) then
 									HideUIPanel(WorldMapFrame)
-									self.oldzoneId = nil
+									self.oldzoneID = nil
 								else
-									SetMapZoom(GetCurrentMapContinent(), self.zoneId)
-									self.oldzoneId = self.zoneId
+									SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+									self.oldzoneID = self.zoneID
 								end
 							else
 								ShowUIPanel(WorldMapFrame)
-								SetMapZoom(GetCurrentMapContinent(), self.zoneId)
-								self.oldzoneId = self.zoneId
+								SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+								self.oldzoneID = self.zoneID
 							end
 						elseif (button == "RightButton") then
-							Archy:ToggleSiteBlacklist(self.siteName)
-							if Archy:IsSiteBlacklisted(self.siteName) then
-								self.name:SetText("|cFFFF0000" .. self.siteName)
+                            self.digsite:ToggleBlacklistStatus()
+
+                            if self.digsite:IsBlacklisted() then
+								self.name:SetText("|cFFFF0000" .. self.digsite.name)
 							else
-								self.name:SetText("|cFFFFFFFF" .. self.siteName)
+								self.name:SetText("|cFFFFFFFF" .. self.digsite.name)
 							end
 						end
 						Archy:UpdateSiteDistances()
 						Archy:RefreshDigSiteDisplay()
 					</OnClick>
 					<OnEnter>
-						Archy:ShowDigSiteTooltip(self)
+						Archy:ShowDigSiteChildFrameSiteButtonTooltip(self)
 					</OnEnter>
 					<OnLeave>
 						GameTooltip:Hide();
@@ -548,7 +549,6 @@
 				<Layers>
 					<Layer>
 						<Texture name="$parentIcon" parentKey="icon" file="Interface\Archeology\Arch-Icon-Marker.blp">
-							<!-- <TexCoords left="0.0" right="0.5703" top="0.0" bottom="0.6484" /> -->
 							<Size x="14" y="14" />
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" x="0" y="0" />
@@ -585,7 +585,9 @@
 						</FontString>
 					</Layer>
 				</Layers>
-				<Anchors><Anchor point="TOPLEFT" relativeTo="$parentSite" relativePoint="BOTTOMLEFT" x="0" y="0" /></Anchors>
+				<Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentSiteButton" relativePoint="BOTTOMLEFT" x="0" y="0" />
+                </Anchors>
 				<Scripts>
 					<OnEnter>
 						if self.tooltip then
@@ -1098,7 +1100,7 @@
 					</OnLeave>
 				</Scripts>
 			</Frame>
-			<Button name="$parentSite" parentKey="site">
+			<Button name="$parentSiteButton" parentKey="siteButton">
 				<Size x="160" y="22" />
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentCrest" relativePoint="RIGHT" x="6" y="0" />
@@ -1117,31 +1119,32 @@
 					<OnClick>
 						if (button == "LeftButton") then
 							if WorldMapFrame:IsShown() then
-								if self.oldzoneId and (self.oldzoneId == self.zoneId) then
+								if self.oldzoneID and (self.oldzoneID == self.zoneID) then
 									HideUIPanel(WorldMapFrame)
-									self.oldzoneId = nil
+									self.oldzoneID = nil
 								else
-									SetMapZoom(GetCurrentMapContinent(), self.zoneId)
-									self.oldzoneId = self.zoneId
+									SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+									self.oldzoneID = self.zoneID
 								end
 							else
 								ShowUIPanel(WorldMapFrame)
-								SetMapZoom(GetCurrentMapContinent(), self.zoneId)
-								self.oldzoneId = self.zoneId
+								SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+								self.oldzoneID = self.zoneID
 							end
 						elseif (button == "RightButton") then
-							Archy:ToggleSiteBlacklist(self.siteName)
-							if Archy:IsSiteBlacklisted(self.siteName) then
-								self.name:SetText("|cFFFF0000" .. self.siteName)
+                            self.digsite:ToggleBlacklistStatus()
+
+							if self.digsite:IsBlacklisted() then
+								self.name:SetText("|cFFFF0000" .. self.digsite.name)
 							else
-								self.name:SetText("|cFFFFFFFF" .. self.siteName)
+								self.name:SetText("|cFFFFFFFF" .. self.digsite.name)
 							end
 						end
 						Archy:UpdateSiteDistances()
 						Archy:RefreshDigSiteDisplay()
 					</OnClick>
 					<OnEnter>
-						Archy:ShowDigSiteTooltip(self)
+						Archy:ShowDigSiteChildFrameSiteButtonTooltip(self)
 					</OnEnter>
 					<OnLeave>
 						GameTooltip:Hide();
