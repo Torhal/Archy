@@ -166,7 +166,7 @@ function private.AddDigsite(digsiteTemplate, landmarkName, continentID, zoneID, 
 
 	Digsites[digsite.blobID] = digsite
 
-	local mapIconFrame = _G.CreateFrame("Frame", "ArchyMinimap_SitePOI" .. digsite.blobID, _G.Minimap)
+	local mapIconFrame = _G.CreateFrame("Frame", ("ArchyMinimap_Digsite%sPOI"):format(digsite.blobID), _G.Minimap)
 	mapIconFrame:SetSize(10, 10)
 	mapIconFrame:SetScript("OnEnter", MapIcon_OnEnter)
 	mapIconFrame:SetScript("OnLeave", MapIcon_OnLeave)
