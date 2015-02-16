@@ -43,9 +43,6 @@ local TomTomHandler = {
 	end,
 	Refresh = function(self, digsite)
 		if not self.hasTomTom or (digsite and digsite == self.currentDigsite) then
-			if digsite == self.currentDigsite then
-				private.Debug("TomTomHandler: Attempting to refresh on the same digsite.")
-			end
 			return
 		end
 		self:ClearWaypoint()
