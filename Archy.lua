@@ -1017,12 +1017,6 @@ local function GetSitePOI(siteId, map, level, x, y, tooltip)
 	poi:SetScript("OnUpdate", Arrow_OnUpdate)
 	poi.type = "site"
 	poi.tooltip = tooltip
-	poi.location = {
-		map = map,
-		level = level,
-		x = x,
-		y = y,
-	}
 	poi.siteId = siteId
 	poi.t = 0
 
@@ -1060,12 +1054,6 @@ local function GetSurveyPOI(siteId, map, level, x, y, tooltip)
 	poi:SetScript("OnUpdate", Arrow_OnUpdate)
 	poi.type = "survey"
 	poi.tooltip = tooltip
-	poi.location = {
-		map = map,
-		level = level,
-		x = x,
-		y = y,
-	}
 	poi.siteId = siteId
 	poi.t = 0
 
@@ -1079,7 +1067,6 @@ local function ClearPOI(poi)
 	end
 	Astrolabe:RemoveIconFromMinimap(poi)
 
-	poi.location = nil
 	poi.siteId = nil
 	poi.tooltip = nil
 
