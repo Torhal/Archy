@@ -619,8 +619,8 @@ end
 local CONFIG_UPDATE_FUNCTIONS = {
 	artifact = function(option)
 		if option == "autofill" then
-			for raceID = 1, _G.GetNumArchaeologyRaces() do
-				private.Races[raceID]:UpdateCurrentProject()
+			for raceID, race in pairs(private.Races) do
+				race:UpdateCurrentProject()
 			end
 		elseif option == "color" then
 			ArtifactFrame:RefreshDisplay()
@@ -1469,8 +1469,8 @@ function Archy:UpdatePlayerPosition(force)
 
 	UpdateAllSites()
 
-	for raceID = 1, _G.GetNumArchaeologyRaces() do
-		private.Races[raceID]:UpdateCurrentProject()
+	for raceID, race in pairs(private.Races) do
+		race:UpdateCurrentProject()
 	end
 	ArtifactFrame:UpdateChrome()
 	ArtifactFrame:RefreshDisplay()
@@ -1690,8 +1690,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		return
 	end
 
-	for raceID = 1, _G.GetNumArchaeologyRaces() do
-		local race = private.Races[raceID]
+	for raceID, race in pairs(private.Races) do
 		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
 		local diff = currency_amount - (race.currency or 0)
 
