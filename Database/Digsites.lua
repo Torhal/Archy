@@ -299,9 +299,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 101,
 		typeID = DigsiteType.Nightelf,
 	},
-	[DS["Schnottz's Landing"]] = {
+	["1:0.432328:0.950096"] = { -- Schnottz's Landing
 		blobID = 60363,
-		continentID = 1,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
