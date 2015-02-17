@@ -294,11 +294,6 @@ _G.BINDING_NAME_DIGSITESARCHY = L["BINDING_NAME_DIGSITES"]
 -----------------------------------------------------------------------
 -- Variables
 -----------------------------------------------------------------------
-local artifactSolved = {
-	raceId = 0,
-	name = ""
-}
-
 local continent_digsites = {}
 private.continent_digsites = continent_digsites
 
@@ -519,9 +514,6 @@ local function SolveRaceArtifact(raceID, useStones)
 		local artifact = race.currentProject
 
 		_G.SetSelectedArtifact(raceID)
-		artifactSolved.raceId = raceID
-		artifactSolved.name = _G.GetSelectedArtifactInfo()
-		artifact.name = artifactSolved.name
 		keystoneLootRaceID = raceID
 
 		if _G.type(useStones) == "boolean" then
@@ -1700,14 +1692,6 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 		if diff < 0 then
 			-- we've spent fragments, aka. Solved an artifact
 			race.currentProject.keystones_added = 0
-
-			if artifactSolved.raceId == race.id then
-				local _, _, completionCount = race:GetArtifactCompletionDataByName(artifactSolved.name)
-				self:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(race.name, artifactSolved.name, completionCount or 0), 1, 1, 1)
-
-				artifactSolved.raceId = 0
-				artifactSolved.name = ""
-			end
 		elseif diff > 0 then
 			-- we've gained fragments, aka. Successfully dug at a dig site
 			if lastSite then
