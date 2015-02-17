@@ -1029,10 +1029,16 @@ function Archy:OnEnable()
 	self:RegisterEvent("PET_BATTLE_CLOSE")
 	self:RegisterEvent("PET_BATTLE_OPENING_START")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_CONTROL_GAINED")
+	self:RegisterEvent("PLAYER_CONTROL_LOST")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_STARTED_MOVING")
+	self:RegisterEvent("PLAYER_STOPPED_MOVING")
 	self:RegisterEvent("QUEST_LOG_UPDATE")
 	self:RegisterEvent("SKILL_LINES_CHANGED", "UpdateSkillBar")
+	self:RegisterEvent("TAXIMAP_CLOSED")
+	self:RegisterEvent("TAXIMAP_OPENED")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_SUCCEEDED")
@@ -1134,7 +1140,6 @@ function Archy:OnEnable()
 	player_position.map, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
 
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
-	self:ScheduleTimer(function() PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.2) end, 3)
 end
 
 function Archy:OnProfileUpdate(event, database, ProfileKey)
@@ -1815,6 +1820,20 @@ function Archy:PET_BATTLE_OPENING_START()
 	self:ConfigUpdated()
 end
 
+function Archy:PLAYER_CONTROL_GAINED()
+	if PositionUpdateTimerHandle then
+		self:UpdatePlayerPosition()
+		PositionUpdateTimerHandle = self:CancelTimer(PositionUpdateTimerHandle)
+	end
+end
+
+function Archy:PLAYER_CONTROL_LOST()
+	if private.isTaxiMapOpen then
+		self:UpdatePlayerPosition()
+		PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
+	end
+end
+
 function Archy:PLAYER_ENTERING_WORLD()
 	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
 	if TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
@@ -1884,6 +1903,20 @@ function Archy:PLAYER_REGEN_ENABLED()
 	end
 end
 
+function Archy:PLAYER_STARTED_MOVING()
+	if not _G.IsInInstance() then
+		self:UpdatePlayerPosition()
+		PositionUpdateTimerHandle = self:ScheduleRepeatingTimer("UpdatePlayerPosition", 0.1)
+	end
+end
+
+function Archy:PLAYER_STOPPED_MOVING()
+	if PositionUpdateTimerHandle then
+		self:UpdatePlayerPosition()
+		PositionUpdateTimerHandle = self:CancelTimer(PositionUpdateTimerHandle)
+	end
+end
+
 -- Delay loading Blizzard_ArchaeologyUI until QUEST_LOG_UPDATE so races main page doesn't bug.
 function Archy:QUEST_LOG_UPDATE()
 	-- Hook and overwrite the default SolveArtifact function to provide confirmations when nearing cap
@@ -1939,6 +1972,14 @@ do
 		end
 	end
 end -- do-block
+
+function Archy:TAXIMAP_CLOSED()
+	private.isTaxiMapOpen = nil
+end
+
+function Archy:TAXIMAP_OPENED()
+	private.isTaxiMapOpen = true
+end
 
 function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
 	if unit == "player" and spell == private.CRATE_SPELL_NAME then
