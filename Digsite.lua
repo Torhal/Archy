@@ -114,6 +114,7 @@ end
 local function CreateSurveyNode(digsite, savedNode, nodeIndex)
 	local node = _G.CreateFrame("Frame", ("ArchyMinimap_Digsite%sSurveyNode%d"):format(digsite.blobID, nodeIndex), _G.Minimap)
 	node:SetSize(8, 8)
+	node:Hide()
 	node:SetScript("OnEnter", MapIcon_OnEnter)
 	node:SetScript("OnLeave", MapIcon_OnLeave)
 	node:SetScript("OnUpdate", MapIcon_OnUpdate)
@@ -168,6 +169,7 @@ function private.AddDigsite(digsiteTemplate, landmarkName, continentID, zoneID, 
 
 	local mapIconFrame = _G.CreateFrame("Frame", ("ArchyMinimap_Digsite%sPOI"):format(digsite.blobID), _G.Minimap)
 	mapIconFrame:SetSize(10, 10)
+	mapIconFrame:Hide()
 	mapIconFrame:SetScript("OnEnter", MapIcon_OnEnter)
 	mapIconFrame:SetScript("OnLeave", MapIcon_OnLeave)
 	mapIconFrame:SetScript("OnUpdate", MapIcon_OnUpdate)
