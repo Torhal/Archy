@@ -1580,7 +1580,7 @@ do
 		lastSite:UpdateSurveyNodeDistanceColors()
 
 		TomTomHandler.isActive = false
-		TomTomHandler:Refresh()
+		TomTomHandler:ClearWaypoint()
 
 		self:RefreshDigSiteDisplay()
 	end
