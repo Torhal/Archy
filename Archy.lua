@@ -1528,15 +1528,10 @@ do
 		bar:Hide()
 	end
 
-	local function UpdateDigsiteCounter(numFindsCompleted)
-		lastSite.stats.counter = numFindsCompleted
-	end
-
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
 		DistanceIndicatorFrame.isActive = false
 		DistanceIndicatorFrame:Toggle()
-
-		UpdateDigsiteCounter(numFindsCompleted)
+		lastSite.stats.counter = numFindsCompleted
 	end
 
 	local function SetSurveyCooldown(time)
@@ -1563,6 +1558,7 @@ do
 
 		lastSite = nearestSite
 		lastSite.stats.surveys = lastSite.stats.surveys + 1
+		lastSite.stats.counter = numFindsCompleted
 
 		DistanceIndicatorFrame.isActive = true
 		DistanceIndicatorFrame:Toggle()
@@ -1586,7 +1582,6 @@ do
 		TomTomHandler.isActive = false
 		TomTomHandler:Refresh()
 
-		UpdateDigsiteCounter(numFindsCompleted)
 		self:RefreshDigSiteDisplay()
 	end
 end
