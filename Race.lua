@@ -153,7 +153,7 @@ function Race:UpdateCurrentProject()
 	local artifact = self.currentProject
 	if artifact.name ~= "" and artifact.name ~= artifactName then
 		local _, _, completionCount = self:GetArtifactCompletionDataByName(artifact.name)
-		Archy:our(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
+		Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
 	end
 
 	artifact.canSolve = _G.CanSolveArtifact()
