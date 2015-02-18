@@ -1594,6 +1594,10 @@ do
 	end
 
 	function Archy:ARTIFACT_COMPLETE(event, artifactName)
+		-- TODO: If this is fired from Blizzard's UI, do NOT immediately update projects.
+		-- This is the cause of ticket 461: Race:UpdateCurrentProject() calls SetSelectedArtifact(), which affects the Blizzard UI.
+		-- Instead, possibly warn the user that changes to Archy's UI will not be available until Blizzard's UI is closed, then register some events/whatever so we can update
+		-- Archy when the Blizzard UI is closed.
 		for raceID, race in pairs(private.Races) do
 			local artifact = race.currentProject
 
