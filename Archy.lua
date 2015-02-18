@@ -1072,8 +1072,6 @@ function Archy:OnEnable()
 		keystoneIDToRaceID[race.keystone.id] = raceID
 	end
 
-	_G.RequestArtifactCompletionHistory()
-
 	if _G.BattlefieldMinimap then
 		InitializeBattlefieldDigsites()
 	else
