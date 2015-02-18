@@ -152,6 +152,9 @@ function Race:UpdateCurrentProject()
 
 	local artifact = self.currentProject
 	if not private.isLoading and artifact.name ~= artifactName then
+		artifact.hasAnnounced = nil
+		artifact.hasPinged = nil
+
 		local _, _, completionCount = self:GetArtifactCompletionDataByName(artifact.name)
 		Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
 	end

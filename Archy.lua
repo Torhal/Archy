@@ -1590,9 +1590,6 @@ do
 			local artifact = race.currentProject
 
 			if artifact and artifact.name == artifactName then
-				artifact.hasAnnounced = nil
-				artifact.hasPinged = nil
-
 				race:UpdateCurrentProject()
 				self:ScheduleTimer(UpdateAndRefresh, 2, race)
 				break
