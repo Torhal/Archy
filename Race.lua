@@ -208,22 +208,20 @@ function Race:UpdateCurrentProject()
 
 	_G.RequestArtifactCompletionHistory()
 
-	if not private.db.general.show or self:IsOnArtifactBlacklist() then
-		return
-	end
+	if not private.isLoading and private.db.general.show and not self:IsOnArtifactBlacklist() then
+		local currencyOwned = artifact.fragments + artifact.keystone_adjustment
+		local currencyRequired = artifact.fragments_required
 
-	local currencyOwned = artifact.fragments + artifact.keystone_adjustment
-	local currencyRequired = artifact.fragments_required
+		if currencyOwned > 0 and currencyRequired > 0 then
+			if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
+				artifact.hasAnnounced = true
+				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
+			end
 
-	if not private.isLoading and currencyOwned > 0 and currencyRequired > 0 then
-		if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
-			artifact.hasAnnounced = true
-			Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
-		end
-
-		if not artifact.hasPinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
-			artifact.hasPinged = true
-			_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+			if not artifact.hasPinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
+				artifact.hasPinged = true
+				_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
+			end
 		end
 	end
 end
