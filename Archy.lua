@@ -1420,10 +1420,6 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	if force then
-		_G.RequestArtifactCompletionHistory()
-	end
-
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
 		DigSiteFrame:UpdateChrome()
