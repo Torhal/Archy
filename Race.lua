@@ -209,8 +209,6 @@ function Race:UpdateCurrentProject()
 	end
 	artifact.keystones_added = prevAdded
 
-	_G.RequestArtifactCompletionHistory()
-
 	if not private.isLoading and private.db.general.show and not self:IsOnArtifactBlacklist() then
 		local currencyOwned = artifact.fragments + artifact.keystone_adjustment
 		local currencyRequired = artifact.fragments_required

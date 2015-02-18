@@ -1067,11 +1067,19 @@ function Archy:OnEnable()
 	TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	TomTomHandler.hasPOIIntegration = TomTomHandler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
+	-----------------------------------------------------------------------
+	-- Initialize Races
+	-----------------------------------------------------------------------
+	_G.RequestArtifactCompletionHistory()
+
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.AddRace(raceID)
 		keystoneIDToRaceID[race.keystone.id] = raceID
 	end
 
+	-----------------------------------------------------------------------
+	-- Map stuff.
+	-----------------------------------------------------------------------
 	if _G.BattlefieldMinimap then
 		InitializeBattlefieldDigsites()
 	else
