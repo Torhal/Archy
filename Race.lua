@@ -151,7 +151,7 @@ function Race:UpdateCurrentProject()
 	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
 
 	local artifact = self.currentProject
-	if artifact.name ~= "" and artifact.name ~= artifactName then
+	if not private.isLoading and artifact.name ~= artifactName then
 		local _, _, completionCount = self:GetArtifactCompletionDataByName(artifact.name)
 		Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
 	end
@@ -215,7 +215,7 @@ function Race:UpdateCurrentProject()
 	local currencyOwned = artifact.fragments + artifact.keystone_adjustment
 	local currencyRequired = artifact.fragments_required
 
-	if currencyOwned > 0 and currencyRequired > 0 then
+	if not private.isLoading and currencyOwned > 0 and currencyRequired > 0 then
 		if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
 			artifact.hasAnnounced = true
 			Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)

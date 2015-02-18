@@ -884,6 +884,8 @@ function UpdateMinimapIcons(isForced)
 end
 
 function Archy:OnInitialize()
+	private.isLoading = true
+
 	self.db = LibStub("AceDB-3.0"):New("ArchyDB", PROFILE_DEFAULTS, 'Default')
 	self.db.RegisterCallback(self, "OnNewProfile", "OnProfileUpdate")
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileUpdate")
@@ -1132,6 +1134,7 @@ function Archy:OnEnable()
 	player_position.map, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
 
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
+	private.isLoading = false
 end
 
 function Archy:OnProfileUpdate(event, database, ProfileKey)
