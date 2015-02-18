@@ -1608,6 +1608,14 @@ function Archy:ARTIFACT_DIG_SITE_UPDATED()
 end
 
 function Archy:ARTIFACT_HISTORY_READY()
+	if not private.initialAnnouncementCheck then
+		private.initialAnnouncementCheck = self:ScheduleTimer(function()
+			for raceID, race in pairs(private.Races) do
+				race:UpdateCurrentProject()
+			end
+		end, 5)
+	end
+
 	for raceID, race in pairs(private.Races) do
 		local artifact = race.currentProject
 
