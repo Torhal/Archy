@@ -305,14 +305,14 @@ local lastSite
 local nearestSite
 
 local player_position = {
-	map = 0,
+	mapID = 0,
 	level = 0,
 	x = 0,
 	y = 0
 }
 
 local survey_location = {
-	map = 0,
+	mapID = 0,
 	level = 0,
 	x = 0,
 	y = 0
@@ -819,7 +819,7 @@ function Archy:UpdateSiteDistances()
 		if digsite.mapIconFrame:IsShown() then
 			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.mapIconFrame)
 		else
-			digsite.distance = Astrolabe:ComputeDistance(player_position.map, player_position.level, player_position.x, player_position.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
+			digsite.distance = Astrolabe:ComputeDistance(player_position.mapID, player_position.level, player_position.x, player_position.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
 		if digsite.coordX and digsite.distance and not digsite:IsBlacklisted() and (not distance or digsite.distance < distance) then
@@ -1101,10 +1101,10 @@ function Archy:OnEnable()
 			MAP_ID_TO_ZONE_NAME[mapID] = continentName
 
 			ZONE_DATA[mapID] = {
-				continent = continentID,
+				continentID = continentID,
 				ID = 0,
 				level = 0,
-				map = mapID,
+				mapID = mapID,
 				name = continentName
 			}
 
@@ -1120,10 +1120,10 @@ function Archy:OnEnable()
 					MAP_ID_TO_ZONE_ID[mapID] = zoneID
 					MAP_ID_TO_ZONE_NAME[mapID] = zoneName
 					ZONE_DATA[mapID] = {
-						continent = continentID,
+						continentID = continentID,
 						ID = zoneID,
 						level = _G.GetCurrentMapDungeonLevel(),
-						map = mapID,
+						mapID = mapID,
 						name = zoneName
 					}
 				else
@@ -1137,7 +1137,7 @@ function Archy:OnEnable()
 	private.current_continent = _G.GetCurrentMapContinent()
 	UpdateAllSites()
 
-	player_position.map, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
+	player_position.mapID, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
 
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 	private.isLoading = false
@@ -1432,12 +1432,12 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	if force or player_position.x ~= mapX or player_position.y ~= mapY or player_position.map ~= mapID or player_position.level ~= mapLevel then
-		player_position.x, player_position.y, player_position.map, player_position.level = mapX, mapY, mapID, mapLevel
+	if force or player_position.x ~= mapX or player_position.y ~= mapY or player_position.mapID ~= mapID or player_position.level ~= mapLevel then
+		player_position.x, player_position.y, player_position.mapID, player_position.level = mapX, mapY, mapID, mapLevel
 
 		self:UpdateSiteDistances()
 
-		DistanceIndicatorFrame:Update(mapID, mapLevel, mapX, mapY, survey_location.map, survey_location.level, survey_location.x, survey_location.y)
+		DistanceIndicatorFrame:Update(mapID, mapLevel, mapX, mapY, survey_location.mapID, survey_location.level, survey_location.x, survey_location.y)
 		UpdateMinimapIcons()
 		self:RefreshDigSiteDisplay()
 	end
@@ -1542,14 +1542,14 @@ do
 		end
 
 		if not nearestSite then
-			survey_location.map = 0
+			survey_location.mapID = 0
 			survey_location.level = 0
 			survey_location.x = 0
 			survey_location.y = 0
 			return
 		end
 		survey_location.level = player_position.level
-		survey_location.map = player_position.map
+		survey_location.mapID = player_position.mapID
 		survey_location.x = player_position.x
 		survey_location.y = player_position.y
 
@@ -1712,10 +1712,10 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 				lastSite.stats.looted = lastSite.stats.looted + 1
 				lastSite.stats.fragments = lastSite.stats.fragments + diff
 
-				lastSite:AddSurveyNode(player_position.map, player_position.level, player_position.x, player_position.y)
+				lastSite:AddSurveyNode(player_position.mapID, player_position.level, player_position.x, player_position.y)
 			end
 
-			survey_location.map = 0
+			survey_location.mapID = 0
 			survey_location.level = 0
 			survey_location.x = 0
 			survey_location.y = 0

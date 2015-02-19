@@ -348,7 +348,7 @@ function Archy:LDBTooltipShow()
 					if #continentDigsites > 0 and (not private.db.tooltip.filter_continent or continentID == private.current_continent) then
 						local continent_name
 						for _, zone in pairs(ZONE_DATA) do
-							if zone.continent == continentID and zone.ID == 0 then
+							if zone.continentID == continentID and zone.ID == 0 then
 								continent_name = zone.name
 								break
 							end
