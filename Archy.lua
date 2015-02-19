@@ -272,8 +272,8 @@ private.ZONE_DATA = ZONE_DATA
 local MAP_CONTINENTS = {} -- Popupated in Archy:OnEnable()
 
 local LOREWALKER_ITEMS = {
-	MAP = { id = 87549, spell = 126957 },
-	LODESTONE = { id = 87548, spell = 126956 },
+	MAP = { ID = 87549, spell = 126957 },
+	LODESTONE = { ID = 87548, spell = 126956 },
 }
 
 local FISHING_POLE_NAME
@@ -604,8 +604,8 @@ local function GetIDFromLink(link)
 		return
 	end
 
-	local _, id = (":"):split(str)
-	return tonumber(id)
+	local _, ID = (":"):split(str)
+	return tonumber(ID)
 end
 
 local CONFIG_UPDATE_FUNCTIONS = {
@@ -1074,7 +1074,7 @@ function Archy:OnEnable()
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.AddRace(raceID)
-		keystoneIDToRaceID[race.keystone.id] = raceID
+		keystoneIDToRaceID[race.keystone.ID] = raceID
 	end
 
 	-----------------------------------------------------------------------
@@ -1102,7 +1102,7 @@ function Archy:OnEnable()
 
 			ZONE_DATA[mapID] = {
 				continent = continentID,
-				id = 0,
+				ID = 0,
 				level = 0,
 				map = mapID,
 				name = continentName
@@ -1121,7 +1121,7 @@ function Archy:OnEnable()
 					MAP_ID_TO_ZONE_NAME[mapID] = zoneName
 					ZONE_DATA[mapID] = {
 						continent = continentID,
-						id = zoneID,
+						ID = zoneID,
 						level = _G.GetCurrentMapDungeonLevel(),
 						map = mapID,
 						name = zoneName
@@ -1296,12 +1296,12 @@ do
 			private.regen_scan_bags = true
 			return
 		end
-		local item_id = _G.GetContainerItemID(bag, slot)
+		local itemID = _G.GetContainerItemID(bag, slot)
 
-		if item_id then
+		if itemID then
 			-- 86068,73410 for debug or any book-type item
-			if CRATE_OF_FRAGMENTS[item_id] then
-				private.crate_item_id = item_id
+			if CRATE_OF_FRAGMENTS[itemID] then
+				private.crate_item_id = itemID
 				return true
 			end
 			DatamineTooltip:SetBagItem(bag, slot)
@@ -1310,7 +1310,7 @@ do
 				local linetext = (_G["ArchyScanTipTextLeft" .. line_num]:GetText())
 
 				if linetext == CRATE_USE_STRING then
-					private.crate_item_id = item_id
+					private.crate_item_id = itemID
 					return true
 				end
 			end
@@ -1361,36 +1361,36 @@ do
 			end
 		end
 
-		local lorewalkerMapCount = _G.GetItemCount(LOREWALKER_ITEMS.MAP.id, false, false)
-		local lorewalkerLodeCount = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.id, false, false)
+		local lorewalkerMapCount = _G.GetItemCount(LOREWALKER_ITEMS.MAP.ID, false, false)
+		local lorewalkerLodeCount = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.ID, false, false)
 		local loreItemButton = DistanceIndicatorFrame.loritemButton
 
 		-- Prioritize map, since it affects Archy's lists. (randomize digsites)
 		if lorewalkerMapCount > 0 then
-			local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.MAP.id))
+			local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.MAP.ID))
 			loreItemButton:SetAttribute("type1", "item")
 			loreItemButton:SetAttribute("item1", itemName)
 			loreItemButton:Enable()
 			loreItemButton.icon:SetDesaturated(false)
-			loreItemButton.tooltip = LOREWALKER_ITEMS.MAP.id
+			loreItemButton.tooltip = LOREWALKER_ITEMS.MAP.ID
 
-			local start, duration, enable = _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id)
+			local start, duration, enable = _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.ID)
 			if start > 0 and duration > 0 then
 				_G.CooldownFrame_SetTimer(loreItemButton.cooldown, start, duration, enable)
 			end
 		end
 
 		if lorewalkerLodeCount > 0 then
-			local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.LODESTONE.id))
+			local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.LODESTONE.ID))
 			loreItemButton:SetAttribute("type2", "item")
 			loreItemButton:SetAttribute("item2", itemName)
 			loreItemButton:Enable()
 			loreItemButton.icon:SetDesaturated(false)
 
 			if lorewalkerMapCount > 0 then
-				loreItemButton.tooltip = { LOREWALKER_ITEMS.MAP.id, itemName }
+				loreItemButton.tooltip = { LOREWALKER_ITEMS.MAP.ID, itemName }
 			else
-				loreItemButton.tooltip = { LOREWALKER_ITEMS.LODESTONE.id, _G.USE }
+				loreItemButton.tooltip = { LOREWALKER_ITEMS.LODESTONE.ID, _G.USE }
 			end
 		end
 
@@ -1942,7 +1942,7 @@ end
 
 do
 	local function SetLoreItemCooldown(time)
-		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.id))
+		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.ID))
 	end
 
 	function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)

@@ -63,14 +63,14 @@ function private.AddRace(raceID)
 			sockets = 0,
 			tooltip = "",
 		},
-		id = raceID,
+		ID = raceID,
 		name = raceName,
 		texture = raceTexture,
 		keystone = {
-			id = keystoneItemID,
+			ID = keystoneItemID,
+			inventory = 0,
 			name = keystoneName,
 			texture = keystoneTexture,
-			inventory = 0
 		}
 	}, raceMetatable)
 
@@ -117,12 +117,12 @@ function Race:GetArtifactCompletionDataByName(artifactName)
 		return 0, 0, 0
 	end
 
-	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.id, artifactIndex)
+	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
 	return artifactIndex, firstCompletionTime, completionCount
 end
 
 function Race:IsOnArtifactBlacklist()
-	return private.db.artifact.blacklist[self.id]
+	return private.db.artifact.blacklist[self.ID]
 end
 
 function Race:KeystoneSocketOnClick(mouseButtonName)
@@ -138,14 +138,14 @@ function Race:KeystoneSocketOnClick(mouseButtonName)
 end
 
 function Race:UpdateCurrentProject()
-	if _G.GetNumArtifactsByRace(self.id) == 0 then
+	if _G.GetNumArtifactsByRace(self.ID) == 0 then
 		return
 	end
 
 	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
-		_G.ArchaeologyFrame_ShowArtifact(self.id)
+		_G.ArchaeologyFrame_ShowArtifact(self.ID)
 	end
-	_G.SetSelectedArtifact(self.id)
+	_G.SetSelectedArtifact(self.ID)
 
 	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
@@ -174,12 +174,12 @@ function Race:UpdateCurrentProject()
 	artifact.spellID = self.ArtifactSpellIDs[artifactName]
 	artifact.tooltip = spellDescription
 
-	self.keystone.inventory = _G.GetItemCount(self.keystone.id) or 0
+	self.keystone.inventory = _G.GetItemCount(self.keystone.ID) or 0
 
 	local keystoneInventory = self.keystone.inventory
 	local prevAdded = math.min(artifact.keystones_added, keystoneInventory, numSockets)
 
-	if private.db.artifact.autofill[self.id] then
+	if private.db.artifact.autofill[self.ID] then
 		prevAdded = math.min(keystoneInventory, numSockets)
 	end
 	artifact.keystones_added = math.min(keystoneInventory, numSockets)

@@ -344,11 +344,11 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Dig Sites"]), "LEFT", num_columns)
 				tooltip:AddSeparator()
 
-				for continent_id, continent_sites in pairs(private.continent_digsites) do
-					if #continent_sites > 0 and (not private.db.tooltip.filter_continent or continent_id == private.current_continent) then
+				for continentID, continentDigsites in pairs(private.continent_digsites) do
+					if #continentDigsites > 0 and (not private.db.tooltip.filter_continent or continentID == private.current_continent) then
 						local continent_name
 						for _, zone in pairs(ZONE_DATA) do
-							if zone.continent == continent_id and zone.id == 0 then
+							if zone.continent == continentID and zone.ID == 0 then
 								continent_name = zone.name
 								break
 							end
@@ -368,7 +368,7 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. _G.ARCHAEOLOGY_RUNE_STONES .. "|r", "CENTER", 1)
 						tooltip:SetCell(line, 10, _G.NORMAL_FONT_COLOR_CODE .. L["Keys"] .. "|r", "CENTER", 1)
 
-						for _, digsite in pairs(continent_sites) do
+						for _, digsite in pairs(continentDigsites) do
 							local race = digsite.race
 
 							line = tooltip:AddLine(" ")
