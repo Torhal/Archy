@@ -271,9 +271,15 @@ private.ZONE_DATA = ZONE_DATA
 
 local MAP_CONTINENTS = {} -- Popupated in Archy:OnEnable()
 
-local LOREWALKER_ITEMS = {
-	MAP = { ID = 87549, spell = 126957 },
-	LODESTONE = { ID = 87548, spell = 126956 },
+
+local LorewalkersLodestone = {
+	itemID = 87548,
+	spellID = 126956
+}
+
+local LorewalkersMap = {
+	itemID = 87549,
+	spellID = 126957
 }
 
 local FISHING_POLE_NAME
@@ -1361,40 +1367,40 @@ do
 			end
 		end
 
-		local lorewalkerMapCount = _G.GetItemCount(LOREWALKER_ITEMS.MAP.ID, false, false)
-		local lorewalkerLodeCount = _G.GetItemCount(LOREWALKER_ITEMS.LODESTONE.ID, false, false)
+		local lorewalkersMapCount = _G.GetItemCount(LorewalkersMap.itemID, false, false)
+		local lorewalkersLodestoneCount = _G.GetItemCount(LorewalkersLodestone.itemID, false, false)
 		local loreItemButton = DistanceIndicatorFrame.loritemButton
 
 		-- Prioritize map, since it affects Archy's lists. (randomize digsites)
-		if lorewalkerMapCount > 0 then
-			local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.MAP.ID))
+		if lorewalkersMapCount > 0 then
+			local itemName = _G.GetItemInfo(LorewalkersMap.itemID)
 			loreItemButton:SetAttribute("type1", "item")
 			loreItemButton:SetAttribute("item1", itemName)
 			loreItemButton:Enable()
 			loreItemButton.icon:SetDesaturated(false)
-			loreItemButton.tooltip = LOREWALKER_ITEMS.MAP.ID
+			loreItemButton.tooltip = LorewalkersMap.itemID
 
-			local start, duration, enable = _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.ID)
+			local start, duration, enable = _G.GetItemCooldown(LorewalkersMap.itemID)
 			if start > 0 and duration > 0 then
 				_G.CooldownFrame_SetTimer(loreItemButton.cooldown, start, duration, enable)
 			end
 		end
 
-		if lorewalkerLodeCount > 0 then
-			local itemName = (_G.GetItemInfo(LOREWALKER_ITEMS.LODESTONE.ID))
+		if lorewalkersLodestoneCount > 0 then
+			local itemName = _G.GetItemInfo(LorewalkersLodestone.itemID)
 			loreItemButton:SetAttribute("type2", "item")
 			loreItemButton:SetAttribute("item2", itemName)
 			loreItemButton:Enable()
 			loreItemButton.icon:SetDesaturated(false)
 
-			if lorewalkerMapCount > 0 then
-				loreItemButton.tooltip = { LOREWALKER_ITEMS.MAP.ID, itemName }
+			if lorewalkersMapCount > 0 then
+				loreItemButton.tooltip = { LorewalkersMap.itemID, itemName }
 			else
-				loreItemButton.tooltip = { LOREWALKER_ITEMS.LODESTONE.ID, _G.USE }
+				loreItemButton.tooltip = { LorewalkersLodestone.itemID, _G.USE }
 			end
 		end
 
-		if lorewalkerMapCount == 0 and lorewalkerLodeCount == 0 then
+		if lorewalkersMapCount == 0 and lorewalkersLodestoneCount == 0 then
 			loreItemButton:Disable()
 			loreItemButton.icon:SetDesaturated(true)
 			loreItemButton.tooltip = _G.BROWSE_NO_RESULTS
@@ -1942,21 +1948,21 @@ end
 
 do
 	local function SetLoreItemCooldown(time)
-		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LOREWALKER_ITEMS.MAP.ID))
+		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LorewalkersMap.itemID))
 	end
 
-	function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spell_id)
+	function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spellID)
 		if unit ~= "player" then
 			return
 		end
 
-		if spell_id == LOREWALKER_ITEMS.MAP.spell and event == "UNIT_SPELLCAST_SUCCEEDED" then
+		if spellID == LorewalkersMap.spellID and event == "UNIT_SPELLCAST_SUCCEEDED" then
 			if DistanceIndicatorFrame.loritemButton:IsShown() then
 				self:ScheduleTimer(SetLoreItemCooldown, 0.2)
 			end
 		end
 
-		if spell_id == private.CRATE_SPELL_ID then
+		if spellID == private.CRATE_SPELL_ID then
 			if private.busy_crating then
 				private.busy_crating = nil
 				self:ScheduleTimer("ScanBags", 1)
