@@ -753,8 +753,7 @@ function UpdateAllSites()
 				local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
 				local mc, fc = Astrolabe:GetMapID(continentID, 0)
 
-				-- TODO: Remove landmarkName check once LibBabble-Digsites-3.0 is gone.
-				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey] or DIGSITE_TEMPLATES[landmarkName]
+				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey]
 				if digsiteTemplate then
 					local digsite = private.Digsites[digsiteTemplate.blobID]
 					if not digsite then
@@ -766,10 +765,9 @@ function UpdateAllSites()
 
 					table.insert(sites, digsite)
 				else
-					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
-					local message = "Archy is missing data for dig site %s (key: %s blobID: %d)"
-					Archy:Printf(message, landmarkName, siteKey, blobID)
-					DebugPour(message, landmarkName, siteKey, blobID)
+					local message = "Archy is missing data for dig site %s (key: %s)"
+					Archy:Printf(message, landmarkName, siteKey)
+					DebugPour(message, landmarkName, siteKey)
 				end
 			end
 		end
