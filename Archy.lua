@@ -58,7 +58,7 @@ local PROFILE_DEFAULTS = {
 			enabled = true,
 			show = true,
 			stealthMode = false,
-			combathide = false,
+			combathide = true,
 			icon = {
 				hide = false
 			},
