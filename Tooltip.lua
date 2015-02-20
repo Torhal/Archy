@@ -177,28 +177,36 @@ end
 -- Helper functions.
 -----------------------------------------------------------------------
 local function GetAchievementProgress()
-	local rare, common = _G.NONE, _G.NONE
-	local rare_ach, common_ach = 4854, 5315 -- "I had it in my hand" (Title: Assistant Professor), "Digger"
-	local completed
+	local rareAchievementName, commonAchievementName = _G.NONE, _G.NONE
+	local rareAchievementID = 4854 -- "I had it in my hand" (Title: Assistant Professor)
+	local commonAchievementID =  5315 -- "Digger"
+	local _, achievementName, isCompleted, rewardText
 
 	-- local id, name, points, completed, month, day, year, description, flags, icon, rewardText = GetAchievementInfo(achID);
-	if select(4, _G.GetAchievementInfo(rare_ach)) then -- completed
-		rare = select(11, _G.GetAchievementInfo(rare_ach)) -- rewardText
-		rare_ach, completed = _G.GetNextAchievement(rare_ach)
-		while rare_ach and completed do
-			rare = select(11, _G.GetAchievementInfo(rare_ach))
-			rare_ach, completed = _G.GetNextAchievement(rare_ach)
+	_, achievementName, _, isCompleted, _, _, _, _, _, _, rewardText = _G.GetAchievementInfo(rareAchievementID)
+	if isCompleted then
+		rareAchievementName = rewardText
+		rareAchievementID, isCompleted = _G.GetNextAchievement(rareAchievementID)
+
+		while rareAchievementID and isCompleted do
+			_, _, _, isCompleted, _, _, _, _, _, _, rewardText = _G.GetAchievementInfo(rareAchievementID)
+			rareAchievementName = rewardText
+			rareAchievementID, isCompleted = _G.GetNextAchievement(rareAchievementID)
 		end
 	end
-	if select(4, _G.GetAchievementInfo(common_ach)) then -- completed
-		common = select(2, _G.GetAchievementInfo(common_ach)) -- name
-		common_ach, completed = _G.GetNextAchievement(common_ach)
-		while common_ach and completed do
-			common = select(2, _G.GetAchievementInfo(common_ach))
-			common_ach, completed = _G.GetNextAchievement(common_ach)
+
+	_, achievementName, _, isCompleted, _, _, _, _, _, _, rewardText = _G.GetAchievementInfo(commonAchievementID)
+	if isCompleted then
+		commonAchievementName = achievementName
+		commonAchievementID, isCompleted = _G.GetNextAchievement(commonAchievementID)
+
+		while commonAchievementID and isCompleted do
+			_, achievementName, _, isCompleted, _, _, _, _, _, _, rewardText = _G.GetAchievementInfo(commonAchievementID)
+			commonAchievementName = achievementName
+			commonAchievementID, isCompleted = _G.GetNextAchievement(commonAchievementID)
 		end
 	end
-	return rare:gsub("^.+:", ""):trim(), common
+	return rareAchievementName:gsub("^.+:", ""):trim(), commonAchievementName
 end
 
 local function GetArtifactsDelta(raceID, missing_data)
