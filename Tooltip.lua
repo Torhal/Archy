@@ -215,13 +215,12 @@ local function GetAchievementProgress()
 	return rareAchievementName:gsub("^.+:", ""):trim(), commonAchievementName
 end
 
-local function GetArtifactsDelta(raceID, missing_data)
+local function GetArtifactsDelta(race, missing_data)
 	local rare_count, common_count, total_count = 0, 0, 0
 	local rare_missing, common_missing, total_missing = 0, 0, 0
 
 	table.wipe(missing_data)
 
-	local race = private.Races[raceID]
 	local artifact = race.currentProject
 
 	if artifact.isRare then
@@ -234,7 +233,7 @@ local function GetArtifactsDelta(raceID, missing_data)
 
 	-- then remove the ones we've already solved at least once so we have the actual missing.
 	local artifact_index = 1
-	local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(raceID, artifact_index)
+	local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race.ID, artifact_index)
 
 	-- TODO: Maybe display "in progress" but not yet obtained artifacts different?
 	if artifactName and completionCount > 0 and missing_data[artifactName] then
@@ -243,7 +242,7 @@ local function GetArtifactsDelta(raceID, missing_data)
 	end
 
 	while artifactName do
-		artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(raceID, artifact_index)
+		artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race.ID, artifact_index)
 		if artifactName and completionCount > 0 and missing_data[artifactName] then
 			missing_data[artifactName] = nil
 		end
@@ -421,7 +420,7 @@ function Archy:LDBTooltipShow()
 
 				local all_rare_done, all_rare_count, all_common_done, all_common_count, all_total_done, all_total_count = 0, 0, 0, 0, 0, 0
 				for raceID, race in pairs(private.Races) do
-					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(raceID, missing_data)
+					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(race, missing_data)
 
 					if total_count > 0 then
 						line = tooltip:AddLine(" ")
@@ -465,7 +464,7 @@ function Archy:LDBTooltipShow()
 						tooltip:SetCell(line, 2, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_MISSING:format(_G.ITEM_QUALITY3_DESC) .. "|r", "LEFT", 1)
 						tooltip:SetCell(line, 3, _G.NORMAL_FONT_COLOR_CODE .. _G.ITEM_MISSING:format(_G.ITEM_QUALITY1_DESC) .. "|r", "LEFT", 2)
 
-						GetArtifactsDelta(raceID, missing_data)
+						GetArtifactsDelta(race, missing_data)
 
 						local start_line, end_line
 
