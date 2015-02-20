@@ -149,6 +149,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 
 		fs:SetFormattedText("%d / %d", data[1], data[2])
 	end
+
 	if perc > 0 then
 		bar:SetWidth(perc)
 		bar:SetVertexColor(self.r, self.g, self.b)
@@ -291,6 +292,7 @@ function Archy:LDBTooltipShow()
 				skill = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, "MAX")
 			end
 			tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.SKILL .. ": ", skill), "CENTER", num_columns)
+
 			if private.db.general.show then
 				line = tooltip:AddLine(".")
 				tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", num_columns)
@@ -414,14 +416,17 @@ function Archy:LDBTooltipShow()
 				local all_rare_done, all_rare_count, all_common_done, all_common_count, all_total_done, all_total_count = 0, 0, 0, 0, 0, 0
 				for raceID, race in pairs(private.Races) do
 					local rare_done, rare_count, common_done, common_count, total_done, total_count = GetArtifactsDelta(raceID, missing_data)
+
 					if total_count > 0 then
 						line = tooltip:AddLine(" ")
 						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
 						tooltip:SetCell(line, 2, race.name .. "*", "LEFT", 1)
-						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceID:" .. raceID)
 						tooltip:SetCell(line, 3, missing_data.rare_counts, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 5, missing_data.common_counts, Archy_cell_provider, 1, 0, 0)
 						tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
+
+						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceID:" .. raceID)
+
 						all_rare_done = all_rare_done + rare_done
 						all_rare_count = all_rare_count + rare_count
 						all_common_done = all_common_done + common_done
@@ -513,7 +518,7 @@ function Archy:LDBTooltipShow()
 
 	tooltip:Show()
 
-	if (tooltip:GetPoint()) then
+	if tooltip:GetPoint() then
 		tooltip:UpdateScrolling()
 	end
 end
@@ -553,12 +558,14 @@ function LDB_object:OnClick(button, down)
 		else
 			private.db.general.show = not private.db.general.show
 			Archy:LDBTooltipShow()
+
 			if private.db.general.show and private.db.general.stealthMode then
 				if not private.stealthWarned then
 					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session
 					private.stealthWarned = true
 				end
 			end
+
 			Archy:ConfigUpdated()
 		end
 	elseif button == "RightButton" then
