@@ -339,7 +339,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 261,
 		typeID = DigsiteType.Nightelf,
 	},
-	["1:Steps of Fate Digsite"] = {
+	["1:0.522736:0.937379"] = { -- Steps of Fate Digsite
 		blobID = 56595,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
