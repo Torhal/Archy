@@ -66,7 +66,8 @@ local current_tooltip_mode = TooltipMode.ArtifactDigsites
 local Archy_cell_provider, Archy_cell_prototype = QTip:CreateCellProvider()
 
 local function Archy_cell_script(_, what, button)
-	if what == "mode" then -- header was clicked, cycle display mode
+	-- header was clicked, cycle display mode
+	if what == "mode" then
 		local nextMode = current_tooltip_mode + 1
 		current_tooltip_mode = TOOLTIP_MODES[nextMode] and nextMode or TooltipMode.ArtifactDigsites
 	end
@@ -144,7 +145,8 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 		perc = math.min((data[1] / data[2]) * 100, 100)
 		local bar_colors = private.db.artifact.fragmentBarColors
 
-		if data[1] > 0 and data[1] == data[2] then -- all done
+		-- all done
+		if data[1] > 0 and data[1] == data[2] then
 			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
 		elseif data[1] > 0 and data[1] < data[2] then
 			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
@@ -185,7 +187,7 @@ end
 local function GetAchievementProgress()
 	local rareAchievementName, commonAchievementName = _G.NONE, _G.NONE
 	local rareAchievementID = 4854 -- "I had it in my hand" (Title: Assistant Professor)
-	local commonAchievementID =  5315 -- "Digger"
+	local commonAchievementID = 5315 -- "Digger"
 	local _, achievementName, isCompleted, rewardText
 
 	-- local id, name, points, completed, month, day, year, description, flags, icon, rewardText = GetAchievementInfo(achID);
@@ -263,6 +265,7 @@ local function GetArtifactsDelta(race, missing_data)
 
 	return rare_count - rare_missing, rare_count, common_count - common_missing, common_count, total_count - total_missing, total_count
 end
+
 local progress_data, missing_data = {}, {}
 
 function Archy:LDBTooltipShow()
