@@ -13,9 +13,6 @@ local tonumber = _G.tonumber
 local ADDON_NAME, private = ...
 
 local LibStub = _G.LibStub
-local DS = LibStub("LibBabble-DigSites-3.0"):GetLookupTable()
-
-local sessionErrors = {}
 
 -----------------------------------------------------------------------
 -- Constants
@@ -237,9 +234,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
-	[DS["Ruins of Ahmtul Digsite"]] = {
+	["1:Ruins of Ahmtul Digsite"] = {
 		blobID = 56607,
-		continentID = 1,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
@@ -265,7 +261,6 @@ local DIGSITE_TEMPLATES = {
 	},
 	["1:0.455915:0.877786"] = { -- Ruins of Khintaset Digsite
 		blobID = 56603,
-		continentID = 1,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
@@ -344,9 +339,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 261,
 		typeID = DigsiteType.Nightelf,
 	},
-	[DS["Steps of Fate Digsite"]] = {
+	["1:Steps of Fate Digsite"] = {
 		blobID = 56595,
-		continentID = 1,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
@@ -1201,9 +1195,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 857,
 		typeID = DigsiteType.Mogu,
 	},
-	[DS["Setting Sun Garrison Digsite"]] = {
+	["6:Setting Sun Garrison Digsite"] = {
 		blobID = 92020,
-		continentID = 6,
 		mapID = 811,
 		typeID = DigsiteType.Mogu,
 	},
@@ -1212,9 +1205,8 @@ local DIGSITE_TEMPLATES = {
 		mapID = 810,
 		typeID = DigsiteType.Mogu,
 	},
-	[DS["Shrine Meadow Digsite"]] = {
+	["6:Shrine Meadow Digsite"] = {
 		blobID = 67037,
-		continentID = 6,
 		mapID = 806,
 		typeID = DigsiteType.Pandaren,
 	},
@@ -1348,15 +1340,13 @@ local DIGSITE_TEMPLATES = {
 		mapID = 858,
 		typeID = DigsiteType.Mantid,
 	},
-	[DS["Veridian Grove Digsite"]] = {
+	["6:Veridian Grove Digsite"] = {
 		blobID = 67039,
-		continentID = 6,
 		mapID = 806,
 		typeID = DigsiteType.Pandaren,
 	},
-	[DS["West Old Village Digsite"]] = {
+	["6:West Old Village Digsite"] = {
 		blobID = 66989,
-		continentID = 6,
 		mapID = 809,
 		typeID = DigsiteType.Pandaren,
 	},
@@ -1671,8 +1661,7 @@ local CONTINENT_RACES = {}
 private.CONTINENT_RACES = CONTINENT_RACES
 
 for siteKey, site in pairs(DIGSITE_TEMPLATES) do
-	-- TODO: Remove check for continentID when removing LibBabble-Digsites-3.0
-	local continentID = site.continentID or tonumber(((":"):split(siteKey)))
+	local continentID = tonumber(((":"):split(siteKey)))
 	CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
 	CONTINENT_RACES[continentID][site.typeID] = true
 end
