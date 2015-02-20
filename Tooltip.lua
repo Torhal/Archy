@@ -39,10 +39,15 @@ local IsTaintable = private.IsTaintable
 local MAX_ARCHAEOLOGY_RANK = private.MAX_ARCHAEOLOGY_RANK
 local ZONE_DATA = private.ZONE_DATA
 
-local TOOLTIP_MODES = {
-	"artifacts_digsites",
-	"overall_completion"
+local TooltipMode = {
+	ArtifactDigsites = 1,
+	OverallCompletion = 2,
 }
+
+local TOOLTIP_MODES = {}
+for name, value in pairs(TooltipMode) do
+	TOOLTIP_MODES[value] = name
+end
 
 local COUNT_DESCRIPTORS = {
 	rare_counts = true,
@@ -53,7 +58,7 @@ local COUNT_DESCRIPTORS = {
 -----------------------------------------------------------------------
 -- Variables
 -----------------------------------------------------------------------
-local current_tooltip_mode = 1
+local current_tooltip_mode = TooltipMode.ArtifactDigsites
 
 -----------------------------------------------------------------------
 -- Tooltip cell provider.
@@ -62,8 +67,8 @@ local Archy_cell_provider, Archy_cell_prototype = QTip:CreateCellProvider()
 
 local function Archy_cell_script(_, what, button)
 	if what == "mode" then -- header was clicked, cycle display mode
-		local nextmode = current_tooltip_mode + 1
-		current_tooltip_mode = TOOLTIP_MODES[nextmode] and nextmode or 1
+		local nextMode = current_tooltip_mode + 1
+		current_tooltip_mode = TOOLTIP_MODES[nextMode] and nextMode or TooltipMode.ArtifactDigsites
 	end
 	local key, value = (":"):split(what)
 	value = tonumber(value)
@@ -115,7 +120,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	local fs = self.fs
 	local perc
 
-	if current_tooltip_mode == 1 then -- artifacts_digsites
+	if current_tooltip_mode == TooltipMode.ArtifactDigsites then
 		perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
 		local bar_colors = private.db.artifact.fragmentBarColors
 
@@ -135,7 +140,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 		end
 
 		fs:SetFormattedText("%d%s / %d", data.fragments, adjust, data.fragments_required)
-	elseif current_tooltip_mode == 2 then -- overall_completion
+	elseif current_tooltip_mode == TooltipMode.OverallCompletion then
 		perc = math.min((data[1] / data[2]) * 100, 100)
 		local bar_colors = private.db.artifact.fragmentBarColors
 
@@ -265,10 +270,10 @@ function Archy:LDBTooltipShow()
 	local num_columns
 	local tooltip = self.LDB_Tooltip
 
-	if current_tooltip_mode == 1 then -- artifacts_digsites
+	if current_tooltip_mode == TooltipMode.ArtifactDigsites then
 		num_columns = 10
 		tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT", "RIGHT", "RIGHT", "RIGHT", "RIGHT")
-	elseif current_tooltip_mode == 2 then -- overall_completion
+	elseif current_tooltip_mode == TooltipMode.OverallCompletion then
 		num_columns = 6
 		tooltip = QTip:Acquire("ArchyTooltip", num_columns, "CENTER", "LEFT", "LEFT", "LEFT", "RIGHT")
 	end
@@ -280,7 +285,7 @@ function Archy:LDBTooltipShow()
 	tooltip:SetCellScript(line, 1, "OnMouseDown", Archy_cell_script, "mode")
 
 	if HasArchaeology() then
-		if current_tooltip_mode == 1 then
+		if current_tooltip_mode == TooltipMode.ArtifactDigsites then
 			line = tooltip:AddLine(".")
 
 			local rank, maxRank = private.GetArchaeologyRank()
@@ -395,10 +400,11 @@ function Archy:LDBTooltipShow()
 					end
 				end
 			end
-		elseif current_tooltip_mode == 2 then
+		elseif current_tooltip_mode == TooltipMode.OverallCompletion then
+			local rareAchievementName, commonAchievementName = GetAchievementProgress()
+			local achiev = ("%s%s|r - %s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, rareAchievementName, _G.ITEM_QUALITY_COLORS[1].hex, commonAchievementName)
+
 			line = tooltip:AddLine(".")
-			local rare_achiev, common_achiev = GetAchievementProgress()
-			local achiev = ("%s%s|r - %s%s|r"):format(_G.ITEM_QUALITY_COLORS[3].hex, rare_achiev, _G.ITEM_QUALITY_COLORS[1].hex, common_achiev)
 			tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.ACHIEVEMENTS .. ": ", achiev), "CENTER", num_columns)
 
 			if private.db.general.show then
