@@ -704,14 +704,14 @@ function Archy:SocketClicked(keystone_button, mouseButtonName, down)
 end
 
 --[[ Dig Site List Functions ]] --
-local function CompareAndResetDigCounters(a, b)
-	if not a or not b or (#a == 0) or (#b == 0) then
+local function CompareAndResetDigCounters(digsiteListA, digsiteListB)
+	if not digsiteListA or not digsiteListB or (#digsiteListA == 0) or (#digsiteListB == 0) then
 		return
 	end
 
-	for _, siteA in pairs(a) do
+	for _, siteA in pairs(digsiteListA) do
 		local exists = false
-		for _, siteB in pairs(b) do
+		for _, siteB in pairs(digsiteListB) do
 			if siteA == siteB then
 				exists = true
 				break
