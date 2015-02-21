@@ -21,6 +21,7 @@ local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	[DigsiteType.Arakkoa] = {
 		[117354] = { -- Ancient Nest Guardian
+			isRare = true,
 			itemID = 117354,
 			spellID = 172460,
 		},
@@ -37,6 +38,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 168330,
 		},
 		[114207] = { -- Beakbreaker of Terokk
+			isRare = true,
 			itemID = 114207,
 			spellID = 168331,
 		},
@@ -79,6 +81,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90853,
 		},
 		[64456] = { -- Arrival of the Naaru
+			isRare = true,
 			itemID = 64456,
 			spellID = 90983,
 		},
@@ -111,6 +114,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90861,
 		},
 		[64457] = { -- The Last Relic of Argus
+			isRare = true,
 			itemID = 64457,
 			spellID = 90984,
 		},
@@ -121,6 +125,7 @@ local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	[DigsiteType.DraenorClans] = {
 		[116985] = { -- Headdress of the First Shaman
+			isRare = true,
 			itemID = 116985,
 			spellID = 139787,
 		},
@@ -169,6 +174,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 168291,
 		},
 		[117380] = { -- Frostwolf Ghostpup
+			isRare = true,
 			itemID = 117380,
 			spellID = 172466,
 		},
@@ -231,10 +237,12 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 86864,
 		},
 		[64373] = { -- Chalice of the Mountain Kings
+			isRare = true,
 			itemID = 64373,
 			spellID = 90553,
 		},
 		[64372] = { -- Clockwork Gnome
+			isRare = true,
 			itemID = 64372,
 			spellID = 90521,
 		},
@@ -303,6 +311,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91223,
 		},
 		[64489] = { -- Staff of Sorcerer-Thane Thaurissan
+			isRare = true,
 			itemID = 64489,
 			spellID = 91227,
 		},
@@ -311,6 +320,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 88180,
 		},
 		[64488] = { -- The Innkeeper's Daughter
+			isRare = true,
 			itemID = 64488,
 			spellID = 91226,
 		},
@@ -341,6 +351,7 @@ local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	[DigsiteType.Fossil] = {
 		[69776] = { -- Ancient Amber
+			isRare = true,
 			itemID = 69776,
 			spellID = 98560,
 		},
@@ -361,6 +372,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90432,
 		},
 		[69764] = { -- Extinct Turtle Shell
+			isRare = true,
 			itemID = 69764,
 			spellID = 98533,
 		},
@@ -369,10 +381,12 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90617,
 		},
 		[60955] = { -- Fossilized Hatchling
+			isRare = true,
 			itemID = 60955,
 			spellID = 89693,
 		},
 		[60954] = { -- Fossilized Raptor
+			isRare = true,
 			itemID = 60954,
 			spellID = 90619,
 		},
@@ -389,6 +403,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91089,
 		},
 		[69821] = { -- Pterrordax Hatchling
+			isRare = true,
 			itemID = 69821,
 			spellID = 98582,
 		},
@@ -435,6 +450,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 139783,
 		},
 		[95391] = { -- Mantid Sky Reaver
+			isRare = true,
 			itemID = 95391,
 			spellID = 139786,
 		},
@@ -447,6 +463,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 139782,
 		},
 		[95392] = { -- Sonic Pulse Generator
+			isRare = true,
 			itemID = 95392,
 			spellID = 139787,
 		},
@@ -461,10 +478,12 @@ local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	[DigsiteType.Mogu] = {
 		[89614] = { -- Anatomical Dummy
+			isRare = true,
 			itemID = 89614,
 			spellID = 113993,
 		},
 		[89611] = { -- Quilen Statuette
+			isRare = true,
 			itemID = 89611,
 			spellID = 113992,
 		},
@@ -515,6 +534,7 @@ local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	[DigsiteType.Nerubian] = {
 		[64481] = { -- Blessing of the Old God
+			isRare = true,
 			itemID = 64481,
 			spellID = 91214,
 		},
@@ -531,6 +551,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91188,
 		},
 		[64482] = { -- Puzzle Box of Yogg-Saron
+			isRare = true,
 			itemID = 64482,
 			spellID = 91215,
 		},
@@ -557,6 +578,7 @@ local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	[DigsiteType.Nightelf] = {
 		[64646] = { -- Bones of Transformation
+			isRare = true,
 			itemID = 64646,
 			spellID = 91761,
 		},
@@ -585,6 +607,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90458,
 		},
 		[64361] = { -- Druid and Priest Statue Set
+			isRare = true,
 			itemID = 64361,
 			spellID = 90493,
 		},
@@ -601,6 +624,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 89009,
 		},
 		[64358] = { -- Highborne Soul Mirror
+			isRare = true,
 			itemID = 64358,
 			spellID = 90464,
 		},
@@ -613,6 +637,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90451,
 		},
 		[64383] = { -- Kaldorei Wind Chimes
+			isRare = true,
 			itemID = 64383,
 			spellID = 90614,
 		},
@@ -621,6 +646,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 93441,
 		},
 		[64643] = { -- Queen Azshara's Dressing Gown
+			isRare = true,
 			itemID = 64643,
 			spellID = 90616,
 		},
@@ -645,6 +671,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90609,
 		},
 		[64645] = { -- Tyrande's Favorite Doll
+			isRare = true,
 			itemID = 64645,
 			spellID = 91757,
 		},
@@ -653,6 +680,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91769,
 		},
 		[64651] = { -- Wisp Amulet
+			isRare = true,
 			itemID = 64651,
 			spellID = 91773,
 		},
@@ -691,6 +719,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 168317,
 		},
 		[114195] = { -- Sorcerer-King Toe Ring
+			isRare = true,
 			itemID = 114195,
 			spellID = 168319,
 		},
@@ -707,6 +736,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 168309,
 		},
 		[114196] = { -- Warmaul of the Warmaul Chieftain
+			isRare = true,
 			itemID = 114196,
 			spellID = 168320,
 		},
@@ -729,6 +759,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90728,
 		},
 		[64644] = { -- Headdress of the First Shaman
+			isRare = true,
 			itemID = 64644,
 			spellID = 90843,
 		},
@@ -791,6 +822,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 113978,
 		},
 		[79907] = { -- Spear of Xuen
+			isRare = true,
 			itemID = 79907,
 			spellID = 113981,
 		},
@@ -803,6 +835,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 113972,
 		},
 		[79906] = { -- Umbrella of Chi-Ji
+			isRare = true,
 			itemID = 79906,
 			spellID = 113980,
 		},
@@ -829,6 +862,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91779,
 		},
 		[60847] = { -- Crawling Claw
+			isRare = true,
 			itemID = 60847,
 			spellID = 92137,
 		},
@@ -837,18 +871,22 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91785,
 		},
 		[64881] = { -- Pendant of the Scarab Storm
+			isRare = true,
 			itemID = 64881,
 			spellID = 92145,
 		},
 		[64904] = { -- Ring of the Boy Emperor
+			isRare = true,
 			itemID = 64904,
 			spellID = 92168,
 		},
 		[64883] = { -- Scepter of Azj'Aqir
+			isRare = true,
 			itemID = 64883,
 			spellID = 92148,
 		},
 		[64885] = { -- Scimitar of the Sirocco
+			isRare = true,
 			itemID = 64885,
 			spellID = 92163,
 		},
@@ -861,6 +899,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91780,
 		},
 		[64880] = { -- Staff of Ammunae
+			isRare = true,
 			itemID = 64880,
 			spellID = 92139,
 		},
@@ -911,6 +950,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90423,
 		},
 		[69777] = { -- Haunted War Drum
+			isRare = true,
 			itemID = 69777,
 			spellID = 98556,
 		},
@@ -931,6 +971,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90558,
 		},
 		[69824] = { -- Voodoo Figurine
+			isRare = true,
 			itemID = 69824,
 			spellID = 98588,
 		},
@@ -939,6 +980,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 88262,
 		},
 		[64377] = { -- Zin'rokh, Destroyer of Worlds
+			isRare = true,
 			itemID = 64377,
 			spellID = 90608,
 		},
@@ -961,6 +1003,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 90988,
 		},
 		[64460] = { -- Nifflevar Bearded Axe
+			isRare = true,
 			itemID = 64460,
 			spellID = 90997,
 		},
@@ -973,6 +1016,7 @@ local ARTIFACT_TEMPLATES = {
 			spellID = 91084,
 		},
 		[69775] = { -- Vrykul Drinking Horn
+			isRare = true,
 			itemID = 69775,
 			spellID = 98569,
 		},
