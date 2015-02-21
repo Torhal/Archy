@@ -223,15 +223,15 @@ local function GetArtifactsDelta(race, missing_data)
 
 	table.wipe(missing_data)
 
-	local artifact = race.currentProject
+	for artifactName, artifact in pairs(race.Artifacts) do
+		if artifact.isRare then
+			rare_count = rare_count + 1
+		else
+			common_count = common_count + 1
+		end
+		total_count = total_count + 1
+		missing_data[artifactName] = artifact
 
-	if artifact.isRare then
-		rare_count = rare_count + 1
-	else
-		common_count = common_count + 1
-	end
-	total_count = total_count + 1
-	missing_data[artifact.name] = artifact
 
 	-- then remove the ones we've already solved at least once so we have the actual missing.
 	local artifact_index = 1
@@ -249,6 +249,7 @@ local function GetArtifactsDelta(race, missing_data)
 			missing_data[artifactName] = nil
 		end
 		artifact_index = artifact_index + 1
+	end
 	end
 
 	for artifactName, artifact in pairs(missing_data) do
