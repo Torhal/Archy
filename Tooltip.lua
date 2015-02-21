@@ -233,23 +233,23 @@ local function GetArtifactsDelta(race, missing_data)
 		missing_data[artifactName] = artifact
 
 
-	-- then remove the ones we've already solved at least once so we have the actual missing.
-	local artifact_index = 1
-	local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race.ID, artifact_index)
+		-- then remove the ones we've already solved at least once so we have the actual missing.
+		local artifact_index = 1
+		local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race.ID, artifact_index)
 
-	-- TODO: Maybe display "in progress" but not yet obtained artifacts different?
-	if artifactName and completionCount > 0 and missing_data[artifactName] then
-		missing_data[artifactName] = nil
-		artifact_index = artifact_index + 1
-	end
-
-	while artifactName do
-		artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race.ID, artifact_index)
+		-- TODO: Maybe display "in progress" but not yet obtained artifacts different?
 		if artifactName and completionCount > 0 and missing_data[artifactName] then
 			missing_data[artifactName] = nil
+			artifact_index = artifact_index + 1
 		end
-		artifact_index = artifact_index + 1
-	end
+
+		while artifactName do
+			artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(race.ID, artifact_index)
+			if artifactName and completionCount > 0 and missing_data[artifactName] then
+				missing_data[artifactName] = nil
+			end
+			artifact_index = artifact_index + 1
+		end
 	end
 
 	for artifactName, artifact in pairs(missing_data) do
