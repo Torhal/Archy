@@ -203,18 +203,10 @@ end
 -- Local helper functions
 -----------------------------------------------------------------------
 local function ToggleDigsiteVisibility(show)
-	if show then
-		_G.WorldMapArchaeologyDigSites:Show()
-	else
-		_G.WorldMapArchaeologyDigSites:Hide()
-	end
+	_G.WorldMapArchaeologyDigSites[show and "Show" or "Hide"](_G.WorldMapArchaeologyDigSites)
 
 	if BattlefieldMinimapDigsites then
-		if show then
-			BattlefieldMinimapDigsites:Show()
-		else
-			BattlefieldMinimapDigsites:Hide()
-		end
+		BattlefieldMinimapDigsites[show and "Show" or "Hide"](BattlefieldMinimapDigsites)
 	end
 end
 
