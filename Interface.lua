@@ -50,6 +50,23 @@ local function FontString_SetShadow(fs, hasShadow)
 	end
 end
 
+function private:ResetFramePositions()
+	local defaultSettings = private.DEFAULT_SETTINGS.profile
+	local settings = Archy.db.profile
+
+	settings.digsite.distanceIndicator.position = { unpack(defaultSettings.digsite.distanceIndicator.position) }
+	settings.digsite.distanceIndicator.anchor = defaultSettings.digsite.distanceIndicator.anchor
+	settings.digsite.distanceIndicator.undocked = defaultSettings.digsite.distanceIndicator.undocked
+	settings.digsite.position = { unpack(defaultSettings.digsite.position) }
+	settings.digsite.anchor = defaultSettings.digsite.anchor
+
+	settings.artifact.position = { unpack(defaultSettings.artifact.position) }
+	settings.artifact.anchor = defaultSettings.artifact.anchor
+
+	Archy:ConfigUpdated()
+	Archy:UpdateFramePositions()
+end
+
 local ArtifactFrame
 local DigSiteFrame
 local DistanceIndicatorFrame

@@ -90,7 +90,7 @@ local function GetGeneralOptions()
 					desc = L["Reset the window positions to defaults"],
 					type = "execute",
 					func = function()
-						private:ResetPositions()
+						private:ResetFramePositions()
 					end,
 				},
 				lock = {

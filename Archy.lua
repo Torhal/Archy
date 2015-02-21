@@ -285,23 +285,6 @@ end
 
 private.IsTaintable = IsTaintable
 
-function private:ResetPositions()
-	local defaultSettings = private.DEFAULT_SETTINGS.profile
-	local settings = Archy.db.profile
-
-	settings.digsite.distanceIndicator.position = { unpack(defaultSettings.digsite.distanceIndicator.position) }
-	settings.digsite.distanceIndicator.anchor = defaultSettings.digsite.distanceIndicator.anchor
-	settings.digsite.distanceIndicator.undocked = defaultSettings.digsite.distanceIndicator.undocked
-	settings.digsite.position = { unpack(defaultSettings.digsite.position) }
-	settings.digsite.anchor = defaultSettings.digsite.anchor
-
-	settings.artifact.position = { unpack(defaultSettings.artifact.position) }
-	settings.artifact.anchor = defaultSettings.artifact.anchor
-
-	Archy:ConfigUpdated()
-	Archy:UpdateFramePositions()
-end
-
 local function SolveRaceArtifact(raceID, useStones)
 	-- The check for raceID exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
 	if raceID then
@@ -968,7 +951,7 @@ local SUBCOMMAND_FUNCS = {
 	[L["nearest"]:lower()] = AnnounceNearestSite,
 	[L["closest"]:lower()] = AnnounceNearestSite,
 	[L["reset"]:lower()] = function()
-		private:ResetPositions()
+		private:ResetFramePositions()
 	end,
 	[_G.MINIMAP_LABEL:lower()] = function()
 		private.db.minimap.show = not private.db.minimap.show
