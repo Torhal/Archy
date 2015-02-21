@@ -15,7 +15,7 @@ local DigsiteType = private.DigsiteType
 
 -- Extracted from ResearchProject.dbc
 -- ItemIDs from wowhead (haven't found a lookup table in the dbcs yet)
-local ARTIFACTS = {
+local ARTIFACT_TEMPLATES = {
 	-----------------------------------------------------------------------
 	-- Arakkoa
 	-----------------------------------------------------------------------
@@ -979,4 +979,4 @@ local ARTIFACTS = {
 	},
 }
 
-private.ARTIFACTS = ARTIFACTS
+private.ARTIFACT_TEMPLATES = ARTIFACT_TEMPLATES

@@ -88,7 +88,7 @@ function private.AddRace(raceID)
 		Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 
-	for itemID, data in pairs(private.ARTIFACTS[raceID]) do
+	for itemID, data in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
 		local artifactName = _G.GetItemInfo(itemID)
 		if artifactName then
 			race.ArtifactItemIDs[artifactName] = data.itemID
