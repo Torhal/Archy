@@ -602,46 +602,47 @@ function Archy:UpdateSiteDistances()
 	table.sort(continentDigsites, private.db.digsite.sortByDistance and SortSitesByDistance or SortSitesByZoneNameAndName)
 end
 
---[[ Minimap Functions ]] --
-local lastNearestSite
+do
+	local lastUpdatedDigsite
 
-function UpdateMinimapIcons(isForced)
-	if not HasArchaeology() or _G.WorldMapButton:IsVisible() or (lastNearestSite == nearestDigsite and not isForced) then
-		return
-	end
+	function UpdateMinimapIcons(isForced)
+		if not HasArchaeology() or _G.WorldMapButton:IsVisible() or (lastUpdatedDigsite == nearestDigsite and not isForced) then
+			return
+		end
 
-	lastNearestSite = nearestDigsite
+		lastUpdatedDigsite = nearestDigsite
 
-	if not playerLocation.x and not playerLocation.y then
-		return
-	end
+		if not playerLocation.x and not playerLocation.y then
+			return
+		end
 
-	local continentDigsites = continent_digsites[private.current_continent]
-	if not continentDigsites then
-		return
-	end
+		local continentDigsites = continent_digsites[private.current_continent]
+		if not continentDigsites then
+			return
+		end
 
-	local canShow = private.db.general.show and private.db.minimap.show
+		local canShow = private.db.general.show and private.db.minimap.show
 
-	for _, digsite in pairs(continentDigsites) do
-		if canShow then
-			if nearestDigsite == digsite or not private.db.minimap.nearest then
-				digsite:EnableMapIcon()
+		for _, digsite in pairs(continentDigsites) do
+			if canShow then
+				if nearestDigsite == digsite or not private.db.minimap.nearest then
+					digsite:EnableMapIcon()
+				else
+					digsite:DisableMapIcon()
+				end
+
+				if nearestDigsite == digsite and private.db.minimap.fragmentNodes then
+					digsite:EnableSurveyNodes()
+				else
+					digsite:DisableSurveyNodes()
+				end
 			else
 				digsite:DisableMapIcon()
-			end
-
-			if nearestDigsite == digsite and private.db.minimap.fragmentNodes then
-				digsite:EnableSurveyNodes()
-			else
 				digsite:DisableSurveyNodes()
 			end
-		else
-			digsite:DisableMapIcon()
-			digsite:DisableSurveyNodes()
 		end
 	end
-end
+end -- do-block
 
 function Archy:OnInitialize()
 	private.isLoading = true
