@@ -170,19 +170,25 @@ function Race:UpdateCurrentProject()
 	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
 
+	local _, completionCount
 	local artifact = self.currentProject
-	if not private.isLoading and artifact.name ~= artifactName then
-		artifact.hasAnnounced = nil
-		artifact.hasPinged = nil
+	if artifactName and artifactName ~= "" and artifact.name and artifact.name ~= "" and artifact.name ~= artifactName then
+		if not private.isLoading then
+			artifact.hasAnnounced = nil
+			artifact.hasPinged = nil
 
-		local _, _, completionCount = self:GetArtifactCompletionDataByName(artifact.name)
-		Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
+			_, _, completionCount = self:GetArtifactCompletionDataByName(artifact.name)
+			Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
+		end
+	else
+		_, _, completionCount = self:GetArtifactCompletionDataByName(artifactName)
 	end
+
 
 	artifact.canSolve = _G.CanSolveArtifact()
 	artifact.canSolveInventory = nil
 	artifact.canSolveStone = nil
-	artifact.completionCount = 0
+	artifact.completionCount = completionCount
 	artifact.fragments = baseFragments
 	artifact.fragments_required = totalFragments
 	artifact.icon = icon
