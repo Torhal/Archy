@@ -566,7 +566,7 @@ local function SortSitesByZoneNameAndName(a, b)
 end
 
 function Archy:UpdateSiteDistances()
-	local continentDigsites = continent_digsites[private.current_continent]
+	local continentDigsites = continent_digsites[private.CurrentContinentID]
 	if not continentDigsites or #continentDigsites == 0 then
 		nearestDigsite = nil
 		return
@@ -616,7 +616,7 @@ do
 			return
 		end
 
-		local continentDigsites = continent_digsites[private.current_continent]
+		local continentDigsites = continent_digsites[private.CurrentContinentID]
 		if not continentDigsites then
 			return
 		end
@@ -895,7 +895,7 @@ function Archy:OnEnable()
 	end
 
 	_G.SetMapToCurrentZone()
-	private.current_continent = _G.GetCurrentMapContinent()
+	private.CurrentContinentID = _G.GetCurrentMapContinent()
 	UpdateAllSites()
 
 	playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y = Astrolabe:GetCurrentPlayerPosition()
@@ -1164,7 +1164,7 @@ do
 end -- do-block
 
 function Archy:UpdateSkillBar()
-	if not ArtifactFrame.skillBar or not private.current_continent or not HasArchaeology() then
+	if not ArtifactFrame.skillBar or not private.CurrentContinentID or not HasArchaeology() then
 		return
 	end
 
@@ -1204,19 +1204,19 @@ function Archy:UpdatePlayerPosition(force)
 	end
 	local continentID = _G.GetCurrentMapContinent()
 
-	if private.current_continent == continentID then
+	if private.CurrentContinentID == continentID then
 		if force then
-			if private.current_continent then
+			if private.CurrentContinentID then
 				UpdateAllSites()
 				DistanceIndicatorFrame:Toggle()
 			elseif not continentID then
-				-- Edge case where continent and private.current_continent are both nil
+				-- Edge case where continent and private.CurrentContinentID are both nil
 				self:ScheduleTimer("UpdatePlayerPosition", 1, true)
 			end
 		end
 		return
 	end
-	private.current_continent = continentID
+	private.CurrentContinentID = continentID
 
 	if force then
 		DistanceIndicatorFrame:Toggle()
@@ -1390,7 +1390,7 @@ do
 end
 
 function Archy:ARTIFACT_DIG_SITE_UPDATED()
-	if not private.current_continent then
+	if not private.CurrentContinentID then
 		return
 	end
 	UpdateAllSites()
@@ -1421,7 +1421,7 @@ end
 function Archy:BAG_UPDATE_DELAYED()
 	self:ScanBags()
 
-	if not private.current_continent or not keystoneLootRaceID then
+	if not private.CurrentContinentID or not keystoneLootRaceID then
 		return
 	end
 	private.Races[keystoneLootRaceID]:UpdateCurrentProject()
@@ -1475,7 +1475,7 @@ do
 end -- do-block
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
-	if not private.current_continent then
+	if not private.CurrentContinentID then
 		return
 	end
 

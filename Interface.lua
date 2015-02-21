@@ -35,7 +35,7 @@ local NUM_DIGSITE_FINDS_DRAENOR = 9
 -- Helpers.
 -----------------------------------------------------------------------
 local function FramesShouldBeHidden()
-	return (not private.db.general.show or not private.current_continent or private.current_continent == -1 or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.HasArchaeology())
+	return (not private.db.general.show or not private.CurrentContinentID or private.CurrentContinentID == -1 or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.HasArchaeology())
 end
 
 private.FramesShouldBeHidden = FramesShouldBeHidden
@@ -100,7 +100,7 @@ do
 
 			child:SetID(raceID)
 
-			local continentHasRace = private.CONTINENT_RACES[private.current_continent][raceID]
+			local continentHasRace = private.CONTINENT_RACES[private.CurrentContinentID][raceID]
 			if not race:IsOnArtifactBlacklist() and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
 				child:ClearAllPoints()
 
@@ -524,7 +524,7 @@ do
 			end
 		end
 
-		local continentID = private.current_continent
+		local continentID = private.CurrentContinentID
 		local continentDigsites = private.continent_digsites
 
 		local canShow = not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0
@@ -868,7 +868,7 @@ function Archy:RefreshDigSiteDisplay()
 	if FramesShouldBeHidden() then
 		return
 	end
-	local continentID = private.current_continent
+	local continentID = private.CurrentContinentID
 	local continentDigsites = private.continent_digsites
 
 	if not continentID or not continentDigsites[continentID] or #continentDigsites[continentID] == 0 then

@@ -317,7 +317,7 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 				for raceID, race in pairs(private.Races) do
-					local continentHasRace = not private.db.tooltip.filter_continent or private.CONTINENT_RACES[private.current_continent][raceID]
+					local continentHasRace = not private.db.tooltip.filter_continent or private.CONTINENT_RACES[private.CurrentContinentID][raceID]
 					local artifact = race.currentProject
 
 					if continentHasRace and artifact.fragments_required > 0 then
@@ -363,7 +363,7 @@ function Archy:LDBTooltipShow()
 				tooltip:AddSeparator()
 
 				for continentID, continentDigsites in pairs(private.continent_digsites) do
-					if #continentDigsites > 0 and (not private.db.tooltip.filter_continent or continentID == private.current_continent) then
+					if #continentDigsites > 0 and (not private.db.tooltip.filter_continent or continentID == private.CurrentContinentID) then
 						local continent_name
 						for _, zone in pairs(ZONE_DATA) do
 							if zone.continentID == continentID and zone.ID == 0 then
