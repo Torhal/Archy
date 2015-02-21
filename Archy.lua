@@ -599,21 +599,6 @@ function Archy:ShowArchaeology()
 	end
 end
 
--- extract the itemid from the itemlink
-local function GetIDFromLink(link)
-	if not link then
-		return
-	end
-	local found, _, str = link:find("^|c%x+|H(.+)|h%[.+%]")
-
-	if not found then
-		return
-	end
-
-	local _, ID = (":"):split(str)
-	return tonumber(ID)
-end
-
 local CONFIG_UPDATE_FUNCTIONS = {
 	artifact = function(option)
 		if option == "autofill" then
@@ -1507,6 +1492,23 @@ function Archy:UpdateTracking()
 end
 
 -------------------------------------------------------------------------------
+-- Event handler helpers.
+-------------------------------------------------------------------------------
+local function GetItemIDFromLink(link)
+	if not link then
+		return
+	end
+	local found, _, str = link:find("^|c%x+|H(.+)|h%[.+%]")
+
+	if not found then
+		return
+	end
+
+	local _, ID = (":"):split(str)
+	return tonumber(ID)
+end
+
+-------------------------------------------------------------------------------
 -- Event handlers.
 -------------------------------------------------------------------------------
 function Archy:ADDON_LOADED(event, addonName)
@@ -1685,7 +1687,7 @@ do
 		if not itemLink then
 			return
 		end
-		local itemID = GetIDFromLink(itemLink)
+		local itemID = GetItemIDFromLink(itemLink)
 		local raceID = keystoneIDToRaceID[itemID]
 
 		if raceID then
@@ -1791,7 +1793,7 @@ do
 				local itemLink = _G.GetLootSlotLink(slotID)
 
 				if itemLink then
-					local itemID = GetIDFromLink(itemLink)
+					local itemID = GetItemIDFromLink(itemLink)
 
 					if itemID and (keystoneIDToRaceID[itemID] or QUEST_ITEM_IDS[itemID]) then
 						_G.LootSlot(slotID)
