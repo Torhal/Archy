@@ -102,14 +102,14 @@ local digsitesTrackingID -- set in Archy:OnEnable()
 local lastSite
 local nearestSite
 
-local player_position = {
+local playerLocation = {
 	mapID = 0,
 	level = 0,
 	x = 0,
 	y = 0
 }
 
-local survey_location = {
+local surveyLocation = {
 	mapID = 0,
 	level = 0,
 	x = 0,
@@ -580,7 +580,7 @@ function Archy:UpdateSiteDistances()
 		if digsite.mapIconFrame:IsShown() then
 			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.mapIconFrame)
 		else
-			digsite.distance = Astrolabe:ComputeDistance(player_position.mapID, player_position.level, player_position.x, player_position.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
+			digsite.distance = Astrolabe:ComputeDistance(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
 		if digsite.coordX and digsite.distance and not digsite:IsBlacklisted() and (not distance or digsite.distance < distance) then
@@ -613,7 +613,7 @@ function UpdateMinimapIcons(isForced)
 
 	lastNearestSite = nearestSite
 
-	if not player_position.x and not player_position.y then
+	if not playerLocation.x and not playerLocation.y then
 		return
 	end
 
@@ -898,7 +898,7 @@ function Archy:OnEnable()
 	private.current_continent = _G.GetCurrentMapContinent()
 	UpdateAllSites()
 
-	player_position.mapID, player_position.level, player_position.x, player_position.y = Astrolabe:GetCurrentPlayerPosition()
+	playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y = Astrolabe:GetCurrentPlayerPosition()
 
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 	private.isLoading = false
@@ -1193,12 +1193,12 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	if force or player_position.x ~= mapX or player_position.y ~= mapY or player_position.mapID ~= mapID or player_position.level ~= mapLevel then
-		player_position.x, player_position.y, player_position.mapID, player_position.level = mapX, mapY, mapID, mapLevel
+	if force or playerLocation.x ~= mapX or playerLocation.y ~= mapY or playerLocation.mapID ~= mapID or playerLocation.level ~= mapLevel then
+		playerLocation.x, playerLocation.y, playerLocation.mapID, playerLocation.level = mapX, mapY, mapID, mapLevel
 
 		self:UpdateSiteDistances()
 
-		DistanceIndicatorFrame:Update(mapID, mapLevel, mapX, mapY, survey_location.mapID, survey_location.level, survey_location.x, survey_location.y)
+		DistanceIndicatorFrame:Update(mapID, mapLevel, mapX, mapY, surveyLocation.mapID, surveyLocation.level, surveyLocation.x, surveyLocation.y)
 		UpdateMinimapIcons()
 		self:RefreshDigSiteDisplay()
 	end
@@ -1320,16 +1320,16 @@ do
 		end
 
 		if not nearestSite then
-			survey_location.mapID = 0
-			survey_location.level = 0
-			survey_location.x = 0
-			survey_location.y = 0
+			surveyLocation.mapID = 0
+			surveyLocation.level = 0
+			surveyLocation.x = 0
+			surveyLocation.y = 0
 			return
 		end
-		survey_location.level = player_position.level
-		survey_location.mapID = player_position.mapID
-		survey_location.x = player_position.x
-		survey_location.y = player_position.y
+		surveyLocation.level = playerLocation.level
+		surveyLocation.mapID = playerLocation.mapID
+		surveyLocation.x = playerLocation.x
+		surveyLocation.y = playerLocation.y
 
 		lastSite = nearestSite
 		lastSite.stats.surveys = lastSite.stats.surveys + 1
@@ -1490,13 +1490,13 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 				lastSite.stats.looted = lastSite.stats.looted + 1
 				lastSite.stats.fragments = lastSite.stats.fragments + diff
 
-				lastSite:AddSurveyNode(player_position.mapID, player_position.level, player_position.x, player_position.y)
+				lastSite:AddSurveyNode(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y)
 			end
 
-			survey_location.mapID = 0
-			survey_location.level = 0
-			survey_location.x = 0
-			survey_location.y = 0
+			surveyLocation.mapID = 0
+			surveyLocation.level = 0
+			surveyLocation.x = 0
+			surveyLocation.y = 0
 
 			UpdateMinimapIcons(true)
 			self:RefreshDigSiteDisplay()
