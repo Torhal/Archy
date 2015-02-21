@@ -99,7 +99,7 @@ local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in Archy:OnEnable()
 
-local nearestSite
+local nearestDigsite
 
 local playerLocation = {
 	mapID = 0,
@@ -255,24 +255,24 @@ do
 	end
 end -- do-block
 
-local function AnnounceNearestSite()
-	if not nearestSite or not nearestSite.distance then
+local function AnnounceNearestDigsite()
+	if not nearestDigsite or not nearestDigsite.distance then
 		return
 	end
-	local site_name = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.name)
-	local site_zone = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestSite.zoneName)
+	local digsiteName = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestDigsite.name)
+	local digsiteZoneName = ("%s%s|r"):format(_G.GREEN_FONT_COLOR_CODE, nearestDigsite.zoneName)
 
-	Archy:Pour(L["Nearest Dig Site is: %s in %s (%.1f yards away)"]:format(site_name, site_zone, nearestSite.distance), 1, 1, 1)
+	Archy:Pour(L["Nearest Dig Site is: %s in %s (%.1f yards away)"]:format(digsiteName, digsiteZoneName, nearestDigsite.distance), 1, 1, 1)
 end
 
 -- returns the rank and max rank for the players archaeology skill
 local function GetArchaeologyRank()
-	local _, _, archaeology_index = _G.GetProfessions()
+	local _, _, archaeologyIndex = _G.GetProfessions()
 
-	if not archaeology_index then
+	if not archaeologyIndex then
 		return
 	end
-	local _, _, rank, maxRank = _G.GetProfessionInfo(archaeology_index)
+	local _, _, rank, maxRank = _G.GetProfessionInfo(archaeologyIndex)
 	return rank, maxRank
 end
 
@@ -413,7 +413,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 				_G.TomTom.profile.arrow.enablePing = db.tomtom.ping
 			end
 		end
-		TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestDigsite)
 	end,
 }
 
@@ -433,7 +433,7 @@ function Archy:ConfigUpdated(namespace, option)
 		UpdateMinimapIcons(true)
 		SuspendClickToMove()
 
-		TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestDigsite)
 	end
 end
 
@@ -568,10 +568,10 @@ end
 function Archy:UpdateSiteDistances()
 	local continentDigsites = continent_digsites[private.current_continent]
 	if not continentDigsites or #continentDigsites == 0 then
-		nearestSite = nil
+		nearestDigsite = nil
 		return
 	end
-	local distance, nearest
+	local closestDistance, closestDigsite
 
 	for index = 1, #continentDigsites do
 		local digsite = continentDigsites[index]
@@ -582,20 +582,20 @@ function Archy:UpdateSiteDistances()
 			digsite.distance = Astrolabe:ComputeDistance(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
-		if digsite.coordX and digsite.distance and not digsite:IsBlacklisted() and (not distance or digsite.distance < distance) then
-			distance = digsite.distance
-			nearest = digsite
+		if digsite.coordX and digsite.distance and not digsite:IsBlacklisted() and (not closestDistance or digsite.distance < closestDistance) then
+			closestDistance = digsite.distance
+			closestDigsite = digsite
 		end
 	end
 
-	if nearest and nearestSite ~= nearest then
-		nearestSite = nearest
+	if closestDigsite and nearestDigsite ~= closestDigsite then
+		nearestDigsite = closestDigsite
 		TomTomHandler.isActive = true
-		TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestDigsite)
 		UpdateMinimapIcons()
 
 		if private.db.digsite.announceNearest and private.db.general.show then
-			AnnounceNearestSite()
+			AnnounceNearestDigsite()
 		end
 	end
 
@@ -606,11 +606,11 @@ end
 local lastNearestSite
 
 function UpdateMinimapIcons(isForced)
-	if not HasArchaeology() or _G.WorldMapButton:IsVisible() or (lastNearestSite == nearestSite and not isForced) then
+	if not HasArchaeology() or _G.WorldMapButton:IsVisible() or (lastNearestSite == nearestDigsite and not isForced) then
 		return
 	end
 
-	lastNearestSite = nearestSite
+	lastNearestSite = nearestDigsite
 
 	if not playerLocation.x and not playerLocation.y then
 		return
@@ -625,13 +625,13 @@ function UpdateMinimapIcons(isForced)
 
 	for _, digsite in pairs(continentDigsites) do
 		if canShow then
-			if nearestSite == digsite or not private.db.minimap.nearest then
+			if nearestDigsite == digsite or not private.db.minimap.nearest then
 				digsite:EnableMapIcon()
 			else
 				digsite:DisableMapIcon()
 			end
 
-			if nearestSite == digsite and private.db.minimap.fragmentNodes then
+			if nearestDigsite == digsite and private.db.minimap.fragmentNodes then
 				digsite:EnableSurveyNodes()
 			else
 				digsite:DisableSurveyNodes()
@@ -947,8 +947,8 @@ local SUBCOMMAND_FUNCS = {
 	[L["solve stone"]:lower()] = function()
 		Archy:SolveAnyArtifact(true)
 	end,
-	[L["nearest"]:lower()] = AnnounceNearestSite,
-	[L["closest"]:lower()] = AnnounceNearestSite,
+	[L["nearest"]:lower()] = AnnounceNearestDigsite,
+	[L["closest"]:lower()] = AnnounceNearestDigsite,
 	[L["reset"]:lower()] = function()
 		private:ResetFramePositions()
 	end,
@@ -958,7 +958,7 @@ local SUBCOMMAND_FUNCS = {
 	end,
 	tomtom = function()
 		private.db.tomtom.enabled = not private.db.tomtom.enabled
-		TomTomHandler:Refresh(nearestSite)
+		TomTomHandler:Refresh(nearestDigsite)
 	end,
 	test = function()
 		ArtifactFrame:SetBackdropBorderColor(1, 1, 1, 0.5)
@@ -1222,7 +1222,7 @@ function Archy:UpdatePlayerPosition(force)
 	end
 
 	TomTomHandler:ClearWaypoint()
-	TomTomHandler:Refresh(nearestSite)
+	TomTomHandler:Refresh(nearestDigsite)
 
 	UpdateAllSites()
 
@@ -1323,7 +1323,7 @@ do
 			DisableProgressBar = nil
 		end
 
-		if not nearestSite then
+		if not nearestDigsite then
 			surveyLocation.mapID = 0
 			surveyLocation.level = 0
 			surveyLocation.x = 0
@@ -1335,7 +1335,7 @@ do
 		surveyLocation.x = playerLocation.x
 		surveyLocation.y = playerLocation.y
 
-		currentDigsite = nearestSite
+		currentDigsite = nearestDigsite
 		currentDigsite.stats.surveys = currentDigsite.stats.surveys + 1
 		currentDigsite.stats.counter = numFindsCompleted
 
