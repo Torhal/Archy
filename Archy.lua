@@ -99,7 +99,6 @@ local keystoneIDToRaceID = {}
 local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in Archy:OnEnable()
 
-local lastSite
 local nearestSite
 
 local playerLocation = {
@@ -1264,6 +1263,11 @@ function Archy:UpdateTracking()
 end
 
 -------------------------------------------------------------------------------
+-- Event handler data.
+-------------------------------------------------------------------------------
+local currentDigsite
+
+-------------------------------------------------------------------------------
 -- Event handler helpers.
 -------------------------------------------------------------------------------
 local function GetItemIDFromLink(link)
@@ -1306,7 +1310,7 @@ do
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
 		DistanceIndicatorFrame.isActive = false
 		DistanceIndicatorFrame:Toggle()
-		lastSite.stats.counter = numFindsCompleted
+		currentDigsite.stats.counter = numFindsCompleted
 	end
 
 	local function SetSurveyCooldown(time)
@@ -1331,9 +1335,9 @@ do
 		surveyLocation.x = playerLocation.x
 		surveyLocation.y = playerLocation.y
 
-		lastSite = nearestSite
-		lastSite.stats.surveys = lastSite.stats.surveys + 1
-		lastSite.stats.counter = numFindsCompleted
+		currentDigsite = nearestSite
+		currentDigsite.stats.surveys = currentDigsite.stats.surveys + 1
+		currentDigsite.stats.counter = numFindsCompleted
 
 		DistanceIndicatorFrame.isActive = true
 		DistanceIndicatorFrame:Toggle()
@@ -1352,7 +1356,7 @@ do
 			end
 		end
 
-		lastSite:UpdateSurveyNodeDistanceColors()
+		currentDigsite:UpdateSurveyNodeDistanceColors()
 
 		TomTomHandler.isActive = false
 		TomTomHandler:ClearWaypoint()
@@ -1463,7 +1467,7 @@ do
 		local raceID = keystoneIDToRaceID[itemID]
 
 		if raceID then
-			lastSite.stats.keystones = lastSite.stats.keystones + 1
+			currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
 			keystoneLootRaceID = raceID
 		end
 	end
@@ -1486,11 +1490,11 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			race.currentProject.keystones_added = 0
 		elseif diff > 0 then
 			-- we've gained fragments, aka. Successfully dug at a dig site
-			if lastSite then
-				lastSite.stats.looted = lastSite.stats.looted + 1
-				lastSite.stats.fragments = lastSite.stats.fragments + diff
+			if currentDigsite then
+				currentDigsite.stats.looted = currentDigsite.stats.looted + 1
+				currentDigsite.stats.fragments = currentDigsite.stats.fragments + diff
 
-				lastSite:AddSurveyNode(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y)
+				currentDigsite:AddSurveyNode(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y)
 			end
 
 			surveyLocation.mapID = 0
