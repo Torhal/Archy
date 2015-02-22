@@ -1527,19 +1527,20 @@ function Archy:GET_ITEM_INFO_RECEIVED(event)
 	end
 
 	for data, race in next, private.RaceArtifactProcessingQueue, nil do
-		local artifactName = _G.GetItemInfo(data.itemID)
-		if artifactName then
-			local artifact = race.Artifacts[artifactName]
+		local itemName = _G.GetItemInfo(data.itemID)
+		local projectName = _G.GetSpellInfo(data.spellID)
+		if itemName and projectName then
+			local artifact = race.Artifacts[projectName]
 			if artifact then
 				artifact.isRare = data.isRare
 				artifact.itemID = data.itemID
 				artifact.spellID = data.spellID
 			else
-				race.Artifacts[artifactName] = {
+				race.Artifacts[projectName] = {
 					completionCount = 0,
 					isRare = data.isRare,
 					itemID = data.itemID,
-					name = artifactName,
+					name = projectName,
 					spellID = data.spellID,
 				}
 			end

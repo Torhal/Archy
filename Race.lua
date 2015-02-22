@@ -87,19 +87,20 @@ function private.AddRace(raceID)
 	race.ArtifactNameToInfoIndexMapping = artifactNameToInfoIndexMapping
 
 	for itemID, data in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
-		local artifactName = _G.GetItemInfo(itemID)
-		if artifactName then
-			local artifact = race.Artifacts[artifactName]
+		local itemName = _G.GetItemInfo(itemID)
+		local projectName = _G.GetSpellInfo(data.spellID)
+		if itemName and projectName then
+			local artifact = race.Artifacts[projectName]
 			if artifact then
 				artifact.isRare = data.isRare
 				artifact.itemID = data.itemID
 				artifact.spellID = data.spellID
 			else
-				race.Artifacts[artifactName] = {
+				race.Artifacts[projectName] = {
 					completionCount = 0,
 					isRare = data.isRare,
 					itemID = data.itemID,
-					name = artifactName,
+					name = projectName,
 					spellID = data.spellID,
 				}
 			end
