@@ -155,7 +155,6 @@ function Race:UpdateCurrentProject()
 	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
 		_G.ArchaeologyFrame_ShowArtifact(self.ID)
 	end
-	local artifactSettings = private.ProfileSettings.artifact
 
 	_G.SetSelectedArtifact(self.ID)
 
@@ -163,8 +162,8 @@ function Race:UpdateCurrentProject()
 	local artifact = self.Artifacts[artifactName]
 	if not artifact then
 		local errorMessage = "Missing data for artifact \"%s\""
-		Archy:DebugPour(errorMessage, artifactName)
-		Archy:Prinft(errorMessage, artifactName)
+		private.DebugPour(errorMessage, artifactName)
+		Archy:Printf(errorMessage, artifactName)
 		return
 	end
 
@@ -206,6 +205,7 @@ function Race:UpdateCurrentProject()
 
 	local keystoneInventory = self.keystone.inventory
 	local prevAdded = math.min(project.keystones_added, keystoneInventory, numSockets)
+	local artifactSettings = private.ProfileSettings.artifact
 
 	if artifactSettings.autofill[self.ID] then
 		prevAdded = math.min(keystoneInventory, numSockets)
