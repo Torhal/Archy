@@ -1411,13 +1411,15 @@ function Archy:ARTIFACT_HISTORY_READY()
 	end
 
 	for raceID, race in pairs(private.Races) do
-		local artifact = race.currentProject
-
-		local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
-		if completionCount then
-			artifact.completionCount = completionCount
+		local project = race.currentProject
+		if project then
+			local _, _, completionCount = race:GetArtifactCompletionDataByName(project.name)
+			if completionCount then
+				project.completionCount = completionCount
+			end
 		end
 	end
+
 	ArtifactFrame:RefreshDisplay()
 end
 

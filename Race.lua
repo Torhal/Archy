@@ -51,17 +51,7 @@ function private.AddRace(raceID)
 	local race = _G.setmetatable({
 		Artifacts = {},
 		currency = currencyAmount,
-		currentProject = {
-			canSolve = false,
-			fragments = 0,
-			fragments_required = 0,
-			icon = "",
-			keystones_added = 0,
-			keystone_adjustment = 0,
-			name = "",
-			sockets = 0,
-			tooltip = "",
-		},
+		currentProject = nil,
 		ID = raceID,
 		name = raceName,
 		texture = raceTexture,
@@ -70,7 +60,7 @@ function private.AddRace(raceID)
 			inventory = 0,
 			name = keystoneName,
 			texture = keystoneTexture,
-		}
+		},
 	}, raceMetatable)
 
 	Races[raceID] = race
@@ -170,51 +160,61 @@ function Race:UpdateCurrentProject()
 	_G.SetSelectedArtifact(self.ID)
 
 	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
-	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
-
-	local _, completionCount
-	local artifact = self.currentProject
-	if artifactName and artifactName ~= "" and artifact.name and artifact.name ~= "" and artifact.name ~= artifactName then
-		if not private.isLoading then
-			artifact.hasAnnounced = nil
-			artifact.hasPinged = nil
-
-			_, _, completionCount = self:GetArtifactCompletionDataByName(artifact.name)
-			Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, artifact.name, completionCount or 0), 1, 1, 1)
-		end
-	else
-		_, _, completionCount = self:GetArtifactCompletionDataByName(artifactName)
+	local artifact = self.Artifacts[artifactName]
+	if not artifact then
+		local errorMessage = "Missing data for artifact \"%s\""
+		Archy:DebugPour(errorMessage, artifactName)
+		Archy:Prinft(errorMessage, artifactName)
+		return
 	end
 
+	local _, completionCount
+	local project = self.currentProject or artifact
+	if project then
+		if project.name ~= artifactName then
+			if not private.isLoading then
+				project.hasAnnounced = nil
+				project.hasPinged = nil
 
-	artifact.canSolve = _G.CanSolveArtifact()
-	artifact.canSolveInventory = nil
-	artifact.canSolveStone = nil
-	artifact.completionCount = completionCount
-	artifact.fragments = baseFragments
-	artifact.fragments_required = totalFragments
-	artifact.icon = icon
-	artifact.isRare = (rarity ~= 0)
-	artifact.itemID = self.Artifacts[artifactName].itemID
-	artifact.keystone_adjustment = 0
-	artifact.name = artifactName
-	artifact.sockets = numSockets
-	artifact.spellID = self.Artifacts[artifactName].spellID
-	artifact.tooltip = spellDescription
+				_, _, completionCount = self:GetArtifactCompletionDataByName(project.name)
+				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount or 0), 1, 1, 1)
+			end
+		else
+			_, _, completionCount = self:GetArtifactCompletionDataByName(artifactName)
+		end
+	end
+	project = artifact
+	self.currentProject = project
+
+	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
+
+	project.canSolve = _G.CanSolveArtifact()
+	project.canSolveInventory = nil
+	project.canSolveStone = nil
+	project.completionCount = completionCount
+	project.fragments = baseFragments
+	project.fragments_required = totalFragments
+	project.icon = icon
+	project.isRare = (rarity ~= 0)
+	project.keystone_adjustment = 0
+	project.keystones_added = project.keystones_added or 0
+	project.name = artifactName
+	project.sockets = numSockets
+	project.tooltip = spellDescription
 
 	self.keystone.inventory = _G.GetItemCount(self.keystone.ID) or 0
 
 	local keystoneInventory = self.keystone.inventory
-	local prevAdded = math.min(artifact.keystones_added, keystoneInventory, numSockets)
+	local prevAdded = math.min(project.keystones_added, keystoneInventory, numSockets)
 
 	if artifactSettings.autofill[self.ID] then
 		prevAdded = math.min(keystoneInventory, numSockets)
 	end
-	artifact.keystones_added = math.min(keystoneInventory, numSockets)
+	project.keystones_added = math.min(keystoneInventory, numSockets)
 
 	-- TODO: This whole section looks like a needlessly convoluted way of doing things.
-	if artifact.keystones_added > 0 and numSockets > 0 then
-		for index = 1, math.min(artifact.keystones_added, numSockets) do
+	if project.keystones_added > 0 and numSockets > 0 then
+		for index = 1, math.min(project.keystones_added, numSockets) do
 			_G.SocketItemToArtifact()
 
 			if not _G.ItemAddedToArtifact(index) then
@@ -223,34 +223,34 @@ function Race:UpdateCurrentProject()
 
 			if index == prevAdded then
 				_, adjustedFragments = _G.GetArtifactProgress()
-				artifact.keystone_adjustment = adjustedFragments
-				artifact.canSolveStone = _G.CanSolveArtifact()
+				project.keystone_adjustment = adjustedFragments
+				project.canSolveStone = _G.CanSolveArtifact()
 			end
 		end
-		artifact.canSolveInventory = _G.CanSolveArtifact()
+		project.canSolveInventory = _G.CanSolveArtifact()
 
-		if prevAdded > 0 and artifact.keystone_adjustment <= 0 then
+		if prevAdded > 0 and project.keystone_adjustment <= 0 then
 			_, adjustedFragments = _G.GetArtifactProgress()
-			artifact.keystone_adjustment = adjustedFragments
-			artifact.canSolveStone = _G.CanSolveArtifact()
+			project.keystone_adjustment = adjustedFragments
+			project.canSolveStone = _G.CanSolveArtifact()
 		end
 	end
-	artifact.keystones_added = prevAdded
+	project.keystones_added = prevAdded
 
 	_G.RequestArtifactCompletionHistory()
 
 	if not private.isLoading and private.ProfileSettings.general.show and not self:IsOnArtifactBlacklist() then
-		local currencyOwned = artifact.fragments + artifact.keystone_adjustment
-		local currencyRequired = artifact.fragments_required
+		local currencyOwned = project.fragments + project.keystone_adjustment
+		local currencyRequired = project.fragments_required
 
 		if currencyOwned > 0 and currencyRequired > 0 then
-			if not artifact.hasAnnounced and ((artifactSettings.announce and artifact.canSolve) or (artifactSettings.keystoneAnnounce and artifact.canSolveInventory)) then
-				artifact.hasAnnounced = true
-				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
+			if not project.hasAnnounced and ((artifactSettings.announce and project.canSolve) or (artifactSettings.keystoneAnnounce and project.canSolveInventory)) then
+				project.hasAnnounced = true
+				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. project.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
 			end
 
-			if not artifact.hasPinged and ((artifactSettings.ping and artifact.canSolve) or (artifactSettings.keystonePing and artifact.canSolveInventory)) then
-				artifact.hasPinged = true
+			if not project.hasPinged and ((artifactSettings.ping and project.canSolve) or (artifactSettings.keystonePing and project.canSolveInventory)) then
+				project.hasPinged = true
 				_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
 			end
 		end
