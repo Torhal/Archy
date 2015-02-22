@@ -63,7 +63,7 @@ local current_tooltip_mode = TooltipMode.ArtifactDigsites
 -----------------------------------------------------------------------
 -- Tooltip cell provider.
 -----------------------------------------------------------------------
-local Archy_cell_provider, Archy_cell_prototype = QTip:CreateCellProvider()
+local StatusBarCellProvider, StatusBarCellPrototype = QTip:CreateCellProvider()
 
 local function Archy_cell_script(_, what, button)
 	-- header was clicked, cycle display mode
@@ -92,7 +92,7 @@ local function Archy_cell_script(_, what, button)
 	Archy:LDBTooltipShow()
 end
 
-function Archy_cell_prototype:InitializeCell()
+function StatusBarCellPrototype:InitializeCell()
 	local bar = self:CreateTexture(nil, "OVERLAY", self)
 	self.bar = bar
 	bar:SetWidth(100)
@@ -115,7 +115,7 @@ function Archy_cell_prototype:InitializeCell()
 	self.r, self.g, self.b = 1, 1, 1
 end
 
-function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g, b)
+function StatusBarCellPrototype:SetupCell(tooltip, data, justification, font, r, g, b)
 	local barTexture = [[Interface\TargetingFrame\UI-StatusBar]]
 	local bar = self.bar
 	local fs = self.fs
@@ -176,11 +176,11 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	return bar:GetWidth() + 2, bar:GetHeight() + 2
 end
 
-function Archy_cell_prototype:ReleaseCell()
+function StatusBarCellPrototype:ReleaseCell()
 	self.r, self.g, self.b = 1, 1, 1
 end
 
-function Archy_cell_prototype:getContentHeight()
+function StatusBarCellPrototype:getContentHeight()
 	return self.bar:GetHeight() + 2
 end
 
@@ -350,7 +350,7 @@ function Archy:LDBTooltipShow()
 						progress_data.canSolveInventory = artifact.canSolveInventory
 						progress_data.isRare = artifact.isRare
 
-						tooltip:SetCell(line, 6, progress_data, Archy_cell_provider, 1, 0, 0)
+						tooltip:SetCell(line, 6, progress_data, StatusBarCellProvider, 1, 0, 0)
 						tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
 						tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
 
@@ -433,8 +433,8 @@ function Archy:LDBTooltipShow()
 						line = tooltip:AddLine(" ")
 						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
 						tooltip:SetCell(line, 2, race.name .. "*", "LEFT", 1)
-						tooltip:SetCell(line, 3, missing_data.rare_counts, Archy_cell_provider, 1, 0, 0)
-						tooltip:SetCell(line, 5, missing_data.common_counts, Archy_cell_provider, 1, 0, 0)
+						tooltip:SetCell(line, 3, missing_data.rare_counts, StatusBarCellProvider, 1, 0, 0)
+						tooltip:SetCell(line, 5, missing_data.common_counts, StatusBarCellProvider, 1, 0, 0)
 						tooltip:SetCell(line, 6, total_done .. "/" .. total_count, "RIGHT", 1)
 
 						tooltip:SetCellScript(line, 2, "OnMouseDown", Archy_cell_script, "raceID:" .. raceID)
