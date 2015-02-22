@@ -148,7 +148,7 @@ function Race:KeystoneSocketOnClick(mouseButtonName)
 end
 
 function Race:UpdateCurrentProject()
-	if _G.GetNumArtifactsByRace(self.ID) == 0 then
+	if private.notInWorld or _G.GetNumArtifactsByRace(self.ID) == 0 then
 		return
 	end
 

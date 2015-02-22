@@ -756,7 +756,6 @@ function Archy:OnInitialize()
 	-----------------------------------------------------------------------
 	_G.RequestArtifactCompletionHistory()
 
-	Debug("Adding races")
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.AddRace(raceID)
 		keystoneIDToRaceID[race.keystone.ID] = raceID
@@ -797,6 +796,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("PET_BATTLE_CLOSE")
 	self:RegisterEvent("PET_BATTLE_OPENING_START")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_LEAVING_WORLD")
 	self:RegisterEvent("PLAYER_CONTROL_GAINED")
 	self:RegisterEvent("PLAYER_CONTROL_LOST")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -1627,6 +1627,8 @@ function Archy:PLAYER_CONTROL_LOST()
 end
 
 function Archy:PLAYER_ENTERING_WORLD()
+	private.notInWorld = nil
+
 	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
 	if TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
 		TomTomHandler:DisplayConflictError()
@@ -1637,6 +1639,11 @@ function Archy:PLAYER_ENTERING_WORLD()
 	else
 		ShowFrames()
 	end
+end
+
+function Archy:PLAYER_LEAVING_WORLD()
+	-- Archaeology functions misbehave when called between now and the next PLAYER_ENTERING_WORLD, so we need to keep track of when it's safe to do so.
+	private.notInWorld = true
 end
 
 function Archy:PLAYER_REGEN_DISABLED()
