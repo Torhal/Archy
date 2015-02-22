@@ -63,7 +63,6 @@ private.ZONE_DATA = ZONE_DATA
 
 local MAP_CONTINENTS = {} -- Popupated in Archy:OnEnable()
 
-
 local LorewalkersLodestone = {
 	itemID = 87548,
 	spellID = 126956
@@ -753,6 +752,17 @@ function Archy:OnInitialize()
 	end
 
 	-----------------------------------------------------------------------
+	-- Initialize Races
+	-----------------------------------------------------------------------
+	_G.RequestArtifactCompletionHistory()
+
+	Debug("Adding races")
+	for raceID = 1, _G.GetNumArchaeologyRaces() do
+		local race = private.AddRace(raceID)
+		keystoneIDToRaceID[race.keystone.ID] = raceID
+	end
+
+	-----------------------------------------------------------------------
 	-- DB cleanups.
 	-----------------------------------------------------------------------
 	for digsiteName, value in pairs(self.db.char.digsites.blacklist) do
@@ -830,16 +840,6 @@ function Archy:OnEnable()
 	TomTomHandler.isActive = true
 	TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	TomTomHandler.hasPOIIntegration = TomTomHandler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
-
-	-----------------------------------------------------------------------
-	-- Initialize Races
-	-----------------------------------------------------------------------
-	_G.RequestArtifactCompletionHistory()
-
-	for raceID = 1, _G.GetNumArchaeologyRaces() do
-		local race = private.AddRace(raceID)
-		keystoneIDToRaceID[race.keystone.ID] = raceID
-	end
 
 	-----------------------------------------------------------------------
 	-- Map stuff.
