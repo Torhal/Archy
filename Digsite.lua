@@ -128,7 +128,7 @@ local function CreateSurveyNode(digsite, savedNode, nodeIndex)
 	icon:SetTexture([[Interface\AddOns\Archy\Media\Nodes]])
 
 	-- TODO: Update this when the config option changes.
-	if private.db.minimap.fragmentIcon == "Cross" then
+	if private.ProfileSettings.minimap.fragmentIcon == "Cross" then
 		icon:SetTexCoord(0, 0.46875, 0, 0.453125)
 	else
 		icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
@@ -268,6 +268,9 @@ function Digsite:EnableMapIcon(tooltipText)
 end
 
 function Digsite:EnableSurveyNodes()
+	local fragmentColorBySurveyDistance = private.ProfileSettings.minimap.fragmentColorBySurveyDistance
+	local fragmentIcon = private.ProfileSettings.minimap.fragmentIcon
+
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
 		local savedData = node.savedData
@@ -277,7 +280,7 @@ function Digsite:EnableSurveyNodes()
 
 		MapIcon_OnUpdate(node, 5)
 
-		if private.db.minimap.fragmentColorBySurveyDistance and private.db.minimap.fragmentIcon ~= "CyanDot" then
+		if fragmentColorBySurveyDistance and fragmentIcon ~= "CyanDot" then
 			node.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
 		end
 	end
@@ -300,12 +303,14 @@ function Digsite:ToggleBlacklistStatus()
 end
 
 function Digsite:UpdateSurveyNodeDistanceColors()
-	if not private.db.minimap.fragmentColorBySurveyDistance then
+	local profileSettings = private.ProfileSettings
+	if not profileSettings.minimap.fragmentColorBySurveyDistance then
 		return
 	end
 
-	local minGreen, maxGreen = 0, private.db.digsite.distanceIndicator.green or 0
-	local minYellow, maxYellow = maxGreen, private.db.digsite.distanceIndicator.yellow or 0
+	local indicatorSettings = profileSettings.digsite.distanceIndicator
+	local minGreen, maxGreen = 0, indicatorSettings.green or 0
+	local minYellow, maxYellow = maxGreen, indicatorSettings.yellow or 0
 	local minRed, maxRed = maxYellow, 500
 
 	for nodeIndex = 1, #self.surveyNodes do

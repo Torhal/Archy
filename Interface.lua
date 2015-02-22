@@ -35,7 +35,7 @@ local NUM_DIGSITE_FINDS_DRAENOR = 9
 -- Helpers.
 -----------------------------------------------------------------------
 local function FramesShouldBeHidden()
-	return (not private.db.general.show or not private.CurrentContinentID or private.CurrentContinentID == -1 or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.HasArchaeology())
+	return (not private.ProfileSettings.general.show or not private.CurrentContinentID or private.CurrentContinentID == -1 or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.HasArchaeology())
 end
 
 private.FramesShouldBeHidden = FramesShouldBeHidden
@@ -85,7 +85,15 @@ do
 		local hiddenAnchor = self
 		local racesCount = 0
 
-		if private.db.general.theme == "Minimal" then
+		local artifactSettings =  private.ProfileSettings.artifact
+		local fragmentBarColors = artifactSettings.fragmentBarColors
+		local fragmentBarTexture = artifactSettings.fragmentBarTexture
+		local isCompactStyle = artifactSettings.style == "Compact"
+
+		local generalSettings = private.ProfileSettings.general
+		local isGraphicalTheme = generalSettings.theme == "Graphical"
+
+		if not isGraphicalTheme then
 			self.title.text:SetText(L["Artifacts"])
 		end
 
@@ -101,7 +109,7 @@ do
 			child:SetID(raceID)
 
 			local continentHasRace = private.CONTINENT_RACES[private.CurrentContinentID][raceID]
-			if not race:IsOnArtifactBlacklist() and artifact.fragments_required > 0 and (not private.db.artifact.filter or continentHasRace) then
+			if not race:IsOnArtifactBlacklist() and artifact.fragments_required > 0 and (not artifactSettings.filter or continentHasRace) then
 				child:ClearAllPoints()
 
 				if topFrame == self.container then
@@ -118,7 +126,7 @@ do
 				child:Hide()
 			end
 
-			if private.db.general.theme == "Graphical" then
+			if isGraphicalTheme then
 				child.crest.texture:SetTexture(race.texture)
 				child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
 				child.crest.text:SetText(race.name)
@@ -126,19 +134,19 @@ do
 				child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. artifact.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. artifact.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 				-- setup the bar texture here
-				local barTexture = (LSM and LSM:Fetch('statusbar', private.db.artifact.fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
+				local barTexture = (LSM and LSM:Fetch('statusbar', fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
 				child.fragmentBar.barTexture:SetTexture(barTexture)
 				child.fragmentBar.barTexture:SetHorizTile(false)
 
 				local barColor
 				if artifact.isRare then
-					barColor = private.db.artifact.fragmentBarColors["Rare"]
+					barColor = fragmentBarColors["Rare"]
 					child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625)
 				else
 					if completionCount == 0 then
-						barColor = private.db.artifact.fragmentBarColors["FirstTime"]
+						barColor = fragmentBarColors["FirstTime"]
 					else
-						barColor = private.db.artifact.fragmentBarColors["Normal"]
+						barColor = fragmentBarColors["Normal"]
 					end
 					child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0, 0.411875)
 				end
@@ -153,7 +161,7 @@ do
 				local endFound = false
 				local artifactNameSize = child.fragmentBar:GetWidth() - 10
 
-				if private.db.artifact.style == "Compact" then
+				if isCompactStyle then
 					artifactNameSize = artifactNameSize - 40
 
 					if artifact.sockets > 0 then
@@ -203,11 +211,11 @@ do
 				-- Actual user-filled sockets enough to solve so enable the manual solve button
 				if artifact.canSolve or (artifact.keystones_added > 0 and artifact.canSolveStone) then
 					child.solveButton:Enable()
-					barColor = private.db.artifact.fragmentBarColors["Solvable"]
+					barColor = fragmentBarColors["Solvable"]
 				else
 					-- Can solve with available stones from inventory, but not enough are socketed.
 					if artifact.canSolveInventory then
-						barColor = private.db.artifact.fragmentBarColors["AttachToSolve"]
+						barColor = fragmentBarColors["AttachToSolve"]
 					end
 					child.solveButton:Disable()
 				end
@@ -243,7 +251,7 @@ do
 		end
 		local containerXofs = 0
 
-		if private.db.general.theme == "Graphical" and private.db.artifact.style == "Compact" then
+		if isGraphicalTheme and isCompactStyle then
 			maxHeight = maxHeight + 10
 			containerXofs = -10
 		end
@@ -255,7 +263,7 @@ do
 			self.skillBar:SetWidth(maxWidth)
 			self.skillBar.border:SetWidth(maxWidth + 9)
 
-			if private.db.general.showSkillBar then
+			if generalSettings.showSkillBar then
 				self.skillBar:Show()
 				self.container:ClearAllPoints()
 				self.container:SetPoint("TOP", self.skillBar, "BOTTOM", containerXofs, -10)
@@ -276,8 +284,8 @@ do
 			if racesCount == 0 then
 				self:Hide()
 			end
-			self:SetHeight(maxHeight + ((private.db.general.theme == "Graphical") and 15 or 25))
-			self:SetWidth(maxWidth + ((private.db.general.theme == "Graphical") and 45 or 0))
+			self:SetHeight(maxHeight + (isGraphicalTheme and 15 or 25))
+			self:SetWidth(maxWidth + (isGraphicalTheme and 45 or 0))
 		end
 	end
 
@@ -287,29 +295,34 @@ do
 			return
 		end
 
-		self:SetScale(private.db.artifact.scale)
-		self:SetAlpha(private.db.artifact.alpha)
+		local artifactSettings = private.ProfileSettings.artifact
 
-		local is_movable = not private.db.general.locked
-		self:SetMovable(is_movable)
-		self:EnableMouse(is_movable)
+		local generalSettings = private.ProfileSettings.general
+		local isGraphicalTheme = generalSettings.theme == "Graphical"
 
-		if is_movable then
+		self:SetScale(artifactSettings.scale)
+		self:SetAlpha(artifactSettings.alpha)
+
+		local isMovable = not generalSettings.locked
+		self:SetMovable(isMovable)
+		self:EnableMouse(isMovable)
+
+		if isMovable then
 			self:RegisterForDrag("LeftButton")
 		else
 			self:RegisterForDrag()
 		end
 
-		local artifactFont = private.db.artifact.font
-		local fragmentFont = private.db.artifact.fragmentFont
-		local keystoneFont = private.db.artifact.keystoneFont
+		local artifactFont = artifactSettings.font
+		local fragmentFont = artifactSettings.fragmentFont
+		local keystoneFont = artifactSettings.keystoneFont
 
 		local artifactFontName = LSM:Fetch("font", artifactFont.name)
 		local fragmentFontName = LSM:Fetch("font", fragmentFont.name)
 		local keystoneFontName = LSM:Fetch("font", keystoneFont.name)
 
 		for _, child in pairs(self.children) do
-			if private.db.general.theme == "Graphical" then
+			if isGraphicalTheme then
 				child.fragmentBar.artifact:SetFont(artifactFontName, artifactFont.size, artifactFont.outline)
 				child.fragmentBar.artifact:SetTextColor(artifactFont.color.r, artifactFont.color.g, artifactFont.color.b, artifactFont.color.a)
 				FontString_SetShadow(child.fragmentBar.artifact, artifactFont.shadow)
@@ -326,8 +339,8 @@ do
 				child.solveButton:SetWidth(child.solveButton:GetTextWidth() + 20)
 				child.solveButton.tooltip = _G.SOLVE
 
-				if child.style ~= private.db.artifact.style then
-					if private.db.artifact.style == "Compact" then
+				if child.style ~= artifactSettings.style then
+					if artifactSettings.style == "Compact" then
 						child.crest:ClearAllPoints()
 						child.crest:SetPoint("TOPLEFT", child, "TOPLEFT", 0, 0)
 
@@ -404,8 +417,8 @@ do
 		end
 
 		self:SetBackdrop({
-			bgFile = LSM:Fetch('background', private.db.artifact.backgroundTexture),
-			edgeFile = LSM:Fetch('border', private.db.artifact.borderTexture),
+			bgFile = LSM:Fetch('background', artifactSettings.backgroundTexture),
+			edgeFile = LSM:Fetch('border', artifactSettings.borderTexture),
 			tile = false,
 			edgeSize = 8,
 			tileSize = 8,
@@ -417,19 +430,19 @@ do
 			}
 		})
 
-		self:SetBackdropColor(1, 1, 1, private.db.artifact.bgAlpha)
-		self:SetBackdropBorderColor(1, 1, 1, private.db.artifact.borderAlpha)
+		self:SetBackdropColor(1, 1, 1, artifactSettings.bgAlpha)
+		self:SetBackdropBorderColor(1, 1, 1, artifactSettings.borderAlpha)
 
 		if not private.IsTaintable() then
-			local height = self.container:GetHeight() + ((private.db.general.theme == "Graphical") and 15 or 25)
-			if private.db.general.showSkillBar and private.db.general.theme == "Graphical" then
+			local height = self.container:GetHeight() + (isGraphicalTheme and 15 or 25)
+			if generalSettings.showSkillBar and isGraphicalTheme then
 				height = height + 30
 			end
 			self:SetHeight(height)
-			self:SetWidth(self.container:GetWidth() + ((private.db.general.theme == "Graphical") and 45 or 0))
+			self:SetWidth(self.container:GetWidth() + (isGraphicalTheme and 45 or 0))
 		end
 
-		local canShow = not private.db.general.stealthMode and private.db.artifact.show and not FramesShouldBeHidden()
+		local canShow = not generalSettings.stealthMode and artifactSettings.show and not FramesShouldBeHidden()
 		if self:IsVisible() then
 			if not canShow then
 				self:Hide()
@@ -450,12 +463,14 @@ do
 			return
 		end
 
-		self:SetScale(private.db.digsite.scale)
-		self:SetAlpha(private.db.digsite.alpha)
+		local digsiteSettings = private.ProfileSettings.digsite
+
+		self:SetScale(digsiteSettings.scale)
+		self:SetAlpha(digsiteSettings.alpha)
 
 		self:SetBackdrop({
-			bgFile = LSM:Fetch('background', private.db.digsite.backgroundTexture),
-			edgeFile = LSM:Fetch('border', private.db.digsite.borderTexture),
+			bgFile = LSM:Fetch('background', digsiteSettings.backgroundTexture),
+			edgeFile = LSM:Fetch('border', digsiteSettings.borderTexture),
 			tile = false,
 			edgeSize = 8,
 			tileSize = 8,
@@ -467,13 +482,13 @@ do
 			}
 		})
 
-		self:SetBackdropColor(1, 1, 1, private.db.digsite.bgAlpha)
-		self:SetBackdropBorderColor(1, 1, 1, private.db.digsite.borderAlpha)
+		self:SetBackdropColor(1, 1, 1, digsiteSettings.bgAlpha)
+		self:SetBackdropBorderColor(1, 1, 1, digsiteSettings.borderAlpha)
 
-		local digsiteFont = private.db.digsite.font
+		local digsiteFont = digsiteSettings.font
 		local digsiteFontName = LSM:Fetch("font", digsiteFont.name)
 
-		local zoneFont = private.db.digsite.zoneFont
+		local zoneFont = digsiteSettings.zoneFont
 		local zoneFontName = LSM:Fetch("font", zoneFont.name)
 
 		for _, siteFrame in pairs(self.children) do
@@ -485,7 +500,7 @@ do
 			siteFrame.digCounter.value:SetTextColor(digsiteFont.color.r, digsiteFont.color.g, digsiteFont.color.b, digsiteFont.color.a)
 			FontString_SetShadow(siteFrame.digCounter.value, digsiteFont.shadow)
 
-			if private.db.general.theme == "Graphical" then
+			if private.ProfileSettings.general.theme == "Graphical" then
 				siteFrame.zone.name:SetFont(zoneFontName, zoneFont.size, zoneFont.outline)
 				siteFrame.zone.name:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
 				FontString_SetShadow(siteFrame.zone.name, zoneFont.shadow)
@@ -494,8 +509,8 @@ do
 				siteFrame.distance.value:SetTextColor(zoneFont.color.r, zoneFont.color.g, zoneFont.color.b, zoneFont.color.a)
 				FontString_SetShadow(siteFrame.distance.value, zoneFont.shadow)
 
-				if siteFrame.style ~= private.db.digsite.style then
-					if private.db.digsite.style == "Compact" then
+				if siteFrame.style ~= digsiteSettings.style then
+					if digsiteSettings.style == "Compact" then
 						siteFrame.crest:SetWidth(20)
 						siteFrame.crest:SetHeight(20)
 						siteFrame.crest.icon:SetWidth(20)
@@ -527,7 +542,7 @@ do
 		local continentID = private.CurrentContinentID
 		local continentDigsites = private.continent_digsites
 
-		local canShow = not private.db.general.stealthMode and private.db.digsite.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0
+		local canShow = not private.ProfileSettings.general.stealthMode and digsiteSettings.show and not FramesShouldBeHidden() and continentDigsites[continentID] and #continentDigsites[continentID] > 0
 		if self:IsVisible() then
 			if not canShow then
 				self:Hide()
@@ -571,8 +586,8 @@ do
 		end
 
 		local distance = Astrolabe:ComputeDistance(mapID, mapLevel, mapX, mapY, surveyMapID, surveyMapLevel, surveyMapX, surveyMapY) or 0
-		local greenMin, greenMax = 0, private.db.digsite.distanceIndicator.green
-		local yellowMin, yellowMax = greenMax, private.db.digsite.distanceIndicator.yellow
+		local greenMin, greenMax = 0, private.ProfileSettings.digsite.distanceIndicator.green
+		local yellowMin, yellowMax = greenMax, private.ProfileSettings.digsite.distanceIndicator.yellow
 		local redMin, redMax = yellowMax, 500
 
 		if distance >= greenMin and distance <= greenMax then
@@ -595,7 +610,7 @@ do
 			return
 		end
 
-		local indicatorSettings = private.db.digsite.distanceIndicator
+		local indicatorSettings = private.ProfileSettings.digsite.distanceIndicator
 		if not indicatorSettings.enabled or private.FramesShouldBeHidden() then
 			self:Hide()
 			return
@@ -607,7 +622,7 @@ do
 		else
 			self.circle.distance:SetText("0")
 
-			if indicatorSettings.undocked and not private.db.general.locked and (indicatorSettings.showSurveyButton or indicatorSettings.showCrateButton or indicatorSettings.showLorItemButton) then
+			if indicatorSettings.undocked and not private.ProfileSettings.general.locked and (indicatorSettings.showSurveyButton or indicatorSettings.showCrateButton or indicatorSettings.showLorItemButton) then
 				self.circle:SetAlpha(0.25)
 			else
 				self.circle:SetAlpha(0)
@@ -643,15 +658,17 @@ do
 			return
 		end
 
+		local isGraphicalTheme = private.ProfileSettings.general.theme == "Graphical"
+
 		-----------------------------------------------------------------------
 		-- ArtifactFrame
 		-----------------------------------------------------------------------
-		local artifactTemplate = (private.db.general.theme == "Graphical" and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
+		local artifactTemplate = (isGraphicalTheme and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
 		ArtifactFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
 		ArtifactFrame.children = setmetatable({}, {
 			__index = function(t, k)
 				if k then
-					local template = (private.db.general.theme == "Graphical" and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
+					local template = (isGraphicalTheme and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
 					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], ArtifactFrame, template)
 					child:Show()
 					t[k] = child
@@ -668,12 +685,12 @@ do
 		-----------------------------------------------------------------------
 		-- DigSiteFrame
 		-----------------------------------------------------------------------
-		local digSiteTemplate = (private.db.general.theme == "Graphical" and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer")
+		local digSiteTemplate = (isGraphicalTheme and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer")
 		DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, digSiteTemplate)
 		DigSiteFrame.children = setmetatable({}, {
 			__index = function(t, k)
 				if k then
-					local template = (private.db.general.theme == "Graphical" and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate")
+					local template = (isGraphicalTheme and "ArchyDigSiteRowTemplate" or "ArchyMinDigSiteRowTemplate")
 					local child = _G.CreateFrame("Frame", "ArchyDigSiteChildFrame" .. k, DigSiteFrame, template)
 					child:Show()
 					t[k] = child
@@ -729,7 +746,7 @@ function Archy:ShowDigSiteChildFrameSiteButtonTooltip(siteButton)
 end
 
 function Archy:ResizeDigSiteDisplay()
-	if private.db.general.theme == "Graphical" then
+	if private.ProfileSettings.general.theme == "Graphical" then
 		self:ResizeGraphicalDigSiteDisplay()
 	else
 		self:ResizeMinimalDigSiteDisplay()
@@ -782,15 +799,17 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		topFrame = siteFrame
 	end
 
-	if not private.db.digsite.minimal.showDistance then
+	local themeSettings = private.ProfileSettings.digsite.minimal
+
+	if not themeSettings.showDistance then
 		maxDistWidth = 0
 	end
 
-	if not private.db.digsite.minimal.showZone then
+	if not themeSettings.showZone then
 		maxZoneWidth = 0
 	end
 
-	if not private.db.digsite.minimal.showDigCounter then
+	if not themeSettings.showDigCounter then
 		maxDigCounterWidth = 0
 	end
 	maxWidth = 57 + maxDigCounterWidth + maxNameWidth + maxZoneWidth + maxDistWidth
@@ -800,8 +819,8 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteFrame.siteButton:SetWidth(maxNameWidth)
 		siteFrame.distance:SetWidth(maxDistWidth == 0 and 1 or maxDistWidth)
 		siteFrame:SetWidth(maxWidth)
-		siteFrame.distance:SetAlpha(private.db.digsite.minimal.showDistance and 1 or 0)
-		siteFrame.zone:SetAlpha(private.db.digsite.minimal.showZone and 1 or 0)
+		siteFrame.distance:SetAlpha(themeSettings.showDistance and 1 or 0)
+		siteFrame.zone:SetAlpha(themeSettings.showZone and 1 or 0)
 	end
 	DigSiteFrame.container:SetWidth(maxWidth)
 	DigSiteFrame.container:SetHeight(maxHeight)
@@ -916,26 +935,27 @@ function Archy:SetFramePosition(frame)
 	end
 	local bPoint, bRelativePoint, bXofs, bYofs
 	local bRelativeTo = _G.UIParent
+	local profileSettings = private.ProfileSettings
 
 	if frame == DigSiteFrame then
-		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.position)
+		bPoint, bRelativePoint, bXofs, bYofs = unpack(profileSettings.digsite.position)
 	elseif frame == ArtifactFrame then
-		bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.artifact.position)
+		bPoint, bRelativePoint, bXofs, bYofs = unpack(profileSettings.artifact.position)
 	elseif frame == DistanceIndicatorFrame then
-		if not private.db.digsite.distanceIndicator.undocked then
+		if not profileSettings.digsite.distanceIndicator.undocked then
 			bRelativeTo = DigSiteFrame
 			bPoint, bRelativePoint, bXofs, bYofs = "CENTER", "TOPLEFT", 50, -5
 			frame:SetParent(DigSiteFrame)
 		else
 			frame:SetParent(_G.UIParent)
-			bPoint, bRelativePoint, bXofs, bYofs = unpack(private.db.digsite.distanceIndicator.position)
+			bPoint, bRelativePoint, bXofs, bYofs = unpack(profileSettings.digsite.distanceIndicator.position)
 		end
 	end
 	frame:ClearAllPoints()
 	frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
 	frame:SetFrameLevel(2)
 
-	if frame:GetParent() == _G.UIParent and not private.IsTaintable() and not private.db.general.locked then
+	if frame:GetParent() == _G.UIParent and not private.IsTaintable() and not profileSettings.general.locked then
 		frame:SetUserPlaced(false)
 	end
 end
@@ -1006,11 +1026,11 @@ function Archy:SaveFramePosition(frame)
 	end
 
 	if frame == DigSiteFrame then
-		private.db.digsite.position = position
+		private.ProfileSettings.digsite.position = position
 	elseif frame == ArtifactFrame then
-		private.db.artifact.position = position
+		private.ProfileSettings.artifact.position = position
 	elseif frame == DistanceIndicatorFrame then
-		private.db.digsite.distanceIndicator.position = position
+		private.ProfileSettings.digsite.distanceIndicator.position = position
 	end
 end
 

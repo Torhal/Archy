@@ -47,13 +47,13 @@ local TomTomHandler = {
 		end
 		self:ClearWaypoint()
 
-		if not digsite or not self.isActive or not private.db.tomtom.enabled or not private.db.general.show then
+		if not digsite or not self.isActive or not private.ProfileSettings.tomtom.enabled or not private.ProfileSettings.general.show then
 			return
 		end
 
 		self.currentDigsite = digsite
 		self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, {
-			crazy = private.db.tomtom.crazyArrowEnabled,
+			crazy = private.ProfileSettings.tomtom.crazyArrowEnabled,
 			title = ("%s %s\n%s"):format(digsite.name, _G.PARENS_TEMPLATE:format(digsite.race.name), digsite.zoneName),
 		})
 	end

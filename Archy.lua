@@ -237,11 +237,11 @@ do
 
 	function SuspendClickToMove()
 		-- we're not using easy cast, no need to mess with click to move
-		if not private.db.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_NAME) then
+		if not private.ProfileSettings.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_NAME) then
 			return
 		end
 
-		if private.db.general.show then
+		if private.ProfileSettings.general.show then
 			if _G.GetCVarBool("autointeract") then
 				_G.SetCVar("autointeract", "0")
 				click_to_move = "1"
@@ -404,13 +404,13 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		UpdateMinimapIcons(true)
 	end,
 	tomtom = function(option)
-		local db = private.db
+		local tomtomSettings = private.ProfileSettings.tomtom
 		TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 
-		if TomTomHandler.hasTomTom and db.tomtom.enabled then
+		if TomTomHandler.hasTomTom and tomtomSettings.enabled then
 			if _G.TomTom.profile then
-				_G.TomTom.profile.arrow.arrival = db.tomtom.distance
-				_G.TomTom.profile.arrow.enablePing = db.tomtom.ping
+				_G.TomTom.profile.arrow.arrival = tomtomSettings.distance
+				_G.TomTom.profile.arrow.enablePing = tomtomSettings.ping
 			end
 		end
 		TomTomHandler:Refresh(nearestDigsite)
@@ -594,12 +594,12 @@ function Archy:UpdateSiteDistances()
 		TomTomHandler:Refresh(nearestDigsite)
 		UpdateMinimapIcons()
 
-		if private.db.digsite.announceNearest and private.db.general.show then
+		if private.ProfileSettings.digsite.announceNearest and private.ProfileSettings.general.show then
 			AnnounceNearestDigsite()
 		end
 	end
 
-	table.sort(continentDigsites, private.db.digsite.sortByDistance and SortSitesByDistance or SortSitesByZoneNameAndName)
+	table.sort(continentDigsites, private.ProfileSettings.digsite.sortByDistance and SortSitesByDistance or SortSitesByZoneNameAndName)
 end
 
 do
@@ -621,17 +621,18 @@ do
 			return
 		end
 
-		local canShow = private.db.general.show and private.db.minimap.show
+		local minimapSettings = private.ProfileSettings.minimap
+		local canShow = private.ProfileSettings.general.show and minimapSettings.show
 
 		for _, digsite in pairs(continentDigsites) do
 			if canShow then
-				if nearestDigsite == digsite or not private.db.minimap.nearest then
+				if nearestDigsite == digsite or not minimapSettings.nearest then
 					digsite:EnableMapIcon()
 				else
 					digsite:DisableMapIcon()
 				end
 
-				if nearestDigsite == digsite and private.db.minimap.fragmentNodes then
+				if nearestDigsite == digsite and minimapSettings.fragmentNodes then
 					digsite:EnableSurveyNodes()
 				else
 					digsite:DisableSurveyNodes()
@@ -686,10 +687,12 @@ function Archy:OnInitialize()
 
 	self.db.char.digsites.blacklist = self.db.char.digsites.blacklist or {}
 
-	private.db = self.db.profile
-	prevTheme = private.db and private.db.general and private.db.general.theme or private.DEFAULT_SETTINGS.profile.general.theme
+	local profileSettings = self.db.profile
+	private.ProfileSettings = profileSettings
 
-	LDBI:Register("Archy", private.LDB_object, private.db.general.icon)
+	prevTheme = profileSettings.general and profileSettings.general.theme or private.DEFAULT_SETTINGS.profile.general.theme
+
+	LDBI:Register("Archy", private.LDB_object, profileSettings.general.icon)
 
 	if not SECURE_ACTION_BUTTON then
 		local button_name = "Archy_SurveyButton"
@@ -722,7 +725,7 @@ function Archy:OnInitialize()
 		local MIN_ACTION_DOUBLECLICK = 0.05
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and private.db.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_NAME) then
+			if button == "RightButton" and profileSettings.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_NAME) then
 				local perform_survey = false
 				local num_loot_items = _G.GetNumLootItems()
 
@@ -758,7 +761,7 @@ function Archy:OnInitialize()
 		end
 	end
 
-	private.db.data = nil
+	profileSettings.data = nil
 end
 
 function Archy:UpdateFramePositions()
@@ -913,7 +916,7 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 			newTheme = database.defaults and database.defaults.profile and database.defaults.profile.general and database.defaults.profile.general.theme
 		end
 	end
-	private.db = database and database.profile or self.db.profile
+	private.ProfileSettings = database and database.profile or self.db.profile
 
 	if newTheme and prevTheme and (newTheme ~= prevTheme) then
 		_G.ReloadUI()
@@ -931,15 +934,15 @@ local SUBCOMMAND_FUNCS = {
 		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
 	end,
 	[L["stealth"]:lower()] = function()
-		private.db.general.stealthMode = not private.db.general.stealthMode
+		private.ProfileSettings.general.stealthMode = not private.ProfileSettings.general.stealthMode
 		Archy:ConfigUpdated()
 	end,
 	[L["dig sites"]:lower()] = function()
-		private.db.digsite.show = not private.db.digsite.show
+		private.ProfileSettings.digsite.show = not private.ProfileSettings.digsite.show
 		Archy:ConfigUpdated('digsite')
 	end,
 	[L["artifacts"]:lower()] = function()
-		private.db.artifact.show = not private.db.artifact.show
+		private.ProfileSettings.artifact.show = not private.ProfileSettings.artifact.show
 		Archy:ConfigUpdated('artifact')
 	end,
 	[_G.SOLVE:lower()] = function()
@@ -954,11 +957,11 @@ local SUBCOMMAND_FUNCS = {
 		private:ResetFramePositions()
 	end,
 	[_G.MINIMAP_LABEL:lower()] = function()
-		private.db.minimap.show = not private.db.minimap.show
+		private.ProfileSettings.minimap.show = not private.ProfileSettings.minimap.show
 		Archy:ConfigUpdated('minimap')
 	end,
 	tomtom = function()
-		private.db.tomtom.enabled = not private.db.tomtom.enabled
+		private.ProfileSettings.tomtom.enabled = not private.ProfileSettings.tomtom.enabled
 		TomTomHandler:Refresh(nearestDigsite)
 	end,
 	test = function()
@@ -1177,7 +1180,7 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") or (not force and not private.db.general.show) then
+	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") or (not force and not private.ProfileSettings.general.show) then
 		return
 	end
 
@@ -1243,7 +1246,7 @@ end
 
 --[[ UI functions ]] --
 function Archy:UpdateTracking()
-	if not HasArchaeology() or private.db.general.manualTrack then
+	if not HasArchaeology() or private.ProfileSettings.general.manualTrack then
 		return
 	end
 
@@ -1253,10 +1256,10 @@ function Archy:UpdateTracking()
 	end
 
 	if digsitesTrackingID then
-		_G.SetTracking(digsitesTrackingID, private.db.general.show)
+		_G.SetTracking(digsitesTrackingID, private.ProfileSettings.general.show)
 	end
 
-	_G.SetCVar("digSites", private.db.general.show and "1" or "0")
+	_G.SetCVar("digSites", private.ProfileSettings.general.show and "1" or "0")
 
 	ToggleDigsiteVisibility(_G.GetCVarBool("digSites"))
 
@@ -1557,7 +1560,7 @@ do
 	function Archy:LOOT_OPENED(event, ...)
 		local auto_loot_enabled = ...
 
-		if not private.db.general.autoLoot or auto_loot_enabled == 1 then
+		if not private.ProfileSettings.general.autoLoot or auto_loot_enabled == 1 then
 			return
 		end
 
@@ -1584,7 +1587,7 @@ end -- do-block
 function Archy:PET_BATTLE_CLOSE()
 	if private.pet_battle_shown then
 		private.pet_battle_shown = nil
-		private.db.general.show = true
+		private.ProfileSettings.general.show = true
 
 		-- API doesn't return correct values in this event
 		if _G.C_PetBattles.IsInBattle() then
@@ -1597,13 +1600,13 @@ function Archy:PET_BATTLE_CLOSE()
 end
 
 function Archy:PET_BATTLE_OPENING_START()
-	if not private.db.general.show or private.db.general.stealthMode then
+	if not private.ProfileSettings.general.show or private.ProfileSettings.general.stealthMode then
 		return
 	end
 
 	-- store our visible state to restore after pet battle
 	private.pet_battle_shown = true
-	private.db.general.show = false
+	private.ProfileSettings.general.show = false
 	self:ConfigUpdated()
 end
 
@@ -1641,7 +1644,7 @@ function Archy:PLAYER_REGEN_DISABLED()
 		self.LDB_Tooltip:Hide()
 	end
 
-	if private.db.general.combathide then
+	if private.ProfileSettings.general.combathide then
 		HideFrames()
 	end
 end
@@ -1685,7 +1688,7 @@ function Archy:PLAYER_REGEN_ENABLED()
 		self:ScanBags()
 	end
 
-	if private.db.general.combathide then
+	if private.ProfileSettings.general.combathide then
 		ShowFrames()
 	end
 end
@@ -1717,7 +1720,7 @@ function Archy:QUEST_LOG_UPDATE()
 		Blizzard_SolveArtifact = _G.SolveArtifact
 		function _G.SolveArtifact(race_index, use_stones)
 			local rank, max_rank = GetArchaeologyRank()
-			if private.db.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
+			if private.ProfileSettings.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
 				Dialog:Spawn("ArchyConfirmSolve", {
 					race_index = race_index,
 					use_stones = use_stones,

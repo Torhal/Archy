@@ -123,7 +123,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 
 	if current_tooltip_mode == TooltipMode.ArtifactDigsites then
 		perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
-		local bar_colors = private.db.artifact.fragmentBarColors
+		local bar_colors = private.ProfileSettings.artifact.fragmentBarColors
 
 		if data.canSolve then
 			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
@@ -143,7 +143,7 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 		fs:SetFormattedText("%d%s / %d", data.fragments, adjust, data.fragments_required)
 	elseif current_tooltip_mode == TooltipMode.OverallCompletion then
 		perc = math.min((data[1] / data[2]) * 100, 100)
-		local bar_colors = private.db.artifact.fragmentBarColors
+		local bar_colors = private.ProfileSettings.artifact.fragmentBarColors
 
 		-- all done
 		if data[1] > 0 and data[1] == data[2] then
@@ -301,7 +301,7 @@ function Archy:LDBTooltipShow()
 			end
 			tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.SKILL .. ": ", skill), "CENTER", num_columns)
 
-			if private.db.general.show then
+			if private.ProfileSettings.general.show then
 				line = tooltip:AddLine(".")
 				tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", L["Artifacts"]), "LEFT", num_columns)
 				tooltip:AddSeparator()
@@ -317,7 +317,7 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 				for raceID, race in pairs(private.Races) do
-					local continentHasRace = not private.db.tooltip.filter_continent or private.CONTINENT_RACES[private.CurrentContinentID][raceID]
+					local continentHasRace = not private.ProfileSettings.tooltip.filter_continent or private.CONTINENT_RACES[private.CurrentContinentID][raceID]
 					local artifact = race.currentProject
 
 					if continentHasRace and artifact.fragments_required > 0 then
@@ -363,7 +363,7 @@ function Archy:LDBTooltipShow()
 				tooltip:AddSeparator()
 
 				for continentID, continentDigsites in pairs(private.continent_digsites) do
-					if #continentDigsites > 0 and (not private.db.tooltip.filter_continent or continentID == private.CurrentContinentID) then
+					if #continentDigsites > 0 and (not private.ProfileSettings.tooltip.filter_continent or continentID == private.CurrentContinentID) then
 						local continent_name
 						for _, zone in pairs(ZONE_DATA) do
 							if zone.continentID == continentID and zone.ID == 0 then
@@ -410,7 +410,7 @@ function Archy:LDBTooltipShow()
 			line = tooltip:AddLine(".")
 			tooltip:SetCell(line, 1, ("%s%s|r%s"):format(_G.NORMAL_FONT_COLOR_CODE, _G.ACHIEVEMENTS .. ": ", achiev), "CENTER", num_columns)
 
-			if private.db.general.show then
+			if private.ProfileSettings.general.show then
 				line = tooltip:AddLine(".")
 				tooltip:SetCell(line, 1, ("%s%s|r"):format("|cFFFFFF00", _G.ACHIEVEMENT_CATEGORY_PROGRESS), "LEFT", num_columns)
 				tooltip:AddSeparator()
@@ -544,8 +544,8 @@ function LDB_object:OnEnter()
 		return
 	end
 	local tooltip = QTip:Acquire("ArchyTooltip")
-	tooltip:SetScale(private.db.tooltip.scale)
-	tooltip:SetAutoHideDelay(private.db.tooltip.hideDelay, self, Tooltip_OnRelease)
+	tooltip:SetScale(private.ProfileSettings.tooltip.scale)
+	tooltip:SetAutoHideDelay(private.ProfileSettings.tooltip.hideDelay, self, Tooltip_OnRelease)
 	tooltip:EnableMouse()
 	tooltip:SmartAnchorTo(self)
 
@@ -558,17 +558,18 @@ function LDB_object:OnLeave()
 end
 
 function LDB_object:OnClick(button, down)
+	local generalSettings = private.ProfileSettings.general
 	if button == "LeftButton" then
 		if _G.IsShiftKeyDown() then
-			private.db.general.stealthMode = not private.db.general.stealthMode
+			generalSettings.stealthMode = not generalSettings.stealthMode
 			Archy:ConfigUpdated()
 		elseif _G.IsControlKeyDown() then
 			_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
 		else
-			private.db.general.show = not private.db.general.show
+			generalSettings.show = not generalSettings.show
 			Archy:LDBTooltipShow()
 
-			if private.db.general.show and private.db.general.stealthMode then
+			if generalSettings.show and generalSettings.stealthMode then
 				if not private.stealthWarned then
 					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session
 					private.stealthWarned = true
@@ -578,8 +579,8 @@ function LDB_object:OnClick(button, down)
 			Archy:ConfigUpdated()
 		end
 	elseif button == "RightButton" then
-		private.db.general.locked = not private.db.general.locked
-		Archy:Pour(_G.SUBTITLE_FORMAT:format(_G.LOCKED, private.db.general.locked and _G.YES or _G.NO))
+		generalSettings.locked = not generalSettings.locked
+		Archy:Pour(_G.SUBTITLE_FORMAT:format(_G.LOCKED, generalSettings.locked and _G.YES or _G.NO))
 		Archy:ConfigUpdated()
 	elseif button == "MiddleButton" then
 		Archy:ShowArchaeology()

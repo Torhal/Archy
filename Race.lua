@@ -142,7 +142,7 @@ function Race:GetArtifactCompletionDataByName(artifactName)
 end
 
 function Race:IsOnArtifactBlacklist()
-	return private.db.artifact.blacklist[self.ID]
+	return private.ProfileSettings.artifact.blacklist[self.ID]
 end
 
 function Race:KeystoneSocketOnClick(mouseButtonName)
@@ -165,6 +165,8 @@ function Race:UpdateCurrentProject()
 	if _G.ArchaeologyFrame and _G.ArchaeologyFrame:IsVisible() then
 		_G.ArchaeologyFrame_ShowArtifact(self.ID)
 	end
+	local artifactSettings = private.ProfileSettings.artifact
+
 	_G.SetSelectedArtifact(self.ID)
 
 	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
@@ -205,7 +207,7 @@ function Race:UpdateCurrentProject()
 	local keystoneInventory = self.keystone.inventory
 	local prevAdded = math.min(artifact.keystones_added, keystoneInventory, numSockets)
 
-	if private.db.artifact.autofill[self.ID] then
+	if artifactSettings.autofill[self.ID] then
 		prevAdded = math.min(keystoneInventory, numSockets)
 	end
 	artifact.keystones_added = math.min(keystoneInventory, numSockets)
@@ -237,17 +239,17 @@ function Race:UpdateCurrentProject()
 
 	_G.RequestArtifactCompletionHistory()
 
-	if not private.isLoading and private.db.general.show and not self:IsOnArtifactBlacklist() then
+	if not private.isLoading and private.ProfileSettings.general.show and not self:IsOnArtifactBlacklist() then
 		local currencyOwned = artifact.fragments + artifact.keystone_adjustment
 		local currencyRequired = artifact.fragments_required
 
 		if currencyOwned > 0 and currencyRequired > 0 then
-			if not artifact.hasAnnounced and ((private.db.artifact.announce and artifact.canSolve) or (private.db.artifact.keystoneAnnounce and artifact.canSolveInventory)) then
+			if not artifact.hasAnnounced and ((artifactSettings.announce and artifact.canSolve) or (artifactSettings.keystoneAnnounce and artifact.canSolveInventory)) then
 				artifact.hasAnnounced = true
 				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. artifact.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
 			end
 
-			if not artifact.hasPinged and ((private.db.artifact.ping and artifact.canSolve) or (private.db.artifact.keystonePing and artifact.canSolveInventory)) then
+			if not artifact.hasPinged and ((artifactSettings.ping and artifact.canSolve) or (artifactSettings.keystonePing and artifact.canSolveInventory)) then
 				artifact.hasPinged = true
 				_G.PlaySoundFile([[Interface\AddOns\Archy\Media\dingding.mp3]])
 			end
