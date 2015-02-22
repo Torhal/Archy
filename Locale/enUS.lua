@@ -103,6 +103,7 @@ L["Filter tooltip to Continent"] = true
 L["Filter by Continent"] = true
 L["Filter the Artifact list by races on the continent"] = true
 L["Filter the tooltip to only include the current continent"] = true
+L["FIND_COMPLETE_MESSAGE_FORMAT"] = "%s discovered."
 L["First Time Color"] = true
 L["Font"] = true
 L["Font Color"] = true

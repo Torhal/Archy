@@ -35,6 +35,25 @@ local raceMetatable = {
 	__index = Race
 }
 
+local DigsiteType = private.DigsiteType
+local CurrencyNameFromRaceID = {
+	[DigsiteType.Dwarf] = _G.GetCurrencyInfo(384),
+	[DigsiteType.Draenei] = _G.GetCurrencyInfo(398),
+	[DigsiteType.Fossil] = _G.GetCurrencyInfo(393),
+	[DigsiteType.Nightelf] = _G.GetCurrencyInfo(394),
+	[DigsiteType.Nerubian] = _G.GetCurrencyInfo(400),
+	[DigsiteType.Orc] = _G.GetCurrencyInfo(397),
+	[DigsiteType.Tolvir] = _G.GetCurrencyInfo(401),
+	[DigsiteType.Troll] = _G.GetCurrencyInfo(385),
+	[DigsiteType.Vrykul] = _G.GetCurrencyInfo(399),
+	[DigsiteType.Mantid] = _G.GetCurrencyInfo(754),
+	[DigsiteType.Pandaren] = _G.GetCurrencyInfo(676),
+	[DigsiteType.Mogu] = _G.GetCurrencyInfo(677),
+	[DigsiteType.Arakkoa] = _G.GetCurrencyInfo(829),
+	[DigsiteType.DraenorClans] = _G.GetCurrencyInfo(821),
+	[DigsiteType.Ogre] = _G.GetCurrencyInfo(828),
+}
+
 -----------------------------------------------------------------------
 -- Helpers.
 -----------------------------------------------------------------------
@@ -51,6 +70,7 @@ function private.AddRace(raceID)
 	local race = _G.setmetatable({
 		Artifacts = {},
 		currency = currencyAmount,
+		currencyName = CurrencyNameFromRaceID[raceID],
 		currentProject = nil,
 		ID = raceID,
 		name = raceName,

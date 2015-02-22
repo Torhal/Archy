@@ -1315,6 +1315,7 @@ do
 		DistanceIndicatorFrame.isActive = false
 		DistanceIndicatorFrame:Toggle()
 		currentDigsite.stats.counter = numFindsCompleted
+		self:Pour(L.FIND_COMPLETE_MESSAGE_FORMAT:format(currentDigsite.race.currencyName))
 	end
 
 	local function SetSurveyCooldown(time)
