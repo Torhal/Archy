@@ -320,42 +320,44 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
 				for raceID, race in pairs(private.Races) do
-					local continentHasRace = not private.ProfileSettings.tooltip.filter_continent or private.CONTINENT_RACES[private.CurrentContinentID][raceID]
-					local artifact = race.currentProject
+					local project = race.currentProject
+					if project then
+						local continentHasRace = not private.ProfileSettings.tooltip.filter_continent or private.CONTINENT_RACES[private.CurrentContinentID][raceID]
 
-					if continentHasRace and artifact.fragments_required > 0 then
-						local race = private.Races[raceID]
+						if continentHasRace and project.fragments_required > 0 then
+							local race = private.Races[raceID]
 
-						line = tooltip:AddLine(" ")
-						tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
-						tooltip:SetCell(line, 2, race.name, "LEFT", 1)
-						tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(artifact.icon), "LEFT", 1)
+							line = tooltip:AddLine(" ")
+							tooltip:SetCell(line, 1, " " .. ("|T%s:18:18:0:1:128:128:4:60:4:60|t"):format(race.texture), "LEFT", 1)
+							tooltip:SetCell(line, 2, race.name, "LEFT", 1)
+							tooltip:SetCell(line, 3, " " .. ("|T%s:18:18|t"):format(project.icon), "LEFT", 1)
 
-						local artifactName = artifact.name
+							local artifactName = project.name
 
-						if artifact.isRare then
-							artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
+							if project.isRare then
+								artifactName = ("%s%s|r"):format("|cFF0070DD", artifactName)
+							end
+
+							tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
+
+							progress_data.fragments = project.fragments
+							progress_data.keystone_adjustment = project.keystone_adjustment
+							progress_data.fragments_required = project.fragments_required
+							progress_data.race_keystone_inventory = race.keystone.inventory
+							progress_data.sockets = project.sockets
+							progress_data.keystones_added = project.keystones_added
+							progress_data.canSolve = project.canSolve
+							progress_data.canSolveStone = project.canSolveStone
+							progress_data.canSolveInventory = project.canSolveInventory
+							progress_data.isRare = project.isRare
+
+							tooltip:SetCell(line, 6, progress_data, StatusBarCellProvider, 1, 0, 0)
+							tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
+							tooltip:SetCell(line, 8, (project.sockets > 0) and project.sockets or "", "CENTER", 1)
+
+							local _, _, completionCount = race:GetArtifactCompletionDataByName(project.name)
+							tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 						end
-
-						tooltip:SetCell(line, 4, artifactName, "LEFT", 2)
-
-						progress_data.fragments = artifact.fragments
-						progress_data.keystone_adjustment = artifact.keystone_adjustment
-						progress_data.fragments_required = artifact.fragments_required
-						progress_data.race_keystone_inventory = race.keystone.inventory
-						progress_data.sockets = artifact.sockets
-						progress_data.keystones_added = artifact.keystones_added
-						progress_data.canSolve = artifact.canSolve
-						progress_data.canSolveStone = artifact.canSolveStone
-						progress_data.canSolveInventory = artifact.canSolveInventory
-						progress_data.isRare = artifact.isRare
-
-						tooltip:SetCell(line, 6, progress_data, StatusBarCellProvider, 1, 0, 0)
-						tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
-						tooltip:SetCell(line, 8, (artifact.sockets > 0) and artifact.sockets or "", "CENTER", 1)
-
-						local _, _, completionCount = race:GetArtifactCompletionDataByName(artifact.name)
-						tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
 					end
 				end
 
