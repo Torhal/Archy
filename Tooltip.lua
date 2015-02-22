@@ -120,19 +120,20 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	local bar = self.bar
 	local fs = self.fs
 	local perc
+	local barColors = private.ProfileSettings.artifact.fragmentBarColors
+	local color
 
 	if current_tooltip_mode == TooltipMode.ArtifactDigsites then
 		perc = math.min((data.fragments + data.keystone_adjustment) / data.fragments_required * 100, 100)
-		local bar_colors = private.ProfileSettings.artifact.fragmentBarColors
 
 		if data.canSolve then
-			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
+			color = barColors["Solvable"]
 		elseif data.canSolveInventory then
-			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
+			color = barColors["AttachToSolve"]
 		elseif data.isRare then
-			self.r, self.g, self.b = bar_colors["Rare"].r, bar_colors["Rare"].g, bar_colors["Rare"].b
+			color = barColors["Rare"]
 		else
-			self.r, self.g, self.b = bar_colors["Normal"].r, bar_colors["Normal"].g, bar_colors["Normal"].b
+			color = barColors["Normal"]
 		end
 
 		local adjust = ""
@@ -143,13 +144,11 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 		fs:SetFormattedText("%d%s / %d", data.fragments, adjust, data.fragments_required)
 	elseif current_tooltip_mode == TooltipMode.OverallCompletion then
 		perc = math.min((data[1] / data[2]) * 100, 100)
-		local bar_colors = private.ProfileSettings.artifact.fragmentBarColors
 
-		-- all done
 		if data[1] > 0 and data[1] == data[2] then
-			self.r, self.g, self.b = bar_colors["Solvable"].r, bar_colors["Solvable"].g, bar_colors["Solvable"].b
+			color = barColors["Solvable"]
 		elseif data[1] > 0 and data[1] < data[2] then
-			self.r, self.g, self.b = bar_colors["AttachToSolve"].r, bar_colors["AttachToSolve"].g, bar_colors["AttachToSolve"].b
+			color = barColors["AttachToSolve"]
 		else
 			self.r, self.g, self.b = 0.0, 0.0, 0.0
 		end
@@ -158,6 +157,10 @@ function Archy_cell_prototype:SetupCell(tooltip, data, justification, font, r, g
 	end
 
 	if perc > 0 then
+		if color then
+			self.r, self.g, self.b = color.r, color.g, color.b
+		end
+
 		bar:SetWidth(perc)
 		bar:SetVertexColor(self.r, self.g, self.b)
 		bar:SetTexture(barTexture)
