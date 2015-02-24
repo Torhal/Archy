@@ -64,7 +64,7 @@ function private.AddRace(raceID)
 		return
 	end
 
-	local raceName, raceTexture, keystoneItemID, fragmentsCollected = _G.GetArchaeologyRaceInfo(raceID)
+	local raceName, raceTexture, keystoneItemID, fragmentsCollected, _, maxFragments = _G.GetArchaeologyRaceInfo(raceID)
 	local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
 
 	local race = _G.setmetatable({
@@ -73,6 +73,7 @@ function private.AddRace(raceID)
 		currentProject = nil,
 		fragmentsCollected = fragmentsCollected,
 		ID = raceID,
+		maxFragments = maxFragments,
 		name = raceName,
 		texture = raceTexture,
 		keystone = {
