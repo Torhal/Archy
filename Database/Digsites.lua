@@ -234,7 +234,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
-	["1:Ruins of Ahmtul Digsite"] = {
+	["1:Ruins of Ahmtul Digsite"] = { -- NEEDS UPDATE
 		blobID = 56607,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
@@ -1195,7 +1195,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 857,
 		typeID = DigsiteType.Mogu,
 	},
-	["6:Setting Sun Garrison Digsite"] = {
+	["6:Setting Sun Garrison Digsite"] = { -- NEEDS UPDATE
 		blobID = 92020,
 		mapID = 811,
 		typeID = DigsiteType.Mogu,
@@ -1205,7 +1205,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 810,
 		typeID = DigsiteType.Mogu,
 	},
-	["6:Shrine Meadow Digsite"] = {
+	["6:Shrine Meadow Digsite"] = { -- NEEDS UPDATE
 		blobID = 67037,
 		mapID = 806,
 		typeID = DigsiteType.Pandaren,
@@ -1340,12 +1340,12 @@ local DIGSITE_TEMPLATES = {
 		mapID = 858,
 		typeID = DigsiteType.Mantid,
 	},
-	["6:Veridian Grove Digsite"] = {
+	["6:Veridian Grove Digsite"] = { -- NEEDS UPDATE
 		blobID = 67039,
 		mapID = 806,
 		typeID = DigsiteType.Pandaren,
 	},
-	["6:West Old Village Digsite"] = {
+	["6:West Old Village Digsite"] = { -- NEEDS UPDATE
 		blobID = 66989,
 		mapID = 809,
 		typeID = DigsiteType.Pandaren,
