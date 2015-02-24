@@ -894,13 +894,13 @@ function Archy:RefreshDigSiteDisplay()
 		return
 	end
 
-	local maxSurveyCount = (continentID == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
+	local maxFindCount = (continentID == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
 
 	for digsiteIndex, digsite in pairs(continentDigsites[continentID]) do
 		local childFrame = DigSiteFrame.children[digsiteIndex]
 		local count = digsite.stats.counter
 
-		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, digsite.maxFindCount or maxSurveyCount)
+		childFrame.digCounter.value:SetFormattedText("%d/%d", count or 0, digsite.maxFindCount or maxFindCount)
 
 		if digsite.distance then
 			childFrame.distance.value:SetFormattedText(L["%d yards"], digsite.distance)
