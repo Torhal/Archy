@@ -94,7 +94,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 121,
 		typeID = DigsiteType.Nightelf,
 	},
-	["1:0.543660:0.885734"] = { -- Dunemaul Fossil Ridge
+	["1:0.543661:0.885734"] = { -- Dunemaul Fossil Ridge
 		blobID = 56373,
 		mapID = 161,
 		typeID = DigsiteType.Fossil,
