@@ -1486,10 +1486,10 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 	end
 
 	for raceID, race in pairs(private.Races) do
-		local _, _, _, currency_amount = _G.GetArchaeologyRaceInfo(raceID)
-		local diff = currency_amount - (race.currency or 0)
+		local _, _, _, fragmentsCollected = _G.GetArchaeologyRaceInfo(raceID)
+		local diff = fragmentsCollected - (race.fragmentsCollected or 0)
 
-		race.currency = currency_amount
+		race.fragmentsCollected = fragmentsCollected
 		race:UpdateCurrentProject()
 
 		if diff < 0 then

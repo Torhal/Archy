@@ -64,14 +64,14 @@ function private.AddRace(raceID)
 		return
 	end
 
-	local raceName, raceTexture, keystoneItemID, currencyAmount = _G.GetArchaeologyRaceInfo(raceID)
+	local raceName, raceTexture, keystoneItemID, fragmentsCollected = _G.GetArchaeologyRaceInfo(raceID)
 	local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
 
 	local race = _G.setmetatable({
 		Artifacts = {},
-		currency = currencyAmount,
 		currencyName = CurrencyNameFromRaceID[raceID],
 		currentProject = nil,
+		fragmentsCollected = fragmentsCollected,
 		ID = raceID,
 		name = raceName,
 		texture = raceTexture,
