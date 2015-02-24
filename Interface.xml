@@ -758,11 +758,6 @@
 					<Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPRIGHT" x="7" y="-3" />
 				</Anchors>
 				<Scripts>
-					<OnEnter>
-						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
-						GameTooltip:AddLine(ARCHAEOLOGY_POJECTBAR_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, 1);
-						GameTooltip:Show();
-					</OnEnter>
 					<OnLeave>
 						GameTooltip:Hide();
 					</OnLeave>

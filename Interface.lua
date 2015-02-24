@@ -670,6 +670,15 @@ do
 				if k then
 					local template = (isGraphicalTheme and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
 					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.DigsiteRaceLabelFromID[k], ArtifactFrame, template)
+
+					child.fragmentBar:SetScript("OnEnter", function(self)
+						local color = _G.HIGHLIGHT_FONT_COLOR
+						local race = private.Races[self:GetParent():GetID()]
+						local tooltip = _G.GameTooltip
+						tooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+						tooltip:AddLine(_G.ARCHAEOLOGY_POJECTBAR_TOOLTIP:format(race.maxFragments), color.r, color.g, color.b, 1)
+						tooltip:Show()
+					end)
 					child:Show()
 					t[k] = child
 					return child
