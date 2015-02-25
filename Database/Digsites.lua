@@ -344,7 +344,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
-	["1:0.424692:0.419346"] = { -- Stonetalon Peak
+	["1:0.424693:0.419346"] = { -- Stonetalon Peak
 		blobID = 55404,
 		mapID = 81,
 		typeID = DigsiteType.Nightelf,
