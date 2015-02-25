@@ -114,7 +114,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 607,
 		typeID = DigsiteType.Fossil,
 	},
-	["1:0.548497:0.403449"] = { -- Forest Song Digsite
+	["1:0.548498:0.403449"] = { -- Forest Song Digsite
 		blobID = 55402,
 		mapID = 43,
 		typeID = DigsiteType.Nightelf,
