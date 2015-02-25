@@ -89,7 +89,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 121,
 		typeID = DigsiteType.Nightelf,
 	},
-	["1:0.427980:0.705815"] = { -- Dire Maul Digsite
+	["1:0.427981:0.705815"] = { -- Dire Maul Digsite
 		blobID = 56327,
 		mapID = 121,
 		typeID = DigsiteType.Nightelf,
