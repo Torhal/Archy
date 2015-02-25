@@ -374,7 +374,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 201,
 		typeID = DigsiteType.Fossil,
 	},
-	["1:0.427192:0.610638"] = { -- Valley of Bones
+	["1:0.427193:0.610638"] = { -- Valley of Bones
 		blobID = 55422,
 		mapID = 101,
 		typeID = DigsiteType.Fossil,
