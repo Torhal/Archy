@@ -284,7 +284,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
-	["1:0.519774:0.341003"] = { -- Sanctuary of Malorne Digsite
+	["1:0.519775:0.341003"] = { -- Sanctuary of Malorne Digsite
 		blobID = 56572,
 		mapID = 606,
 		typeID = DigsiteType.Nightelf,
