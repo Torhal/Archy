@@ -259,7 +259,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 81,
 		typeID = DigsiteType.Nightelf,
 	},
-	["1:0.455915:0.877786"] = { -- Ruins of Khintaset Digsite
+	["1:0.455916:0.877786"] = { -- Ruins of Khintaset Digsite
 		blobID = 56603,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
