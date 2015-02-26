@@ -751,6 +751,11 @@ function Archy:OnInitialize()
 		end)
 	end
 
+	private.InitializeFrames()
+	ArtifactFrame = private.ArtifactFrame
+	DigSiteFrame = private.DigSiteFrame
+	DistanceIndicatorFrame = private.DistanceIndicatorFrame
+
 	-----------------------------------------------------------------------
 	-- DB cleanups.
 	-----------------------------------------------------------------------
@@ -804,11 +809,6 @@ function Archy:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
-
-	private.InitializeFrames()
-	ArtifactFrame = private.ArtifactFrame
-	DigSiteFrame = private.DigSiteFrame
-	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
 	Archy:UpdateFramePositions()
 	DigSiteFrame:UpdateChrome()
