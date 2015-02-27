@@ -127,7 +127,7 @@ local ARTIFACT_TEMPLATES = {
 		[116985] = { -- Headdress of the First Shaman
 			isRare = true,
 			itemID = 116985,
-			spellID = 139787,
+			spellID = 172459,
 		},
 		[114171] = { -- Ancestral Talisman
 			itemID = 114171,
