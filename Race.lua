@@ -91,7 +91,6 @@ function private.AddRace(raceID)
 		Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 
-	local artifactNameToInfoIndexMapping = {}
 	for artifactIndex = 1, _G.GetNumArtifactsByRace(raceID) do
 		local artifactName, artifactDescription, artifactRarity, artifactIcon, hoverDescription, keystoneCount, bgTexture, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(raceID, artifactIndex)
 		local artifact = {
@@ -103,9 +102,7 @@ function private.AddRace(raceID)
 		}
 
 		race.Artifacts[artifactName] = artifact
-		artifactNameToInfoIndexMapping[artifactName] = artifactIndex
 	end
-	race.ArtifactNameToInfoIndexMapping = artifactNameToInfoIndexMapping
 
 	for itemID, data in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
 		local itemName = _G.GetItemInfo(itemID)
@@ -139,18 +136,18 @@ end
 -----------------------------------------------------------------------
 -- Race methods.
 -----------------------------------------------------------------------
-function Race:GetArtifactCompletionDataByName(artifactName)
-	if not artifactName or artifactName == "" then
+function Race:GetArtifactCompletionDataByName(targetArtifactName)
+	if not targetArtifactName or targetArtifactName == "" then
 		return
 	end
 
-	local artifactIndex = self.ArtifactNameToInfoIndexMapping[artifactName]
-	if not artifactIndex then
-		return 0, 0, 0
+	for artifactIndex = 1, _G.GetNumArtifactsByRace(self.ID) do
+		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
+		if artifactName == targetArtifactName then
+			return artifactIndex, firstCompletionTime, completionCount
+		end
 	end
-
-	local _, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
-	return artifactIndex, firstCompletionTime, completionCount
+	return 0, 0, 0
 end
 
 function Race:IsOnArtifactBlacklist()
