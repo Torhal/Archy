@@ -1615,10 +1615,8 @@ end
 function Archy:PLAYER_ENTERING_WORLD()
 	private.notInWorld = nil
 
-	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
-	if TomTomHandler.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
-		TomTomHandler:DisplayConflictError()
-	end
+    -- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
+    TomTomHandler:CheckForConflict()
 
 	if _G.IsInInstance() then
 		HideFrames()

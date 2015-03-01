@@ -20,7 +20,7 @@ local TomTomHandler = {
 	-- Data.
 	-----------------------------------------------------------------------
 	currentDigsite = nil,
-	hasDisplayedError = false,
+	hasDisplayedConflictError = false,
 	hasPOIIntegration = false,
 	hasTomTom = false,
 	isActive = false,
@@ -28,6 +28,12 @@ local TomTomHandler = {
 	-----------------------------------------------------------------------
 	-- Methods.
 	-----------------------------------------------------------------------
+    CheckForConflict = function(self)
+        if not self.hasDisplayedConflictError and private.ProfileSettings.tomtom.enabled and self.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
+            self.hasDisplayedConflictError = true
+            Dialog:Spawn("ArchyTomTomError")
+        end
+    end,
 	ClearWaypoint = function(self)
 		if self.waypoint then
 			 _G.TomTom:RemoveWaypoint(self.waypoint)
@@ -35,14 +41,8 @@ local TomTomHandler = {
 			self.currentDigsite = nil
 		end
 	end,
-	DisplayConflictError = function(self)
-		if not self.hasDisplayedError then
-			self.hasDisplayedError = true
-			Dialog:Spawn("ArchyTomTomError")
-		end
-	end,
 	Refresh = function(self, digsite)
-		if not self.hasTomTom or (digsite and digsite == self.currentDigsite) then
+		if not self.hasTomTom or not private.ProfileSettings.tomtom.enabled or (digsite and digsite == self.currentDigsite) then
 			return
 		end
 		self:ClearWaypoint()
