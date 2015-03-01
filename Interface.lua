@@ -101,7 +101,9 @@ do
 			child:Hide()
 		end
 
-		for raceID, race in pairs(private.Races) do
+        local currentContinentRaces = private.CONTINENT_RACES[private.CurrentContinentID]
+
+        for raceID, race in pairs(private.Races) do
 			local project = race.currentProject
 			if project then
 				local _, _, completionCount = race:GetArtifactCompletionDataByName(project.name)
@@ -109,7 +111,7 @@ do
 				local child = self.children[raceID]
 				child:SetID(raceID)
 
-				local continentHasRace = private.CONTINENT_RACES[private.CurrentContinentID][raceID]
+				local continentHasRace = currentContinentRaces and currentContinentRaces[raceID]
 				if not race:IsOnArtifactBlacklist() and project.fragments_required > 0 and (not artifactSettings.filter or continentHasRace) then
 					child:ClearAllPoints()
 

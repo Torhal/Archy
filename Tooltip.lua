@@ -319,10 +319,12 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
+                local currentContinentRaces = private.CONTINENT_RACES[private.CurrentContinentID]
+
 				for raceID, race in pairs(private.Races) do
 					local project = race.currentProject
 					if project then
-						local continentHasRace = not private.ProfileSettings.tooltip.filter_continent or private.CONTINENT_RACES[private.CurrentContinentID][raceID]
+						local continentHasRace = not private.ProfileSettings.tooltip.filter_continent or (currentContinentRaces and currentContinentRaces[raceID])
 
 						if continentHasRace and project.fragments_required > 0 then
 							local race = private.Races[raceID]
