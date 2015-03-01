@@ -104,26 +104,9 @@ function private.AddRace(raceID)
 		race.Artifacts[artifactName] = artifact
 	end
 
-	for itemID, data in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
-		local itemName = _G.GetItemInfo(itemID)
-		local projectName = _G.GetSpellInfo(data.spellID)
-		if itemName and projectName then
-			local artifact = race.Artifacts[projectName]
-			if artifact then
-				artifact.isRare = data.isRare
-				artifact.itemID = data.itemID
-				artifact.spellID = data.spellID
-			else
-				race.Artifacts[projectName] = {
-					completionCount = 0,
-					isRare = data.isRare,
-					itemID = data.itemID,
-					name = projectName,
-					spellID = data.spellID,
-				}
-			end
-		else
-			RaceArtifactProcessingQueue[data] = race
+	for itemID, template in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
+        if not race:AddOrUpdateArtifactFromTemplate(template) then
+			RaceArtifactProcessingQueue[template] = race
 			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 		end
 	end
@@ -136,6 +119,32 @@ end
 -----------------------------------------------------------------------
 -- Race methods.
 -----------------------------------------------------------------------
+function Race:AddOrUpdateArtifactFromTemplate(template)
+    local itemName = _G.GetItemInfo(template.itemID)
+    local projectName = _G.GetSpellInfo(template.spellID)
+
+    if itemName and projectName then
+        local artifact = self.Artifacts[projectName]
+        if artifact then
+            artifact.isRare = template.isRare
+            artifact.itemID = template.itemID
+            artifact.spellID = template.spellID
+        else
+            self.Artifacts[projectName] = {
+                completionCount = 0,
+                isRare = template.isRare,
+                itemID = template.itemID,
+                name = projectName,
+                spellID = template.spellID,
+            }
+        end
+
+        return true
+    end
+
+    return false
+end
+
 function Race:GetArtifactCompletionDataByName(targetArtifactName)
 	if not targetArtifactName or targetArtifactName == "" then
 		return
