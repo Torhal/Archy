@@ -69,14 +69,9 @@ do
 		local isOnEdge = Astrolabe:IsIconOnEdge(self)
 
 		if self.arrow then
-			if isOnEdge then
-				if self.icon:IsShown() then
-					self.icon:Hide()
-				end
-
-				if not self.arrow:IsShown() then
-					self.arrow:Show()
-				end
+            if isOnEdge then
+                self.icon:Hide()
+                self.arrow:Show()
 
 				-- Rotate the icon, as required
 				local angle = Astrolabe:GetDirectionToIcon(self) + RAD_135
@@ -86,25 +81,17 @@ do
 
 				local sin, cos = math.sin(angle) * SQUARE_HALF, math.cos(angle) * SQUARE_HALF
 				self.arrow:SetTexCoord(0.5 - sin, 0.5 + cos, 0.5 + cos, 0.5 + sin, 0.5 - cos, 0.5 - sin, 0.5 + sin, 0.5 - cos)
-			else
-				if not self.icon:IsShown() then
-					self.icon:Show()
-				end
-
-				if self.arrow:IsShown() then
-					self.arrow:Hide()
-				end
+            else
+                self.icon:Show()
+                self.arrow:Hide()
 			end
 		elseif isOnEdge then
-			if self.icon:IsShown() then
-				self.icon:Hide()
-			end
-		else
-			if not self.icon:IsShown() then
-				self.icon:Show()
-			end
-		end
-	end
+            self:Hide()
+            self.icon:Hide()
+        else
+            self.icon:Show()
+        end
+    end
 end
 
 
