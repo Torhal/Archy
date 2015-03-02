@@ -204,8 +204,9 @@ function Race:UpdateCurrentProject()
 				project.hasPinged = nil
 
 				_, _, completionCount = self:GetArtifactCompletionDataByName(project.name)
-				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount or 0), 1, 1, 1)
-			end
+				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount or 0),
+                    1, 1, 1, nil, nil, nil, nil, nil, project.icon)
+            end
 		else
 			_, _, completionCount = self:GetArtifactCompletionDataByName(artifactName)
 		end
@@ -274,7 +275,8 @@ function Race:UpdateCurrentProject()
 		if currencyOwned > 0 and currencyRequired > 0 then
 			if not project.hasAnnounced and ((artifactSettings.announce and project.canSolve) or (artifactSettings.keystoneAnnounce and project.canSolveInventory)) then
 				project.hasAnnounced = true
-				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. project.name .. "|r", currencyOwned, currencyRequired), 1, 1, 1)
+				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. project.name .. "|r", currencyOwned, currencyRequired),
+                    1, 1, 1, nil, nil, nil, nil, nil, project.icon)
 			end
 
 			if not project.hasPinged and ((artifactSettings.ping and project.canSolve) or (artifactSettings.keystonePing and project.canSolveInventory)) then
