@@ -42,14 +42,11 @@ local TomTomHandler = {
 		end
 	end,
 	Refresh = function(self, digsite)
-		if not self.hasTomTom or not private.ProfileSettings.tomtom.enabled or (digsite and digsite == self.currentDigsite) then
-			return
-		end
-		self:ClearWaypoint()
+        self:ClearWaypoint()
 
-		if not digsite or not self.isActive or not private.ProfileSettings.tomtom.enabled or not private.ProfileSettings.general.show then
-			return
-		end
+        if not digsite or digsite == self.currentDigsite or not self.hasTomTom or not self.isActive or not private.ProfileSettings.tomtom.enabled or not private.ProfileSettings.general.show then
+            return
+        end
 
 		self.currentDigsite = digsite
 		self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, {
