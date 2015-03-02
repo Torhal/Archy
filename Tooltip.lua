@@ -576,11 +576,9 @@ function LDB_object:OnClick(button, down)
 			generalSettings.show = not generalSettings.show
 			Archy:LDBTooltipShow()
 
-			if generalSettings.show and generalSettings.stealthMode then
-				if not private.stealthWarned then
+			if generalSettings.show and generalSettings.stealthMode and not private.stealthWarned then
 					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session
 					private.stealthWarned = true
-				end
 			end
 
 			Archy:ConfigUpdated()
