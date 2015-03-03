@@ -30,7 +30,6 @@ local LDB_object = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 })
 private.LDB_object = LDB_object
 
-local HasArchaeology = private.HasArchaeology
 local IsTaintable = private.IsTaintable
 
 -----------------------------------------------------------------------
@@ -290,7 +289,7 @@ function Archy:LDBTooltipShow()
 	tooltip:SetCell(line, 1, ("%s%s%s"):format(_G.ORANGE_FONT_COLOR_CODE, "Archy", "|r") .. "*", "CENTER", num_columns)
 	tooltip:SetCellScript(line, 1, "OnMouseDown", Archy_cell_script, "mode")
 
-	if HasArchaeology() then
+	if private.hasArchaeology then
 		if current_tooltip_mode == TooltipMode.ArtifactDigsites then
 			line = tooltip:AddLine(".")
 

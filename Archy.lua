@@ -208,14 +208,6 @@ local function ToggleDigsiteVisibility(show)
 	end
 end
 
--- Returns true if the player has the archaeology secondary skill
-local function HasArchaeology()
-	local _, _, archaeologyIndex = _G.GetProfessions()
-	return archaeologyIndex and true or false
-end
-
-private.HasArchaeology = HasArchaeology
-
 local function HideFrames()
 	DigSiteFrame:Hide()
 	ArtifactFrame:Hide()
@@ -605,7 +597,7 @@ do
 	local lastUpdatedDigsite
 
 	function UpdateMinimapIcons(isForced)
-		if not HasArchaeology() or _G.WorldMapButton:IsVisible() or (lastUpdatedDigsite == nearestDigsite and not isForced) then
+		if not private.hasArchaeology or _G.WorldMapButton:IsVisible() or (lastUpdatedDigsite == nearestDigsite and not isForced) then
 			return
 		end
 
@@ -799,7 +791,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("PLAYER_STARTED_MOVING")
 	self:RegisterEvent("PLAYER_STOPPED_MOVING")
 	self:RegisterEvent("QUEST_LOG_UPDATE")
-	self:RegisterEvent("SKILL_LINES_CHANGED", "UpdateSkillBar")
+	self:RegisterEvent("SKILL_LINES_CHANGED")
 	self:RegisterEvent("TAXIMAP_CLOSED")
 	self:RegisterEvent("TAXIMAP_OPENED")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
@@ -809,6 +801,8 @@ function Archy:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
+
+    self:SKILL_LINES_CHANGED()
 
 	Archy:UpdateFramePositions()
 	DigSiteFrame:UpdateChrome()
@@ -1052,7 +1046,7 @@ do
 	}
 
 	local function FindCrateable(bag, slot)
-		if not HasArchaeology() then
+		if not private.hasArchaeology then
 			return
 		end
 
@@ -1167,7 +1161,7 @@ do
 end -- do-block
 
 function Archy:UpdateSkillBar()
-	if not ArtifactFrame.skillBar or not private.CurrentContinentID or not HasArchaeology() then
+	if not ArtifactFrame.skillBar or not private.CurrentContinentID or not private.hasArchaeology then
 		return
 	end
 
@@ -1180,7 +1174,7 @@ end
 
 --[[ Positional functions ]] --
 function Archy:UpdatePlayerPosition(force)
-	if not HasArchaeology() or _G.IsInInstance() or _G.UnitIsGhost("player") or (not force and not private.ProfileSettings.general.show) then
+	if not private.hasArchaeology or _G.IsInInstance() or _G.UnitIsGhost("player") or (not force and not private.ProfileSettings.general.show) then
 		return
 	end
 
@@ -1246,7 +1240,7 @@ end
 
 --[[ UI functions ]] --
 function Archy:UpdateTracking()
-	if not HasArchaeology() or private.ProfileSettings.general.manualTrack then
+	if not private.hasArchaeology or private.ProfileSettings.general.manualTrack then
 		return
 	end
 
@@ -1731,6 +1725,27 @@ function Archy:QUEST_LOG_UPDATE()
 	self.QUEST_LOG_UPDATE = nil
 end
 
+function Archy:SKILL_LINES_CHANGED()
+    local _, _, archaeologyIndex = _G.GetProfessions()
+    private.hasArchaeology = archaeologyIndex and true or false
+
+    self:UpdateSkillBar()
+end
+
+function Archy:TAXIMAP_CLOSED()
+    private.isTaxiMapOpen = nil
+end
+
+function Archy:TAXIMAP_OPENED()
+    private.isTaxiMapOpen = true
+end
+
+function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
+    if unit == "player" and spell == private.CRATE_SPELL_NAME then
+        private.busy_crating = true
+    end
+end
+
 do
 	local function SetLoreItemCooldown(time)
 		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LorewalkersMap.itemID))
@@ -1755,17 +1770,3 @@ do
 		end
 	end
 end -- do-block
-
-function Archy:TAXIMAP_CLOSED()
-	private.isTaxiMapOpen = nil
-end
-
-function Archy:TAXIMAP_OPENED()
-	private.isTaxiMapOpen = true
-end
-
-function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
-	if unit == "player" and spell == private.CRATE_SPELL_NAME then
-		private.busy_crating = true
-	end
-end
