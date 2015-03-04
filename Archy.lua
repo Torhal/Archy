@@ -94,8 +94,9 @@ _G.BINDING_NAME_DIGSITESARCHY = L["BINDING_NAME_DIGSITES"]
 local continent_digsites = {}
 private.continent_digsites = continent_digsites
 
-local keystoneIDToRaceID = {}
-local keystoneLootRaceID -- this is to force a refresh after the BAG_UPDATE event
+local KeystoneIDToRace = {}
+
+local lootedKeystoneRace -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in Archy:OnEnable()
 
 local nearestDigsite
@@ -282,7 +283,7 @@ local function SolveRaceArtifact(raceID, useStones)
 		local artifact = race.currentProject
 
 		_G.SetSelectedArtifact(raceID)
-		keystoneLootRaceID = raceID
+		lootedKeystoneRace = race
 
 		if _G.type(useStones) == "boolean" then
 			if useStones then
@@ -832,7 +833,7 @@ function Archy:OnEnable()
 
 	for raceID = 1, _G.GetNumArchaeologyRaces() do
 		local race = private.AddRace(raceID)
-		keystoneIDToRaceID[race.keystone.ID] = raceID
+		KeystoneIDToRace[race.keystone.ID] = race
 	end
 
 	-----------------------------------------------------------------------
@@ -1421,12 +1422,13 @@ end
 function Archy:BAG_UPDATE_DELAYED()
 	self:ScanBags()
 
-	if not private.CurrentContinentID or not keystoneLootRaceID then
+	if not private.CurrentContinentID or not lootedKeystoneRace then
 		return
 	end
-	private.Races[keystoneLootRaceID]:UpdateCurrentProject()
+	lootedKeystoneRace:UpdateCurrentProject()
+	lootedKeystoneRace = nil
+
 	ArtifactFrame:RefreshDisplay()
-	keystoneLootRaceID = nil
 end
 
 do
@@ -1468,10 +1470,10 @@ do
             return
         end
 
-        local raceID = keystoneIDToRaceID[GetItemIDFromLink(itemLink)]
-        if raceID then
+        local race = KeystoneIDToRace[GetItemIDFromLink(itemLink)]
+        if race then
             currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
-            keystoneLootRaceID = raceID
+            lootedKeystoneRace = race
         end
 	end
 end -- do-block
@@ -1559,7 +1561,7 @@ do
 				if itemLink then
 					local itemID = GetItemIDFromLink(itemLink)
 
-					if itemID and (keystoneIDToRaceID[itemID] or QUEST_ITEM_IDS[itemID]) then
+					if itemID and (KeystoneIDToRace[itemID] or QUEST_ITEM_IDS[itemID]) then
 						_G.LootSlot(slotID)
 					end
 				end
