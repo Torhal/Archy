@@ -1459,18 +1459,20 @@ do
 	end
 
 	function Archy:CHAT_MSG_LOOT(event, msg)
-		local _, itemLink, amount = ParseLootMessage(msg)
+        if not currentDigsite then
+            return
+        end
 
-		if not itemLink then
-			return
-		end
-		local itemID = GetItemIDFromLink(itemLink)
-		local raceID = keystoneIDToRaceID[itemID]
+        local _, itemLink, amount = ParseLootMessage(msg)
+        if itemLink then
+            return
+        end
 
-		if raceID then
-			currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
-			keystoneLootRaceID = raceID
-		end
+        local raceID = keystoneIDToRaceID[GetItemIDFromLink(itemLink)]
+        if raceID then
+            currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
+            keystoneLootRaceID = raceID
+        end
 	end
 end -- do-block
 
