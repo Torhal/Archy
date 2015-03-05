@@ -356,8 +356,7 @@ function Archy:LDBTooltipShow()
 							tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
 							tooltip:SetCell(line, 8, (project.sockets > 0) and project.sockets or "", "CENTER", 1)
 
-							local _, _, completionCount = race:GetArtifactCompletionDataByName(project.name)
-							tooltip:SetCell(line, 9, completionCount or _G.UNKNOWN, "CENTER", 2)
+							tooltip:SetCell(line, 9, project.completionCount or _G.UNKNOWN, "CENTER", 2)
 						end
 					end
 				end
