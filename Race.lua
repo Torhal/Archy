@@ -101,7 +101,7 @@ function private.AddRace(raceID)
 			texture = artifactIcon,
 		}
 
-		race.Artifacts[artifactName] = artifact
+		race.Artifacts[artifactName:lower()] = artifact
 	end
 
 	for itemID, template in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
