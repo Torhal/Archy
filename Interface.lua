@@ -106,7 +106,7 @@ do
         for raceID, race in pairs(private.Races) do
 			local project = race.currentProject
 			if project then
-				local _, _, completionCount = race:GetArtifactCompletionDataByName(project.name)
+				local completionCount = race:GetArtifactCompletionCountByName(project.name)
 
 				local child = self.children[raceID]
 				child:SetID(raceID)
@@ -228,7 +228,7 @@ do
 
 				else
 					local fragmentColor = (project.canSolve and "|cFF00FF00" or (project.canSolveStone and "|cFFFFFF00" or ""))
-					local nameColor = (project.isRare and "|cFF0070DD" or ((completionCount and completionCount > 0) and _G.GRAY_FONT_COLOR_CODE or ""))
+					local nameColor = (project.isRare and "|cFF0070DD" or (completionCount > 0 and _G.GRAY_FONT_COLOR_CODE or ""))
 					child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, project.fragments, project.fragments_required)
 
 					if race.keystone.inventory > 0 or project.sockets > 0 then

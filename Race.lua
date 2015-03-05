@@ -132,7 +132,7 @@ function Race:AddOrUpdateArtifactFromTemplate(template)
             artifact.spellID = template.spellID
         else
             self.Artifacts[projectName] = {
-                completionCount = 0,
+                completionCount = self:GetArtifactCompletionCountByName(projectName),
                 isRare = template.isRare,
                 itemID = template.itemID,
                 name = projectName,
@@ -146,18 +146,18 @@ function Race:AddOrUpdateArtifactFromTemplate(template)
     return false
 end
 
-function Race:GetArtifactCompletionDataByName(targetArtifactName)
+function Race:GetArtifactCompletionCountByName(targetArtifactName)
 	if not targetArtifactName or targetArtifactName == "" then
 		return
 	end
 
 	for artifactIndex = 1, _G.GetNumArtifactsByRace(self.ID) do
-		local artifactName, _, _, _, _, _, _, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
+		local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
 		if artifactName == targetArtifactName then
-			return artifactIndex, firstCompletionTime, completionCount
+			return completionCount
 		end
 	end
-	return 0, 0, 0
+	return 0
 end
 
 function Race:IsOnArtifactBlacklist()
@@ -204,12 +204,12 @@ function Race:UpdateCurrentProject()
 				project.hasAnnounced = nil
 				project.hasPinged = nil
 
-				_, _, completionCount = self:GetArtifactCompletionDataByName(project.name)
+				completionCount = self:GetArtifactCompletionCountByName(project.name)
 				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount or 0),
                     1, 1, 1, nil, nil, nil, nil, nil, project.icon)
             end
 		else
-			_, _, completionCount = self:GetArtifactCompletionDataByName(artifactName)
+			completionCount = self:GetArtifactCompletionCountByName(artifactName)
 		end
 	end
 	project = artifact
