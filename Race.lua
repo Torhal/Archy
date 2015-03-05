@@ -122,6 +122,7 @@ end
 function Race:AddOrUpdateArtifactFromTemplate(template)
     local itemName = _G.GetItemInfo(template.itemID)
     local projectName = _G.GetSpellInfo(template.spellID)
+    projectName = projectName:lower()
 
     if itemName and projectName then
         local artifact = self.Artifacts[projectName]
@@ -187,7 +188,7 @@ function Race:UpdateCurrentProject()
 	_G.SetSelectedArtifact(self.ID)
 
 	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
-	local artifact = self.Artifacts[artifactName]
+	local artifact = self.Artifacts[artifactName:lower()]
 	if not artifact then
 		local errorMessage = "Missing data for %s artifact \"%s\""
 		private.DebugPour(errorMessage, self.name, artifactName)
