@@ -187,7 +187,7 @@ function Race:UpdateCurrentProject()
 
 	_G.SetSelectedArtifact(self.ID)
 
-	local artifactName, _, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
+	local artifactName, artifactDescription, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local artifact = self.Artifacts[artifactName:lower()]
 	if not artifact then
 		local errorMessage = "Missing data for %s artifact \"%s\""
@@ -197,7 +197,7 @@ function Race:UpdateCurrentProject()
 		return
 	end
 
-	local _, completionCount
+	local completionCount
 	local project = self.currentProject or artifact
 	if project then
 		if project.name ~= artifactName then
@@ -253,7 +253,7 @@ function Race:UpdateCurrentProject()
 			end
 
 			if index == prevAdded then
-				_, adjustedFragments = _G.GetArtifactProgress()
+				local _, adjustedFragments = _G.GetArtifactProgress()
 				project.keystone_adjustment = adjustedFragments
 				project.canSolveStone = _G.CanSolveArtifact()
 			end
@@ -261,7 +261,7 @@ function Race:UpdateCurrentProject()
 		project.canSolveInventory = _G.CanSolveArtifact()
 
 		if prevAdded > 0 and project.keystone_adjustment <= 0 then
-			_, adjustedFragments = _G.GetArtifactProgress()
+			local _, adjustedFragments = _G.GetArtifactProgress()
 			project.keystone_adjustment = adjustedFragments
 			project.canSolveStone = _G.CanSolveArtifact()
 		end
