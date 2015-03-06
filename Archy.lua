@@ -276,23 +276,15 @@ end
 
 private.IsTaintable = IsTaintable
 
-local function SolveRaceArtifact(raceID, useStones)
+local function SolveRaceArtifact(race, useKeystones)
 	-- The check for raceID exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
-	if raceID then
-		local race = private.Races[raceID]
+	if race then
 		local artifact = race.currentProject
 
-		_G.SetSelectedArtifact(raceID)
+		_G.SetSelectedArtifact(race.ID)
 		lootedKeystoneRace = race
 
-		if _G.type(useStones) == "boolean" then
-			if useStones then
-				artifact.keystones_added = math.min(race.keystone.inventory, artifact.sockets)
-			else
-				artifact.keystones_added = 0
-			end
-		end
-
+		artifact.keystones_added = useKeystones and math.min(race.keystone.inventory, artifact.sockets) or 0
 		if artifact.keystones_added > 0 then
 			for index = 1, artifact.keystones_added do
 				_G.SocketItemToArtifact()
@@ -313,14 +305,14 @@ end
 Dialog:Register("ArchyConfirmSolve", {
 	text = "",
 	on_show = function(self, data)
-		self.text:SetFormattedText(L["Your Archaeology skill is at %d of %d.  Are you sure you would like to solve this artifact before visiting a trainer?"], data.rank, data.max_rank)
+		self.text:SetFormattedText(L["Your Archaeology skill is at %d of %d.  Are you sure you would like to solve this artifact before visiting a trainer?"], data.rank, data.maxRank)
 	end,
 	buttons = {
 		{
 			text = _G.YES,
 			on_click = function(self, data)
-				if data.race_index then
-					SolveRaceArtifact(data.race_index, data.use_stones)
+				if data.race then
+					SolveRaceArtifact(data.race, data.useKeystones)
 				else
 					Blizzard_SolveArtifact()
 				end
@@ -429,12 +421,12 @@ function Archy:ConfigUpdated(namespace, option)
 	end
 end
 
-function Archy:SolveAnyArtifact(use_stones)
+function Archy:SolveAnyArtifact(useKeystones)
 	local found = false
 	for raceID, race in pairs(private.Races) do
 		local artifact = race.currentProject
-		if not race:IsOnArtifactBlacklist() and (artifact.canSolve or (use_stones and artifact.canSolveInventory)) then
-			SolveRaceArtifact(raceID, use_stones)
+		if not race:IsOnArtifactBlacklist() and (artifact.canSolve or (useKeystones and artifact.canSolveInventory)) then
+			SolveRaceArtifact(race, useKeystones)
 			found = true
 			break
 		end
@@ -1703,20 +1695,25 @@ function Archy:QUEST_LOG_UPDATE()
 			local loaded, reason = _G.LoadAddOn("Blizzard_ArchaeologyUI")
 			if not loaded then
 				self:Print(L["ArchaeologyUI not loaded: %s SolveArtifact hook not installed."]:format(_G["ADDON_" .. reason]))
+				return
 			end
 		end
+
 		Blizzard_SolveArtifact = _G.SolveArtifact
-		function _G.SolveArtifact(race_index, use_stones)
-			local rank, max_rank = GetArchaeologyRank()
-			if private.ProfileSettings.general.confirmSolve and max_rank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= max_rank then
+
+		function _G.SolveArtifact(raceID, useKeystones)
+			local rank, maxRank = GetArchaeologyRank()
+			local race = private.Races[raceID]
+
+			if private.ProfileSettings.general.confirmSolve and maxRank < MAX_ARCHAEOLOGY_RANK and (rank + 25) >= maxRank then
 				Dialog:Spawn("ArchyConfirmSolve", {
-					race_index = race_index,
-					use_stones = use_stones,
+					race = race,
+					useKeystones = useKeystones,
 					rank = rank,
-					max_rank = max_rank
+					maxRank = maxRank
 				})
 			else
-				return SolveRaceArtifact(race_index, use_stones)
+				return SolveRaceArtifact(race, useKeystones)
 			end
 		end
 	end
