@@ -193,6 +193,7 @@ function Race:UpdateCurrentProject()
 		local errorMessage = "Missing data for %s artifact \"%s\""
 		private.DebugPour(errorMessage, self.name, artifactName)
 		Archy:Printf(errorMessage, self.name, artifactName)
+		self.currentProject = nil
 		return
 	end
 
