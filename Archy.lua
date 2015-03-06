@@ -277,7 +277,7 @@ end
 private.IsTaintable = IsTaintable
 
 local function SolveRaceArtifact(race, useKeystones)
-	-- The check for raceID exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
+	-- The check for race exists because its absence means we're calling this function from the default UI and should NOT perform any of the actions within the block.
 	if race then
 		local artifact = race.currentProject
 
