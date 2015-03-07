@@ -122,16 +122,16 @@ end
 function Race:AddOrUpdateArtifactFromTemplate(template)
     local itemName = _G.GetItemInfo(template.itemID)
     local projectName = _G.GetSpellInfo(template.spellID)
-    projectName = projectName:lower()
 
     if itemName and projectName then
-        local artifact = self.Artifacts[projectName]
+		local projectNameLower = projectName:lower()
+        local artifact = self.Artifacts[projectNameLower]
         if artifact then
             artifact.isRare = template.isRare
             artifact.itemID = template.itemID
             artifact.spellID = template.spellID
         else
-            self.Artifacts[projectName] = {
+            self.Artifacts[projectNameLower] = {
                 completionCount = self:GetArtifactCompletionCountByName(projectName),
                 isRare = template.isRare,
                 itemID = template.itemID,
