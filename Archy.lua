@@ -286,7 +286,7 @@ local function SolveRaceArtifact(race, useKeystones)
 
 		-- Override keystones that have already been added if true or false were passed.
 		if _G.type(useKeystones) == "boolean" then
-			artifact.keystones_added = useKeystones and math.min(race.keystone.inventory, artifact.sockets) or 0
+			artifact.keystones_added = useKeystones and math.min(race.keystonesInInventory, artifact.sockets) or 0
 		end
 
 		if artifact.keystones_added > 0 then

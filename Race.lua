@@ -78,10 +78,10 @@ function private.AddRace(raceID)
 		texture = raceTexture,
 		keystone = {
 			ID = keystoneItemID,
-			inventory = 0,
 			name = keystoneName,
 			texture = keystoneTexture,
 		},
+		keystonesInInventory = 0,
 	}, raceMetatable)
 
 	Races[raceID] = race
@@ -167,7 +167,7 @@ end
 function Race:KeystoneSocketOnClick(mouseButtonName)
 	local artifact = self.currentProject
 
-	if mouseButtonName == "LeftButton" and artifact.keystones_added < artifact.sockets and artifact.keystones_added < self.keystone.inventory then
+	if mouseButtonName == "LeftButton" and artifact.keystones_added < artifact.sockets and artifact.keystones_added < self.keystonesInInventory then
 		artifact.keystones_added = artifact.keystones_added + 1
 	elseif mouseButtonName == "RightButton" and artifact.keystones_added > 0 then
 		artifact.keystones_added = artifact.keystones_added - 1
@@ -232,9 +232,9 @@ function Race:UpdateCurrentProject()
 	project.sockets = numSockets
 	project.tooltip = spellDescription
 
-	self.keystone.inventory = _G.GetItemCount(self.keystone.ID) or 0
+	self.keystonesInInventory = _G.GetItemCount(self.keystone.ID) or 0
 
-	local keystoneInventory = self.keystone.inventory
+	local keystoneInventory = self.keystonesInInventory
 	local prevAdded = math.min(project.keystones_added, keystoneInventory, numSockets)
 	local artifactSettings = private.ProfileSettings.artifact
 

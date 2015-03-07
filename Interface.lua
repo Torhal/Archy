@@ -129,7 +129,7 @@ do
 
 				if isGraphicalTheme then
 					child.crest.texture:SetTexture(race.texture)
-					child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystone.inventory
+					child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystonesInInventory
 					child.crest.text:SetText(race.name)
 					child.icon.texture:SetTexture(project.icon)
 					child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
@@ -166,7 +166,7 @@ do
 						artifactNameSize = artifactNameSize - 40
 
 						if project.sockets > 0 then
-							child.fragmentBar.keystones.tooltip = L["%d Key stone sockets available"]:format(project.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
+							child.fragmentBar.keystones.tooltip = L["%d Key stone sockets available"]:format(project.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystonesInInventory or 0, race.keystone.name or L["Key stone"])
 							child.fragmentBar.keystones:Show()
 
 							if child.fragmentBar.keystones and child.fragmentBar.keystones.count then
@@ -231,9 +231,9 @@ do
 					local nameColor = (project.isRare and "|cFF0070DD" or (completionCount > 0 and _G.GRAY_FONT_COLOR_CODE or ""))
 					child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, project.fragments, project.fragments_required)
 
-					if race.keystone.inventory > 0 or project.sockets > 0 then
-						child.sockets.text:SetFormattedText("%d/%d", race.keystone.inventory, project.sockets)
-						child.sockets.tooltip = L["%d Key stone sockets available"]:format(project.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystone.inventory or 0, race.keystone.name or L["Key stone"])
+					if race.keystonesInInventory > 0 or project.sockets > 0 then
+						child.sockets.text:SetFormattedText("%d/%d", race.keystonesInInventory, project.sockets)
+						child.sockets.tooltip = L["%d Key stone sockets available"]:format(project.sockets) .. "\n" .. L["%d %ss in your inventory"]:format(race.keystonesInInventory or 0, race.keystone.name or L["Key stone"])
 					else
 						child.sockets.text:SetText("")
 						child.sockets.tooltip = nil

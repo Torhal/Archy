@@ -344,7 +344,7 @@ function Archy:LDBTooltipShow()
 							progress_data.fragments = project.fragments
 							progress_data.keystone_adjustment = project.keystone_adjustment
 							progress_data.fragments_required = project.fragments_required
-							progress_data.race_keystone_inventory = race.keystone.inventory
+							progress_data.race_keystone_inventory = race.keystonesInInventory
 							progress_data.sockets = project.sockets
 							progress_data.keystones_added = project.keystones_added
 							progress_data.canSolve = project.canSolve
@@ -353,7 +353,7 @@ function Archy:LDBTooltipShow()
 							progress_data.isRare = project.isRare
 
 							tooltip:SetCell(line, 6, progress_data, StatusBarCellProvider, 1, 0, 0)
-							tooltip:SetCell(line, 7, (race.keystone.inventory > 0) and race.keystone.inventory or "", "CENTER", 1)
+							tooltip:SetCell(line, 7, (race.keystonesInInventory > 0) and race.keystonesInInventory or "", "CENTER", 1)
 							tooltip:SetCell(line, 8, (project.sockets > 0) and project.sockets or "", "CENTER", 1)
 
 							tooltip:SetCell(line, 9, project.completionCount or _G.UNKNOWN, "CENTER", 2)
