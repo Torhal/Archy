@@ -232,7 +232,7 @@ local function GetArtifactsDelta(race, missing_data)
 			common_count = common_count + 1
 		end
 		total_count = total_count + 1
-		missing_data[artifactName] = artifact
+		missing_data[artifact.name] = artifact
 
 
 		-- then remove the ones we've already solved at least once so we have the actual missing.
