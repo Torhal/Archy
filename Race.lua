@@ -121,7 +121,7 @@ end
 -----------------------------------------------------------------------
 function Race:AddOrUpdateArtifactFromTemplate(template)
     local itemName = _G.GetItemInfo(template.itemID)
-    local projectName = _G.GetSpellInfo(template.spellID)
+    local projectName = template.usesItemForProjectName and itemName or _G.GetSpellInfo(template.spellID)
 
     if itemName and projectName then
 		local projectNameLower = projectName:lower()

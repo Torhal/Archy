@@ -1019,6 +1019,7 @@ local ARTIFACT_TEMPLATES = {
 			isRare = true,
 			itemID = 69775,
 			spellID = 98569,
+			usesItemForProjectName = true,
 		},
 	},
 }
