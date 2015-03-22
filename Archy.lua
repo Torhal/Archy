@@ -592,11 +592,7 @@ end
 
 do
 	function UpdateMinimapIcons()
-		if not private.hasArchaeology then
-			return
-		end
-
-		if not playerLocation.x and not playerLocation.y then
+		if not private.hasArchaeology or not playerLocation.x and not playerLocation.y then
 			return
 		end
 
