@@ -1762,9 +1762,7 @@ do
 			if DistanceIndicatorFrame.loritemButton:IsShown() then
 				self:ScheduleTimer(SetLoreItemCooldown, 0.2)
 			end
-		end
-
-		if spellID == private.CRATE_SPELL_ID then
+		elseif spellID == private.CRATE_SPELL_ID then
 			if private.busy_crating then
 				private.busy_crating = nil
 				self:ScheduleTimer("ScanBags", 1)
