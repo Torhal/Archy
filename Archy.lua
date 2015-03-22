@@ -262,7 +262,7 @@ local function GetArchaeologyRank()
 	local _, _, archaeologyIndex = _G.GetProfessions()
 
 	if not archaeologyIndex then
-		return
+		return 0, 0
 	end
 	local _, _, rank, maxRank = _G.GetProfessionInfo(archaeologyIndex)
 	return rank, maxRank
