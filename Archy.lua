@@ -1305,8 +1305,11 @@ do
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
 		DistanceIndicatorFrame.isActive = false
 		DistanceIndicatorFrame:Toggle()
-		currentDigsite.stats.counter = numFindsCompleted
-		self:Pour(L.FIND_COMPLETE_MESSAGE_FORMAT:format(currentDigsite.race.currencyName))
+
+		if currentDigsite then
+			currentDigsite.stats.counter = numFindsCompleted
+			self:Pour(L.FIND_COMPLETE_MESSAGE_FORMAT:format(currentDigsite.race.currencyName))
+		end
 	end
 
 	local function SetSurveyCooldown(time)
