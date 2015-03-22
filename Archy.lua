@@ -1158,7 +1158,7 @@ do
 end -- do-block
 
 function Archy:UpdateSkillBar()
-	if private.notInWorld or not ArtifactFrame.skillBar or not private.CurrentContinentID or not private.hasArchaeology then
+	if private.notInWorld or not ArtifactFrame or not ArtifactFrame.skillBar or not private.CurrentContinentID or not private.hasArchaeology then
 		return
 	end
 
