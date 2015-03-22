@@ -246,7 +246,7 @@ end
 
 function Digsite:EnableMapIcon(tooltipText)
 	local mapIcon = self.mapIconFrame
-	mapIcon.tooltip = tooltipText
+	mapIcon.tooltip = tooltipText or ("%s %s\n%s"):format(self.name, _G.PARENS_TEMPLATE:format(self.race.name), self.zoneName)
 
 	Astrolabe:PlaceIconOnMinimap(self.mapIconFrame, self.mapID, self.level, self.coordX, self.coordY)
 	mapIcon:Show()
