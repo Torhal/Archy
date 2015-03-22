@@ -389,7 +389,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		DistanceIndicatorFrame:Toggle()
 	end,
 	minimap = function(option)
-		UpdateMinimapIcons(true)
+		UpdateMinimapIcons()
 	end,
 	tomtom = function(option)
 		local tomtomSettings = private.ProfileSettings.tomtom
@@ -418,7 +418,7 @@ function Archy:ConfigUpdated(namespace, option)
 		self:UpdateTracking()
 
 		DistanceIndicatorFrame:Toggle()
-		UpdateMinimapIcons(true)
+		UpdateMinimapIcons()
 		SuspendClickToMove()
 
 		TomTomHandler:Refresh(nearestDigsite)
@@ -591,14 +591,10 @@ function Archy:UpdateSiteDistances()
 end
 
 do
-	local lastUpdatedDigsite
-
-	function UpdateMinimapIcons(isForced)
-		if not private.hasArchaeology or _G.WorldMapButton:IsVisible() or (lastUpdatedDigsite == nearestDigsite and not isForced) then
+	function UpdateMinimapIcons()
+		if not private.hasArchaeology then
 			return
 		end
-
-		lastUpdatedDigsite = nearestDigsite
 
 		if not playerLocation.x and not playerLocation.y then
 			return
@@ -1503,7 +1499,7 @@ function Archy:CURRENCY_DISPLAY_UPDATE()
 			surveyLocation.x = 0
 			surveyLocation.y = 0
 
-			UpdateMinimapIcons(true)
+			UpdateMinimapIcons()
 			self:RefreshDigSiteDisplay()
 		end
 	end
