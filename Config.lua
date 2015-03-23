@@ -8,7 +8,7 @@ local pairs = _G.pairs
 -----------------------------------------------------------------------
 -- AddOn namespace.
 -----------------------------------------------------------------------
-local ADDON_NAME, private = ...
+local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
 

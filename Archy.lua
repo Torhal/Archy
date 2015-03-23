@@ -25,9 +25,9 @@ local unpack = _G.unpack
 -----------------------------------------------------------------------
 local LibStub = _G.LibStub
 
-local ADDON_NAME, private = ...
+local FOLDER_NAME, private = ...
 local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceBucket-3.0", "AceTimer-3.0", "LibSink-2.0", "LibToast-1.0")
-Archy.version = _G.GetAddOnMetadata(ADDON_NAME, "Version")
+Archy.version = _G.GetAddOnMetadata(FOLDER_NAME, "Version")
 _G["Archy"] = Archy
 
 local Astrolabe = _G.DongleStub("Astrolabe-1.0")
@@ -124,7 +124,7 @@ local function CreateDebugFrame()
 	if debugger then
 		return
 	end
-	debugger = LibStub("LibTextDump-1.0"):New(("%s Debug Output"):format(ADDON_NAME), 640, 480)
+	debugger = LibStub("LibTextDump-1.0"):New(("%s Debug Output"):format(FOLDER_NAME), 640, 480)
 end
 
 local function Debug(...)
@@ -639,7 +639,7 @@ function Archy:OnInitialize()
 	if about_panel then
 		self.optionsFrame = about_panel.new(nil, "Archy")
 	end
-	self:DefineSinkToast(ADDON_NAME, [[Interface\Archeology\Arch-Icon-Marker]])
+	self:DefineSinkToast(FOLDER_NAME, [[Interface\Archeology\Arch-Icon-Marker]])
 	self:SetSinkStorage(self.db.profile.general.sinkOptions)
 	self:SetupOptions()
 

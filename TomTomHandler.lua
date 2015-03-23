@@ -6,7 +6,7 @@ local _G = getfenv(0)
 -----------------------------------------------------------------------
 -- AddOn namespace.
 -----------------------------------------------------------------------
-local ADDON_NAME, private = ...
+local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
 
@@ -62,7 +62,7 @@ Dialog:Register("ArchyTomTomError", {
 	text = "",
 	on_show = function(self, data)
 		self.text:SetFormattedText("An incompatible TomTom setting was detected.\n\nThe \"%s%s|r\" setting will cause %s to lose control of TomTom when approaching quest POIs.\n\nDo you want to reset it?",
-			"|cFFFFCC00", _G.TomTomLocals and _G.TomTomLocals["Enable automatic quest objective waypoints"] or "", ADDON_NAME)
+			"|cFFFFCC00", _G.TomTomLocals and _G.TomTomLocals["Enable automatic quest objective waypoints"] or "", FOLDER_NAME)
 	end,
 	buttons = {
 		{

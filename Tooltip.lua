@@ -16,7 +16,7 @@ local tostring = _G.tostring
 -----------------------------------------------------------------------
 local LibStub = _G.LibStub
 
-local ADDON_NAME, private = ...
+local FOLDER_NAME, private = ...
 local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 
