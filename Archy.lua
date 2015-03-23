@@ -10,15 +10,11 @@ local string = _G.string
 
 -- Functions
 local date = _G.date
-local ipairs = _G.ipairs
 local next = _G.next
 local pairs = _G.pairs
-local select = _G.select
 local setmetatable = _G.setmetatable
 local tonumber = _G.tonumber
-local tostring = _G.tostring
 local type = _G.type
-local unpack = _G.unpack
 
 -----------------------------------------------------------------------
 -- AddOn namespace.
@@ -34,7 +30,6 @@ local Astrolabe = _G.DongleStub("Astrolabe-1.0")
 local Dialog = LibStub("LibDialog-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local LDBI = LibStub("LibDBIcon-1.0")
-local Toast = LibStub("LibToast-1.0")
 
 local debugger -- Only defined if needed.
 
@@ -285,7 +280,7 @@ local function SolveRaceArtifact(race, useKeystones)
 		lootedKeystoneRace = race
 
 		-- Override keystones that have already been added if true or false were passed.
-		if _G.type(useKeystones) == "boolean" then
+		if type(useKeystones) == "boolean" then
 			artifact.keystones_added = useKeystones and math.min(race.keystonesInInventory, artifact.sockets) or 0
 		end
 
@@ -1453,7 +1448,7 @@ do
             return
         end
 
-        local _, itemLink, amount = ParseLootMessage(msg)
+        local _, itemLink = ParseLootMessage(msg)
         if itemLink then
             return
         end

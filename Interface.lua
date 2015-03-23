@@ -5,12 +5,10 @@ local _G = getfenv(0)
 
 -- Libraries
 local math = _G.math
-local table = _G.table
 
 -- Functions
 local pairs = _G.pairs
 local setmetatable = _G.setmetatable
-local tonumber = _G.tonumber
 local unpack = _G.unpack
 
 -----------------------------------------------------------------------
@@ -82,7 +80,6 @@ do
 		Archy:UpdateSkillBar()
 
 		local topFrame = self.container
-		local hiddenAnchor = self
 		local racesCount = 0
 
 		local artifactSettings = private.ProfileSettings.artifact
@@ -779,7 +776,6 @@ function Archy:ResizeMinimalDigSiteDisplay()
 		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
 		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
-		local width
 		local nameWidth = siteFrame.siteButton:GetWidth()
 		local zoneWidth = siteFrame.zone:GetWidth()
 		local digCounterWidth = siteFrame.digCounter:GetWidth()

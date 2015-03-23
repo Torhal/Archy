@@ -7,7 +7,6 @@ local math = _G.math
 local table = _G.table
 
 local pairs = _G.pairs
-local select = _G.select
 local tonumber = _G.tonumber
 local tostring = _G.tostring
 
@@ -28,9 +27,8 @@ local LDB_object = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 	iconCoords = { 0.075, 0.925, 0.075, 0.925 },
 	text = "Archy",
 })
-private.LDB_object = LDB_object
 
-local IsTaintable = private.IsTaintable
+private.LDB_object = LDB_object
 
 -----------------------------------------------------------------------
 -- Constants
