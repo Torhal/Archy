@@ -120,12 +120,12 @@ end
 -- Race methods.
 -----------------------------------------------------------------------
 function Race:AddOrUpdateArtifactFromTemplate(template)
-    local itemName = _G.GetItemInfo(template.itemID)
-    local projectName = template.usesItemForProjectName and itemName or _G.GetSpellInfo(template.spellID)
+    local projectName = template.projectName or (template.usesItemForProjectName and _G.GetItemInfo(template.itemID) or _G.GetSpellInfo(template.spellID))
 
-    if itemName and projectName then
+    if projectName then
 		local projectNameLower = projectName:lower()
         local artifact = self.Artifacts[projectNameLower]
+
         if artifact then
             artifact.isRare = template.isRare
             artifact.itemID = template.itemID

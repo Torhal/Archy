@@ -154,6 +154,7 @@ L["Minimal Style Options"] = true
 L["Minimap Icon"] = true
 L["Minimap Options"] = true
 L["Move the slider to adjust the scale of the tooltip."] = true
+L["Mummified Monkey Paw"] = true
 L["Name Font Outline"] = true
 L["Name Font Size"] = true
 L["Navigation"] = true
