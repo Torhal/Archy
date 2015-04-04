@@ -232,7 +232,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
 	},
-	["1:Ruins of Ahmtul Digsite"] = { -- NEEDS UPDATE
+	["1:0.474367:0.874077"] = { -- Ruins of Ahmtul Digsite
 		blobID = 56607,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
