@@ -867,7 +867,7 @@ local ARTIFACT_TEMPLATES = {
 		[60847] = { -- Crawling Claw
 			isRare = true,
 			itemID = 60847,
-			projectName = L["Mummified Monkey Paw"],
+			projectName = L["ProjectNames/Mummified Monkey Paw"],
 			spellID = 92137,
 		},
 		[64656] = { -- Engraved Scimitar Hilt
