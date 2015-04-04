@@ -882,12 +882,6 @@ function Archy:OnEnable()
 		end
 	end
 
-	_G.SetMapToCurrentZone()
-	private.CurrentContinentID = _G.GetCurrentMapContinent()
-	UpdateAllSites()
-
-	playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y = Astrolabe:GetCurrentPlayerPosition()
-
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 	private.isLoading = false
 end
@@ -1169,14 +1163,22 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
+	if not playerLocation.mapID then
+		_G.SetMapToCurrentZone()
+		private.CurrentContinentID = _G.GetCurrentMapContinent()
+		UpdateAllSites()
+
+		playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y = Astrolabe:GetCurrentPlayerPosition()
+	end
+
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
 		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
 		return
 	end
-	local mapID, mapLevel, mapX, mapY = Astrolabe:GetCurrentPlayerPosition()
 
+	local mapID, mapLevel, mapX, mapY = Astrolabe:GetCurrentPlayerPosition()
 	if not mapID or not mapLevel or (mapX == 0 and mapY == 0) then
 		return
 	end
@@ -1190,8 +1192,8 @@ function Archy:UpdatePlayerPosition(force)
 		UpdateMinimapIcons()
 		self:RefreshDigSiteDisplay()
 	end
-	local continentID = _G.GetCurrentMapContinent()
 
+	local continentID = _G.GetCurrentMapContinent()
 	if private.CurrentContinentID == continentID then
 		if force then
 			if private.CurrentContinentID then
@@ -1210,20 +1212,22 @@ function Archy:UpdatePlayerPosition(force)
 		DistanceIndicatorFrame:Toggle()
 	end
 
+	UpdateAllSites()
+
 	TomTomHandler:ClearWaypoint()
 	TomTomHandler:Refresh(nearestDigsite)
-
-	UpdateAllSites()
 
 	for raceID, race in pairs(private.Races) do
 		race:UpdateCurrentProject()
 	end
+
 	ArtifactFrame:UpdateChrome()
 	ArtifactFrame:RefreshDisplay()
 
 	if force then
 		self:UpdateSiteDistances()
 	end
+
 	DigSiteFrame:UpdateChrome()
 	self:RefreshDigSiteDisplay()
 	self:UpdateFramePositions()
