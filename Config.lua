@@ -131,11 +131,7 @@ local function GetGeneralOptions()
 					get = function() return generalSettings.combathide end,
 					set = function(k, v)
 						generalSettings.combathide = v
-						if generalSettings.combathide then
-							private.regen_update_visibility = true
-						else
-							private.regen_update_visibility = nil
-						end
+						private.regen_update_visibility = generalSettings.combathide or nil
 					end,
 					width = "double"
 				},
