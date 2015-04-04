@@ -67,4 +67,4 @@ externals:
         url: git://git.wowace.com/wow/libtextdump-1-0/mainline.git
         tag: latest
     Libs/Astrolabe-1.0:
-        url: http://svn.esamynn.org/astrolabe/trunk
+        url: https://github.com/jnwhiteh/astrolabe.git
