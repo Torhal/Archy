@@ -213,8 +213,15 @@ local function ShowFrames()
 	if private.in_combat or private.FramesShouldBeHidden() then
 		return
 	end
-	DigSiteFrame:Show()
-	ArtifactFrame:Show()
+
+	if private.ProfileSettings.digsite.show then
+		DigSiteFrame:Show()
+	end
+
+	if private.ProfileSettings.artifact.show then
+		ArtifactFrame:Show()
+	end
+
 	Archy:ConfigUpdated()
 end
 
