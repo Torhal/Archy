@@ -137,7 +137,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 182,
 		typeID = DigsiteType.Nightelf,
 	},
-	["1:0.530861:0.926699"] = { -- Keset Pass Digsite
+	["1:0.530862:0.926699"] = { -- Keset Pass Digsite
 		blobID = 60354,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
