@@ -231,7 +231,7 @@ do
 
 	function SuspendClickToMove()
 		-- we're not using easy cast, no need to mess with click to move
-		if not private.ProfileSettings.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_NAME) then
+		if not private.ProfileSettings.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_NAME) or not _G.CanScanResearchSite() then
 			return
 		end
 
@@ -707,7 +707,7 @@ function Archy:OnInitialize()
 		local MIN_ACTION_DOUBLECLICK = 0.05
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and profileSettings.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_NAME) then
+			if button == "RightButton" and profileSettings.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_NAME) and _G.CanScanResearchSite() then
 				local perform_survey = false
 				local num_loot_items = _G.GetNumLootItems()
 
