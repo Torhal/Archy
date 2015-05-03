@@ -476,21 +476,21 @@ function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
 
+	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
+	-- So make sure we enable and show blobs and restore the setting at the end.
+	local showDig = _G.GetCVarBool("digSites")
+	if not showDig then
+		_G.SetCVar("digSites", "1")
+		ToggleDigsiteVisibility(true)
+		_G.RefreshWorldMap()
+
+		showDig = "0"
+	end
+
 	for continentID, continentName in pairs(MAP_CONTINENTS) do
-		_G.SetMapZoom(continentID)
-
-		-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
-		-- So make sure we enable and show blobs and restore the setting at the end.
-		local showDig = _G.GetCVarBool("digSites")
-		if not showDig then
-			_G.SetCVar("digSites", "1")
-			ToggleDigsiteVisibility(true)
-			_G.RefreshWorldMap()
-
-			showDig = "0"
-		end
-
 		local sites = {}
+
+		_G.SetMapZoom(continentID)
 
 		for landmarkIndex = 1, _G.GetNumMapLandmarks() do
 			local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
@@ -518,13 +518,6 @@ function UpdateAllSites()
 			end
 		end
 
-		-- restore initial setting
-		if showDig == "0" then
-			_G.SetCVar("digSites", showDig)
-			ToggleDigsiteVisibility(false)
-			_G.RefreshWorldMap()
-		end
-
 		if #sites > 0 then
 			if continent_digsites[continentID] then
 				CompareAndResetDigCounters(continent_digsites[continentID], sites)
@@ -532,6 +525,13 @@ function UpdateAllSites()
 			end
 			continent_digsites[continentID] = sites
 		end
+	end
+
+	-- restore initial setting
+	if showDig == "0" then
+		_G.SetCVar("digSites", showDig)
+		ToggleDigsiteVisibility(false)
+		_G.RefreshWorldMap()
 	end
 
 	_G.SetMapByID(originalMapID)
