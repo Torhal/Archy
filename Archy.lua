@@ -202,6 +202,8 @@ local function ToggleDigsiteVisibility(show)
 	if BattlefieldMinimapDigsites then
 		BattlefieldMinimapDigsites[show and "Show" or "Hide"](BattlefieldMinimapDigsites)
 	end
+
+	_G.RefreshWorldMap()
 end
 
 local function HideFrames()
@@ -482,7 +484,6 @@ function UpdateAllSites()
 	if not showDig then
 		_G.SetCVar("digSites", "1")
 		ToggleDigsiteVisibility(true)
-		_G.RefreshWorldMap()
 
 		showDig = "0"
 	end
@@ -531,7 +532,6 @@ function UpdateAllSites()
 	if showDig == "0" then
 		_G.SetCVar("digSites", showDig)
 		ToggleDigsiteVisibility(false)
-		_G.RefreshWorldMap()
 	end
 
 	_G.SetMapByID(originalMapID)
@@ -1251,8 +1251,6 @@ function Archy:UpdateTracking()
 	_G.SetCVar("digSites", private.ProfileSettings.general.show and "1" or "0")
 
 	ToggleDigsiteVisibility(_G.GetCVarBool("digSites"))
-
-	_G.RefreshWorldMap()
 end
 
 -------------------------------------------------------------------------------
