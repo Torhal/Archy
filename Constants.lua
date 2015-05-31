@@ -209,7 +209,8 @@ private.DEFAULT_SETTINGS = {
 			useBlobDistance = true,
 		},
 		tooltip = {
-			filter_continent = true,
+			filterArtifactsByContinent = true,
+			filterDigsitesByContinent = true,
 			hideDelay = 0.1,
 			scale = 1,
 		},

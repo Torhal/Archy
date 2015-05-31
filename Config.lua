@@ -1509,22 +1509,36 @@ local function GetTooltipOptions()
 			name = "Tooltips",
 			desc = L["Tooltip Options"],
 			args = {
-				filterLDB = {
+				filterTooltipArtifacts = {
 					order = 1,
 					type = "toggle",
 					width = "full",
-					name = L["Filter tooltip to Continent"],
-					desc = L["Filter the tooltip to only include the current continent"],
+					name = L["TOOLTIP_FILTER_LABEL_FORMAT"]:format(L["Artifacts"]),
+					desc = L["TOOLTIP_FILTER_DESC_FORMAT"]:format(L["Artifacts"]),
 					get = function()
-						return tooltipSettings.filter_continent
+						return tooltipSettings.filterArtifactsByContinent
 					end,
 					set = function(_, value)
-						tooltipSettings.filter_continent = value
+						tooltipSettings.filterArtifactsByContinent = value
+						Archy:ConfigUpdated('artifact', 'tooltip')
+					end,
+				},
+				filterTooltipDigsites = {
+					order = 2,
+					type = "toggle",
+					width = "full",
+					name = L["TOOLTIP_FILTER_LABEL_FORMAT"]:format(L["Dig Sites"]),
+					desc = L["TOOLTIP_FILTER_DESC_FORMAT"]:format(L["Dig Sites"]),
+					get = function()
+						return tooltipSettings.filterDigsitesByContinent
+					end,
+					set = function(_, value)
+						tooltipSettings.filterDigsitesByContinent = value
 						Archy:ConfigUpdated('digsite', 'tooltip')
 					end,
 				},
 				scale = {
-					order = 2,
+					order = 3,
 					type = "range",
 					width = "full",
 					name = L["Tooltip Scale"],
@@ -1540,7 +1554,7 @@ local function GetTooltipOptions()
 					end,
 				},
 				hideDelay = {
-					order = 3,
+					order = 4,
 					type = "range",
 					width = "full",
 					name = L.TOOLTIP_HIDEDELAY_LABEL,

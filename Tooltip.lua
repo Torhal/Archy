@@ -321,7 +321,7 @@ function Archy:LDBTooltipShow()
 				for raceID, race in pairs(private.Races) do
 					local project = race.currentProject
 					if project then
-						local continentHasRace = not private.ProfileSettings.tooltip.filter_continent or (currentContinentRaces and currentContinentRaces[raceID])
+						local continentHasRace = not private.ProfileSettings.tooltip.filterArtifactsByContinent or (currentContinentRaces and currentContinentRaces[raceID])
 
 						if continentHasRace and project.fragments_required > 0 then
 							local race = private.Races[raceID]
@@ -366,7 +366,7 @@ function Archy:LDBTooltipShow()
 				tooltip:AddSeparator()
 
 				for continentID, continentDigsites in pairs(private.continent_digsites) do
-					if #continentDigsites > 0 and (not private.ProfileSettings.tooltip.filter_continent or continentID == private.CurrentContinentID) then
+					if #continentDigsites > 0 and (not private.ProfileSettings.tooltip.filterDigsitesByContinent or continentID == private.CurrentContinentID) then
 						local continent_name
 						for _, zone in pairs(ZONE_DATA) do
 							if zone.continentID == continentID and zone.ID == 0 then
