@@ -1,4 +1,4 @@
-## Interface: 60100
+## Interface: 60200
 ## Title: Archy - Archaeology Assistant
 ## Title-zhCN: Archy - 考古学助手
 ## Title-zhTW: Archy - 考古學助手
