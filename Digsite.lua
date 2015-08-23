@@ -266,9 +266,6 @@ function Digsite:EnableMapIcon(tooltipText)
 end
 
 function Digsite:EnableSurveyNodes()
-	local fragmentColorBySurveyDistance = private.ProfileSettings.minimap.fragmentColorBySurveyDistance
-	local fragmentIcon = private.ProfileSettings.minimap.fragmentIcon
-
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
 		local savedData = node.savedData
@@ -277,10 +274,6 @@ function Digsite:EnableSurveyNodes()
 		node:Show()
 
 		MapIcon_OnUpdate(node, 5)
-
-		if fragmentColorBySurveyDistance and fragmentIcon ~= "CyanDot" then
-			node.icon:SetTexCoord(0, 0.234375, 0.5, 0.734375)
-		end
 	end
 end
 
