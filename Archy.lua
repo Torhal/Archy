@@ -44,9 +44,6 @@ local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of va
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
 
-local MAP_ID_TO_ZONE_ID = {} -- Popupated in Archy:OnInitialize()
-local MAP_ID_TO_ZONE_NAME = {} -- Popupated in Archy:OnInitialize()
-
 local GLOBAL_COOLDOWN_TIME = 1.5
 local SECURE_ACTION_BUTTON -- Populated in Archy:OnInitialize()
 local SURVEY_SPELL_ID = 80451
@@ -844,7 +841,6 @@ function Archy:OnEnable()
 			local mapID = _G.GetCurrentMapAreaID()
 
 			MAP_CONTINENTS[continentID] = continentName
-			MAP_ID_TO_ZONE_NAME[mapID] = continentName
 
 			ZONE_DATA[mapID] = {
 				continentID = continentID,
@@ -863,8 +859,6 @@ function Archy:OnEnable()
 					local zoneID = _G.GetCurrentMapZone()
 					local zoneName = zoneData[zoneDataIndex]
 
-					MAP_ID_TO_ZONE_ID[mapID] = zoneID
-					MAP_ID_TO_ZONE_NAME[mapID] = zoneName
 					ZONE_DATA[mapID] = {
 						continentID = continentID,
 						ID = zoneID,
