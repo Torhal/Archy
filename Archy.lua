@@ -1154,23 +1154,21 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	if not playerLocation.mapID then
-		_G.SetMapToCurrentZone()
-		private.CurrentContinentID = _G.GetCurrentMapContinent()
-		UpdateAllSites()
+	local mapX, mapY, mapID, mapLevel = HereBeDragons:GetPlayerZonePosition()
+	if not mapID or not mapLevel or (mapX == 0 and mapY == 0) then
+		return
+	end
 
-		playerLocation.x, playerLocation.y, playerLocation.mapID, playerLocation.level = HereBeDragons:GetPlayerZonePosition()
+	if not playerLocation.mapID then
+		playerLocation.x, playerLocation.y, playerLocation.mapID, playerLocation.level = mapX, mapY, mapID, mapLevel
+		private.CurrentContinentID = HereBeDragons:GetCZFromMapID(mapID)
+		UpdateAllSites()
 	end
 
 	if _G.GetCurrentMapAreaID() == -1 then
 		self:UpdateSiteDistances()
 		DigSiteFrame:UpdateChrome()
 		self:RefreshDigSiteDisplay()
-		return
-	end
-
-	local mapX, mapY, mapID, mapLevel = HereBeDragons:GetPlayerZonePosition()
-	if not mapID or not mapLevel or (mapX == 0 and mapY == 0) then
 		return
 	end
 
