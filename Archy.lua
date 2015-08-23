@@ -26,8 +26,8 @@ local Archy = LibStub("AceAddon-3.0"):NewAddon("Archy", "AceConsole-3.0", "AceEv
 Archy.version = _G.GetAddOnMetadata(FOLDER_NAME, "Version")
 _G["Archy"] = Archy
 
-local Astrolabe = _G.DongleStub("Astrolabe-1.0")
 local Dialog = LibStub("LibDialog-1.0")
+local HereBeDragons = LibStub("HereBeDragons-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local LDBI = LibStub("LibDBIcon-1.0")
 
@@ -526,18 +526,20 @@ function UpdateAllSites()
 		for landmarkIndex = 1, _G.GetNumMapLandmarks() do
 			local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
 
-			if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+			if textureIndex == DIG_LOCATION_TEXTURE_INDEX and mapPositionX and mapPositionY then
 				local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
-				local mc, fc = Astrolabe:GetMapID(continentID, 0)
+				local mapID, floorID = HereBeDragons:GetMapIDFromCZ(continentID, 0)
 
 				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey]
 				if digsiteTemplate then
 					local digsite = private.Digsites[digsiteTemplate.blobID]
 					if not digsite then
-						local mapID = digsiteTemplate.mapID
-						local x, y = Astrolabe:TranslateWorldMapPosition(mc, fc, mapPositionX, mapPositionY, mapID, 0)
+						local digsiteMapID = digsiteTemplate.mapID
+						local x, y = HereBeDragons:TranslateZoneCoordinates(mapPositionX, mapPositionY, mapID, floorID, digsiteMapID, 0)
 
-						digsite = private.AddDigsite(digsiteTemplate, landmarkName, continentID, MAP_ID_TO_ZONE_ID[mapID], MAP_ID_TO_ZONE_NAME[mapID], x, y)
+						if x and y then
+							digsite = private.AddDigsite(digsiteTemplate, landmarkName, x, y)
+						end
 					end
 
 					table.insert(sites, digsite)
@@ -597,9 +599,9 @@ function Archy:UpdateSiteDistances()
 		local digsite = continentDigsites[index]
 
 		if digsite.mapIconFrame:IsShown() then
-			digsite.distance = Astrolabe:GetDistanceToIcon(digsite.mapIconFrame)
+			digsite.distance = digsite.mapIconFrame:GetDistance()
 		else
-			digsite.distance = Astrolabe:ComputeDistance(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
+			digsite.distance = HereBeDragons:GetZoneDistance(playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y, digsite.mapID, digsite.level, digsite.coordX, digsite.coordY)
 		end
 
 		if digsite.coordX and digsite.distance and not digsite:IsBlacklisted() and (not closestDistance or digsite.distance < closestDistance) then
@@ -1163,7 +1165,7 @@ function Archy:UpdatePlayerPosition(force)
 		private.CurrentContinentID = _G.GetCurrentMapContinent()
 		UpdateAllSites()
 
-		playerLocation.mapID, playerLocation.level, playerLocation.x, playerLocation.y = Astrolabe:GetCurrentPlayerPosition()
+		playerLocation.x, playerLocation.y, playerLocation.mapID, playerLocation.level = HereBeDragons:GetPlayerZonePosition()
 	end
 
 	if _G.GetCurrentMapAreaID() == -1 then
@@ -1173,7 +1175,7 @@ function Archy:UpdatePlayerPosition(force)
 		return
 	end
 
-	local mapID, mapLevel, mapX, mapY = Astrolabe:GetCurrentPlayerPosition()
+	local mapX, mapY, mapID, mapLevel = HereBeDragons:GetPlayerZonePosition()
 	if not mapID or not mapLevel or (mapX == 0 and mapY == 0) then
 		return
 	end

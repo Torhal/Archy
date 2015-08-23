@@ -18,7 +18,9 @@ local FOLDER_NAME, private = ...
 local LibStub = _G.LibStub
 local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 
-local Astrolabe = _G.DongleStub("Astrolabe-1.0")
+local HereBeDragons = LibStub("HereBeDragons-1.0")
+local HereBeDragonsPins = LibStub("HereBeDragons-Pins-1.0")
+
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 
 local Digsites = {}
@@ -66,7 +68,7 @@ do
 			return
 		end
 
-		local isOnEdge = Astrolabe:IsIconOnEdge(self)
+		local isOnEdge = HereBeDragonsPins:IsMinimapIconOnEdge(self)
 
 		if self.arrow then
             if isOnEdge then
@@ -74,7 +76,7 @@ do
                 self.arrow:Show()
 
 				-- Rotate the icon, as required
-				local angle = Astrolabe:GetDirectionToIcon(self) + RAD_135
+				local angle = HereBeDragonsPins:GetVectorToIcon(self) + RAD_135
 				if _G.GetCVar("rotateMinimap") == "1" then
 					angle = angle - _G.GetPlayerFacing()
 				end
@@ -128,12 +130,19 @@ local function CreateSurveyNode(digsite, savedNode, nodeIndex)
 	return node
 end
 
-function private.AddDigsite(digsiteTemplate, landmarkName, continentID, zoneID, zoneName, coordX, coordY)
+local function MapIconFrameGetDistance(self)
+	local angle, distance = HereBeDragonsPins:GetVectorToIcon(self)
+	return distance
+end
+
+function private.AddDigsite(digsiteTemplate, landmarkName, coordX, coordY)
 	local existingDigsite = Digsite[digsiteTemplate.blobID]
 	if existingDigsite then
 		-- TODO: Debug output
 		return
 	end
+
+	local continentID, zoneID = HereBeDragons:GetCZFromMapID(digsiteTemplate.mapID)
 
 	local digsite = _G.setmetatable({
 		blobID = digsiteTemplate.blobID,
@@ -149,7 +158,7 @@ function private.AddDigsite(digsiteTemplate, landmarkName, continentID, zoneID, 
 		stats = Archy.db.char.digsites.stats[digsiteTemplate.blobID],
 		surveyNodes = {},
 		zoneID = zoneID,
-		zoneName = zoneName or ("%s %s"):format(_G.UNKNOWN, _G.PARENS_TEMPLATE:format(zoneID)),
+		zoneName = HereBeDragons:GetLocalizedMap(digsiteTemplate.mapID) or ("%s %s"):format(_G.UNKNOWN, _G.PARENS_TEMPLATE:format(zoneID)),
 	}, digsiteMetatable)
 
 	Digsites[digsite.blobID] = digsite
@@ -163,6 +172,8 @@ function private.AddDigsite(digsiteTemplate, landmarkName, continentID, zoneID, 
 
 	mapIconFrame.onUpdateElapsedTime = 0
 	mapIconFrame.tooltip = ""
+
+	mapIconFrame.GetDistance = MapIconFrameGetDistance
 
 	digsite.mapIconFrame = mapIconFrame
 
@@ -202,7 +213,7 @@ function Digsite:AddSurveyNode(mapID, mapLevel, coordX, coordY)
 
 	for nodeIndex = 1, #surveyNodes do
 		local node = surveyNodes[nodeIndex]
-		local distance = Astrolabe:ComputeDistance(mapID, mapLevel, coordX, coordY, node.m, node.f, node.x, node.y)
+		local distance = HereBeDragons:GetZoneDistance(mapID, mapLevel, coordX, coordY, node.m, node.f, node.x, node.y)
 		if not distance or _G.IsInInstance() then
 			distance = 0
 		end
@@ -230,7 +241,7 @@ end
 function Digsite:DisableMapIcon()
 	local mapIcon = self.mapIconFrame
 
-	Astrolabe:RemoveIconFromMinimap(mapIcon)
+	HereBeDragonsPins:RemoveMinimapIcon(self, mapIcon)
 	mapIcon:Hide()
 end
 
@@ -238,7 +249,7 @@ function Digsite:DisableSurveyNodes()
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
 
-		Astrolabe:RemoveIconFromMinimap(node)
+		HereBeDragonsPins:RemoveMinimapIcon(self, node)
 		node:Hide()
 	end
 
@@ -248,7 +259,7 @@ function Digsite:EnableMapIcon(tooltipText)
 	local mapIcon = self.mapIconFrame
 	mapIcon.tooltip = tooltipText or ("%s %s\n%s"):format(self.name, _G.PARENS_TEMPLATE:format(self.race.name), self.zoneName)
 
-	Astrolabe:PlaceIconOnMinimap(self.mapIconFrame, self.mapID, self.level, self.coordX, self.coordY)
+	HereBeDragonsPins:AddMinimapIconMF(self, self.mapIconFrame, self.mapID, self.level, self.coordX, self.coordY)
 	mapIcon:Show()
 
 	MapIcon_OnUpdate(mapIcon, 5)
@@ -262,7 +273,7 @@ function Digsite:EnableSurveyNodes()
 		local node = self.surveyNodes[nodeIndex]
 		local savedData = node.savedData
 
-		Astrolabe:PlaceIconOnMinimap(node, savedData.m, savedData.f, savedData.x, savedData.y)
+		HereBeDragonsPins:AddMinimapIconMF(self, node, savedData.m, savedData.f, savedData.x, savedData.y)
 		node:Show()
 
 		MapIcon_OnUpdate(node, 5)
@@ -303,14 +314,16 @@ function Digsite:UpdateSurveyNodeDistanceColors()
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
 
-		local distance = Astrolabe:GetDistanceToIcon(node) or 0
+		local angle, distance = HereBeDragonsPins:GetVectorToIcon(node)
 
-		if distance >= minGreen and distance <= maxGreen then
-			node.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
-		elseif distance >= minYellow and distance <= maxYellow then
-			node.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
-		elseif distance >= minRed and distance <= maxRed then
-			node.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+		if distance then
+			if distance >= minGreen and distance <= maxGreen then
+				node.icon:SetTexCoord(0.75, 1, 0.5, 0.734375)
+			elseif distance >= minYellow and distance <= maxYellow then
+				node.icon:SetTexCoord(0.5, 0.734375, 0.5, 0.734375)
+			elseif distance >= minRed and distance <= maxRed then
+				node.icon:SetTexCoord(0.25, 0.484375, 0.5, 0.734375)
+			end
 		end
 	end
 end

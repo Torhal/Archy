@@ -6,9 +6,6 @@ package-as: Archy
 
 license-output: LICENSE.txt
 
-tools-used:
-    - astrolabe
-
 optional-dependencies:
     - tomtom
 
@@ -66,5 +63,5 @@ externals:
     Libs/LibTextDump-1.0:
         url: git://git.wowace.com/wow/libtextdump-1-0/mainline.git
         tag: latest
-    Libs/Astrolabe-1.0:
-        url: https://github.com/jnwhiteh/astrolabe.git
+    Libs/HereBeDragons-1.0:
+        url: git://git.wowace.com/wow/herebedragons/mainline.git

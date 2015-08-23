@@ -21,7 +21,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 local LSM = LibStub("LibSharedMedia-3.0")
 
-local Astrolabe = _G.DongleStub("Astrolabe-1.0")
+local HereBeDragons = LibStub("HereBeDragons-1.0")
 
 -----------------------------------------------------------------------
 -- Constants.
@@ -584,7 +584,7 @@ do
 			return
 		end
 
-		local distance = Astrolabe:ComputeDistance(mapID, mapLevel, mapX, mapY, surveyMapID, surveyMapLevel, surveyMapX, surveyMapY) or 0
+		local distance = HereBeDragons:GetZoneDistance(mapID, mapLevel, mapX, mapY, surveyMapID, surveyMapLevel, surveyMapX, surveyMapY) or 0
 		local greenMin, greenMax = 0, private.ProfileSettings.digsite.distanceIndicator.green
 		local yellowMin, yellowMax = greenMax, private.ProfileSettings.digsite.distanceIndicator.yellow
 		local redMin, redMax = yellowMax, 500
