@@ -399,11 +399,9 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		local tomtomSettings = private.ProfileSettings.tomtom
 		TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 
-		if TomTomHandler.hasTomTom and tomtomSettings.enabled then
-			if _G.TomTom.profile then
-				_G.TomTom.profile.arrow.arrival = tomtomSettings.distance
-				_G.TomTom.profile.arrow.enablePing = tomtomSettings.ping
-			end
+		if TomTomHandler.hasTomTom and tomtomSettings.enabled and _G.TomTom.profile then
+			_G.TomTom.profile.arrow.arrival = tomtomSettings.distance
+			_G.TomTom.profile.arrow.enablePing = tomtomSettings.ping
 		end
 		TomTomHandler:Refresh(nearestDigsite)
 	end,
