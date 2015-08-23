@@ -240,40 +240,47 @@ end
 
 function Digsite:DisableMapIcon()
 	local mapIcon = self.mapIconFrame
+	mapIcon.isEnabled = nil
+	mapIcon:Hide()
 
 	HereBeDragonsPins:RemoveMinimapIcon(self, mapIcon)
-	mapIcon:Hide()
 end
 
 function Digsite:DisableSurveyNodes()
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
+		node.isEnabled = nil
+		node:Hide()
 
 		HereBeDragonsPins:RemoveMinimapIcon(self, node)
-		node:Hide()
 	end
 
 end
 
 function Digsite:EnableMapIcon(tooltipText)
 	local mapIcon = self.mapIconFrame
-	mapIcon.tooltip = tooltipText or ("%s %s\n%s"):format(self.name, _G.PARENS_TEMPLATE:format(self.race.name), self.zoneName)
+	if not mapIcon.isEnabled then
+		mapIcon.isEnabled = true
+		mapIcon.tooltip = tooltipText or ("%s %s\n%s"):format(self.name, _G.PARENS_TEMPLATE:format(self.race.name), self.zoneName)
+		mapIcon:Show()
 
-	HereBeDragonsPins:AddMinimapIconMF(self, self.mapIconFrame, self.mapID, self.level, self.coordX, self.coordY)
-	mapIcon:Show()
+		HereBeDragonsPins:AddMinimapIconMF(self, self.mapIconFrame, self.mapID, self.level, self.coordX, self.coordY, true)
 
-	MapIcon_OnUpdate(mapIcon, 5)
+		MapIcon_OnUpdate(mapIcon, 5)
+	end
 end
 
 function Digsite:EnableSurveyNodes()
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
-		local savedData = node.savedData
+		if not node.isEnabled then
+			local savedData = node.savedData
+			node:Show()
 
-		HereBeDragonsPins:AddMinimapIconMF(self, node, savedData.m, savedData.f, savedData.x, savedData.y)
-		node:Show()
+			HereBeDragonsPins:AddMinimapIconMF(self, node, savedData.m, savedData.f, savedData.x, savedData.y)
 
-		MapIcon_OnUpdate(node, 5)
+			MapIcon_OnUpdate(node, 5)
+		end
 	end
 end
 
