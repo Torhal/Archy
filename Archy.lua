@@ -143,7 +143,6 @@ private.DebugPour = DebugPour
 -- Function upvalues
 -----------------------------------------------------------------------
 local Blizzard_SolveArtifact
-local UpdateMinimapIcons
 local UpdateAllSites
 
 -----------------------------------------------------------------------
@@ -204,6 +203,39 @@ local function ToggleDigsiteVisibility(show)
 	end
 
 	_G.RefreshWorldMap()
+end
+
+local function UpdateMinimapIcons()
+	if not private.hasArchaeology or not playerLocation.x and not playerLocation.y then
+		return
+	end
+
+	local continentDigsites = continent_digsites[private.CurrentContinentID]
+	if not continentDigsites then
+		return
+	end
+
+	local minimapSettings = private.ProfileSettings.minimap
+	local canShow = private.ProfileSettings.general.show and minimapSettings.show
+
+	for _, digsite in pairs(continentDigsites) do
+		if canShow then
+			if nearestDigsite == digsite or not minimapSettings.nearest then
+				digsite:EnableMapIcon()
+			else
+				digsite:DisableMapIcon()
+			end
+
+			if nearestDigsite == digsite and minimapSettings.fragmentNodes then
+				digsite:EnableSurveyNodes()
+			else
+				digsite:DisableSurveyNodes()
+			end
+		else
+			digsite:DisableMapIcon()
+			digsite:DisableSurveyNodes()
+		end
+	end
 end
 
 local function HideFrames()
@@ -589,41 +621,6 @@ function Archy:UpdateSiteDistances()
 
 	table.sort(continentDigsites, private.ProfileSettings.digsite.sortByDistance and SortSitesByDistance or SortSitesByZoneNameAndName)
 end
-
-do
-	function UpdateMinimapIcons()
-		if not private.hasArchaeology or not playerLocation.x and not playerLocation.y then
-			return
-		end
-
-		local continentDigsites = continent_digsites[private.CurrentContinentID]
-		if not continentDigsites then
-			return
-		end
-
-		local minimapSettings = private.ProfileSettings.minimap
-		local canShow = private.ProfileSettings.general.show and minimapSettings.show
-
-		for _, digsite in pairs(continentDigsites) do
-			if canShow then
-				if nearestDigsite == digsite or not minimapSettings.nearest then
-					digsite:EnableMapIcon()
-				else
-					digsite:DisableMapIcon()
-				end
-
-				if nearestDigsite == digsite and minimapSettings.fragmentNodes then
-					digsite:EnableSurveyNodes()
-				else
-					digsite:DisableSurveyNodes()
-				end
-			else
-				digsite:DisableMapIcon()
-				digsite:DisableSurveyNodes()
-			end
-		end
-	end
-end -- do-block
 
 function Archy:OnInitialize()
 	private.isLoading = true
