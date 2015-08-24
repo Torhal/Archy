@@ -72,11 +72,17 @@ do
 
 		if self.arrow then
             if isOnEdge then
-                self.icon:Hide()
+				local angle = HereBeDragonsPins:GetVectorToIcon(self)
+				if not angle then
+					self:Hide()
+					return
+				end
+				angle = angle + RAD_135
+
+				self.icon:Hide()
                 self.arrow:Show()
 
 				-- Rotate the icon, as required
-				local angle = HereBeDragonsPins:GetVectorToIcon(self) + RAD_135
 				if _G.GetCVar("rotateMinimap") == "1" then
 					angle = angle - _G.GetPlayerFacing()
 				end
