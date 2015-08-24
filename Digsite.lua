@@ -274,9 +274,10 @@ function Digsite:EnableSurveyNodes()
 	for nodeIndex = 1, #self.surveyNodes do
 		local node = self.surveyNodes[nodeIndex]
 		if not node.isEnabled then
-			local savedData = node.savedData
+			node.isEnabled = true
 			node:Show()
 
+			local savedData = node.savedData
 			HereBeDragonsPins:AddMinimapIconMF(self, node, savedData.m, savedData.f, savedData.x, savedData.y)
 
 			MapIcon_OnUpdate(node, 5)
