@@ -77,7 +77,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 182,
 		typeID = DigsiteType.Nightelf,
 	},
-	["1:0.539285:0.932202"] = { -- Cursed Landing Digsite
+	["1:0.539286:0.932202"] = { -- Cursed Landing Digsite
 		blobID = 60352,
 		mapID = 720,
 		typeID = DigsiteType.Tolvir,
