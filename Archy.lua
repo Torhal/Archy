@@ -39,7 +39,6 @@ DatamineTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
 -----------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------
-local DIGSITE_TEMPLATES = private.DIGSITE_TEMPLATES
 local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of vanilla
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
@@ -518,13 +517,13 @@ function UpdateAllSites()
 		_G.SetMapZoom(continentID)
 
 		for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-			local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
+			local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
 
-			if textureIndex == DIG_LOCATION_TEXTURE_INDEX and mapPositionX and mapPositionY then
+			if landmarkType == _G.LE_MAP_LANDMARK_TYPE_DIGSITE and mapPositionX and mapPositionY then
 				local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
 				local mapID, floorID = HereBeDragons:GetMapIDFromCZ(continentID, 0)
 
-				local digsiteTemplate = DIGSITE_TEMPLATES[siteKey]
+				local digsiteTemplate = private.DIGSITE_TEMPLATES[siteKey]
 				if digsiteTemplate then
 					local digsite = private.Digsites[digsiteTemplate.blobID]
 					if not digsite then
@@ -958,7 +957,7 @@ local SUBCOMMAND_FUNCS = {
 				if landmarkType == _G.LE_MAP_LANDMARK_TYPE_DIGSITE then
 					local siteKey = ("%d:%.6f:%.6f"):format(_G.GetCurrentMapContinent(), mapPositionX, mapPositionY)
 
-					if not DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
+					if not private.DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
 						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteType.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
 						sites[siteKey] = true
 						found = found + 1
