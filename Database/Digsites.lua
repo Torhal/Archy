@@ -1656,6 +1656,49 @@ local DIGSITE_TEMPLATES = {
 		mapID = 946,
 		typeID = DigsiteType.Ogre,
 	},
+	-----------------------------------------------------------------------
+	-- Broken Isles
+	-----------------------------------------------------------------------
+	["8:0.366973:0.540268"] = { -- Llothien
+		blobID = 346522,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.378757:0.617903"] = { -- Garden of Elune
+		blobID = 354033,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.401902:0.599032"] = { -- The Ruined Sancum
+		blobID = 354037,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.335282:0.621327"] = { -- Old Coast Path
+		blobID = 354041,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.369362:0.683355"] = { --Temple of a Thousand Lights
+		blobID = 354043,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.371113:0.474498"] = { -- Ruins of Zarkhenar
+		blobID = 354045,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.301361:0.459210"] = { -- The Tidal Marsh
+		blobID = 354047,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
+	["8:0.307413:0.556034"] = { -- Nor'Danil Wellspring
+		blobID = 354049,
+		mapID = 1015,
+		typeID = DigsiteType.Unknown,
+	},
 }
 
 local CONTINENT_RACES = {}
