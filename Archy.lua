@@ -48,7 +48,6 @@ local GLOBAL_COOLDOWN_TIME = 1.5
 local SECURE_ACTION_BUTTON -- Populated in Archy:OnInitialize()
 local SURVEY_SPELL_ID = 80451
 local CRATE_USE_STRING -- Populate in Archy:OnEnable()
-local DIG_LOCATION_TEXTURE_INDEX = 177
 
 local ZONE_DATA = {}
 private.ZONE_DATA = ZONE_DATA
@@ -954,9 +953,9 @@ local SUBCOMMAND_FUNCS = {
 			_G.SetMapZoom(continentID)
 
 			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-				local landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
+				local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY, mapLinkID, showInBattleMap = _G.GetMapLandmarkInfo(landmarkIndex)
 
-				if textureIndex == DIG_LOCATION_TEXTURE_INDEX then
+				if landmarkType == _G.LE_MAP_LANDMARK_TYPE_DIGSITE then
 					local siteKey = ("%d:%.6f:%.6f"):format(_G.GetCurrentMapContinent(), mapPositionX, mapPositionY)
 
 					if not DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
