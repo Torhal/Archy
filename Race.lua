@@ -76,6 +76,10 @@ function private.InitializeRaces()
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Troll] = _G.GetCurrencyInfo(385)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Vrykul] = _G.GetCurrencyInfo(399)
 
+	for raceID, currencyName in pairs(CurrencyNameFromRaceID) do
+		Races[raceID].currencyName = currencyName
+	end
+
 	private.InitializeRaces = nil
 end
 
@@ -95,7 +99,6 @@ function private.AddRace(raceID)
 
 	local race = _G.setmetatable({
 		Artifacts = {},
-		currencyName = CurrencyNameFromRaceID[raceID],
 		currentProject = nil,
 		fragmentsCollected = fragmentsCollected,
 		ID = raceID,
