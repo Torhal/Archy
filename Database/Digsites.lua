@@ -1555,7 +1555,7 @@ local DIGSITE_TEMPLATES = {
 		mapID = 950,
 		typeID = DigsiteType.DraenorClans,
 	},
-	["7:0.318060:0.529386"] = { -- Ring of Trials Sludge Digsite
+	["7:0.317620:0.529452"] = { -- Ring of Trials Sludge Digsite
 		blobID = 307989,
 		mapID = 950,
 		typeID = DigsiteType.DraenorClans,
