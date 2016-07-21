@@ -1100,7 +1100,7 @@ do
 
 			local start, duration, enable = _G.GetItemCooldown(LorewalkersMap.itemID)
 			if start > 0 and duration > 0 then
-				_G.CooldownFrame_SetTimer(loreItemButton.cooldown, start, duration, enable)
+				_G.CooldownFrame_Set(loreItemButton.cooldown, start, duration, enable)
 			end
 		end
 
@@ -1288,7 +1288,7 @@ do
 	end
 
 	local function SetSurveyCooldown(time)
-		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
+		_G.CooldownFrame_Set(DistanceIndicatorFrame.surveyButton.cooldown, _G.GetSpellCooldown(SURVEY_SPELL_ID))
 	end
 
 	function Archy:ARCHAEOLOGY_SURVEY_CAST(eventName, numFindsCompleted, totalFinds)
@@ -1325,7 +1325,7 @@ do
 				if duration <= GLOBAL_COOLDOWN_TIME then
 					self:ScheduleTimer(SetSurveyCooldown, (start + duration) - now)
 				elseif duration > GLOBAL_COOLDOWN_TIME then
-					_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.surveyButton.cooldown, start, duration, enable)
+					_G.CooldownFrame_Set(DistanceIndicatorFrame.surveyButton.cooldown, start, duration, enable)
 				end
 			end
 		end
@@ -1728,7 +1728,7 @@ end
 
 do
 	local function SetLoreItemCooldown(time)
-		_G.CooldownFrame_SetTimer(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LorewalkersMap.itemID))
+		_G.CooldownFrame_Set(DistanceIndicatorFrame.loritemButton.cooldown, _G.GetItemCooldown(LorewalkersMap.itemID))
 	end
 
 	function Archy:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, line_id, spellID)
