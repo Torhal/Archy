@@ -2002,9 +2002,11 @@ function private.InitializeDigsiteTemplates()
 	private.CONTINENT_RACES = CONTINENT_RACES
 
 	for siteKey, site in pairs(DIGSITE_TEMPLATES) do
-		local continentID = tonumber(((":"):split(siteKey)))
-		CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
-		CONTINENT_RACES[continentID][site.typeID] = true
+		if site.typeID ~= RaceID.Unknown then
+			local continentID = tonumber(((":"):split(siteKey)))
+			CONTINENT_RACES[continentID] = CONTINENT_RACES[continentID] or {}
+			CONTINENT_RACES[continentID][site.typeID] = true
+		end
 	end
 
 
