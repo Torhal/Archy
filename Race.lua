@@ -104,10 +104,13 @@ function private.AddRace(raceID)
 		race.Artifacts[artifactName:lower()] = artifact
 	end
 
-	for itemID, template in pairs(private.ARTIFACT_TEMPLATES[raceID]) do
-        if not race:AddOrUpdateArtifactFromTemplate(template) then
-			RaceArtifactProcessingQueue[template] = race
-			Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+	local artifactTemplates = private.ARTIFACT_TEMPLATES[raceID]
+	if artifactTemplates then
+		for itemID, template in pairs(artifactTemplates) do
+			if not race:AddOrUpdateArtifactFromTemplate(template) then
+				RaceArtifactProcessingQueue[template] = race
+				Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+			end
 		end
 	end
 
