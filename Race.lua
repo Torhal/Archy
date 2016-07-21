@@ -57,21 +57,24 @@ function private.InitializeRaces()
 		KeystoneIDToRace[race.keystone.ID] = race
 	end
 
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Dwarf] = _G.GetCurrencyInfo(384)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Arakkoa] = _G.GetCurrencyInfo(829)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Demonic] = _G.GetCurrencyInfo(1174)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Draenei] = _G.GetCurrencyInfo(398)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.DraenorClans] = _G.GetCurrencyInfo(821)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Dwarf] = _G.GetCurrencyInfo(384)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Fossil] = _G.GetCurrencyInfo(393)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Highborne] = _G.GetCurrencyInfo(1172)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.HighmountainTauren] = _G.GetCurrencyInfo(1173)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Mantid] = _G.GetCurrencyInfo(754)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Mogu] = _G.GetCurrencyInfo(677)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.NightElf] = _G.GetCurrencyInfo(394)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Nerubian] = _G.GetCurrencyInfo(400)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Ogre] = _G.GetCurrencyInfo(828)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Orc] = _G.GetCurrencyInfo(397)
+	CurrencyNameFromRaceID[ArchaeologyRaceID.Pandaren] = _G.GetCurrencyInfo(676)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Tolvir] = _G.GetCurrencyInfo(401)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Troll] = _G.GetCurrencyInfo(385)
 	CurrencyNameFromRaceID[ArchaeologyRaceID.Vrykul] = _G.GetCurrencyInfo(399)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Mantid] = _G.GetCurrencyInfo(754)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Pandaren] = _G.GetCurrencyInfo(676)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Mogu] = _G.GetCurrencyInfo(677)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Arakkoa] = _G.GetCurrencyInfo(829)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.DraenorClans] = _G.GetCurrencyInfo(821)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Ogre] = _G.GetCurrencyInfo(828)
 
 	private.InitializeRaces = nil
 end
