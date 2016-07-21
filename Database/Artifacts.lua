@@ -22,13 +22,13 @@ local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 -- Extracted from ResearchProject.dbc
 -- ItemIDs from wowhead (haven't found a lookup table in the dbcs yet)
 function private.InitializeArtifactTemplates()
-	local ArchaeologyRaceID = private.ArchaeologyRaceID
+	local RaceID = private.RaceID
 
 	local ARTIFACT_TEMPLATES = {
 		-----------------------------------------------------------------------
 		-- Arakkoa
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Arakkoa] = {
+		[RaceID.ArchRaceArakkoa] = {
 			[117354] = {
 				-- Ancient Nest Guardian
 				isRare = true,
@@ -96,7 +96,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Draenei
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Draenei] = {
+		[RaceID.ArchRaceDraenei] = {
 			[64440] = {
 				-- Anklet with Golden Bells
 				itemID = 64440,
@@ -154,7 +154,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- DraenorClans
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.DraenorClans] = {
+		[RaceID.ArchRaceDraenorOrc] = {
 			[116985] = {
 				-- Headdress of the First Shaman
 				isRare = true,
@@ -267,7 +267,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Dwarf
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Dwarf] = {
+		[RaceID.ArchRaceDwarf] = {
 			[63113] = {
 				-- Belt Buckle with Anvilmar Crest
 				itemID = 63113,
@@ -432,7 +432,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Fossil
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Fossil] = {
+		[RaceID.ArchRaceFossil] = {
 			[69776] = {
 				-- Ancient Amber
 				isRare = true,
@@ -528,7 +528,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Mantid
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Mantid] = {
+		[RaceID.ArchRaceMantid] = {
 			[95376] = {
 				-- Ancient Sap Feeder
 				itemID = 95376,
@@ -586,7 +586,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Mogu
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Mogu] = {
+		[RaceID.ArchRaceMogu] = {
 			[89614] = {
 				-- Anatomical Dummy
 				isRare = true,
@@ -654,7 +654,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Nerubian
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Nerubian] = {
+		[RaceID.ArchRaceNerubian] = {
 			[64481] = {
 				-- Blessing of the Old God
 				isRare = true,
@@ -707,7 +707,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Night Elf
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.NightElf] = {
+		[RaceID.ArchRaceNightElf] = {
 			[64646] = {
 				-- Bones of Transformation
 				isRare = true,
@@ -845,7 +845,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Ogre
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Ogre] = {
+		[RaceID.ArchRaceOgre] = {
 			[114191] = {
 				-- Eye of Har'gunn the Blind
 				itemID = 114191,
@@ -913,7 +913,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Orc
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Orc] = {
+		[RaceID.ArchRaceOrc] = {
 			[64436] = {
 				-- Fiendish Whip
 				itemID = 64436,
@@ -970,7 +970,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Pandaren
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Pandaren] = {
+		[RaceID.ArchRacePandaren] = {
 			[79903] = {
 				-- Apothecary Tins
 				itemID = 79903,
@@ -1038,7 +1038,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Tolvir
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Tolvir] = {
+		[RaceID.ArchRaceTolvir] = {
 			[64657] = {
 				-- Canopic Jar
 				itemID = 64657,
@@ -1116,7 +1116,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Troll
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Troll] = {
+		[RaceID.ArchRaceTroll] = {
 			[64348] = {
 				-- Atal'ai Scepter
 				itemID = 64348,
@@ -1210,7 +1210,7 @@ function private.InitializeArtifactTemplates()
 		-----------------------------------------------------------------------
 		-- Vrykul
 		-----------------------------------------------------------------------
-		[ArchaeologyRaceID.Vrykul] = {
+		[RaceID.ArchRaceVrykul] = {
 			[64464] = {
 				-- Fanged Cloak Pin
 				itemID = 64464,

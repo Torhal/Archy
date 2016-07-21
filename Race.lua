@@ -35,8 +35,8 @@ local raceMetatable = {
 	__index = Race
 }
 
-local ArchaeologyRaceID = {	Unknown = 0 } -- Populated in AddRace
-private.ArchaeologyRaceID = ArchaeologyRaceID
+local RaceID = {	Unknown = 0 } -- Populated in AddRace
+private.RaceID = RaceID
 
 local AechaeologyRaceLabelFromID = {} -- Populated in AddRace
 private.AechaeologyRaceLabelFromID = AechaeologyRaceLabelFromID
@@ -57,24 +57,24 @@ function private.InitializeRaces()
 		KeystoneIDToRace[race.keystone.ID] = race
 	end
 
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Arakkoa] = _G.GetCurrencyInfo(829)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Demonic] = _G.GetCurrencyInfo(1174)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Draenei] = _G.GetCurrencyInfo(398)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.DraenorClans] = _G.GetCurrencyInfo(821)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Dwarf] = _G.GetCurrencyInfo(384)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Fossil] = _G.GetCurrencyInfo(393)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Highborne] = _G.GetCurrencyInfo(1172)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.HighmountainTauren] = _G.GetCurrencyInfo(1173)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Mantid] = _G.GetCurrencyInfo(754)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Mogu] = _G.GetCurrencyInfo(677)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.NightElf] = _G.GetCurrencyInfo(394)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Nerubian] = _G.GetCurrencyInfo(400)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Ogre] = _G.GetCurrencyInfo(828)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Orc] = _G.GetCurrencyInfo(397)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Pandaren] = _G.GetCurrencyInfo(676)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Tolvir] = _G.GetCurrencyInfo(401)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Troll] = _G.GetCurrencyInfo(385)
-	CurrencyNameFromRaceID[ArchaeologyRaceID.Vrykul] = _G.GetCurrencyInfo(399)
+	CurrencyNameFromRaceID[RaceID.ArchRaceArakkoa] = _G.GetCurrencyInfo(829)
+	CurrencyNameFromRaceID[RaceID.ArchRaceDemons] = _G.GetCurrencyInfo(1174)
+	CurrencyNameFromRaceID[RaceID.ArchRaceDraenei] = _G.GetCurrencyInfo(398)
+	CurrencyNameFromRaceID[RaceID.ArchRaceDraenorOrc] = _G.GetCurrencyInfo(821)
+	CurrencyNameFromRaceID[RaceID.ArchRaceDwarf] = _G.GetCurrencyInfo(384)
+	CurrencyNameFromRaceID[RaceID.ArchRaceFossil] = _G.GetCurrencyInfo(393)
+	CurrencyNameFromRaceID[RaceID.ArchRaceHighborneNightElves] = _G.GetCurrencyInfo(1172)
+	CurrencyNameFromRaceID[RaceID.ArchRaceHighmountainTauren] = _G.GetCurrencyInfo(1173)
+	CurrencyNameFromRaceID[RaceID.ArchRaceMantid] = _G.GetCurrencyInfo(754)
+	CurrencyNameFromRaceID[RaceID.ArchRaceMogu] = _G.GetCurrencyInfo(677)
+	CurrencyNameFromRaceID[RaceID.ArchRaceNightElf] = _G.GetCurrencyInfo(394)
+	CurrencyNameFromRaceID[RaceID.ArchRaceNerubian] = _G.GetCurrencyInfo(400)
+	CurrencyNameFromRaceID[RaceID.ArchRaceOgre] = _G.GetCurrencyInfo(828)
+	CurrencyNameFromRaceID[RaceID.ArchRaceOrc] = _G.GetCurrencyInfo(397)
+	CurrencyNameFromRaceID[RaceID.ArchRacePandaren] = _G.GetCurrencyInfo(676)
+	CurrencyNameFromRaceID[RaceID.ArchRaceTolvir] = _G.GetCurrencyInfo(401)
+	CurrencyNameFromRaceID[RaceID.ArchRaceTroll] = _G.GetCurrencyInfo(385)
+	CurrencyNameFromRaceID[RaceID.ArchRaceVrykul] = _G.GetCurrencyInfo(399)
 
 	for raceID, currencyName in pairs(CurrencyNameFromRaceID) do
 		Races[raceID].currencyName = currencyName
@@ -90,11 +90,12 @@ function private.AddRace(raceID)
 		return
 	end
 
-	local raceName, raceTexture, keystoneItemID, fragmentsCollected, _, maxFragments = _G.GetArchaeologyRaceInfo(raceID)
+	local raceName, raceTexturePath, keystoneItemID, fragmentsCollected, _, maxFragments = _G.GetArchaeologyRaceInfo(raceID)
+	local _, _, textureName = ("\\"):split(raceTexturePath)
+	local raceLabel = textureName:gsub("-", "")
 	local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
-	local raceLabel = raceName:gsub(" ", ""):gsub("'", "")
 
-	ArchaeologyRaceID[raceLabel] = raceID
+	RaceID[raceLabel] = raceID
 	AechaeologyRaceLabelFromID[raceID] = raceLabel
 
 	local race = _G.setmetatable({
@@ -105,7 +106,7 @@ function private.AddRace(raceID)
 		label = raceLabel,
 		maxFragments = maxFragments,
 		name = raceName,
-		texture = raceTexture,
+		texture = raceTexturePath,
 		keystone = {
 			ID = keystoneItemID,
 			name = keystoneName,
