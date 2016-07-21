@@ -31,6 +31,9 @@ local DigsiteType = {
 	Arakkoa = 13,
 	DraenorClans = 14,
 	Ogre = 15,
+	Highborne = 16,
+	HighmountainTauren = 17,
+	Demonic = 18,
 	Unknown = 0,
 }
 
