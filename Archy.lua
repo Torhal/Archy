@@ -86,8 +86,6 @@ _G.BINDING_NAME_DIGSITESARCHY = L["BINDING_NAME_DIGSITES"]
 local continent_digsites = {}
 private.continent_digsites = continent_digsites
 
-local KeystoneIDToRace = {}
-
 local lootedKeystoneRace -- this is to force a refresh after the BAG_UPDATE event
 local digsitesTrackingID -- set in Archy:OnEnable()
 
@@ -810,15 +808,9 @@ function Archy:OnEnable()
 	TomTomHandler.hasTomTom = (_G.TomTom and _G.TomTom.AddZWaypoint and _G.TomTom.RemoveWaypoint) and true or false
 	TomTomHandler.hasPOIIntegration = TomTomHandler.hasTomTom and (_G.TomTom.profile and _G.TomTom.profile.poi and _G.TomTom.EnableDisablePOIIntegration) and true or false
 
-	-----------------------------------------------------------------------
-	-- Initialize Races
-	-----------------------------------------------------------------------
-	_G.RequestArtifactCompletionHistory()
-
-	for raceID = 1, _G.GetNumArchaeologyRaces() do
-		local race = private.AddRace(raceID)
-		KeystoneIDToRace[race.keystone.ID] = race
-	end
+	private.InitializeRaces()
+	private.InitializeDigsiteTemplates()
+	private.InitializeArtifactTemplates()
 
 	-----------------------------------------------------------------------
 	-- Map stuff.
@@ -1451,7 +1443,7 @@ do
             return
         end
 
-        local race = KeystoneIDToRace[GetItemIDFromLink(itemLink)]
+        local race = private.KeystoneIDToRace[GetItemIDFromLink(itemLink)]
         if race then
             currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
             lootedKeystoneRace = race
@@ -1542,7 +1534,7 @@ do
 				if itemLink then
 					local itemID = GetItemIDFromLink(itemLink)
 
-					if itemID and (KeystoneIDToRace[itemID] or QUEST_ITEM_IDS[itemID]) then
+					if itemID and (private.KeystoneIDToRace[itemID] or QUEST_ITEM_IDS[itemID]) then
 						_G.LootSlot(slotID)
 					end
 				end

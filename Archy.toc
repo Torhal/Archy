@@ -60,8 +60,6 @@ Locale\zhTW.lua
 ## Must be loaded first.
 Constants.lua
 
-Database\Digsites.lua
-Database\Artifacts.lua
 Archy.lua
 Interface.xml
 Interface.lua
@@ -70,4 +68,6 @@ Race.lua
 Tooltip.lua
 Config.lua
 TomTomHandler.lua
+Database\Digsites.lua
+Database\Artifacts.lua
 Bindings.xml
