@@ -35,13 +35,16 @@ local raceMetatable = {
 	__index = Race
 }
 
-local RaceID = {	Unknown = 0 } -- Populated in AddRace
+local RaceID = { Unknown = 0 } -- Populated in AddRace
 private.RaceID = RaceID
 
 local AechaeologyRaceLabelFromID = {} -- Populated in AddRace
 private.AechaeologyRaceLabelFromID = AechaeologyRaceLabelFromID
 
-local CurrencyNameFromRaceID = {} -- Populated in InitializeRaces
+-- Populated in InitializeRaces
+local CurrencyNameFromRaceID = {
+	[RaceID.Unknown] = _G.NONE,
+}
 
 local KeystoneIDToRace = {} -- Populated in InitializeRaces
 private.KeystoneIDToRace = KeystoneIDToRace
@@ -56,6 +59,23 @@ function private.InitializeRaces()
 		local race = private.AddRace(raceID)
 		KeystoneIDToRace[race.keystone.ID] = race
 	end
+
+	Races[RaceID.Unknown] = _G.setmetatable({
+		Artifacts = {},
+		currentProject = nil,
+		fragmentsCollected = 0,
+		ID = RaceID.Unknown,
+		label = _G.UNKNOWN,
+		maxFragments = 0,
+		name = _G.UNKNOWN,
+		texture = [[Interface\LFGFRAME\BattlenetWorking1]],
+		keystone = {
+			ID = 0,
+			name = _G.NONE,
+			texture = [[Interface\LFGFRAME\BattlenetWorking4]],
+		},
+		keystonesInInventory = 0,
+	}, raceMetatable)
 
 	CurrencyNameFromRaceID[RaceID.ArchRaceArakkoa] = _G.GetCurrencyInfo(829)
 	CurrencyNameFromRaceID[RaceID.ArchRaceDemons] = _G.GetCurrencyInfo(1174)
