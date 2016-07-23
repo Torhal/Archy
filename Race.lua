@@ -212,9 +212,7 @@ function Race:UpdateCurrentProject()
 	local artifactName, artifactDescription, rarity, icon, spellDescription, numSockets = _G.GetSelectedArtifactInfo()
 	local artifact = self.Artifacts[artifactName:lower()]
 	if not artifact then
-		local errorMessage = "Missing data for %s artifact \"%s\""
-		private.DebugPour(errorMessage, self.name, artifactName)
-		Archy:Printf(errorMessage, self.name, artifactName)
+		private.Debug("Missing data for %s artifact \"%s\"", self.name, artifactName)
 		self.currentProject = nil
 		return
 	end
