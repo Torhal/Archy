@@ -756,7 +756,6 @@ function Archy:OnEnable()
 	self:RegisterEvent("ARCHAEOLOGY_FIND_COMPLETE")
 	self:RegisterEvent("ARCHAEOLOGY_SURVEY_CAST")
 	self:RegisterEvent("ARTIFACT_COMPLETE")
-	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
@@ -772,6 +771,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("PLAYER_STARTED_MOVING")
 	self:RegisterEvent("PLAYER_STOPPED_MOVING")
 	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterEvent("RESEARCH_ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("SKILL_LINES_CHANGED")
 	self:RegisterEvent("TAXIMAP_CLOSED")
 	self:RegisterEvent("TAXIMAP_OPENED")
@@ -1362,7 +1362,7 @@ do
 	end
 end
 
-function Archy:ARTIFACT_DIG_SITE_UPDATED()
+function Archy:RESEARCH_ARTIFACT_DIG_SITE_UPDATED()
 	if not private.CurrentContinentID then
 		return
 	end
