@@ -68,6 +68,7 @@ function private.InitializeRaces()
 		label = _G.UNKNOWN,
 		maxFragments = 0,
 		name = _G.UNKNOWN,
+		numArtifacts = 0,
 		texture = [[Interface\LFGFRAME\BattlenetWorking1]],
 		keystone = {
 			ID = 0,
@@ -126,6 +127,7 @@ function private.AddRace(raceID)
 		label = raceLabel,
 		maxFragments = maxFragments,
 		name = raceName,
+		numArtifacts = _G.GetNumArtifactsByRace(raceID) or 0,
 		texture = raceTexturePath,
 		keystone = {
 			ID = keystoneItemID,
@@ -142,7 +144,7 @@ function private.AddRace(raceID)
 		Archy:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 
-	for artifactIndex = 1, _G.GetNumArtifactsByRace(raceID) do
+	for artifactIndex = 1, race.numArtifacts do
 		local artifactName, artifactDescription, artifactRarity, artifactIcon, hoverDescription, keystoneCount, bgTexture, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(raceID, artifactIndex)
 		local artifact = {
 			ID = artifactIndex,
@@ -189,16 +191,17 @@ function Race:AddOrUpdateArtifactFromTemplate(template)
 end
 
 function Race:GetArtifactCompletionCountByName(targetArtifactName)
-	if not targetArtifactName or targetArtifactName == "" then
+	if not targetArtifactName or targetArtifactName == "" or self.numArtifacts == 0 then
 		return
 	end
 
-	for artifactIndex = 1, _G.GetNumArtifactsByRace(self.ID) do
+	for artifactIndex = 1, self.numArtifacts do
 		local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
 		if artifactName == targetArtifactName then
 			return completionCount
 		end
 	end
+
 	return 0
 end
 
@@ -219,7 +222,7 @@ function Race:KeystoneSocketOnClick(mouseButtonName)
 end
 
 function Race:UpdateCurrentProject()
-	if private.notInWorld or _G.GetNumArtifactsByRace(self.ID) == 0 then
+	if private.notInWorld or self.numArtifacts == 0 then
 		return
 	end
 
