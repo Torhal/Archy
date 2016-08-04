@@ -1147,13 +1147,15 @@ function Archy:UpdatePlayerPosition(force)
 	end
 
 	local mapX, mapY, mapID, mapLevel = HereBeDragons:GetPlayerZonePosition()
+	local continentID = HereBeDragons:GetCZFromMapID(mapID)
+
 	if not mapID or not mapLevel or (mapX == 0 and mapY == 0) then
 		return
 	end
 
 	if not playerLocation.mapID then
 		playerLocation.x, playerLocation.y, playerLocation.mapID, playerLocation.level = mapX, mapY, mapID, mapLevel
-		private.CurrentContinentID = HereBeDragons:GetCZFromMapID(mapID)
+		private.CurrentContinentID = continentID
 		UpdateAllSites()
 	end
 
@@ -1174,7 +1176,6 @@ function Archy:UpdatePlayerPosition(force)
 		self:RefreshDigSiteDisplay()
 	end
 
-	local continentID = _G.GetCurrentMapContinent()
 	if private.CurrentContinentID == continentID then
 		if force then
 			if private.CurrentContinentID then
