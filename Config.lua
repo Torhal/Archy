@@ -206,7 +206,7 @@ local function GetArtifactOptions()
 						show = {
 							order = 1,
 							type = "toggle",
-							name = _G.SHOW,
+							name = _G.DISPLAY,
 							desc = L["Toggles the display of the Artifacts list"],
 							get = function()
 								return artifactSettings.show
@@ -216,25 +216,49 @@ local function GetArtifactOptions()
 								Archy:ConfigUpdated('artifact')
 							end,
 						},
-						filter = {
+						showOptions = {
+							name = _G.DISPLAY_OPTIONS,
 							order = 2,
-							type = "toggle",
-							name = L["Filter by Continent"],
-							desc = L["Filter the Artifact list by races on the continent"],
-							get = function()
-								return artifactSettings.filter
-							end,
-							set = function(_, value)
-								artifactSettings.filter = value
-								Archy:ConfigUpdated('artifact')
-							end,
+							type = "group",
+							guiInline = true,
 							disabled = function()
 								return not artifactSettings.show
 							end,
+							args = {
+								filter = {
+									order = 1,
+									name = L["Filter by Continent"],
+									desc = L["Filter the Artifact list by races on the continent"],
+									type = "toggle",
+									width = "full",
+									get = function()
+										return artifactSettings.filter
+									end,
+									set = function(_, value)
+										artifactSettings.filter = value
+										Archy:ConfigUpdated('artifact')
+									end,
+								},
+								showSkillBar = {
+									order = 2,
+									name = L["Show Archaeology Skill"],
+									desc = L["Show your Archaeology skill on the Artifacts list header"],
+									type = "toggle",
+									width = "full",
+									get = function()
+										return generalSettings.showSkillBar
+									end,
+									set = function(_, value)
+										generalSettings.showSkillBar = value
+										Archy:ConfigUpdated()
+									end,
+								},
+							},
 						},
 						announce = {
 							order = 3,
 							type = "toggle",
+							width = "double",
 							name = L["Announce when solvable"],
 							desc = L["Announce in the chat window when an artifact can be solved with fragments"],
 							get = function()
@@ -259,9 +283,15 @@ local function GetArtifactOptions()
 							end,
 							disabled = function() return not artifactSettings.announce end,
 						},
+						blank1 = {
+							order = 4.5,
+							type = "description",
+							name = "",
+						},
 						ping = {
 							order = 5,
 							type = "toggle",
+							width = "double",
 							name = L["Play sound when solvable"],
 							desc = L["Play a sound when an artifact can be solved with fragments"],
 							get = function()
@@ -300,20 +330,6 @@ local function GetArtifactOptions()
 							end,
 							width = "full",
 						},
-						showSkillBar = {
-							order = 7,
-							name = L["Show Archaeology Skill"],
-							desc = L["Show your Archaeology skill on the Artifacts list header"],
-							type = "toggle",
-							get = function()
-								return generalSettings.showSkillBar
-							end,
-							set = function(_, value)
-								generalSettings.showSkillBar = value
-								Archy:ConfigUpdated()
-							end,
-							width = "double",
-						},
 					},
 				},
 				blacklist = {
@@ -339,6 +355,7 @@ local function GetArtifactOptions()
 										races[raceID] = race.name
 									end
 								end
+
 								return races
 							end,
 							get = function(info, key) return artifactSettings.blacklist[key] end,
@@ -858,7 +875,7 @@ local function GetDigSiteOptions()
 						show = {
 							order = 1,
 							type = "toggle",
-							name = _G.SHOW,
+							name = _G.DISPLAY,
 							desc = L["Toggles the display of the Dig Sites list"],
 							get = function() return digsiteSettings.show end,
 							set = function(_, value)
@@ -866,20 +883,32 @@ local function GetDigSiteOptions()
 								Archy:ConfigUpdated('digsite')
 							end,
 						},
-						sortByDistance = {
+						showOptions = {
+							name = _G.DISPLAY_OPTIONS,
 							order = 2,
-							type = "toggle",
-							name = L["Sort by distance"],
-							desc = L["Sort the dig sites by your distance to them"],
-							get = function() return digsiteSettings.sortByDistance end,
-							set = function(_, value)
-								digsiteSettings.sortByDistance = value
-								Archy:ConfigUpdated('digsite')
+							type = "group",
+							guiInline = true,
+							disabled = function()
+								return not digsiteSettings.show
 							end,
+							args = {
+								sortByDistance = {
+									order = 1,
+									type = "toggle",
+									name = L["Sort by distance"],
+									desc = L["Sort the dig sites by your distance to them"],
+									get = function() return digsiteSettings.sortByDistance end,
+									set = function(_, value)
+										digsiteSettings.sortByDistance = value
+										Archy:ConfigUpdated('digsite')
+									end,
+								},
+							},
 						},
 						announceNearest = {
 							order = 3,
 							type = "toggle",
+							width = "double",
 							name = L["Announce Nearest Dig Site"],
 							desc = L["Announces the nearest dig site when it is found"],
 							get = function() return digsiteSettings.announceNearest end,
