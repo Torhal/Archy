@@ -537,9 +537,11 @@ function UpdateAllSites()
 
 					table.insert(sites, digsite)
 				else
-					local message = "Archy is missing data for dig site %s (key: %s)"
-					Archy:Printf(message, landmarkName, siteKey)
-					DebugPour(message, landmarkName, siteKey)
+					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
+					local message = ([[Missing dig site data: ["%s"] = { blobID = %d, mapID = 0, typeID = RaceID.Unknown } -- %s]]):format(siteKey, blobID, landmarkName)
+
+					Archy:Printf(message)
+					DebugPour(message)
 				end
 			end
 		end
@@ -958,7 +960,7 @@ local SUBCOMMAND_FUNCS = {
 					local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
 
 					if not private.DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
-						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteType.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
+						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = RaceID.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
 						sites[siteKey] = true
 						found = found + 1
 					end
