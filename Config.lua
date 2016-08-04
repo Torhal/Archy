@@ -335,7 +335,9 @@ local function GetArtifactOptions()
 							values = function()
 								local races = {}
 								for raceID, race in pairs(private.Races) do
-									races[raceID] = race.name
+									if raceID ~= private.RaceID.Unknown then
+										races[raceID] = race.name
+									end
 								end
 								return races
 							end,
