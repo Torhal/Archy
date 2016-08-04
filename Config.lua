@@ -905,8 +905,22 @@ local function GetDigSiteOptions()
 								},
 							},
 						},
-						announceNearest = {
+						displayProgressBar = {
 							order = 3,
+							type = "toggle",
+							width = "double",
+							name = _G.ARCHAEOLOGY_DIGSITE_PROGRESS_BAR_TITLE,
+							get = function()
+								return digsiteSettings.displayProgressBar
+							end,
+							set = function(_, value)
+								digsiteSettings.displayProgressBar = value
+
+								Archy[value and "EnableProgressBar" or "DisableProgressBar"](Archy)
+							end,
+						},
+						announceNearest = {
+							order = 4,
 							type = "toggle",
 							width = "double",
 							name = L["Announce Nearest Dig Site"],

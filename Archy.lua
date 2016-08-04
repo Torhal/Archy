@@ -405,6 +405,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		if option == "tooltip" then
 			UpdateAllSites()
 		end
+
 		Archy:UpdateSiteDistances()
 		DigSiteFrame:UpdateChrome()
 
@@ -413,6 +414,7 @@ local CONFIG_UPDATE_FUNCTIONS = {
 		else
 			Archy:RefreshDigSiteDisplay()
 		end
+
 		Archy:SetFramePosition(DigSiteFrame)
 		Archy:SetFramePosition(DistanceIndicatorFrame)
 		DistanceIndicatorFrame:Toggle()
@@ -1268,18 +1270,6 @@ function Archy:ADDON_LOADED(event, addonName)
 end
 
 do
-	local function DisableProgressBar()
-		local bar = _G.ArcheologyDigsiteProgressBar
-		bar:UnregisterEvent("ARCHAEOLOGY_SURVEY_CAST")
-		bar:UnregisterEvent("ARCHAEOLOGY_FIND_COMPLETE")
-		bar:UnregisterEvent("ARTIFACT_DIGSITE_COMPLETE")
-		bar:SetScript("OnEvent", nil)
-		bar:SetScript("OnHide", nil)
-		bar:SetScript("OnShow", nil)
-		bar:SetScript("OnUpdate", nil)
-		bar:Hide()
-	end
-
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
 		DistanceIndicatorFrame.isActive = false
 		DistanceIndicatorFrame:Toggle()
@@ -1295,9 +1285,8 @@ do
 	end
 
 	function Archy:ARCHAEOLOGY_SURVEY_CAST(eventName, numFindsCompleted, totalFinds)
-		if DisableProgressBar then
-			DisableProgressBar()
-			DisableProgressBar = nil
+		if not private.ProfileSettings.digsite.displayProgressBar then
+			self:DisableProgressBar()
 		end
 
 		if not nearestDigsite then

@@ -138,6 +138,7 @@ private.DEFAULT_SETTINGS = {
 			style = "Extended",
 			sortByDistance = true,
 			announceNearest = true,
+			displayProgressBar = false,
 			distanceIndicator = {
 				enabled = true,
 				green = 40,
