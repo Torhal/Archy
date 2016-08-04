@@ -292,18 +292,16 @@ function Digsite:EnableSurveyNodes()
 end
 
 function Digsite:IsBlacklisted()
-	-- TODO: Change this to use the blobID, since digsite names can be non-unique (Outland vs Draenor, for example)
-	return Archy.db.char.digsites.blacklist[self.name]
+	return Archy.db.char.digsites.blacklist[self.blobID]
 end
 
 function Digsite:ToggleBlacklistStatus()
 	local blacklist = Archy.db.char.digsites.blacklist
 
-	-- TODO: Change this to use the blobID, since digsite names can be non-unique (Outland vs Draenor, for example)
-	if blacklist[self.name] then
-		blacklist[self.name] = nil
+	if blacklist[self.blobID] then
+		blacklist[self.blobID] = nil
 	else
-		blacklist[self.name] = true
+		blacklist[self.blobID] = true
 	end
 end
 

@@ -734,9 +734,9 @@ function Archy:OnInitialize()
 	-----------------------------------------------------------------------
 	-- DB cleanups.
 	-----------------------------------------------------------------------
-	for digsiteName, value in pairs(self.db.char.digsites.blacklist) do
+	for blobID, value in pairs(self.db.char.digsites.blacklist) do
 		if value == false then
-			self.db.char.digsites.blacklist[digsiteName] = nil
+			self.db.char.digsites.blacklist[blobID] = nil
 		end
 	end
 
