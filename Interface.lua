@@ -550,10 +550,8 @@ do
 			if not canShow then
 				self:Hide()
 			end
-		else
-			if canShow then
-				self:Show()
-			end
+		elseif canShow then
+			self:Show()
 		end
 	end
 
