@@ -948,14 +948,14 @@ local SUBCOMMAND_FUNCS = {
 
 		Debug("Scanning digsites:\n")
 
-		for continentIndex, continentID in pairs({ 1, 2, 3, 4, 6, 7 }) do
+		for continentID, continentName in pairs(MAP_CONTINENTS) do
 			_G.SetMapZoom(continentID)
 
 			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
 				local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY, mapLinkID, showInBattleMap = _G.GetMapLandmarkInfo(landmarkIndex)
 
 				if landmarkType == _G.LE_MAP_LANDMARK_TYPE_DIGSITE then
-					local siteKey = ("%d:%.6f:%.6f"):format(_G.GetCurrentMapContinent(), mapPositionX, mapPositionY)
+					local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
 
 					if not private.DIGSITE_TEMPLATES[siteKey] and not sites[siteKey] then
 						Debug(("[\"%s\"] = { blobID = %d, mapID = 0, typeID = DigsiteType.Unknown } -- \"%s\""):format(siteKey, _G.ArcheologyGetVisibleBlobID(landmarkIndex), landmarkName))
