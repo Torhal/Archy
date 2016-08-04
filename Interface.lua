@@ -111,7 +111,7 @@ do
 					local completionCount = race:GetArtifactCompletionCountByName(project.name)
 					local continentHasRace = currentContinentRaces and currentContinentRaces[raceID]
 
-					if not race:IsOnArtifactBlacklist() and project.fragments_required > 0 and (not artifactSettings.filter or continentHasRace) then
+					if not race:IsOnArtifactBlacklist() and project.fragments_required > 0 and (not artifactSettings.filter or project.canSolve or continentHasRace) then
 						child:ClearAllPoints()
 
 						if topFrame == self.container then
