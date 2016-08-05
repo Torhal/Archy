@@ -670,7 +670,7 @@ function Archy:OnInitialize()
 
 	LDBI:Register("Archy", private.LDB_object, profileSettings.general.icon)
 
-	if not SECURE_ACTION_BUTTON then
+	do
 		local button_name = "Archy_SurveyButton"
 		local button = _G.CreateFrame("Button", button_name, _G.UIParent, "SecureActionButtonTemplate")
 		button:SetPoint("LEFT", _G.UIParent, "RIGHT", 10000, 0)
@@ -693,9 +693,7 @@ function Archy:OnInitialize()
 		end)
 
 		SECURE_ACTION_BUTTON = button
-	end
 
-	do
 		local clicked_time
 		local ACTION_DOUBLE_WAIT = 0.2
 		local MIN_ACTION_DOUBLECLICK = 0.04
