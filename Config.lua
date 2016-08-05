@@ -363,7 +363,6 @@ local function GetArtifactOptions()
 								artifactSettings.blacklist[key] = value
 								Archy:ConfigUpdated("artifact")
 							end,
-							width = "full",
 						},
 					},
 				},
