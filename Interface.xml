@@ -543,28 +543,29 @@
                     </OnLoad>
                     <OnClick>
                         if (button == "LeftButton") then
-                        if WorldMapFrame:IsShown() then
-                        if self.oldzoneID and (self.oldzoneID == self.zoneID) then
-                        HideUIPanel(WorldMapFrame)
-                        self.oldzoneID = nil
-                        else
-                        SetMapZoom(GetCurrentMapContinent(), self.zoneID)
-                        self.oldzoneID = self.zoneID
-                        end
-                        else
-                        ShowUIPanel(WorldMapFrame)
-                        SetMapZoom(GetCurrentMapContinent(), self.zoneID)
-                        self.oldzoneID = self.zoneID
-                        end
-                        elseif (button == "RightButton") then
-                        self.digsite:ToggleBlacklistStatus()
+                            if WorldMapFrame:IsShown() then
+                                if self.oldzoneID and (self.oldzoneID == self.zoneID) then
+                                    HideUIPanel(WorldMapFrame)
+                                    self.oldzoneID = nil
+                                else
+                                    SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+                                    self.oldzoneID = self.zoneID
+                                end
+                            else
+                                ShowUIPanel(WorldMapFrame)
+                                SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+                                self.oldzoneID = self.zoneID
+                            end
+                        elseif button == "RightButton" and not self.digsite.race:IsOnDigSiteBlacklist() then
+                            self.digsite:ToggleBlacklistStatus()
 
-                        if self.digsite:IsBlacklisted() then
-                        self.name:SetText("|cFFFF0000" .. self.digsite.name)
-                        else
-                        self.name:SetText("|cFFFFFFFF" .. self.digsite.name)
+                            if self.digsite:IsBlacklisted() then
+                                self.name:SetText("|cFFFF0000" .. self.digsite.name)
+                            else
+                                self.name:SetText("|cFFFFFFFF" .. self.digsite.name)
+                            end
                         end
-                        end
+
                         Archy:UpdateSiteDistances()
                         Archy:RefreshDigSiteDisplay()
                     </OnClick>
@@ -1169,28 +1170,29 @@
                     </OnLoad>
                     <OnClick>
                         if (button == "LeftButton") then
-                        if WorldMapFrame:IsShown() then
-                        if self.oldzoneID and (self.oldzoneID == self.zoneID) then
-                        HideUIPanel(WorldMapFrame)
-                        self.oldzoneID = nil
-                        else
-                        SetMapZoom(GetCurrentMapContinent(), self.zoneID)
-                        self.oldzoneID = self.zoneID
-                        end
-                        else
-                        ShowUIPanel(WorldMapFrame)
-                        SetMapZoom(GetCurrentMapContinent(), self.zoneID)
-                        self.oldzoneID = self.zoneID
-                        end
-                        elseif (button == "RightButton") then
-                        self.digsite:ToggleBlacklistStatus()
+                            if WorldMapFrame:IsShown() then
+                                if self.oldzoneID and (self.oldzoneID == self.zoneID) then
+                                    HideUIPanel(WorldMapFrame)
+                                    self.oldzoneID = nil
+                                else
+                                    SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+                                    self.oldzoneID = self.zoneID
+                                end
+                            else
+                                ShowUIPanel(WorldMapFrame)
+                                SetMapZoom(GetCurrentMapContinent(), self.zoneID)
+                                self.oldzoneID = self.zoneID
+                            end
+                        elseif button == "RightButton" and not self.digsite.race:IsOnDigSiteBlacklist() then
+                            self.digsite:ToggleBlacklistStatus()
 
-                        if self.digsite:IsBlacklisted() then
-                        self.name:SetText("|cFFFF0000" .. self.digsite.name)
-                        else
-                        self.name:SetText("|cFFFFFFFF" .. self.digsite.name)
+                            if self.digsite:IsBlacklisted() then
+                                self.name:SetText("|cFFFF0000" .. self.digsite.name)
+                            else
+                                self.name:SetText("|cFFFFFFFF" .. self.digsite.name)
+                            end
                         end
-                        end
+
                         Archy:UpdateSiteDistances()
                         Archy:RefreshDigSiteDisplay()
                     </OnClick>

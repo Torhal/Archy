@@ -209,6 +209,10 @@ function Race:IsOnArtifactBlacklist()
 	return private.ProfileSettings.artifact.blacklist[self.ID]
 end
 
+function Race:IsOnDigSiteBlacklist()
+	return private.ProfileSettings.digsite.blacklist[self.ID]
+end
+
 function Race:KeystoneSocketOnClick(mouseButtonName)
 	local artifact = self.currentProject
 

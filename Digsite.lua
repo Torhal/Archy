@@ -292,7 +292,7 @@ function Digsite:EnableSurveyNodes()
 end
 
 function Digsite:IsBlacklisted()
-	return Archy.db.char.digsites.blacklist[self.blobID]
+	return Archy.db.char.digsites.blacklist[self.blobID] or self.race:IsOnDigSiteBlacklist()
 end
 
 function Digsite:ToggleBlacklistStatus()

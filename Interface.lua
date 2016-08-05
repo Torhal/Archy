@@ -790,11 +790,14 @@ function Archy:ShowDigSiteChildFrameSiteButtonTooltip(siteButton)
 	siteButton.tooltip = siteButton.tooltip .. ("\n%s%s %s%s|r"):format(normalFont, L["Key Stones:"], highlightFont, digsite.stats.keystones)
 	siteButton.tooltip = siteButton.tooltip .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to view the zone map"]
 
-	if siteButton.digsite:IsBlacklisted() then
+	local raceIsBlacklisted = siteButton.digsite.race:IsOnDigSiteBlacklist()
+
+	if siteButton.digsite:IsBlacklisted() and not raceIsBlacklisted then
 		siteButton.tooltip = siteButton.tooltip .. "\n" .. L["Right-Click to remove from blacklist"]
-	else
+	elseif not raceIsBlacklisted then
 		siteButton.tooltip = siteButton.tooltip .. "\n" .. L["Right-Click to blacklist"]
 	end
+
 	_G.GameTooltip:SetOwner(siteButton, "ANCHOR_BOTTOMRIGHT")
 	_G.GameTooltip:SetText(siteButton.tooltip, _G.NORMAL_FONT_COLOR[1], _G.NORMAL_FONT_COLOR[2], _G.NORMAL_FONT_COLOR[3], 1, true)
 end

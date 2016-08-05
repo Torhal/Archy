@@ -961,9 +961,43 @@ local function GetDigSiteOptions()
 						},
 					},
 				},
+				blacklist = {
+					order = 1,
+					type = "group",
+					name = L["Blacklist"],
+					args = {
+						desc = {
+							order = 0,
+							type = "description",
+							name = L["Allows you to blacklist races from being used by Archy"],
+						},
+						races = {
+							order = 1,
+							type = "multiselect",
+							tristate = false,
+							name = _G.RACES,
+							desc = L["Select races to blacklist"],
+							values = function()
+								local races = {}
+								for raceID, race in pairs(private.Races) do
+									if raceID ~= private.RaceID.Unknown then
+										races[raceID] = race.name
+									end
+								end
+
+								return races
+							end,
+							get = function(info, key) return digsiteSettings.blacklist[key] end,
+							set = function(info, key, value)
+								digsiteSettings.blacklist[key] = value
+								Archy:ConfigUpdated("digsite")
+							end,
+						},
+					},
+				},
 				distanceIndicator = {
 					name = L["Survey Distance Indicator"],
-					order = 1,
+					order = 1.5,
 					type = "group",
 					args = {
 						desc = {
