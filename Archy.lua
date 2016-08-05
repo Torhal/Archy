@@ -677,7 +677,7 @@ function Archy:OnInitialize()
 		button:Hide()
 		button:SetFrameStrata("LOW")
 		button:EnableMouse(true)
-		button:RegisterForClicks("RightButtonUp")
+		button:RegisterForClicks("RightButtonDown")
 		button.name = button_name
 		button:SetAttribute("type", "spell")
 		button:SetAttribute("spell", SURVEY_SPELL_ID)
@@ -697,8 +697,8 @@ function Archy:OnInitialize()
 
 	do
 		local clicked_time
-		local ACTION_DOUBLE_WAIT = 0.4
-		local MIN_ACTION_DOUBLECLICK = 0.05
+		local ACTION_DOUBLE_WAIT = 0.2
+		local MIN_ACTION_DOUBLECLICK = 0.04
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
 			if button == "RightButton" and profileSettings.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_NAME) and _G.CanScanResearchSite() and _G.GetSpellCooldown(SURVEY_SPELL_ID) == 0 then
@@ -714,13 +714,10 @@ function Archy:OnInitialize()
 						perform_survey = true
 					end
 				end
+
 				clicked_time = _G.GetTime()
 
 				if perform_survey and not IsTaintable() then
-					-- We're stealing the mouse-up event, make sure we exit MouseLook
-					if _G.IsMouselooking() then
-						_G.MouselookStop()
-					end
 					_G.SetOverrideBindingClick(SECURE_ACTION_BUTTON, true, "BUTTON2", SECURE_ACTION_BUTTON.name)
 					private.override_binding_on = true
 				end
