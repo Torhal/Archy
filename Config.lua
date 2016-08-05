@@ -213,7 +213,7 @@ local function GetArtifactOptions()
 							end,
 							set = function(_, value)
 								artifactSettings.show = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						showOptions = {
@@ -236,7 +236,7 @@ local function GetArtifactOptions()
 									end,
 									set = function(_, value)
 										artifactSettings.filter = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								showSkillBar = {
@@ -266,7 +266,7 @@ local function GetArtifactOptions()
 							end,
 							set = function(_, value)
 								artifactSettings.announce = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						keystoneAnnounce = {
@@ -279,7 +279,7 @@ local function GetArtifactOptions()
 							end,
 							set = function(_, value)
 								artifactSettings.keystoneAnnounce = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 							disabled = function() return not artifactSettings.announce end,
 						},
@@ -299,7 +299,7 @@ local function GetArtifactOptions()
 							end,
 							set = function(_, value)
 								artifactSettings.ping = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						keystonePing = {
@@ -312,7 +312,7 @@ local function GetArtifactOptions()
 							end,
 							set = function(_, value)
 								artifactSettings.keystonePing = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 							disabled = function() return not artifactSettings.ping end,
 						},
@@ -361,7 +361,7 @@ local function GetArtifactOptions()
 							get = function(info, key) return artifactSettings.blacklist[key] end,
 							set = function(info, key, value)
 								artifactSettings.blacklist[key] = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 							width = "full",
 						},
@@ -396,7 +396,7 @@ local function GetArtifactOptions()
 							get = function(info, key) return artifactSettings.autofill[key] end,
 							set = function(info, key, value)
 								artifactSettings.autofill[key] = value
-								Archy:ConfigUpdated('artifact', 'autofill')
+								Archy:ConfigUpdated("artifact", "autofill")
 							end,
 							width = "full",
 						},
@@ -420,7 +420,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.scale end,
 							set = function(_, value)
 								artifactSettings.scale = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						alpha = {
@@ -435,7 +435,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.alpha end,
 							set = function(_, value)
 								artifactSettings.alpha = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						anchor = {
@@ -467,7 +467,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.borderAlpha end,
 							set = function(_, value)
 								artifactSettings.borderAlpha = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						bgAlpha = {
@@ -482,7 +482,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.bgAlpha end,
 							set = function(_, value)
 								artifactSettings.bgAlpha = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						borderTexture = {
@@ -495,7 +495,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.borderTexture end,
 							set = function(_, value)
 								artifactSettings.borderTexture = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						backgroundTexture = {
@@ -508,7 +508,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.backgroundTexture end,
 							set = function(_, value)
 								artifactSettings.backgroundTexture = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 						fragmentBarTexture = {
@@ -521,7 +521,7 @@ local function GetArtifactOptions()
 							get = function() return artifactSettings.fragmentBarTexture end,
 							set = function(_, value)
 								artifactSettings.fragmentBarTexture = value
-								Archy:ConfigUpdated('artifact')
+								Archy:ConfigUpdated("artifact")
 							end,
 						},
 					},
@@ -540,14 +540,14 @@ local function GetArtifactOptions()
 								fontName = {
 									order = 1,
 									type = "select",
-									dialogControl = 'LSM30_Font',
+									dialogControl = "LSM30_Font",
 									name = L["Font"],
 									desc = L["The font that will be used"],
 									values = _G.AceGUIWidgetLSMlists.font,
 									get = function() return artifactSettings.font.name end,
 									set = function(_, value)
 										artifactSettings.font.name = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontSize = {
@@ -561,7 +561,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.font.size end,
 									set = function(_, value)
 										artifactSettings.font.size = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontOutline = {
@@ -573,7 +573,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.font.outline end,
 									set = function(_, value)
 										artifactSettings.font.outline = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontShadow = {
@@ -584,7 +584,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.font.shadow end,
 									set = function(_, value)
 										artifactSettings.font.shadow = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontColor = {
@@ -601,7 +601,7 @@ local function GetArtifactOptions()
 										artifactSettings.font.color.g = g
 										artifactSettings.font.color.b = b
 										artifactSettings.font.color.a = a
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 							},
@@ -616,14 +616,14 @@ local function GetArtifactOptions()
 								fontName = {
 									order = 1,
 									type = "select",
-									dialogControl = 'LSM30_Font',
+									dialogControl = "LSM30_Font",
 									name = L["Font"],
 									desc = L["The font that will be used"],
 									values = _G.AceGUIWidgetLSMlists.font,
 									get = function() return artifactSettings.fragmentFont.name end,
 									set = function(_, value)
 										artifactSettings.fragmentFont.name = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontSize = {
@@ -637,7 +637,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.fragmentFont.size end,
 									set = function(_, value)
 										artifactSettings.fragmentFont.size = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontOutline = {
@@ -649,7 +649,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.fragmentFont.outline end,
 									set = function(_, value)
 										artifactSettings.fragmentFont.outline = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontShadow = {
@@ -660,7 +660,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.fragmentFont.shadow end,
 									set = function(_, value)
 										artifactSettings.fragmentFont.shadow = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontColor = {
@@ -677,7 +677,7 @@ local function GetArtifactOptions()
 										artifactSettings.fragmentFont.color.g = g
 										artifactSettings.fragmentFont.color.b = b
 										artifactSettings.fragmentFont.color.a = a
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 							},
@@ -692,14 +692,14 @@ local function GetArtifactOptions()
 								fontName = {
 									order = 1,
 									type = "select",
-									dialogControl = 'LSM30_Font',
+									dialogControl = "LSM30_Font",
 									name = L["Font"],
 									desc = L["The font that will be used"],
 									values = _G.AceGUIWidgetLSMlists.font,
 									get = function() return artifactSettings.keystoneFont.name end,
 									set = function(_, value)
 										artifactSettings.keystoneFont.name = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontSize = {
@@ -713,7 +713,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.keystoneFont.size end,
 									set = function(_, value)
 										artifactSettings.keystoneFont.size = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontOutline = {
@@ -725,7 +725,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.keystoneFont.outline end,
 									set = function(_, value)
 										artifactSettings.keystoneFont.outline = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontShadow = {
@@ -736,7 +736,7 @@ local function GetArtifactOptions()
 									get = function() return artifactSettings.keystoneFont.shadow end,
 									set = function(_, value)
 										artifactSettings.keystoneFont.shadow = value
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 								fontColor = {
@@ -753,7 +753,7 @@ local function GetArtifactOptions()
 										artifactSettings.keystoneFont.color.g = g
 										artifactSettings.keystoneFont.color.b = b
 										artifactSettings.keystoneFont.color.a = a
-										Archy:ConfigUpdated('artifact')
+										Archy:ConfigUpdated("artifact")
 									end,
 								},
 							},
@@ -777,7 +777,7 @@ local function GetArtifactOptions()
 								artifactSettings.fragmentBarColors["Normal"].r = r
 								artifactSettings.fragmentBarColors["Normal"].g = g
 								artifactSettings.fragmentBarColors["Normal"].b = b
-								Archy:ConfigUpdated('artifact', 'color')
+								Archy:ConfigUpdated("artifact", "color")
 							end,
 						},
 						fragmentBarFirstTimeColor = {
@@ -792,7 +792,7 @@ local function GetArtifactOptions()
 								artifactSettings.fragmentBarColors["FirstTime"].r = r
 								artifactSettings.fragmentBarColors["FirstTime"].g = g
 								artifactSettings.fragmentBarColors["FirstTime"].b = b
-								Archy:ConfigUpdated('artifact', 'color')
+								Archy:ConfigUpdated("artifact", "color")
 							end,
 						},
 						fragmentBarSolvableColor = {
@@ -807,7 +807,7 @@ local function GetArtifactOptions()
 								artifactSettings.fragmentBarColors["Solvable"].r = r
 								artifactSettings.fragmentBarColors["Solvable"].g = g
 								artifactSettings.fragmentBarColors["Solvable"].b = b
-								Archy:ConfigUpdated('artifact', 'color')
+								Archy:ConfigUpdated("artifact", "color")
 							end,
 						},
 						fragmentBarRareColor = {
@@ -822,7 +822,7 @@ local function GetArtifactOptions()
 								artifactSettings.fragmentBarColors["Rare"].r = r
 								artifactSettings.fragmentBarColors["Rare"].g = g
 								artifactSettings.fragmentBarColors["Rare"].b = b
-								Archy:ConfigUpdated('artifact', 'color')
+								Archy:ConfigUpdated("artifact", "color")
 							end,
 						},
 						fragmentBarKeystoneColor = {
@@ -837,7 +837,7 @@ local function GetArtifactOptions()
 								artifactSettings.fragmentBarColors["AttachToSolve"].r = r
 								artifactSettings.fragmentBarColors["AttachToSolve"].g = g
 								artifactSettings.fragmentBarColors["AttachToSolve"].b = b
-								Archy:ConfigUpdated('artifact', 'color')
+								Archy:ConfigUpdated("artifact", "color")
 							end,
 						},
 					},
@@ -880,7 +880,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.show end,
 							set = function(_, value)
 								digsiteSettings.show = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						showOptions = {
@@ -900,7 +900,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.sortByDistance end,
 									set = function(_, value)
 										digsiteSettings.sortByDistance = value
-										Archy:ConfigUpdated('digsite')
+										Archy:ConfigUpdated("digsite")
 									end,
 								},
 							},
@@ -928,7 +928,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.announceNearest end,
 							set = function(_, value)
 								digsiteSettings.announceNearest = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						minimalOptions = {
@@ -945,7 +945,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.minimal.showZone end,
 									set = function(_, value)
 										digsiteSettings.minimal.showZone = value
-										Archy:ConfigUpdated('digsite')
+										Archy:ConfigUpdated("digsite")
 									end,
 								},
 								announceNearest = {
@@ -955,7 +955,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.minimal.showDistance end,
 									set = function(_, value)
 										digsiteSettings.minimal.showDistance = value
-										Archy:ConfigUpdated('digsite')
+										Archy:ConfigUpdated("digsite")
 									end,
 								},
 							},
@@ -980,7 +980,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.enabled end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.enabled = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						docked = {
@@ -991,7 +991,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.undocked end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.undocked = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						anchor = {
@@ -1015,7 +1015,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.showSurveyButton end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.showSurveyButton = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						showCrateButton = {
@@ -1026,7 +1026,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.showCrateButton end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.showCrateButton = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						showLorItemButton = {
@@ -1037,7 +1037,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.showLorItemButton end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.showLorItemButton = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						space = {
@@ -1056,7 +1056,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.green end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.green = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						yellow = {
@@ -1070,7 +1070,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.distanceIndicator.yellow end,
 							set = function(_, value)
 								digsiteSettings.distanceIndicator.yellow = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 					},
@@ -1097,7 +1097,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.scale end,
 							set = function(_, value)
 								digsiteSettings.scale = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						alpha = {
@@ -1112,7 +1112,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.alpha end,
 							set = function(_, value)
 								digsiteSettings.alpha = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						anchor = {
@@ -1144,7 +1144,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.borderAlpha end,
 							set = function(_, value)
 								digsiteSettings.borderAlpha = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						bgAlpha = {
@@ -1159,7 +1159,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.bgAlpha end,
 							set = function(_, value)
 								digsiteSettings.bgAlpha = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						borderTexture = {
@@ -1172,7 +1172,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.borderTexture end,
 							set = function(_, value)
 								digsiteSettings.borderTexture = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 						backgroundTexture = {
@@ -1185,7 +1185,7 @@ local function GetDigSiteOptions()
 							get = function() return digsiteSettings.backgroundTexture end,
 							set = function(_, value)
 								digsiteSettings.backgroundTexture = value
-								Archy:ConfigUpdated('digsite')
+								Archy:ConfigUpdated("digsite")
 							end,
 						},
 					},
@@ -1204,14 +1204,14 @@ local function GetDigSiteOptions()
 								fontName = {
 									order = 1,
 									type = "select",
-									dialogControl = 'LSM30_Font',
+									dialogControl = "LSM30_Font",
 									name = L["Font"],
 									desc = L["The font that will be used"],
 									values = _G.AceGUIWidgetLSMlists.font,
 									get = function() return digsiteSettings.font.name end,
 									set = function(_, value)
 										digsiteSettings.font.name = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontSize = {
@@ -1225,7 +1225,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.font.size end,
 									set = function(_, value)
 										digsiteSettings.font.size = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontOutline = {
@@ -1237,7 +1237,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.font.outline end,
 									set = function(_, value)
 										digsiteSettings.font.outline = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontShadow = {
@@ -1248,7 +1248,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.font.shadow end,
 									set = function(_, value)
 										digsiteSettings.font.shadow = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontColor = {
@@ -1265,7 +1265,7 @@ local function GetDigSiteOptions()
 										digsiteSettings.font.color.g = g
 										digsiteSettings.font.color.b = b
 										digsiteSettings.font.color.a = a
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 							},
@@ -1280,14 +1280,14 @@ local function GetDigSiteOptions()
 								fontName = {
 									order = 1,
 									type = "select",
-									dialogControl = 'LSM30_Font',
+									dialogControl = "LSM30_Font",
 									name = L["Font"],
 									desc = L["The font that will be used"],
 									values = _G.AceGUIWidgetLSMlists.font,
 									get = function() return digsiteSettings.zoneFont.name end,
 									set = function(_, value)
 										digsiteSettings.zoneFont.name = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontSize = {
@@ -1301,7 +1301,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.zoneFont.size end,
 									set = function(_, value)
 										digsiteSettings.zoneFont.size = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontOutline = {
@@ -1313,7 +1313,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.zoneFont.outline end,
 									set = function(_, value)
 										digsiteSettings.zoneFont.outline = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontShadow = {
@@ -1324,7 +1324,7 @@ local function GetDigSiteOptions()
 									get = function() return digsiteSettings.zoneFont.shadow end,
 									set = function(_, value)
 										digsiteSettings.zoneFont.shadow = value
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 								fontColor = {
@@ -1341,7 +1341,7 @@ local function GetDigSiteOptions()
 										digsiteSettings.zoneFont.color.g = g
 										digsiteSettings.zoneFont.color.b = b
 										digsiteSettings.zoneFont.color.a = a
-										Archy:ConfigUpdated('digsite', 'font')
+										Archy:ConfigUpdated("digsite', 'font")
 									end,
 								},
 							},
@@ -1380,7 +1380,7 @@ local function GetTomTomOptions()
 					get = function() return tomtomSettings.enabled end,
 					set = function(_, value)
 						tomtomSettings.enabled = value
-						Archy:ConfigUpdated('tomtom')
+						Archy:ConfigUpdated("tomtom")
 					end,
 				},
 				crazyArrowEnabled = {
@@ -1393,7 +1393,7 @@ local function GetTomTomOptions()
 					end,
 					set = function(_, value)
 						tomtomSettings.crazyArrowEnabled = value
-						Archy:ConfigUpdated('tomtom')
+						Archy:ConfigUpdated("tomtom")
 					end,
 					disabled = function()
 						return not tomtomSettings.enabled or not private.TomTomHandler.hasTomTom
@@ -1410,7 +1410,7 @@ local function GetTomTomOptions()
 					get = function() return tomtomSettings.distance end,
 					set = function(_, value)
 						tomtomSettings.distance = value
-						Archy:ConfigUpdated('tomtom')
+						Archy:ConfigUpdated("tomtom")
 					end,
 					disabled = function()
 						return not tomtomSettings.enabled or not private.TomTomHandler.hasTomTom
@@ -1425,7 +1425,7 @@ local function GetTomTomOptions()
 					get = function() return tomtomSettings.ping end,
 					set = function(_, value)
 						tomtomSettings.ping = value
-						Archy:ConfigUpdated('tomtom')
+						Archy:ConfigUpdated("tomtom")
 					end,
 					disabled = function()
 						return not tomtomSettings.enabled or not private.TomTomHandler.hasTomTom
@@ -1465,7 +1465,7 @@ local function GetMinimapOptions()
 					get = function() return minimapSettings.show end,
 					set = function(_, value)
 						minimapSettings.show = value
-						Archy:ConfigUpdated('minimap')
+						Archy:ConfigUpdated("minimap")
 					end,
 				},
 				nearest = {
@@ -1476,7 +1476,7 @@ local function GetMinimapOptions()
 					get = function() return minimapSettings.nearest end,
 					set = function(_, value)
 						minimapSettings.nearest = value
-						Archy:ConfigUpdated('minimap')
+						Archy:ConfigUpdated("minimap")
 					end,
 					disabled = function() return not minimapSettings.show end,
 				},
@@ -1489,7 +1489,7 @@ local function GetMinimapOptions()
 					get = function() return minimapSettings.fragmentNodes end,
 					set = function(_, value)
 						minimapSettings.fragmentNodes = value
-						Archy:ConfigUpdated('minimap')
+						Archy:ConfigUpdated("minimap")
 					end,
 				},
 				fragmentColorBySurveyDistance = {
@@ -1501,7 +1501,7 @@ local function GetMinimapOptions()
 					get = function() return minimapSettings.fragmentColorBySurveyDistance end,
 					set = function(_, value)
 						minimapSettings.fragmentColorBySurveyDistance = value
-						Archy:ConfigUpdated('minimap')
+						Archy:ConfigUpdated("minimap")
 					end,
 				},
 				fragmentIcon = {
@@ -1518,7 +1518,7 @@ local function GetMinimapOptions()
 					end,
 					set = function(_, value)
 						minimapSettings.fragmentIcon = value
-						Archy:ConfigUpdated('minimap')
+						Archy:ConfigUpdated("minimap")
 					end,
 				},
 				icon = {
@@ -1568,7 +1568,7 @@ local function GetTooltipOptions()
 					end,
 					set = function(_, value)
 						tooltipSettings.filterArtifactsByContinent = value
-						Archy:ConfigUpdated('artifact', 'tooltip')
+						Archy:ConfigUpdated("artifact", "tooltip")
 					end,
 				},
 				filterTooltipDigsites = {
@@ -1582,7 +1582,7 @@ local function GetTooltipOptions()
 					end,
 					set = function(_, value)
 						tooltipSettings.filterDigsitesByContinent = value
-						Archy:ConfigUpdated('digsite', 'tooltip')
+						Archy:ConfigUpdated("digsite', 'tooltip")
 					end,
 				},
 				scale = {

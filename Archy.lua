@@ -1350,7 +1350,9 @@ function Archy:RESEARCH_ARTIFACT_DIG_SITE_UPDATED()
 	if not private.CurrentContinentID then
 		return
 	end
+
 	UpdateAllSites()
+
 	self:UpdateSiteDistances()
 	self:RefreshDigSiteDisplay()
 end
