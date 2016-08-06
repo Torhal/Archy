@@ -64,11 +64,39 @@ local LorewalkersMap = {
 	spellID = 126957
 }
 
-local FISHING_POLE_NAME
+local FISHING_POLE_ITEM_TYPE_NAME
 do
-	--  If this stops working, check for the index of "Weapon" via GetAuctionItemClasses(), then find the index of "Fishing Poles" via GetAuctionItemSubClasses().
-	local auctionItemSubClassNames = { _G.GetAuctionItemSubClasses(1) }
-	FISHING_POLE_NAME = auctionItemSubClassNames[#auctionItemSubClassNames]
+	-- If this breaks in a future patch due to indices changing, uncomment the below code to find the correct values:
+	--	do
+	--		COMPILED_ITEM_CLASSES = {}
+	--		local classIndex = 0
+	--		local className = _G.GetItemClassInfo(classIndex)
+	--
+	--		while className and className ~= "" do
+	--			COMPILED_ITEM_CLASSES[classIndex] = {
+	--				name = className,
+	--				subClasses = {},
+	--			}
+	--
+	--			local subClassIndex = 0
+	--			local subClassName = _G.GetItemSubClassInfo(classIndex, subClassIndex)
+	--
+	--			while subClassName and subClassName ~= "" do
+	--				COMPILED_ITEM_CLASSES[classIndex].subClasses[subClassIndex] = subClassName
+	--
+	--				subClassIndex = subClassIndex + 1
+	--				subClassName = _G.GetItemSubClassInfo(classIndex, subClassIndex)
+	--			end
+	--
+	--			classIndex = classIndex + 1
+	--			className = _G.GetItemClassInfo(classIndex)
+	--		end
+	--	end
+
+	local ITEM_CLASS_WEAPON = 2
+	local ITEM_SUBCLASS_FISHING_POLE = 20
+
+	FISHING_POLE_ITEM_TYPE_NAME = _G.GetItemSubClassInfo(ITEM_CLASS_WEAPON, ITEM_SUBCLASS_FISHING_POLE)
 end
 
 _G.BINDING_HEADER_ARCHY = "Archy"
@@ -259,7 +287,7 @@ do
 
 	function SuspendClickToMove()
 		-- we're not using easy cast, no need to mess with click to move
-		if not private.ProfileSettings.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_NAME) or not _G.CanScanResearchSite() then
+		if not private.ProfileSettings.general.easyCast or _G.IsEquippedItemType(FISHING_POLE_ITEM_TYPE_NAME) or not _G.CanScanResearchSite() then
 			return
 		end
 
@@ -700,7 +728,7 @@ function Archy:OnInitialize()
 		local previousClickTime
 
 		_G.WorldFrame:HookScript("OnMouseDown", function(frame, button, down)
-			if button == "RightButton" and profileSettings.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_NAME) and _G.CanScanResearchSite() and _G.GetSpellCooldown(SURVEY_SPELL_ID) == 0 then
+			if button == "RightButton" and profileSettings.general.easyCast and _G.ArchaeologyMapUpdateAll() > 0 and not IsTaintable() and not _G.IsEquippedItemType(FISHING_POLE_ITEM_TYPE_NAME) and _G.CanScanResearchSite() and _G.GetSpellCooldown(SURVEY_SPELL_ID) == 0 then
 				-- Ensure the LootFrame contains no items; we don't care if it's simply visible.
 				if _G.GetNumLootItems() == 0 and previousClickTime then
 					local doubleClickTime = _G.GetTime() - previousClickTime
