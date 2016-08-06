@@ -64,35 +64,35 @@ local LorewalkersMap = {
 	spellID = 126957
 }
 
+-- If fishing pole detection breaks in a future patch due to indices changing, uncomment the below code to find the correct values:
+--do
+--	COMPILED_ITEM_CLASSES = {}
+--	local classIndex = 0
+--	local className = _G.GetItemClassInfo(classIndex)
+--
+--	while className and className ~= "" do
+--		COMPILED_ITEM_CLASSES[classIndex] = {
+--			name = className,
+--			subClasses = {},
+--		}
+--
+--		local subClassIndex = 0
+--		local subClassName = _G.GetItemSubClassInfo(classIndex, subClassIndex)
+--
+--		while subClassName and subClassName ~= "" do
+--			COMPILED_ITEM_CLASSES[classIndex].subClasses[subClassIndex] = subClassName
+--
+--			subClassIndex = subClassIndex + 1
+--			subClassName = _G.GetItemSubClassInfo(classIndex, subClassIndex)
+--		end
+--
+--		classIndex = classIndex + 1
+--		className = _G.GetItemClassInfo(classIndex)
+--	end
+--end
+
 local FISHING_POLE_ITEM_TYPE_NAME
 do
-	-- If this breaks in a future patch due to indices changing, uncomment the below code to find the correct values:
-	--	do
-	--		COMPILED_ITEM_CLASSES = {}
-	--		local classIndex = 0
-	--		local className = _G.GetItemClassInfo(classIndex)
-	--
-	--		while className and className ~= "" do
-	--			COMPILED_ITEM_CLASSES[classIndex] = {
-	--				name = className,
-	--				subClasses = {},
-	--			}
-	--
-	--			local subClassIndex = 0
-	--			local subClassName = _G.GetItemSubClassInfo(classIndex, subClassIndex)
-	--
-	--			while subClassName and subClassName ~= "" do
-	--				COMPILED_ITEM_CLASSES[classIndex].subClasses[subClassIndex] = subClassName
-	--
-	--				subClassIndex = subClassIndex + 1
-	--				subClassName = _G.GetItemSubClassInfo(classIndex, subClassIndex)
-	--			end
-	--
-	--			classIndex = classIndex + 1
-	--			className = _G.GetItemClassInfo(classIndex)
-	--		end
-	--	end
-
 	local ITEM_CLASS_WEAPON = 2
 	local ITEM_SUBCLASS_FISHING_POLE = 20
 
