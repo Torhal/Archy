@@ -31,8 +31,6 @@ local HereBeDragons = LibStub("HereBeDragons-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local LDBI = LibStub("LibDBIcon-1.0")
 
-local debugger -- Only defined if needed.
-
 local DatamineTooltip = _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
 DatamineTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
 
@@ -134,32 +132,44 @@ local surveyLocation = {
 
 local prevTheme
 
--------------------------------------------------------------------------------
+-----------------------------------------------------------------------
 -- Debugger.
--------------------------------------------------------------------------------
-local function CreateDebugFrame()
-	if debugger then
-		return
+-----------------------------------------------------------------------
+local Debug, DebugPour, GetDebugger
+do
+	local TextDump = LibStub("LibTextDump-1.0")
+
+	local DEBUGGER_WIDTH = 750
+	local DEBUGGER_HEIGHT = 800
+
+	local debugger
+
+	function Debug(...)
+		if not debugger then
+			debugger = TextDump:New(("%s Debug Output"):format(FOLDER_NAME), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
+		end
+
+		local message = string.format(...)
+		debugger:AddLine(message, "%X")
+
+		return message
 	end
-	debugger = LibStub("LibTextDump-1.0"):New(("%s Debug Output"):format(FOLDER_NAME), 640, 480)
-end
 
-local function Debug(...)
-	if not debugger then
-		CreateDebugFrame()
+	local function DebugPour(...)
+		Archy:Pour(Debug(...), 1, 1, 1)
 	end
-	local message = ("[%s] %s"):format(date("%X"), string.format(...))
 
-	debugger:AddLine(message)
-	return message
+	function GetDebugger()
+		if not debugger then
+			debugger = TextDump:New(("%s Debug Output"):format(FOLDER_NAME), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
+		end
+
+		return debugger
+	end
+
+	private.Debug = Debug
+	private.DebugPour = DebugPour
 end
-
-local function DebugPour(...)
-	Archy:Pour(Debug(...), 1, 1, 1)
-end
-
-private.Debug = Debug
-private.DebugPour = DebugPour
 
 -----------------------------------------------------------------------
 -- Function upvalues
@@ -952,9 +962,7 @@ local SUBCOMMAND_FUNCS = {
 		ArtifactFrame:SetBackdropBorderColor(1, 1, 1, 0.5)
 	end,
 	debug = function()
-		if not debugger then
-			CreateDebugFrame()
-		end
+		local debugger = GetDebugger()
 
 		if debugger:Lines() == 0 then
 			debugger:AddLine("Nothing to report.")
@@ -962,6 +970,7 @@ local SUBCOMMAND_FUNCS = {
 			debugger:Clear()
 			return
 		end
+
 		debugger:Display()
 	end,
 	-- @alpha@
