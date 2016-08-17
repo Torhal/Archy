@@ -155,7 +155,7 @@ do
 		return message
 	end
 
-	local function DebugPour(...)
+	function DebugPour(...)
 		Archy:Pour(Debug(...), 1, 1, 1)
 	end
 
