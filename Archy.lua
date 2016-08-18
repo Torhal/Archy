@@ -581,7 +581,6 @@ function UpdateAllSites()
 					local blobID = _G.ArcheologyGetVisibleBlobID(landmarkIndex)
 					local message = ([[Missing dig site data: ["%s"] = { blobID = %d, mapID = 0, typeID = RaceID.Unknown } -- %s]]):format(siteKey, blobID, landmarkName)
 
-					Archy:Printf(message)
 					DebugPour(message)
 				end
 			end
