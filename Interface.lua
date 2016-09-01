@@ -950,7 +950,7 @@ function Archy:RefreshDigSiteDisplay()
 		return
 	end
 
-	local maxFindCount = (continentID == _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
+	local maxFindCount = (continentID >= _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
 
 	for digsiteIndex, digsite in pairs(continentDigsites[continentID]) do
 		local childFrame = DigSiteFrame.children[digsiteIndex]
