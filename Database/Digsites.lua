@@ -2028,7 +2028,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Garden of Elune
 			blobID = 354033,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.000000:0.000000"] = { blobID = 363021, mapID = 0, typeID = RaceID.Unknown, }, -- Digsite: Gates of the City
 		["8:0.000000:0.000000"] = { blobID = 350063, mapID = 0, typeID = RaceID.Unknown, }, -- Digsite: Gates of Valor
@@ -2040,7 +2040,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Llothien
 			blobID = 346522,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.000000:0.000000"] = { blobID = 354018, mapID = 0, typeID = RaceID.Unknown, }, -- Digsite: Llothien Highlands
 		["8:0.000000:0.000000"] = { blobID = 354031, mapID = 0, typeID = RaceID.Unknown, }, -- Digsite: Makrana
@@ -2051,7 +2051,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Nor'Danil Wellspring
 			blobID = 354049,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.600169:0.284432"] = {
 			-- Digsite: Northern Helmouth Shallows
@@ -2071,7 +2071,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Old Coast Path
 			blobID = 354041,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.442936:0.203692"] = {
 			-- Digsite: Pinerock Basin
@@ -2090,7 +2090,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Ruins of Zarkhenar
 			blobID = 354045,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.461780:0.195092"] = {
 			-- Digsite: Screeching Bend
@@ -2149,7 +2149,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Temple of a Thousand Lights
 			blobID = 354043,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.331194:0.395509"] = {
 			-- Digsite: Thas'talah
@@ -2173,13 +2173,13 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: The Ruined Sancum
 			blobID = 354037,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.301361:0.459210"] = {
 			-- Digsite: The Tidal Marsh
 			blobID = 354047,
 			mapID = 1015,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.359913:0.376001"] = {
 			-- Digsite: The Wildwood
