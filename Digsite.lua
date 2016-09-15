@@ -1,8 +1,6 @@
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
+-- ----------------------------------------------------------------------------
 -- Libraries
 local math = _G.math
 local table = _G.table
@@ -10,9 +8,9 @@ local table = _G.table
 -- Functions
 local pairs = _G.pairs
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- AddOn namespace.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
@@ -26,17 +24,17 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Archy", false)
 local Digsites = {}
 private.Digsites = Digsites
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Local constants.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local Digsite = {}
 local digsiteMetatable = {
 	__index = Digsite
 }
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Scripts.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local function MapIcon_OnEnter(self)
 	if not self.tooltip then
 		return
@@ -71,7 +69,7 @@ do
 		local isOnEdge = HereBeDragonsPins:IsMinimapIconOnEdge(self)
 
 		if self.arrow then
-            if isOnEdge then
+			if isOnEdge then
 				local angle = HereBeDragonsPins:GetVectorToIcon(self)
 				if not angle then
 					self:Hide()
@@ -80,7 +78,7 @@ do
 				angle = angle + RAD_135
 
 				self.icon:Hide()
-                self.arrow:Show()
+				self.arrow:Show()
 
 				-- Rotate the icon, as required
 				if _G.GetCVar("rotateMinimap") == "1" then
@@ -89,23 +87,23 @@ do
 
 				local sin, cos = math.sin(angle) * SQUARE_HALF, math.cos(angle) * SQUARE_HALF
 				self.arrow:SetTexCoord(0.5 - sin, 0.5 + cos, 0.5 + cos, 0.5 + sin, 0.5 - cos, 0.5 - sin, 0.5 + sin, 0.5 - cos)
-            else
-                self.icon:Show()
-                self.arrow:Hide()
+			else
+				self.icon:Show()
+				self.arrow:Hide()
 			end
 		elseif isOnEdge then
-            self:Hide()
-            self.icon:Hide()
-        else
-            self.icon:Show()
-        end
-    end
+			self:Hide()
+			self.icon:Hide()
+		else
+			self.icon:Show()
+		end
+	end
 end
 
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Helpers.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local function CreateSurveyNode(digsite, savedNode, nodeIndex)
 	local node = _G.CreateFrame("Frame", ("ArchyMinimap_Digsite%sSurveyNode%d"):format(digsite.blobID, nodeIndex), _G.Minimap)
 	node:SetSize(8, 8)
@@ -207,9 +205,9 @@ function private.AddDigsite(digsiteTemplate, landmarkName, coordX, coordY)
 	return digsite
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Digsite methods.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 function Digsite:AddSurveyNode(mapID, mapLevel, coordX, coordY)
 	local surveyNodes = Archy.db.global.surveyNodes[self.blobID]
 	if not surveyNodes then
@@ -260,7 +258,6 @@ function Digsite:DisableSurveyNodes()
 
 		HereBeDragonsPins:RemoveMinimapIcon(self, node)
 	end
-
 end
 
 function Digsite:EnableMapIcon(tooltipText)

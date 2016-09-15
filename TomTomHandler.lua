@@ -1,52 +1,46 @@
------------------------------------------------------------------------
--- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- AddOn namespace.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
-
 local Dialog = LibStub("LibDialog-1.0")
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Handler.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local TomTomHandler = {
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- Data.
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	currentDigsite = nil,
 	hasDisplayedConflictError = false,
 	hasPOIIntegration = false,
 	hasTomTom = false,
 	isActive = false,
 	waypoint = nil,
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- Methods.
-	-----------------------------------------------------------------------
-    CheckForConflict = function(self)
-        if not self.hasDisplayedConflictError and private.ProfileSettings.tomtom.enabled and self.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
-            self.hasDisplayedConflictError = true
-            Dialog:Spawn("ArchyTomTomError")
-        end
-    end,
+	-- ----------------------------------------------------------------------------
+	CheckForConflict = function(self)
+		if not self.hasDisplayedConflictError and private.ProfileSettings.tomtom.enabled and self.hasPOIIntegration and _G.TomTom.profile.poi.setClosest then
+			self.hasDisplayedConflictError = true
+			Dialog:Spawn("ArchyTomTomError")
+		end
+	end,
 	ClearWaypoint = function(self)
 		if self.waypoint then
-			 _G.TomTom:RemoveWaypoint(self.waypoint)
+			_G.TomTom:RemoveWaypoint(self.waypoint)
 			self.waypoint = nil
 			self.currentDigsite = nil
 		end
 	end,
 	Refresh = function(self, digsite)
-        self:ClearWaypoint()
+		self:ClearWaypoint()
 
-        if not digsite or digsite == self.currentDigsite or not self.hasTomTom or not self.isActive or not private.ProfileSettings.tomtom.enabled or not private.ProfileSettings.general.show then
-            return
-        end
+		if not digsite or digsite == self.currentDigsite or not self.hasTomTom or not self.isActive or not private.ProfileSettings.tomtom.enabled or not private.ProfileSettings.general.show then
+			return
+		end
 
 		self.currentDigsite = digsite
 		self.waypoint = _G.TomTom:AddMFWaypoint(digsite.mapID, nil, digsite.coordX, digsite.coordY, {

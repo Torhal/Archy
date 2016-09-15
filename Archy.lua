@@ -1,8 +1,6 @@
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
+-- ----------------------------------------------------------------------------
 -- Libraries
 local math = _G.math
 local table = _G.table
@@ -16,9 +14,9 @@ local setmetatable = _G.setmetatable
 local tonumber = _G.tonumber
 local type = _G.type
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- AddOn namespace.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local LibStub = _G.LibStub
 
 local FOLDER_NAME, private = ...
@@ -34,9 +32,9 @@ local LDBI = LibStub("LibDBIcon-1.0")
 local DatamineTooltip = _G.CreateFrame("GameTooltip", "ArchyScanTip", nil, "GameTooltipTemplate")
 DatamineTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Constants
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local MAX_PROFESSION_RANK = _G.GetExpansionLevel() + 4 -- Skip the 4 ranks of vanilla
 local MAX_ARCHAEOLOGY_RANK = _G.PROFESSION_RANKS[MAX_PROFESSION_RANK][1]
 private.MAX_ARCHAEOLOGY_RANK = MAX_ARCHAEOLOGY_RANK
@@ -105,9 +103,9 @@ _G.BINDING_NAME_SOLVE_WITH_KEYSTONESARCHY = L["BINDING_NAME_SOLVESTONE"]
 _G.BINDING_NAME_ARTIFACTSARCHY = L["BINDING_NAME_ARTIFACTS"]
 _G.BINDING_NAME_DIGSITESARCHY = L["BINDING_NAME_DIGSITES"]
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Variables
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local continent_digsites = {}
 private.continent_digsites = continent_digsites
 
@@ -132,9 +130,9 @@ local surveyLocation = {
 
 local prevTheme
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Debugger.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local Debug, DebugPour, GetDebugger
 do
 	local TextDump = LibStub("LibTextDump-1.0")
@@ -171,23 +169,23 @@ do
 	private.DebugPour = DebugPour
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Function upvalues
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local Blizzard_SolveArtifact
 local UpdateAllSites
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- External objects. Assigned in Archy:OnEnable()
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local ArtifactFrame
 local DigSiteFrame
 local DistanceIndicatorFrame
 local TomTomHandler
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Initialization.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local BattlefieldMinimapDigsites
 
 local function InitializeBattlefieldDigsites()
@@ -224,9 +222,9 @@ local function InitializeBattlefieldDigsites()
 	end)
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Local helper functions
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local function ToggleDigsiteVisibility(show)
 	_G.WorldMapArchaeologyDigSites[show and "Show" or "Hide"](_G.WorldMapArchaeologyDigSites)
 
@@ -399,9 +397,9 @@ Dialog:Register("ArchyConfirmSolve", {
 	hide_on_escape = true,
 })
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- AddOn methods
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 function Archy:ShowArchaeology()
 	if _G.IsAddOnLoaded("Blizzard_ArchaeologyUI") then
 		if _G.ArchaeologyFrame:IsShown() then
@@ -762,9 +760,9 @@ function Archy:OnInitialize()
 	DigSiteFrame = private.DigSiteFrame
 	DistanceIndicatorFrame = private.DistanceIndicatorFrame
 
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- DB cleanups.
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	for blobID, value in pairs(self.db.char.digsites.blacklist) do
 		if value == false then
 			self.db.char.digsites.blacklist[blobID] = nil
@@ -817,7 +815,7 @@ function Archy:OnEnable()
 
 	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
 
-    self:SKILL_LINES_CHANGED()
+	self:SKILL_LINES_CHANGED()
 
 	Archy:UpdateFramePositions()
 	DigSiteFrame:UpdateChrome()
@@ -844,9 +842,9 @@ function Archy:OnEnable()
 	private.InitializeDigsiteTemplates()
 	private.InitializeArtifactTemplates()
 
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- Map stuff.
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	if _G.BattlefieldMinimap then
 		InitializeBattlefieldDigsites()
 	else
@@ -922,9 +920,9 @@ function Archy:OnProfileUpdate(event, database, ProfileKey)
 	self:UpdateFramePositions()
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Slash command handler
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local SUBCOMMAND_FUNCS = {
 	[L["config"]:lower()] = function()
 		_G.InterfaceOptionsFrame_OpenToCategory(Archy.optionsFrame)
@@ -1268,14 +1266,14 @@ function Archy:UpdateTracking()
 	ToggleDigsiteVisibility(_G.GetCVarBool("digSites"))
 end
 
--------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
 -- Event handler data.
--------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
 local currentDigsite
 
--------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
 -- Event handler helpers.
--------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
 local function GetItemIDFromLink(link)
 	if not link then
 		return
@@ -1290,9 +1288,9 @@ local function GetItemIDFromLink(link)
 	return tonumber(ID)
 end
 
--------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
 -- Event handlers.
--------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
 function Archy:ADDON_LOADED(event, addonName)
 	if addonName == "Blizzard_BattlefieldMinimap" then
 		InitializeBattlefieldDigsites()
@@ -1408,7 +1406,7 @@ function Archy:ARTIFACT_HISTORY_READY()
 	for raceID, race in pairs(private.Races) do
 		local project = race.currentProject
 		if project then
-				project.completionCount = race:GetArtifactCompletionCountByName(project.name)
+			project.completionCount = race:GetArtifactCompletionCountByName(project.name)
 		end
 	end
 
@@ -1457,20 +1455,20 @@ do
 	end
 
 	function Archy:CHAT_MSG_LOOT(event, msg)
-        if not currentDigsite then
-            return
-        end
+		if not currentDigsite then
+			return
+		end
 
-        local _, itemLink = ParseLootMessage(msg)
-        if itemLink then
-            return
-        end
+		local _, itemLink = ParseLootMessage(msg)
+		if itemLink then
+			return
+		end
 
-        local race = private.KeystoneIDToRace[GetItemIDFromLink(itemLink)]
-        if race then
-            currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
-            lootedKeystoneRace = race
-        end
+		local race = private.KeystoneIDToRace[GetItemIDFromLink(itemLink)]
+		if race then
+			currentDigsite.stats.keystones = currentDigsite.stats.keystones + 1
+			lootedKeystoneRace = race
+		end
 	end
 end -- do-block
 
@@ -1533,7 +1531,7 @@ function Archy:GET_ITEM_INFO_RECEIVED(event)
 	end
 
 	for template, race in next, private.RaceArtifactProcessingQueue, nil do
-        if race:AddOrUpdateArtifactFromTemplate(template) then
+		if race:AddOrUpdateArtifactFromTemplate(template) then
 			private.RaceArtifactProcessingQueue[template] = nil
 		end
 	end
@@ -1620,8 +1618,8 @@ end
 function Archy:PLAYER_ENTERING_WORLD()
 	private.notInWorld = nil
 
-    -- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
-    TomTomHandler:CheckForConflict()
+	-- If TomTom is configured to automatically set a waypoint to the closest quest objective, that will interfere with Archy. Warn, if applicable.
+	TomTomHandler:CheckForConflict()
 
 	if _G.IsInInstance() then
 		HideFrames()
@@ -1742,24 +1740,24 @@ function Archy:QUEST_LOG_UPDATE()
 end
 
 function Archy:SKILL_LINES_CHANGED()
-    local _, _, archaeologyIndex = _G.GetProfessions()
-    private.hasArchaeology = archaeologyIndex and true or false
+	local _, _, archaeologyIndex = _G.GetProfessions()
+	private.hasArchaeology = archaeologyIndex and true or false
 
-    self:UpdateSkillBar()
+	self:UpdateSkillBar()
 end
 
 function Archy:TAXIMAP_CLOSED()
-    private.isTaxiMapOpen = nil
+	private.isTaxiMapOpen = nil
 end
 
 function Archy:TAXIMAP_OPENED()
-    private.isTaxiMapOpen = true
+	private.isTaxiMapOpen = true
 end
 
 function Archy:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target)
-    if unit == "player" and spell == private.CRATE_SPELL_NAME then
-        private.busy_crating = true
-    end
+	if unit == "player" and spell == private.CRATE_SPELL_NAME then
+		private.busy_crating = true
+	end
 end
 
 do

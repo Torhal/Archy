@@ -1,8 +1,6 @@
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
+-- ----------------------------------------------------------------------------
 -- Libraries
 local math = _G.math
 
@@ -11,9 +9,9 @@ local pairs = _G.pairs
 local setmetatable = _G.setmetatable
 local unpack = _G.unpack
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- AddOn namespace.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
@@ -23,15 +21,15 @@ local LSM = LibStub("LibSharedMedia-3.0")
 
 local HereBeDragons = LibStub("HereBeDragons-1.0")
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Constants.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local NUM_DIGSITE_FINDS_DEFAULT = 6
 local NUM_DIGSITE_FINDS_DRAENOR = 9
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Helpers.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local function FramesShouldBeHidden()
 	return (not private.ProfileSettings.general.show or not private.CurrentContinentID or private.CurrentContinentID == -1 or _G.UnitIsGhost("player") or _G.IsInInstance() or _G.C_PetBattles.IsInBattle() or not private.hasArchaeology)
 end
@@ -64,7 +62,6 @@ function private:ResetFramePositions()
 	Archy:ConfigUpdated()
 	Archy:UpdateFramePositions()
 end
-
 
 function Archy:DisableProgressBar()
 	if not private.DefaultProgressBarData or not private.DefaultProgressBarData.isDisabled then
@@ -109,16 +106,17 @@ local ArtifactFrame
 local DigSiteFrame
 local DistanceIndicatorFrame
 do
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- ArtifactFrame
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	local function ArtifactFrame_RefreshDisplay(self)
 		if FramesShouldBeHidden() then
 			return
 		end
-		local maxWidth, maxHeight = 0, 0
+
 		Archy:UpdateSkillBar()
 
+		local maxWidth, maxHeight = 0, 0
 		local topFrame = self.container
 		local racesCount = 0
 
@@ -138,9 +136,9 @@ do
 			child:Hide()
 		end
 
-        local currentContinentRaces = private.CONTINENT_RACES[private.CurrentContinentID]
+		local currentContinentRaces = private.CONTINENT_RACES[private.CurrentContinentID]
 
-        for raceID, race in pairs(private.Races) do
+		for raceID, race in pairs(private.Races) do
 			local project = race.currentProject
 			if project then
 				local child = self.children[raceID]
@@ -497,9 +495,9 @@ do
 		end
 	end
 
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- DigSiteFrame
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	local function DigSiteFrame_UpdateChrome(self)
 		if private.IsTaintable() then
 			private.regen_update_digsites = true
@@ -595,9 +593,9 @@ do
 		end
 	end
 
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	-- DistanceIndicatorFrame
-	-----------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
 	local DISTANCE_COLOR_TEXCOORDS = {
 		green = {
 			0, 0.24609375, 0, 1
@@ -701,9 +699,9 @@ do
 
 		local isGraphicalTheme = private.ProfileSettings.general.theme == "Graphical"
 
-		-----------------------------------------------------------------------
+		-- ----------------------------------------------------------------------------
 		-- ArtifactFrame
-		-----------------------------------------------------------------------
+		-- ----------------------------------------------------------------------------
 		local artifactTemplate = (isGraphicalTheme and "ArchyArtifactContainer" or "ArchyMinArtifactContainer")
 		ArtifactFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
 		ArtifactFrame.children = setmetatable({}, {
@@ -736,9 +734,9 @@ do
 
 		private.ArtifactFrame = ArtifactFrame
 
-		-----------------------------------------------------------------------
+		-- ----------------------------------------------------------------------------
 		-- DigSiteFrame
-		-----------------------------------------------------------------------
+		-- ----------------------------------------------------------------------------
 		local digSiteTemplate = (isGraphicalTheme and "ArchyDigSiteContainer" or "ArchyMinDigSiteContainer")
 		DigSiteFrame = _G.CreateFrame("Frame", "ArchyDigSiteFrame", _G.UIParent, digSiteTemplate)
 		DigSiteFrame.children = setmetatable({}, {
@@ -757,9 +755,9 @@ do
 
 		private.DigSiteFrame = DigSiteFrame
 
-		-----------------------------------------------------------------------
+		-- ----------------------------------------------------------------------------
 		-- DistanceIndicatorFrame
-		-----------------------------------------------------------------------
+		-- ----------------------------------------------------------------------------
 		DistanceIndicatorFrame = _G.CreateFrame("Frame", "ArchyDistanceIndicatorFrame", _G.UIParent, "ArchyDistanceIndicator")
 		DistanceIndicatorFrame.circle:SetScale(0.65)
 
@@ -774,9 +772,9 @@ do
 	private.InitializeFrames = InitializeFrames
 end -- do-block
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Methods.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 function Archy:ShowDigSiteChildFrameSiteButtonTooltip(siteButton)
 	local digsite = siteButton.digsite
 	local highlightFont = _G.HIGHLIGHT_FONT_COLOR_CODE
@@ -982,6 +980,7 @@ function Archy:RefreshDigSiteDisplay()
 			childFrame.crest.tooltip = race.name
 		end
 	end
+
 	self:ResizeDigSiteDisplay()
 end
 
@@ -1007,6 +1006,7 @@ function Archy:SetFramePosition(frame)
 			bPoint, bRelativePoint, bXofs, bYofs = unpack(profileSettings.digsite.distanceIndicator.position)
 		end
 	end
+
 	frame:ClearAllPoints()
 	frame:SetPoint(bPoint, bRelativeTo, bRelativePoint, bXofs, bYofs)
 	frame:SetFrameLevel(2)

@@ -1,17 +1,15 @@
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
+-- ----------------------------------------------------------------------------
 -- Functions
 local pairs = _G.pairs
 
 -- Libraries
 local math = _G.math
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- AddOn namespace.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
@@ -27,9 +25,9 @@ private.RaceArtifactProcessingQueue = RaceArtifactProcessingQueue
 local RaceKeystoneProcessingQueue = {}
 private.RaceKeystoneProcessingQueue = RaceKeystoneProcessingQueue
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Local constants.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local Race = {}
 local raceMetatable = {
 	__index = Race
@@ -49,9 +47,9 @@ local CurrencyNameFromRaceID = {
 local KeystoneIDToRace = {} -- Populated in InitializeRaces
 private.KeystoneIDToRace = KeystoneIDToRace
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Helpers.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 function private.InitializeRaces()
 	_G.RequestArtifactCompletionHistory()
 
@@ -160,34 +158,34 @@ function private.AddRace(raceID)
 	return Races[raceID]
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Race methods.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 function Race:AddOrUpdateArtifactFromTemplate(template)
-    local projectName = template.projectName or (template.usesItemForProjectName and _G.GetItemInfo(template.itemID) or _G.GetSpellInfo(template.spellID))
+	local projectName = template.projectName or (template.usesItemForProjectName and _G.GetItemInfo(template.itemID) or _G.GetSpellInfo(template.spellID))
 
-    if projectName then
+	if projectName then
 		local projectNameLower = projectName:lower()
-        local artifact = self.Artifacts[projectNameLower]
+		local artifact = self.Artifacts[projectNameLower]
 
-        if artifact then
-            artifact.isRare = template.isRare
-            artifact.itemID = template.itemID
-            artifact.spellID = template.spellID
-        else
-            self.Artifacts[projectNameLower] = {
-                completionCount = self:GetArtifactCompletionCountByName(projectName),
-                isRare = template.isRare,
-                itemID = template.itemID,
-                name = projectName,
-                spellID = template.spellID,
-            }
-        end
+		if artifact then
+			artifact.isRare = template.isRare
+			artifact.itemID = template.itemID
+			artifact.spellID = template.spellID
+		else
+			self.Artifacts[projectNameLower] = {
+				completionCount = self:GetArtifactCompletionCountByName(projectName),
+				isRare = template.isRare,
+				itemID = template.itemID,
+				name = projectName,
+				spellID = template.spellID,
+			}
+		end
 
-        return true
-    end
+		return true
+	end
 
-    return false
+	return false
 end
 
 function Race:GetArtifactCompletionCountByName(targetArtifactName)
@@ -254,14 +252,15 @@ function Race:UpdateCurrentProject()
 
 				completionCount = self:GetArtifactCompletionCountByName(project.name)
 				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount or 0),
-                    1, 1, 1, nil, nil, nil, nil, nil, project.icon)
-            end
+					1, 1, 1, nil, nil, nil, nil, nil, project.icon)
+			end
 		else
 			completionCount = self:GetArtifactCompletionCountByName(artifactName)
 		end
 	end
 
 	project = artifact
+
 	self.currentProject = project
 
 	local baseFragments, adjustedFragments, totalFragments = _G.GetArtifactProgress()
@@ -307,6 +306,7 @@ function Race:UpdateCurrentProject()
 				project.canSolveStone = _G.CanSolveArtifact()
 			end
 		end
+
 		project.canSolveInventory = _G.CanSolveArtifact()
 
 		if prevAdded > 0 and project.keystone_adjustment <= 0 then
@@ -315,6 +315,7 @@ function Race:UpdateCurrentProject()
 			project.canSolveStone = _G.CanSolveArtifact()
 		end
 	end
+
 	project.keystones_added = prevAdded
 
 	_G.RequestArtifactCompletionHistory()
@@ -327,7 +328,7 @@ function Race:UpdateCurrentProject()
 			if not project.hasAnnounced and ((artifactSettings.announce and project.canSolve) or (artifactSettings.keystoneAnnounce and project.canSolveInventory)) then
 				project.hasAnnounced = true
 				Archy:Pour(L["You can solve %s Artifact - %s (Fragments: %d of %d)"]:format("|cFFFFFF00" .. self.name .. "|r", "|cFFFFFF00" .. project.name .. "|r", currencyOwned, currencyRequired),
-                    1, 1, 1, nil, nil, nil, nil, nil, project.icon)
+					1, 1, 1, nil, nil, nil, nil, nil, project.icon)
 			end
 
 			if not project.hasPinged and ((artifactSettings.ping and project.canSolve) or (artifactSettings.keystonePing and project.canSolveInventory)) then

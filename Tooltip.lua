@@ -1,18 +1,18 @@
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
-local math = _G.math
-local table = _G.table
-
+-- ----------------------------------------------------------------------------
+-- Functions
 local pairs = _G.pairs
 local tonumber = _G.tonumber
 local tostring = _G.tostring
 
------------------------------------------------------------------------
+-- Libraries
+local math = _G.math
+local table = _G.table
+
+-- ----------------------------------------------------------------------------
 -- AddOn namespace.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local LibStub = _G.LibStub
 
 local FOLDER_NAME, private = ...
@@ -30,9 +30,9 @@ local LDB_object = LibStub("LibDataBroker-1.1"):NewDataObject("Archy", {
 
 private.LDB_object = LDB_object
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Constants
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local MAX_ARCHAEOLOGY_RANK = private.MAX_ARCHAEOLOGY_RANK
 local ZONE_DATA = private.ZONE_DATA
 
@@ -52,14 +52,14 @@ local COUNT_DESCRIPTORS = {
 	total_counts = true
 }
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Variables
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local current_tooltip_mode = TooltipMode.ArtifactDigsites
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Tooltip cell provider.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local StatusBarCellProvider, StatusBarCellPrototype = QTip:CreateCellProvider()
 
 local function Archy_cell_script(_, what, button)
@@ -181,9 +181,9 @@ function StatusBarCellPrototype:getContentHeight()
 	return self.bar:GetHeight() + 2
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Helper functions.
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local function GetAchievementProgress()
 	local rareAchievementName, commonAchievementName = _G.NONE, _G.NONE
 	local rareAchievementID = 4854 -- "I had it in my hand" (Title: Assistant Professor)
@@ -316,7 +316,7 @@ function Archy:LDBTooltipShow()
 				tooltip:SetCell(line, 8, _G.NORMAL_FONT_COLOR_CODE .. L["Sockets"] .. "|r", "CENTER", 1)
 				tooltip:SetCell(line, 9, _G.NORMAL_FONT_COLOR_CODE .. L["Completed"] .. "|r", "CENTER", 2)
 
-                local currentContinentRaces = private.CONTINENT_RACES[private.CurrentContinentID]
+				local currentContinentRaces = private.CONTINENT_RACES[private.CurrentContinentID]
 
 				for raceID, race in pairs(private.Races) do
 					local project = race.currentProject
@@ -535,9 +535,9 @@ function Archy:LDBTooltipShow()
 	end
 end
 
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- LDB_object methods
------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 local function Tooltip_OnRelease()
 	Archy.LDB_Tooltip = nil
 end
@@ -573,8 +573,8 @@ function LDB_object:OnClick(button, down)
 			Archy:LDBTooltipShow()
 
 			if generalSettings.show and generalSettings.stealthMode and not private.stealthWarned then
-					Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session
-					private.stealthWarned = true
+				Archy:Print(L["In stealth mode. Shift-click the button or type /archy stealth if you wanted to show the Artifact and Digsite frames."]) -- we warn only once/session
+				private.stealthWarned = true
 			end
 
 			Archy:ConfigUpdated()
