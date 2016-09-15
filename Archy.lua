@@ -791,6 +791,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("ARTIFACT_COMPLETE")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("CHAT_MSG_LOOT")
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 	self:RegisterEvent("LOOT_OPENED")
 	self:RegisterEvent("PET_BATTLE_CLOSE")
@@ -1470,6 +1471,17 @@ do
         end
 	end
 end -- do-block
+
+do
+	local STANDING_ON_IT_SPELL_ID = 210837
+	local STANDING_ON_IT_DESCRIPTION = _G.GetSpellDescription(STANDING_ON_IT_SPELL_ID)
+
+	function Archy:COMBAT_LOG_EVENT_UNFILTERED(eventName, _, subEvent, _, _, _, _, _, _, _, _, _, spellID)
+		if subEvent == "SPELL_CAST_SUCCESS" and spellID == STANDING_ON_IT_SPELL_ID then
+			self:Pour(STANDING_ON_IT_DESCRIPTION)
+		end
+	end
+end
 
 function Archy:CURRENCY_DISPLAY_UPDATE()
 	if not private.CurrentContinentID then
