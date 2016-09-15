@@ -17,8 +17,8 @@ local Archy = LibStub("AceAddon-3.0"):GetAddon("Archy")
 -- Constants
 -- ----------------------------------------------------------------------------
 
--- Extracted from ResearchProject.dbc
--- ItemIDs from wowhead (haven't found a lookup table in the dbcs yet)
+-- Extracted from ResearchProject.db2
+-- ItemIDs obtained by matching ResearchProject name against known item-sparse names
 function private.InitializeArtifactTemplates()
 	local RaceID = private.RaceID
 
@@ -90,6 +90,67 @@ function private.InitializeArtifactTemplates()
 				spellID = 168326,
 			},
 		},
+
+		-- ----------------------------------------------------------------------------
+		-- Demons
+		-- ----------------------------------------------------------------------------
+		[RaceID.ArchRaceDemons] = {
+			[131743] = {
+				-- Blood of Young Mannoroth
+				isRare = true,
+				itemID = 131743,
+				spellID = 223857,
+			},
+			[131724] = {
+				-- Crystalline Eye of Undravius
+				isRare = true,
+				itemID = 131724,
+				spellID = 223854,
+			},
+			[130917] = {
+				-- Flayed-Skin Chronicle
+				itemID = 130917,
+				spellID = 196481,
+			},
+			[130920] = {
+				-- Houndstooth Hauberk
+				itemID = 130920,
+				spellID = 196484,
+			},
+			[131735] = {
+				-- Imp Generator
+				isRare = true,
+				itemID = 131735,
+				spellID = 223855,
+			},
+			[130916] = {
+				-- Imp's Cup
+				itemID = 130916,
+				spellID = 196480,
+			},
+			[136922] = {
+				-- Infernal Device
+				isRare = true,
+				itemID = 136922,
+				spellID = 223856,
+			},
+			[130918] = {
+				-- Malformed Abyssal
+				itemID = 130918,
+				spellID = 196482,
+			},
+			[130919] = {
+				-- Orb of Inner Chaos
+				itemID = 130919,
+				spellID = 196483,
+			},
+			[131732] = {
+				-- Purple Hills of Mac'Aree
+				isRare = true,
+				itemID = 131732,
+				spellID = 223858,
+			},
+		}
 
 		-- ----------------------------------------------------------------------------
 		-- Draenei
@@ -522,6 +583,116 @@ function private.InitializeArtifactTemplates()
 				spellID = 90618,
 			},
 		},
+
+		-- ----------------------------------------------------------------------------
+		-- Highborne Night Elves
+		-- ----------------------------------------------------------------------------
+		[RaceID.ArchRaceHighborneNightElves] = {
+			[131740] = {
+				-- Crown Jewels of Suramar
+				isRare = true,
+				itemID = 131740,
+				spellID = 223846,
+			},
+			[130907] = {
+				-- Inert Leystone Charm
+				itemID = 130907,
+				spellID = 196471,
+			},
+			[131745] = {
+				-- Key of Kalyndras
+				isRare = true,
+				itemID = 131745,
+				spellID = 223848,
+			},
+			[131744] = {
+				-- Key to Nar'thalas Academy
+				isRare = true,
+				itemID = 131744,
+				spellID = 223850,
+			},
+			[130910] = {
+				-- Nobleman's Letter Opener
+				itemID = 130910,
+				spellID = 196474,
+			},
+			[134078] = {
+				-- Orb of Sciallax
+				isRare = true,
+				itemID = 134078,
+				spellID = 223849,
+			},
+			[130909] = {
+				-- Pre-War Highborne Tapestry
+				itemID = 130909,
+				spellID = 196473,
+			},
+			[130908] = {
+				-- Quietwine Vial
+				itemID = 130908,
+				spellID = 196472,
+			},
+			[131717] = {
+				-- Starlight Beacon
+				isRare = true,
+				itemID = 131717,
+				spellID = 223844,
+			},
+			[130906] = {
+				-- Violetglass Vessel
+				itemID = 130906,
+				spellID = 196470,
+			},
+		}
+
+		-- ----------------------------------------------------------------------------
+		-- Highmountain Tauren
+		-- ----------------------------------------------------------------------------
+		[RaceID.ArchRaceHighmountainTauren] = {
+			[130914] = {
+				-- Drogbar Gem-Roller
+				itemID = 130914,
+				spellID = 196478,
+			},
+			[130913] = {
+				-- Hand-Smoothed Pyrestone
+				itemID = 130913,
+				spellID = 196477,
+			},
+			[130912] = {
+				-- Moosebone Fish-Hook
+				itemID = 130912,
+				spellID = 196476,
+			},
+			[131736] = {
+				-- Prizerock Neckband
+				isRare = true,
+				itemID = 131736,
+				spellID = 223852,
+			},
+			[131733] = {
+				-- Spear of Rethu
+				isRare = true,
+				itemID = 131733,
+				spellID = 223851,
+			},
+			[131734] = {
+				-- Spirit of Eche'ro
+				isRare = true,
+				itemID = 131734,
+				spellID = 223853,
+			},
+			[130915] = {
+				-- Stonewood Bow
+				itemID = 130915,
+				spellID = 196479,
+			},
+			[130911] = {
+				-- Trailhead Drum
+				itemID = 130911,
+				spellID = 196475,
+			},
+		}
 
 		-- ----------------------------------------------------------------------------
 		-- Mantid
