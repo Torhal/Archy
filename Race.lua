@@ -226,7 +226,7 @@ function Race:KeystoneSocketOnClick(mouseButtonName)
 end
 
 function Race:UpdateCurrentProject()
-	if private.notInWorld or self.numArtifacts == 0 then
+	if private.notInWorld or self.ID == 0 or _G.GetNumArtifactsByRace(self.ID) == 0 then
 		return
 	end
 
@@ -240,12 +240,12 @@ function Race:UpdateCurrentProject()
 	local artifact = self.Artifacts[artifactName:lower()]
 	if not artifact then
 		private.Debug("Missing data for %s artifact \"%s\"", self.name, artifactName)
-		self.currentProject = nil
 		return
 	end
 
 	local completionCount
 	local project = self.currentProject or artifact
+
 	if project then
 		if project.name ~= artifactName then
 			if not private.isLoading then
@@ -260,6 +260,7 @@ function Race:UpdateCurrentProject()
 			completionCount = self:GetArtifactCompletionCountByName(artifactName)
 		end
 	end
+
 	project = artifact
 	self.currentProject = project
 
@@ -288,6 +289,7 @@ function Race:UpdateCurrentProject()
 	if artifactSettings.autofill[self.ID] then
 		prevAdded = math.min(keystoneInventory, numSockets)
 	end
+
 	project.keystones_added = math.min(keystoneInventory, numSockets)
 
 	-- TODO: This whole section looks like a needlessly convoluted way of doing things.
