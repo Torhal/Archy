@@ -150,7 +150,7 @@ function private.InitializeArtifactTemplates()
 				itemID = 131732,
 				spellID = 223858,
 			},
-		}
+		},
 
 		-- ----------------------------------------------------------------------------
 		-- Draenei
@@ -643,7 +643,7 @@ function private.InitializeArtifactTemplates()
 				itemID = 130906,
 				spellID = 196470,
 			},
-		}
+		},
 
 		-- ----------------------------------------------------------------------------
 		-- Highmountain Tauren
@@ -692,7 +692,7 @@ function private.InitializeArtifactTemplates()
 				itemID = 130911,
 				spellID = 196475,
 			},
-		}
+		},
 
 		-- ----------------------------------------------------------------------------
 		-- Mantid
