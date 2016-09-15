@@ -897,6 +897,8 @@ function Archy:OnEnable()
 		end
 	end
 
+	private.PlayerGUID = _G.UnitGUID("player")
+
 	self:ScheduleTimer("UpdatePlayerPosition", 2, true)
 	private.isLoading = false
 end
@@ -1476,8 +1478,8 @@ do
 	local STANDING_ON_IT_SPELL_ID = 210837
 	local STANDING_ON_IT_DESCRIPTION = _G.GetSpellDescription(STANDING_ON_IT_SPELL_ID)
 
-	function Archy:COMBAT_LOG_EVENT_UNFILTERED(eventName, _, subEvent, _, _, _, _, _, _, _, _, _, spellID)
-		if subEvent == "SPELL_CAST_SUCCESS" and spellID == STANDING_ON_IT_SPELL_ID then
+	function Archy:COMBAT_LOG_EVENT_UNFILTERED(eventName, _, subEvent, _, sourceGUID, _, _, _, _, _, _, _, spellID)
+		if subEvent == "SPELL_CAST_SUCCESS" and sourceGUID == private.PlayerGUID and spellID == STANDING_ON_IT_SPELL_ID then
 			self:Pour(STANDING_ON_IT_DESCRIPTION)
 		end
 	end
