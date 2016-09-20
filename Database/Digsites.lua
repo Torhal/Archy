@@ -2336,7 +2336,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1024,
 			typeID = RaceID.ArchRaceHighmountainTauren,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.302635:0.495598"] = {
 			-- Digsite: Timeworn Strand
 			blobID = 350662,
 			mapID = 1015,
