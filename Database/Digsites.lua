@@ -2132,7 +2132,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1015,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.453181:0.482381"] = {
 			-- Digsite: Meredil
 			blobID = 363025,
 			mapID = 1033,
