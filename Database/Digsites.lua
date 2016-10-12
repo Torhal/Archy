@@ -2006,17 +2006,17 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1017,
 			typeID = RaceID.ArchRaceDemons
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.534983:0.435322"] = {
 			-- Digsite: Crimson Thicket
 			blobID = 363027,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.000000:0.000000"] = {
 			-- Digsite: Crimson Thicket
 			blobID = 363060,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.473618:0.188563"] = {
 			-- Digsite: Darkfeather Valley
@@ -2036,11 +2036,11 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1018,
 			typeID = RaceID.Unknown,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.427701:0.432854"] = {
 			-- Digsite: Eastern Ambervale
 			blobID = 363017,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.631011:0.303383"] = {
 			-- Digsite: Fallen Kings
@@ -2078,11 +2078,11 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1015,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.465284:0.449814"] = {
 			-- Digsite: Gates of the City
 			blobID = 363021,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.000000:0.000000"] = {
 			-- Digsite: Gates of Valor
@@ -2144,11 +2144,11 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1033,
 			typeID = RaceID.Unknown,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.443997:0.390095"] = {
 			-- Digsite: Moonwhisper Gulch
 			blobID = 346531,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.307413:0.556034"] = {
 			-- Digsite: Nor'Danil Wellspring
@@ -2162,11 +2162,11 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1017,
 			typeID = RaceID.ArchRaceDemons
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.396859:0.408170"] = {
 			-- Digsite: Northern Moonfall Retreat
 			blobID = 363019,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.479245:0.265640"] = {
 			-- Digsite: Northern Snowblind Mesa
