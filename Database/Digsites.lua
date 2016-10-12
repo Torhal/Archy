@@ -2100,7 +2100,7 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Koralune Estate
 			blobID = 363029,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.000000:0.000000"] = {
 			-- Digsite: Legion Camp: Chaos
