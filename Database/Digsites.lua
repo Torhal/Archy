@@ -2096,7 +2096,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1018,
 			typeID = RaceID.Unknown,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.403229:0.475374"] = {
 			-- Digsite: Koralune Estate
 			blobID = 363029,
 			mapID = 1033,
@@ -2136,13 +2136,13 @@ function private.InitializeDigsiteTemplates()
 			-- Digsite: Meredil
 			blobID = 363025,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.000000:0.000000"] = {
 			-- Digsite: Meredil
 			blobID = 363036,
 			mapID = 1033,
-			typeID = RaceID.Unknown,
+			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
 		["8:0.443997:0.390095"] = {
 			-- Digsite: Moonwhisper Gulch
