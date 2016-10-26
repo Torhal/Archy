@@ -186,55 +186,10 @@ local TomTomHandler
 -- ----------------------------------------------------------------------------
 -- Initialization.
 -- ----------------------------------------------------------------------------
-local BattlefieldMinimapDigsites
-
-local function InitializeBattlefieldDigsites()
-	_G.BattlefieldMinimap:HookScript("OnShow", Archy.UpdateTracking)
-
-	BattlefieldMinimapDigsites = _G.CreateFrame("ArchaeologyDigSiteFrame", "ArchyBattleFieldDigsites", _G.BattlefieldMinimap)
-	BattlefieldMinimapDigsites:SetSize(225, 150)
-	BattlefieldMinimapDigsites:SetPoint("TOPLEFT", _G.BattlefieldMinimap)
-	BattlefieldMinimapDigsites:SetPoint("BOTTOMRIGHT", _G.BattlefieldMinimap)
-	BattlefieldMinimapDigsites:SetFillAlpha(128)
-	BattlefieldMinimapDigsites:SetFillTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Inside")
-	BattlefieldMinimapDigsites:SetBorderTexture("Interface\\WorldMap\\UI-ArchaeologyBlob-Outside")
-	BattlefieldMinimapDigsites:EnableSmoothing(true)
-	BattlefieldMinimapDigsites:SetBorderScalar(0.1)
-	BattlefieldMinimapDigsites.lastUpdate = 0
-
-	local texture = BattlefieldMinimapDigsites:CreateTexture("ArchyBattleFieldDigsitesTexture", "OVERLAY")
-	texture:SetAllPoints()
-
-	BattlefieldMinimapDigsites:SetScript("OnUpdate", function(self, elapsed)
-		self.lastUpdate = self.lastUpdate + elapsed
-
-		if self.lastUpdate < _G.TOOLTIP_UPDATE_TIME then
-			return
-		end
-
-		self.lastUpdate = 0
-		self:DrawNone()
-
-		local numEntries = _G.ArchaeologyMapUpdateAll()
-		for index = 1, numEntries do
-			self:DrawBlob(_G.ArcheologyGetVisibleBlobID(index), true)
-		end
-	end)
-end
 
 -- ----------------------------------------------------------------------------
 -- Local helper functions
 -- ----------------------------------------------------------------------------
-local function ToggleDigsiteVisibility(show)
-	_G.WorldMapArchaeologyDigSites[show and "Show" or "Hide"](_G.WorldMapArchaeologyDigSites)
-
-	if BattlefieldMinimapDigsites then
-		BattlefieldMinimapDigsites[show and "Show" or "Hide"](BattlefieldMinimapDigsites)
-	end
-
-	_G.RefreshWorldMap()
-end
-
 local function UpdateMinimapIcons()
 	if not private.hasArchaeology or not playerLocation.x and not playerLocation.y then
 		return
@@ -540,16 +495,6 @@ function UpdateAllSites()
 	-- Set this for restoration at the end of the loop, since it's changed every iteration.
 	local originalMapID = _G.GetCurrentMapAreaID()
 
-	-- Function fails to populate continent_digsites if showing digsites on the worldmap has been toggled off by the user.
-	-- So make sure we enable and show blobs and restore the setting at the end.
-	local showDig = _G.GetCVarBool("digSites")
-	if not showDig then
-		_G.SetCVar("digSites", "1")
-		ToggleDigsiteVisibility(true)
-
-		showDig = "0"
-	end
-
 	for continentID, continentName in pairs(MAP_CONTINENTS) do
 		local sites = {}
 
@@ -591,12 +536,6 @@ function UpdateAllSites()
 			end
 			continent_digsites[continentID] = sites
 		end
-	end
-
-	-- restore initial setting
-	if showDig == "0" then
-		_G.SetCVar("digSites", showDig)
-		ToggleDigsiteVisibility(false)
 	end
 
 	_G.SetMapByID(originalMapID)
@@ -845,12 +784,6 @@ function Archy:OnEnable()
 	-- ----------------------------------------------------------------------------
 	-- Map stuff.
 	-- ----------------------------------------------------------------------------
-	if _G.BattlefieldMinimap then
-		InitializeBattlefieldDigsites()
-	else
-		Archy:RegisterEvent("ADDON_LOADED")
-	end
-
 	local continentData = { _G.GetMapContinents() }
 	for continentDataIndex = 1, #continentData do
 		-- Odd indices are IDs, even are names.
@@ -1260,10 +1193,6 @@ function Archy:UpdateTracking()
 	if digsitesTrackingID then
 		_G.SetTracking(digsitesTrackingID, private.ProfileSettings.general.show)
 	end
-
-	_G.SetCVar("digSites", private.ProfileSettings.general.show and "1" or "0")
-
-	ToggleDigsiteVisibility(_G.GetCVarBool("digSites"))
 end
 
 -- ------------------------------------------------------------------------------------
@@ -1291,13 +1220,6 @@ end
 -- ------------------------------------------------------------------------------------
 -- Event handlers.
 -- ------------------------------------------------------------------------------------
-function Archy:ADDON_LOADED(event, addonName)
-	if addonName == "Blizzard_BattlefieldMinimap" then
-		InitializeBattlefieldDigsites()
-		self:UnregisterEvent("ADDON_LOADED")
-	end
-end
-
 do
 	function Archy:ARCHAEOLOGY_FIND_COMPLETE(eventName, numFindsCompleted, totalFinds)
 		DistanceIndicatorFrame.isActive = false
