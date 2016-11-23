@@ -2048,7 +2048,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1017,
 			typeID = RaceID.ArchRaceDemons
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.399354:0.506587"] = {
 			-- Digsite: Farondale
 			blobID = 354020,
 			mapID = 1015,
@@ -2102,7 +2102,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1033,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.308262:0.602774"] = {
 			-- Digsite: Legion Camp: Chaos
 			blobID = 346517,
 			mapID = 1015,
@@ -2120,13 +2120,13 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1015,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.329283:0.547355"] = {
 			-- Digsite: Llothien Highlands
 			blobID = 354018,
 			mapID = 1015,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.387145:0.642268"] = {
 			-- Digsite: Makrana
 			blobID = 354031,
 			mapID = 1015,
@@ -2174,12 +2174,6 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1024,
 			typeID = RaceID.ArchRaceHighmountainTauren,
 		},
-		["8:0.000000:0.000000"] = {
-			-- Digsite: Northern Watcher Isle
-			blobID = 354027,
-			mapID = 1015,
-			typeID = RaceID.ArchRaceHighborneNightElves,
-		},
 		["8:0.335282:0.621327"] = {
 			-- Digsite: Old Coast Path
 			blobID = 354041,
@@ -2198,7 +2192,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1024,
 			typeID = RaceID.ArchRaceHighmountainTauren,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.355985:0.475055"] = {
 			-- Digsite: Rhut'van Passage
 			blobID = 354022,
 			mapID = 1015,
@@ -2258,7 +2252,13 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1018,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.324187:0.693149"] = {
+			-- Digsite: Southern Watcher Isle
+			blobID = 354027,
+			mapID = 1015,
+			typeID = RaceID.ArchRaceHighborneNightElves,
+		},
+		["8:0.340059:0.751514"] = {
 			-- Digsite: Southern Watcher Isle (copy)
 			blobID = 354029,
 			mapID = 1015,
@@ -2342,7 +2342,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1015,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.000000:0.000000"] = {
+		["8:0.287507:0.534615"] = {
 			-- Digsite: Timeworn Strand
 			blobID = 354025,
 			mapID = 1015,
