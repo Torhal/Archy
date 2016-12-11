@@ -729,7 +729,6 @@ function Archy:OnEnable()
 	--    self:RegisterEvent("ARTIFACT_UPDATE")
 	self:RegisterEvent("ARCHAEOLOGY_FIND_COMPLETE")
 	self:RegisterEvent("ARCHAEOLOGY_SURVEY_CAST")
-	self:RegisterEvent("ARTIFACT_COMPLETE")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -746,6 +745,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("PLAYER_STARTED_MOVING")
 	self:RegisterEvent("PLAYER_STOPPED_MOVING")
 	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterEvent("RESEARCH_ARTIFACT_COMPLETE")
 	self:RegisterEvent("RESEARCH_ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("SKILL_LINES_CHANGED")
 	self:RegisterEvent("TAXIMAP_CLOSED")
@@ -756,7 +756,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 
-	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
+	self:RegisterBucketEvent("RESEARCH_ARTIFACT_HISTORY_READY", 0.2)
 
 	self:SKILL_LINES_CHANGED()
 
@@ -1292,7 +1292,7 @@ do
 		ArtifactFrame:RefreshDisplay()
 	end
 
-	function Archy:ARTIFACT_COMPLETE(event, artifactName)
+	function Archy:RESEARCH_ARTIFACT_COMPLETE(event, artifactName)
 		-- TODO: If this is fired from Blizzard's UI, do NOT immediately update projects.
 		-- This is the cause of ticket 461: Race:UpdateCurrentProject() calls SetSelectedArtifact(), which affects the Blizzard UI.
 		-- Instead, possibly warn the user that changes to Archy's UI will not be available until Blizzard's UI is closed, then register some events/whatever so we can update
@@ -1320,7 +1320,7 @@ function Archy:RESEARCH_ARTIFACT_DIG_SITE_UPDATED()
 	self:RefreshDigSiteDisplay()
 end
 
-function Archy:ARTIFACT_HISTORY_READY()
+function Archy:RESEARCH_ARTIFACT_HISTORY_READY()
 	if not private.initialAnnouncementCheck then
 		private.initialAnnouncementCheck = self:ScheduleTimer(function()
 			for raceID, race in pairs(private.Races) do
