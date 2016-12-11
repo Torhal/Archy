@@ -809,42 +809,45 @@ function Archy:ResizeMinimalDigSiteDisplay()
 	local maxNameWidth, maxZoneWidth, maxDistWidth, maxDigCounterWidth = 0, 0, 70, 20
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
-		siteIndex = siteIndex + 1
-		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
-		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
-		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
-		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
+		if siteFrame:IsShown() then
+			siteIndex = siteIndex + 1
+			siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
+			siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
+			siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
+			siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
-		local nameWidth = siteFrame.siteButton:GetWidth()
-		local zoneWidth = siteFrame.zone:GetWidth()
-		local digCounterWidth = siteFrame.digCounter:GetWidth()
-		local distWidth = siteFrame.distance:GetWidth()
+			local nameWidth = siteFrame.siteButton:GetWidth()
+			local zoneWidth = siteFrame.zone:GetWidth()
+			local digCounterWidth = siteFrame.digCounter:GetWidth()
+			local distWidth = siteFrame.distance:GetWidth()
 
-		if maxNameWidth < nameWidth then
-			maxNameWidth = nameWidth
+			if maxNameWidth < nameWidth then
+				maxNameWidth = nameWidth
+			end
+
+			if maxZoneWidth < zoneWidth then
+				maxZoneWidth = zoneWidth
+			end
+
+			if maxDistWidth < distWidth then
+				maxDistWidth = distWidth
+			end
+
+			if maxDigCounterWidth < digCounterWidth then
+				maxDigCounterWidth = digCounterWidth
+			end
+
+			maxHeight = maxHeight + siteFrame:GetHeight() + 5
+			siteFrame:ClearAllPoints()
+
+			if siteIndex == 1 then
+				siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
+			else
+				siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
+			end
+
+			topFrame = siteFrame
 		end
-
-		if maxZoneWidth < zoneWidth then
-			maxZoneWidth = zoneWidth
-		end
-
-		if maxDistWidth < distWidth then
-			maxDistWidth = distWidth
-		end
-
-		if maxDigCounterWidth < digCounterWidth then
-			maxDigCounterWidth = digCounterWidth
-		end
-
-		maxHeight = maxHeight + siteFrame:GetHeight() + 5
-		siteFrame:ClearAllPoints()
-
-		if siteIndex == 1 then
-			siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
-		else
-			siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
-		end
-		topFrame = siteFrame
 	end
 
 	local themeSettings = private.ProfileSettings.digsite.minimal
@@ -886,41 +889,47 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 	local siteIndex = 0
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
-		siteIndex = siteIndex + 1
-		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
-		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
-		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
-		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
+		if siteFrame:IsShown() then
+			siteIndex = siteIndex + 1
+			siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
+			siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
+			siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
+			siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
-		local width
-		local nameWidth = siteFrame.siteButton:GetWidth()
-		local zoneWidth = siteFrame.zone:GetWidth() + 10
+			local width
+			local nameWidth = siteFrame.siteButton:GetWidth()
+			local zoneWidth = siteFrame.zone:GetWidth() + 10
 
-		if nameWidth > zoneWidth then
-			width = siteFrame.crest:GetWidth() + nameWidth + siteFrame.digCounter:GetWidth() + 6
-		else
-			width = siteFrame.crest:GetWidth() + zoneWidth + siteFrame.distance:GetWidth() + 6
+			if nameWidth > zoneWidth then
+				width = siteFrame.crest:GetWidth() + nameWidth + siteFrame.digCounter:GetWidth() + 6
+			else
+				width = siteFrame.crest:GetWidth() + zoneWidth + siteFrame.distance:GetWidth() + 6
+			end
+
+			width = width + siteFrame.digCounter:GetWidth()
+
+			if width > maxWidth then
+				maxWidth = width
+			end
+
+			maxHeight = maxHeight + siteFrame:GetHeight() + 5
+
+			siteFrame:ClearAllPoints()
+
+			if siteIndex == 1 then
+				siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
+			else
+				siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
+			end
+
+			topFrame = siteFrame
 		end
-		width = width + siteFrame.digCounter:GetWidth()
-
-		if width > maxWidth then
-			maxWidth = width
-		end
-		maxHeight = maxHeight + siteFrame:GetHeight() + 5
-
-		siteFrame:ClearAllPoints()
-
-		if siteIndex == 1 then
-			siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
-		else
-			siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
-		end
-		topFrame = siteFrame
 	end
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteFrame:SetWidth(maxWidth)
 	end
+
 	DigSiteFrame.container:SetWidth(maxWidth)
 	DigSiteFrame.container:SetHeight(maxHeight)
 
@@ -943,6 +952,10 @@ function Archy:RefreshDigSiteDisplay()
 	end
 
 	local maxFindCount = (continentID >= _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
+
+	for index = 1, #DigSiteFrame.children do
+		DigSiteFrame.children[index]:Hide()
+	end
 
 	for digsiteIndex, digsite in pairs(continentDigsites[continentID]) do
 		local childFrame = DigSiteFrame.children[digsiteIndex]
@@ -973,6 +986,8 @@ function Archy:RefreshDigSiteDisplay()
 			childFrame.crest.icon:SetTexture(race.texture)
 			childFrame.crest.tooltip = race.name
 		end
+
+		childFrame:Show()
 	end
 
 	self:ResizeDigSiteDisplay()
