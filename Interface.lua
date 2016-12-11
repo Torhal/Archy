@@ -692,11 +692,6 @@ do
 	end
 
 	local function InitializeFrames()
-		if private.IsTaintable() then
-			private.regen_create_frames = true
-			return
-		end
-
 		local isGraphicalTheme = private.ProfileSettings.general.theme == "Graphical"
 
 		-- ----------------------------------------------------------------------------

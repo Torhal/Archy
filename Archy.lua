@@ -1574,11 +1574,6 @@ end
 function Archy:PLAYER_REGEN_ENABLED()
 	private.in_combat = nil
 
-	if private.regen_create_frames then
-		private.regen_create_frames = nil
-		private.InitializeFrames()
-	end
-
 	if private.regen_toggle_distance then
 		private.regen_toggle_distance = nil
 		DistanceIndicatorFrame:Toggle()
