@@ -1551,6 +1551,8 @@ function Archy:PLAYER_ENTERING_WORLD()
 		HideFrames()
 	else
 		ShowFrames()
+
+		self:UpdatePlayerPosition()
 	end
 end
 
