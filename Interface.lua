@@ -146,7 +146,6 @@ do
 				if child then
 					child:SetID(raceID)
 
-					local completionCount = race:GetArtifactCompletionCountByName(project.name)
 					local continentHasRace = currentContinentRaces and currentContinentRaces[raceID]
 
 					if not race:IsOnArtifactBlacklist() and project.fragments_required > 0 and (not artifactSettings.filter or project.canSolve or continentHasRace) then
@@ -169,7 +168,7 @@ do
 						child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystonesInInventory
 						child.crest.text:SetText(race.name)
 						child.icon.texture:SetTexture(project.icon)
-						child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+						child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. project.completionCount .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 						-- setup the bar texture here
 						local barTexture = (LSM and LSM:Fetch('statusbar', fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
@@ -181,7 +180,7 @@ do
 							barColor = fragmentBarColors["Rare"]
 							child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625)
 						else
-							if completionCount == 0 then
+							if project.completionCount == 0 then
 								barColor = fragmentBarColors["FirstTime"]
 							else
 								barColor = fragmentBarColors["Normal"]
@@ -265,7 +264,7 @@ do
 
 					else
 						local fragmentColor = (project.canSolve and "|cFF00FF00" or (project.canSolveStone and "|cFFFFFF00" or ""))
-						local nameColor = (project.isRare and "|cFF0070DD" or (completionCount > 0 and _G.GRAY_FONT_COLOR_CODE or ""))
+						local nameColor = (project.isRare and "|cFF0070DD" or (project.completionCount > 0 and _G.GRAY_FONT_COLOR_CODE or ""))
 						child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, project.fragments, project.fragments_required)
 
 						if race.keystonesInInventory > 0 or project.sockets > 0 then
@@ -280,7 +279,7 @@ do
 						child.crest.tooltip = project.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race.name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 						child.artifact.text:SetFormattedText("%s%s", nameColor, project.name)
-						child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+						child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. project.completionCount .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 						child.artifact:SetWidth(child.artifact.text:GetStringWidth())
 						child.artifact:SetHeight(child.artifact.text:GetStringHeight())
