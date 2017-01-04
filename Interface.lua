@@ -146,7 +146,6 @@ do
 				if child then
 					child:SetID(raceID)
 
-					local completionCount = race:GetArtifactCompletionCountByName(project.name)
 					local continentHasRace = currentContinentRaces and currentContinentRaces[raceID]
 
 					if not race:IsOnArtifactBlacklist() and project.fragments_required > 0 and (not artifactSettings.filter or project.canSolve or continentHasRace) then
@@ -169,7 +168,7 @@ do
 						child.crest.tooltip = race.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. L["Key Stones:"] .. "|r " .. race.keystonesInInventory
 						child.crest.text:SetText(race.name)
 						child.icon.texture:SetTexture(project.icon)
-						child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+						child.icon.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. project.completionCount .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 						-- setup the bar texture here
 						local barTexture = (LSM and LSM:Fetch('statusbar', fragmentBarTexture)) or _G.DEFAULT_STATUSBAR_TEXTURE
@@ -181,7 +180,7 @@ do
 							barColor = fragmentBarColors["Rare"]
 							child.fragmentBar.barBackground:SetTexCoord(0, 0.72265625, 0.3671875, 0.7890625)
 						else
-							if completionCount == 0 then
+							if project.completionCount == 0 then
 								barColor = fragmentBarColors["FirstTime"]
 							else
 								barColor = fragmentBarColors["Normal"]
@@ -265,7 +264,7 @@ do
 
 					else
 						local fragmentColor = (project.canSolve and "|cFF00FF00" or (project.canSolveStone and "|cFFFFFF00" or ""))
-						local nameColor = (project.isRare and "|cFF0070DD" or (completionCount > 0 and _G.GRAY_FONT_COLOR_CODE or ""))
+						local nameColor = (project.isRare and "|cFF0070DD" or (project.completionCount > 0 and _G.GRAY_FONT_COLOR_CODE or ""))
 						child.fragments.text:SetFormattedText("%s%d/%d", fragmentColor, project.fragments, project.fragments_required)
 
 						if race.keystonesInInventory > 0 or project.sockets > 0 then
@@ -280,7 +279,7 @@ do
 						child.crest.tooltip = project.name .. "\n" .. _G.NORMAL_FONT_COLOR_CODE .. _G.RACE .. " - " .. "|r" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. race.name .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to solve without key stones"] .. "\n" .. L["Right-Click to solve with key stones"]
 
 						child.artifact.text:SetFormattedText("%s%s", nameColor, project.name)
-						child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. (completionCount or "0") .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
+						child.artifact.tooltip = _G.HIGHLIGHT_FONT_COLOR_CODE .. project.name .. "|r\n" .. _G.NORMAL_FONT_COLOR_CODE .. project.tooltip .. "\n\n" .. _G.HIGHLIGHT_FONT_COLOR_CODE .. L["Solved Count: %s"]:format(_G.NORMAL_FONT_COLOR_CODE .. project.completionCount .. "|r") .. "\n\n" .. _G.GREEN_FONT_COLOR_CODE .. L["Left-Click to open artifact in default Archaeology UI"] .. "|r"
 
 						child.artifact:SetWidth(child.artifact.text:GetStringWidth())
 						child.artifact:SetHeight(child.artifact.text:GetStringHeight())
@@ -692,11 +691,6 @@ do
 	end
 
 	local function InitializeFrames()
-		if private.IsTaintable() then
-			private.regen_create_frames = true
-			return
-		end
-
 		local isGraphicalTheme = private.ProfileSettings.general.theme == "Graphical"
 
 		-- ----------------------------------------------------------------------------
@@ -815,42 +809,45 @@ function Archy:ResizeMinimalDigSiteDisplay()
 	local maxNameWidth, maxZoneWidth, maxDistWidth, maxDigCounterWidth = 0, 0, 70, 20
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
-		siteIndex = siteIndex + 1
-		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
-		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
-		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
-		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
+		if siteFrame:IsShown() then
+			siteIndex = siteIndex + 1
+			siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
+			siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
+			siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
+			siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
-		local nameWidth = siteFrame.siteButton:GetWidth()
-		local zoneWidth = siteFrame.zone:GetWidth()
-		local digCounterWidth = siteFrame.digCounter:GetWidth()
-		local distWidth = siteFrame.distance:GetWidth()
+			local nameWidth = siteFrame.siteButton:GetWidth()
+			local zoneWidth = siteFrame.zone:GetWidth()
+			local digCounterWidth = siteFrame.digCounter:GetWidth()
+			local distWidth = siteFrame.distance:GetWidth()
 
-		if maxNameWidth < nameWidth then
-			maxNameWidth = nameWidth
+			if maxNameWidth < nameWidth then
+				maxNameWidth = nameWidth
+			end
+
+			if maxZoneWidth < zoneWidth then
+				maxZoneWidth = zoneWidth
+			end
+
+			if maxDistWidth < distWidth then
+				maxDistWidth = distWidth
+			end
+
+			if maxDigCounterWidth < digCounterWidth then
+				maxDigCounterWidth = digCounterWidth
+			end
+
+			maxHeight = maxHeight + siteFrame:GetHeight() + 5
+			siteFrame:ClearAllPoints()
+
+			if siteIndex == 1 then
+				siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
+			else
+				siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
+			end
+
+			topFrame = siteFrame
 		end
-
-		if maxZoneWidth < zoneWidth then
-			maxZoneWidth = zoneWidth
-		end
-
-		if maxDistWidth < distWidth then
-			maxDistWidth = distWidth
-		end
-
-		if maxDigCounterWidth < digCounterWidth then
-			maxDigCounterWidth = digCounterWidth
-		end
-
-		maxHeight = maxHeight + siteFrame:GetHeight() + 5
-		siteFrame:ClearAllPoints()
-
-		if siteIndex == 1 then
-			siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
-		else
-			siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
-		end
-		topFrame = siteFrame
 	end
 
 	local themeSettings = private.ProfileSettings.digsite.minimal
@@ -892,41 +889,47 @@ function Archy:ResizeGraphicalDigSiteDisplay()
 	local siteIndex = 0
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
-		siteIndex = siteIndex + 1
-		siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
-		siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
-		siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
-		siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
+		if siteFrame:IsShown() then
+			siteIndex = siteIndex + 1
+			siteFrame.zone:SetWidth(siteFrame.zone.name:GetStringWidth())
+			siteFrame.distance:SetWidth(siteFrame.distance.value:GetStringWidth())
+			siteFrame.siteButton:SetWidth(siteFrame.siteButton.name:GetStringWidth())
+			siteFrame.digCounter:SetWidth(siteFrame.digCounter.value:GetStringWidth())
 
-		local width
-		local nameWidth = siteFrame.siteButton:GetWidth()
-		local zoneWidth = siteFrame.zone:GetWidth() + 10
+			local width
+			local nameWidth = siteFrame.siteButton:GetWidth()
+			local zoneWidth = siteFrame.zone:GetWidth() + 10
 
-		if nameWidth > zoneWidth then
-			width = siteFrame.crest:GetWidth() + nameWidth + siteFrame.digCounter:GetWidth() + 6
-		else
-			width = siteFrame.crest:GetWidth() + zoneWidth + siteFrame.distance:GetWidth() + 6
+			if nameWidth > zoneWidth then
+				width = siteFrame.crest:GetWidth() + nameWidth + siteFrame.digCounter:GetWidth() + 6
+			else
+				width = siteFrame.crest:GetWidth() + zoneWidth + siteFrame.distance:GetWidth() + 6
+			end
+
+			width = width + siteFrame.digCounter:GetWidth()
+
+			if width > maxWidth then
+				maxWidth = width
+			end
+
+			maxHeight = maxHeight + siteFrame:GetHeight() + 5
+
+			siteFrame:ClearAllPoints()
+
+			if siteIndex == 1 then
+				siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
+			else
+				siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
+			end
+
+			topFrame = siteFrame
 		end
-		width = width + siteFrame.digCounter:GetWidth()
-
-		if width > maxWidth then
-			maxWidth = width
-		end
-		maxHeight = maxHeight + siteFrame:GetHeight() + 5
-
-		siteFrame:ClearAllPoints()
-
-		if siteIndex == 1 then
-			siteFrame:SetPoint("TOP", topFrame, "TOP", 0, 0)
-		else
-			siteFrame:SetPoint("TOP", topFrame, "BOTTOM", 0, -5)
-		end
-		topFrame = siteFrame
 	end
 
 	for _, siteFrame in pairs(DigSiteFrame.children) do
 		siteFrame:SetWidth(maxWidth)
 	end
+
 	DigSiteFrame.container:SetWidth(maxWidth)
 	DigSiteFrame.container:SetHeight(maxHeight)
 
@@ -949,6 +952,10 @@ function Archy:RefreshDigSiteDisplay()
 	end
 
 	local maxFindCount = (continentID >= _G.WORLDMAP_DRAENOR_ID) and NUM_DIGSITE_FINDS_DRAENOR or NUM_DIGSITE_FINDS_DEFAULT
+
+	for index = 1, #DigSiteFrame.children do
+		DigSiteFrame.children[index]:Hide()
+	end
 
 	for digsiteIndex, digsite in pairs(continentDigsites[continentID]) do
 		local childFrame = DigSiteFrame.children[digsiteIndex]
@@ -979,6 +986,8 @@ function Archy:RefreshDigSiteDisplay()
 			childFrame.crest.icon:SetTexture(race.texture)
 			childFrame.crest.tooltip = race.name
 		end
+
+		childFrame:Show()
 	end
 
 	self:ResizeDigSiteDisplay()

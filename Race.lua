@@ -146,7 +146,7 @@ function private.AddRace(raceID)
 		local artifactName, artifactDescription, artifactRarity, artifactIcon, hoverDescription, keystoneCount, bgTexture, firstCompletionTime, completionCount = _G.GetArtifactInfoByRace(raceID, artifactIndex)
 		local artifact = {
 			ID = artifactIndex,
-			completionCount = completionCount,
+			completionCount = completionCount or 0,
 			isRare = artifactRarity ~= 0,
 			name = artifactName,
 			texture = artifactIcon,
@@ -190,13 +190,13 @@ end
 
 function Race:GetArtifactCompletionCountByName(targetArtifactName)
 	if not targetArtifactName or targetArtifactName == "" or self.numArtifacts == 0 then
-		return
+		return 0
 	end
 
 	for artifactIndex = 1, self.numArtifacts do
 		local artifactName, _, _, _, _, _, _, _, completionCount = _G.GetArtifactInfoByRace(self.ID, artifactIndex)
 		if artifactName == targetArtifactName then
-			return completionCount
+			return completionCount or 0
 		end
 	end
 
@@ -241,7 +241,7 @@ function Race:UpdateCurrentProject()
 		return
 	end
 
-	local completionCount
+	local completionCount = 0
 	local project = self.currentProject or artifact
 
 	if project then
@@ -251,7 +251,7 @@ function Race:UpdateCurrentProject()
 				project.hasPinged = nil
 
 				completionCount = self:GetArtifactCompletionCountByName(project.name)
-				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount or 0),
+				Archy:Pour(L["You have solved |cFFFFFF00%s|r Artifact - |cFFFFFF00%s|r (Times completed: %d)"]:format(self.name, project.name, completionCount),
 					1, 1, 1, nil, nil, nil, nil, nil, project.icon)
 			end
 		else

@@ -302,25 +302,27 @@ local function SolveRaceArtifact(race, useKeystones)
 	if race then
 		local artifact = race.currentProject
 
-		_G.SetSelectedArtifact(race.ID)
-		lootedKeystoneRace = race
+		if artifact then
+			_G.SetSelectedArtifact(race.ID)
+			lootedKeystoneRace = race
 
-		-- Override keystones that have already been added if true or false were passed.
-		if type(useKeystones) == "boolean" then
-			artifact.keystones_added = useKeystones and math.min(race.keystonesInInventory, artifact.sockets) or 0
-		end
-
-		if artifact.keystones_added > 0 then
-			for index = 1, artifact.keystones_added do
-				_G.SocketItemToArtifact()
-
-				if not _G.ItemAddedToArtifact(index) then
-					break
-				end
+			-- Override keystones that have already been added if true or false were passed.
+			if type(useKeystones) == "boolean" then
+				artifact.keystones_added = useKeystones and math.min(race.keystonesInInventory, artifact.sockets) or 0
 			end
-		elseif artifact.sockets > 0 then
-			for index = 1, artifact.sockets do
-				_G.RemoveItemFromArtifact()
+
+			if artifact.keystones_added > 0 then
+				for index = 1, artifact.keystones_added do
+					_G.SocketItemToArtifact()
+
+					if not _G.ItemAddedToArtifact(index) then
+						break
+					end
+				end
+			elseif artifact.sockets > 0 then
+				for index = 1, artifact.sockets do
+					_G.RemoveItemFromArtifact()
+				end
 			end
 		end
 	end
@@ -448,9 +450,11 @@ end
 
 function Archy:SolveAnyArtifact(useKeystones)
 	local found = false
+
 	for raceID, race in pairs(private.Races) do
 		local artifact = race.currentProject
-		if not race:IsOnArtifactBlacklist() and (artifact.canSolve or (useKeystones and artifact.canSolveInventory)) then
+
+		if artifact and not race:IsOnArtifactBlacklist() and (artifact.canSolve or (useKeystones and artifact.canSolveInventory)) then
 			SolveRaceArtifact(race, useKeystones)
 			found = true
 			break
@@ -725,7 +729,6 @@ function Archy:OnEnable()
 	--    self:RegisterEvent("ARTIFACT_UPDATE")
 	self:RegisterEvent("ARCHAEOLOGY_FIND_COMPLETE")
 	self:RegisterEvent("ARCHAEOLOGY_SURVEY_CAST")
-	self:RegisterEvent("ARTIFACT_COMPLETE")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -742,6 +745,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("PLAYER_STARTED_MOVING")
 	self:RegisterEvent("PLAYER_STOPPED_MOVING")
 	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterEvent("RESEARCH_ARTIFACT_COMPLETE")
 	self:RegisterEvent("RESEARCH_ARTIFACT_DIG_SITE_UPDATED")
 	self:RegisterEvent("SKILL_LINES_CHANGED")
 	self:RegisterEvent("TAXIMAP_CLOSED")
@@ -752,7 +756,7 @@ function Archy:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 
-	self:RegisterBucketEvent("ARTIFACT_HISTORY_READY", 0.2)
+	self:RegisterBucketEvent("RESEARCH_ARTIFACT_HISTORY_READY", 0.2)
 
 	self:SKILL_LINES_CHANGED()
 
@@ -1288,7 +1292,7 @@ do
 		ArtifactFrame:RefreshDisplay()
 	end
 
-	function Archy:ARTIFACT_COMPLETE(event, artifactName)
+	function Archy:RESEARCH_ARTIFACT_COMPLETE(event, artifactName)
 		-- TODO: If this is fired from Blizzard's UI, do NOT immediately update projects.
 		-- This is the cause of ticket 461: Race:UpdateCurrentProject() calls SetSelectedArtifact(), which affects the Blizzard UI.
 		-- Instead, possibly warn the user that changes to Archy's UI will not be available until Blizzard's UI is closed, then register some events/whatever so we can update
@@ -1316,7 +1320,7 @@ function Archy:RESEARCH_ARTIFACT_DIG_SITE_UPDATED()
 	self:RefreshDigSiteDisplay()
 end
 
-function Archy:ARTIFACT_HISTORY_READY()
+function Archy:RESEARCH_ARTIFACT_HISTORY_READY()
 	if not private.initialAnnouncementCheck then
 		private.initialAnnouncementCheck = self:ScheduleTimer(function()
 			for raceID, race in pairs(private.Races) do
@@ -1547,6 +1551,8 @@ function Archy:PLAYER_ENTERING_WORLD()
 		HideFrames()
 	else
 		ShowFrames()
+
+		self:UpdatePlayerPosition()
 	end
 end
 
@@ -1569,11 +1575,6 @@ end
 
 function Archy:PLAYER_REGEN_ENABLED()
 	private.in_combat = nil
-
-	if private.regen_create_frames then
-		private.regen_create_frames = nil
-		private.InitializeFrames()
-	end
 
 	if private.regen_toggle_distance then
 		private.regen_toggle_distance = nil
