@@ -2324,7 +2324,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1015,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.359913:0.376001"] = {
+		["8:0.360337:0.374966"] = {
 			-- Digsite: The Wildwood
 			blobID = 354249,
 			mapID = 1018,
