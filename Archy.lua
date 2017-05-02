@@ -505,7 +505,7 @@ function UpdateAllSites()
 		_G.SetMapZoom(continentID)
 
 		for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-			local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY = _G.GetMapLandmarkInfo(landmarkIndex)
+			local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY = C_WorldMap.GetMapLandmarkInfo(landmarkIndex)
 
 			if landmarkType == _G.LE_MAP_LANDMARK_TYPE_DIGSITE and mapPositionX and mapPositionY then
 				local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
@@ -922,7 +922,7 @@ local SUBCOMMAND_FUNCS = {
 			_G.SetMapZoom(continentID)
 
 			for landmarkIndex = 1, _G.GetNumMapLandmarks() do
-				local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY, mapLinkID, showInBattleMap = _G.GetMapLandmarkInfo(landmarkIndex)
+				local landmarkType, landmarkName, _, textureIndex, mapPositionX, mapPositionY, mapLinkID, showInBattleMap = C_WorldMap.GetMapLandmarkInfo(landmarkIndex)
 
 				if landmarkType == _G.LE_MAP_LANDMARK_TYPE_DIGSITE then
 					local siteKey = ("%d:%.6f:%.6f"):format(continentID, mapPositionX, mapPositionY)
