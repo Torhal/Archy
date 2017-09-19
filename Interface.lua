@@ -700,9 +700,9 @@ do
 		ArtifactFrame = _G.CreateFrame("Frame", "ArchyArtifactFrame", _G.UIParent, artifactTemplate)
 		ArtifactFrame.children = setmetatable({}, {
 			__index = function(t, k)
-				if k and private.AechaeologyRaceLabelFromID[k] then
+				if k and private.ArchaeologyRaceLabelFromID[k] then
 					local template = (isGraphicalTheme and "ArchyArtifactRowTemplate" or "ArchyMinArtifactRowTemplate")
-					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.AechaeologyRaceLabelFromID[k], ArtifactFrame, template)
+					local child = _G.CreateFrame("Frame", "ArchyArtifactChildFrame" .. private.ArchaeologyRaceLabelFromID[k], ArtifactFrame, template)
 
 					if child.fragmentBar then
 						child.fragmentBar:SetScript("OnEnter", function(self)

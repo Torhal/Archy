@@ -36,8 +36,8 @@ local raceMetatable = {
 local RaceID = { Unknown = 0 } -- Populated in AddRace
 private.RaceID = RaceID
 
-local AechaeologyRaceLabelFromID = {} -- Populated in AddRace
-private.AechaeologyRaceLabelFromID = AechaeologyRaceLabelFromID
+local ArchaeologyRaceLabelFromID = {} -- Populated in AddRace
+private.ArchaeologyRaceLabelFromID = ArchaeologyRaceLabelFromID
 
 -- Populated in InitializeRaces
 local CurrencyNameFromRaceID = {
@@ -115,7 +115,7 @@ function private.AddRace(raceID)
 	local keystoneName, _, _, _, _, _, _, _, _, keystoneTexture, _ = _G.GetItemInfo(keystoneItemID)
 
 	RaceID[raceLabel] = raceID
-	AechaeologyRaceLabelFromID[raceID] = raceLabel
+	ArchaeologyRaceLabelFromID[raceID] = raceLabel
 
 	local race = _G.setmetatable({
 		Artifacts = {},
