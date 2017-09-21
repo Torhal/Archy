@@ -2150,7 +2150,7 @@ function private.InitializeDigsiteTemplates()
 			mapID = 1033,
 			typeID = RaceID.ArchRaceHighborneNightElves,
 		},
-		["8:0.308156:0.555317"] = {
+		["8:0.307094:0.555477"] = {
 			-- Digsite: Nor'Danil Wellspring
 			blobID = 354049,
 			mapID = 1015,
