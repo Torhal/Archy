@@ -349,7 +349,6 @@ Dialog:Register("ArchyConfirmSolve", {
 			text = _G.NO,
 		},
 	},
-	sound = "levelup2",
 	show_while_dead = false,
 	hide_on_escape = true,
 })
