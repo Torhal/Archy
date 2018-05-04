@@ -671,8 +671,7 @@ function Archy:OnInitialize()
 
 		EasySurveyButton = surveyButton
 
-		local DOUBLECLICK_MAX_SECONDS = 0.2
-		local DOUBLECLICK_MIN_SECONDS = 0.04
+		local DOUBLECLICK_SECONDS = 0.4
 
 		local previousClickTime
 
@@ -682,7 +681,7 @@ function Archy:OnInitialize()
 				if _G.GetNumLootItems() == 0 and previousClickTime then
 					local doubleClickTime = _G.GetTime() - previousClickTime
 
-					if doubleClickTime < DOUBLECLICK_MAX_SECONDS and doubleClickTime > DOUBLECLICK_MIN_SECONDS then
+					if doubleClickTime < DOUBLECLICK_SECONDS then
 						previousClickTime = nil
 
 						if not IsTaintable() then
